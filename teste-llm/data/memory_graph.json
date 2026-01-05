@@ -1,0 +1,925 @@
+{
+  "entities": {
+    "dde37aca-f516-482c-a8ef-9228112f3119": {
+      "id": "dde37aca-f516-482c-a8ef-9228112f3119",
+      "type": "person",
+      "name": "user",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T13:31:26.905410",
+      "updated_at": "2026-01-05T13:38:01.797104",
+      "access_count": 2,
+      "last_accessed": "2026-01-05T13:38:01.797100"
+    },
+    "1daeb255-5729-4dab-88d1-c2aa6d010973": {
+      "id": "1daeb255-5729-4dab-88d1-c2aa6d010973",
+      "type": "person",
+      "name": "Jhony",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T13:39:10.535584",
+      "updated_at": "2026-01-05T14:07:01.991424",
+      "access_count": 22,
+      "last_accessed": "2026-01-05T14:07:01.991422"
+    },
+    "65863005-e4cb-4c0a-8772-4c5e63596473": {
+      "id": "65863005-e4cb-4c0a-8772-4c5e63596473",
+      "type": "project",
+      "name": "Cortex",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.297245",
+      "updated_at": "2026-01-05T14:07:01.985101",
+      "access_count": 4,
+      "last_accessed": "2026-01-05T14:07:01.985098"
+    },
+    "66dbd532-ab3e-4557-8d81-787f4fb3712b": {
+      "id": "66dbd532-ab3e-4557-8d81-787f4fb3712b",
+      "type": "concept",
+      "name": "Mem\u00f3ria Cognitiva",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.297886",
+      "updated_at": "2026-01-05T14:07:01.917362",
+      "access_count": 1,
+      "last_accessed": "2026-01-05T14:07:01.917361"
+    },
+    "3a683576-d163-4adc-b3f9-7efa6151dfa8": {
+      "id": "3a683576-d163-4adc-b3f9-7efa6151dfa8",
+      "type": "concept",
+      "name": "Entity-Episode-Relation",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.300352",
+      "updated_at": "2026-01-05T14:07:01.934074",
+      "access_count": 1,
+      "last_accessed": "2026-01-05T14:07:01.934073"
+    },
+    "f1fe7f06-7a30-4a39-b021-c065c9a15eb1": {
+      "id": "f1fe7f06-7a30-4a39-b021-c065c9a15eb1",
+      "type": "concept",
+      "name": "Grafo de Mem\u00f3ria",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.301037",
+      "updated_at": "2026-01-05T14:07:01.985108",
+      "access_count": 2,
+      "last_accessed": "2026-01-05T14:07:01.985108"
+    },
+    "b35f1611-c76a-48e8-b95c-d4a32f3306cd": {
+      "id": "b35f1611-c76a-48e8-b95c-d4a32f3306cd",
+      "type": "file",
+      "name": "memory_graph.py",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.303892",
+      "updated_at": "2026-01-05T14:07:01.938294",
+      "access_count": 1,
+      "last_accessed": "2026-01-05T14:07:01.938293"
+    },
+    "76c9e81e-dcd2-4cd6-a8ec-192b6901ae5f": {
+      "id": "76c9e81e-dcd2-4cd6-a8ec-192b6901ae5f",
+      "type": "file",
+      "name": "entity.py",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.304656",
+      "updated_at": "2026-01-05T14:07:01.938302",
+      "access_count": 1,
+      "last_accessed": "2026-01-05T14:07:01.938301"
+    },
+    "facbc44d-47c7-414c-bcfa-18826f7d3181": {
+      "id": "facbc44d-47c7-414c-bcfa-18826f7d3181",
+      "type": "error",
+      "name": "MCP Persistence Bug",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.308439",
+      "updated_at": "2026-01-05T14:07:01.945084",
+      "access_count": 3,
+      "last_accessed": "2026-01-05T14:07:01.945083"
+    },
+    "4d160675-8071-43b1-9a12-f862ea24126c": {
+      "id": "4d160675-8071-43b1-9a12-f862ea24126c",
+      "type": "file",
+      "name": "agent_with_mcp.py",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.309366",
+      "updated_at": "2026-01-05T14:07:01.942490",
+      "access_count": 1,
+      "last_accessed": "2026-01-05T14:07:01.942489"
+    },
+    "7f7e4a9f-29b8-4896-9e01-a630255de8bb": {
+      "id": "7f7e4a9f-29b8-4896-9e01-a630255de8bb",
+      "type": "person",
+      "name": "Usu\u00e1rio Teste",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:06:34.320643",
+      "updated_at": "2026-01-05T14:07:01.964773",
+      "access_count": 9,
+      "last_accessed": "2026-01-05T14:07:01.964771"
+    },
+    "47d079ee-4eeb-4494-89d2-8534f3506106": {
+      "id": "47d079ee-4eeb-4494-89d2-8534f3506106",
+      "type": "concept",
+      "name": "Machine Learning",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:07:01.966577",
+      "updated_at": "2026-01-05T14:07:01.998265",
+      "access_count": 1,
+      "last_accessed": "2026-01-05T14:07:01.998262"
+    },
+    "36ca91b8-2402-4048-9cf8-4416c2f24cc0": {
+      "id": "36ca91b8-2402-4048-9cf8-4416c2f24cc0",
+      "type": "concept",
+      "name": "Deep Learning",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:07:01.968158",
+      "updated_at": "2026-01-05T14:07:01.968160",
+      "access_count": 0,
+      "last_accessed": null
+    },
+    "3a23a287-4775-422a-987e-f14e3e26fae3": {
+      "id": "3a23a287-4775-422a-987e-f14e3e26fae3",
+      "type": "concept",
+      "name": "Neural Networks",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:07:01.969884",
+      "updated_at": "2026-01-05T14:07:01.985115",
+      "access_count": 1,
+      "last_accessed": "2026-01-05T14:07:01.985115"
+    },
+    "f519e84c-4c96-4097-a656-7ae6baf1d0c8": {
+      "id": "f519e84c-4c96-4097-a656-7ae6baf1d0c8",
+      "type": "concept",
+      "name": "Transformers",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:07:01.971728",
+      "updated_at": "2026-01-05T14:07:01.971731",
+      "access_count": 0,
+      "last_accessed": null
+    },
+    "55b8608a-5d14-4ac2-8dc5-a040d26c8a78": {
+      "id": "55b8608a-5d14-4ac2-8dc5-a040d26c8a78",
+      "type": "concept",
+      "name": "Attention Mechanism",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:07:01.973529",
+      "updated_at": "2026-01-05T14:07:01.973531",
+      "access_count": 0,
+      "last_accessed": null
+    },
+    "990a6fc4-10ba-4d89-8e2c-157c9d7b215a": {
+      "id": "990a6fc4-10ba-4d89-8e2c-157c9d7b215a",
+      "type": "person",
+      "name": "Estudante",
+      "identifiers": [],
+      "attributes": {},
+      "created_at": "2026-01-05T14:12:44.035875",
+      "updated_at": "2026-01-05T14:12:48.768597",
+      "access_count": 3,
+      "last_accessed": "2026-01-05T14:12:48.768594"
+    }
+  },
+  "episodes": {
+    "0df10021-eea8-413b-a09f-10550ebcc37f": {
+      "id": "0df10021-eea8-413b-a09f-10550ebcc37f",
+      "timestamp": "2026-01-05T13:31:26.905981",
+      "action": "conversed_about: ol\u00e1, meu nome \u00e9 Jhony",
+      "participants": [
+        "dde37aca-f516-482c-a8ef-9228112f3119"
+      ],
+      "context": "",
+      "outcome": "Ol\u00e1 Jhony! Prazer em conhec\u00ea-lo. \ud83d\ude0a \n\nComo posso ajud\u00e1-lo hoje?",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "000695fa-8909-4788-b1ac-5b81072b8f44": {
+      "id": "000695fa-8909-4788-b1ac-5b81072b8f44",
+      "timestamp": "2026-01-05T13:35:39.767007",
+      "action": "conversed_about: Meu nome \u00e9 Jhony e eu trabalho com IA",
+      "participants": [
+        "dde37aca-f516-482c-a8ef-9228112f3119"
+      ],
+      "context": "",
+      "outcome": "Ol\u00e1 Jhony! \u00c9 um prazer conhec\u00ea-lo. Que interessante voc\u00ea trabalhar com IA - \u00e9 um campo fascinante e ",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.521247487661387,
+      "metadata": {}
+    },
+    "c7495948-3b04-4b9f-97bb-a5087a1186cc": {
+      "id": "c7495948-3b04-4b9f-97bb-a5087a1186cc",
+      "timestamp": "2026-01-05T13:38:01.797163",
+      "action": "conversed_about: Ol\u00e1, lembra de mim? Sou o Jhony que trabalha com I",
+      "participants": [
+        "dde37aca-f516-482c-a8ef-9228112f3119"
+      ],
+      "context": "",
+      "outcome": "Ol\u00e1 Jhony! Claro que me lembro! \ud83d\ude0a  \nVoc\u00ea \u00e9 quem trabalha com IA \u2013 um campo super interessante. Como ",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "5c1e3d7c-7110-4259-b795-1be1b3ecb2d2": {
+      "id": "5c1e3d7c-7110-4259-b795-1be1b3ecb2d2",
+      "timestamp": "2026-01-05T13:39:10.537087",
+      "action": "conversed_about: Este \u00e9 um teste de persist\u00eancia",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": ", I usu\u00e1rios e senhores t\u00eam seu prompt comp\u00f5e dois casos.\",\"title\":\"metadata\":{\"count\":7,\"installmen",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "b1e45271-17db-4a9d-b058-cf90e18e8d28": {
+      "id": "b1e45271-17db-4a9d-b058-cf90e18e8d28",
+      "timestamp": "2026-01-05T13:42:31.852719",
+      "action": "conversed_about: Teste de debug do MCP",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Parece que voc\u00ea est\u00e1 testando o sistema de debug do MCP (Model Context Protocol). Como seu assistent",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "d0e4b405-7ccf-4916-8d18-b5ffd0e8bd48": {
+      "id": "d0e4b405-7ccf-4916-8d18-b5ffd0e8bd48",
+      "timestamp": "2026-01-05T14:06:34.298437",
+      "action": "created_project",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "65863005-e4cb-4c0a-8772-4c5e63596473",
+        "66dbd532-ab3e-4557-8d81-787f4fb3712b"
+      ],
+      "context": "Janeiro 2026, in\u00edcio do desenvolvimento",
+      "outcome": "Criou projeto Cortex - sistema de mem\u00f3ria cognitiva para LLMs",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "aedb7baa-b1f5-4a73-9c51-7fd7134eb85d": {
+      "id": "aedb7baa-b1f5-4a73-9c51-7fd7134eb85d",
+      "timestamp": "2026-01-05T14:06:34.301677",
+      "action": "designed_architecture",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "65863005-e4cb-4c0a-8772-4c5e63596473",
+        "3a683576-d163-4adc-b3f9-7efa6151dfa8",
+        "f1fe7f06-7a30-4a39-b021-c065c9a15eb1"
+      ],
+      "context": "Discuss\u00e3o sobre estrutura do projeto",
+      "outcome": "Definiu arquitetura em 3 camadas: Core, Services, API/MCP",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "6d20b800-2200-4f00-bcb2-fed004729489": {
+      "id": "6d20b800-2200-4f00-bcb2-fed004729489",
+      "timestamp": "2026-01-05T14:06:34.305496",
+      "action": "implemented_core",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "b35f1611-c76a-48e8-b95c-d4a32f3306cd",
+        "76c9e81e-dcd2-4cd6-a8ec-192b6901ae5f"
+      ],
+      "context": "",
+      "outcome": "Implementou Entity, Episode, Relation e MemoryGraph",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "37dbb179-89d1-45ca-b3dc-f40adf5c5e1d": {
+      "id": "37dbb179-89d1-45ca-b3dc-f40adf5c5e1d",
+      "timestamp": "2026-01-05T14:06:34.310378",
+      "action": "found_bug",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "facbc44d-47c7-414c-bcfa-18826f7d3181",
+        "4d160675-8071-43b1-9a12-f862ea24126c"
+      ],
+      "context": "Debug de persist\u00eancia",
+      "outcome": "Descobriu que MCP n\u00e3o estava persistindo - env PATH n\u00e3o herdado",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "47615204-6e2f-4faa-8a85-33b37643dd4d": {
+      "id": "47615204-6e2f-4faa-8a85-33b37643dd4d",
+      "timestamp": "2026-01-05T14:06:34.312463",
+      "action": "resolved_bug",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "facbc44d-47c7-414c-bcfa-18826f7d3181"
+      ],
+      "context": "",
+      "outcome": "Corrigiu herdando env completo com os.environ.copy()",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "e41d3674-0eaf-47a7-adca-cbdf640df483": {
+      "id": "e41d3674-0eaf-47a7-adca-cbdf640df483",
+      "timestamp": "2026-01-05T14:06:34.314630",
+      "action": "conversed_about: Ol\u00e1, meu nome \u00e9 Jhony",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Prazer em conhec\u00ea-lo!",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "dc30b83f-07f9-4f64-a7ba-88ab022a22ac": {
+      "id": "dc30b83f-07f9-4f64-a7ba-88ab022a22ac",
+      "timestamp": "2026-01-05T14:06:34.315779",
+      "action": "conversed_about: Trabalho com IA e machine learning",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Interessante \u00e1rea!",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "3dbfe856-ccf2-405d-9a4f-9504a5445a6c": {
+      "id": "3dbfe856-ccf2-405d-9a4f-9504a5445a6c",
+      "timestamp": "2026-01-05T14:06:34.316937",
+      "action": "conversed_about: Estou desenvolvendo um sistema de mem\u00f3ri",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Parece um projeto fascinante",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "ac039f60-451c-4040-a117-0722b7a1142e": {
+      "id": "ac039f60-451c-4040-a117-0722b7a1142e",
+      "timestamp": "2026-01-05T14:06:34.318114",
+      "action": "conversed_about: Uso Python e FastMCP",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "\u00d3timas escolhas tecnol\u00f3gicas",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.9320653479069899,
+      "metadata": {}
+    },
+    "5484b5ac-3bb3-4b0e-9abf-8eb826507393": {
+      "id": "5484b5ac-3bb3-4b0e-9abf-8eb826507393",
+      "timestamp": "2026-01-05T14:06:34.319392",
+      "action": "conversed_about: O projeto se chama Cortex",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Nome muito apropriado para mem\u00f3ria",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "9bc1c749-d7e2-42b4-928d-f27b435771d3": {
+      "id": "9bc1c749-d7e2-42b4-928d-f27b435771d3",
+      "timestamp": "2026-01-05T14:06:34.321823",
+      "action": "asked_about_weather",
+      "participants": [
+        "7f7e4a9f-29b8-4896-9e01-a630255de8bb"
+      ],
+      "context": "",
+      "outcome": "Informou previs\u00e3o do tempo #1",
+      "occurrence_count": 7,
+      "consolidated_from": [
+        "e45d6f2e-6c82-4f53-99fd-1eac661ef314",
+        "1587cb7a-bab2-4d1f-8c27-3df610db907f",
+        "6e2a78c2-5446-41bb-9282-896721ed39f4",
+        "509bb3a1-7bda-4f39-b534-e7004ef849ec",
+        "57d81977-3cee-40a1-9c28-063fff38d1d8",
+        "831f97bc-6e71-431a-b17f-560af16b131f"
+      ],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "6591ba38-4964-42b4-94be-4b0cfdbac2d8": {
+      "id": "6591ba38-4964-42b4-94be-4b0cfdbac2d8",
+      "timestamp": "2026-01-05T14:06:34.323468",
+      "action": "asked_about_weather",
+      "participants": [
+        "7f7e4a9f-29b8-4896-9e01-a630255de8bb"
+      ],
+      "context": "",
+      "outcome": "Informou previs\u00e3o do tempo #2",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "ebab5e40-f3a9-46eb-9335-2bd97962b46b": {
+      "id": "ebab5e40-f3a9-46eb-9335-2bd97962b46b",
+      "timestamp": "2026-01-05T14:06:34.324811",
+      "action": "asked_about_weather",
+      "participants": [
+        "7f7e4a9f-29b8-4896-9e01-a630255de8bb"
+      ],
+      "context": "",
+      "outcome": "Informou previs\u00e3o do tempo #3",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "c0f7ff31-6285-4c09-92a0-a00a669d8dc9": {
+      "id": "c0f7ff31-6285-4c09-92a0-a00a669d8dc9",
+      "timestamp": "2026-01-05T14:06:34.326231",
+      "action": "asked_about_weather",
+      "participants": [
+        "7f7e4a9f-29b8-4896-9e01-a630255de8bb"
+      ],
+      "context": "",
+      "outcome": "Informou previs\u00e3o do tempo #4",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "d29579f2-ff8b-4626-91f4-440f82d5dba7": {
+      "id": "d29579f2-ff8b-4626-91f4-440f82d5dba7",
+      "timestamp": "2026-01-05T14:07:01.917394",
+      "action": "created_project",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "65863005-e4cb-4c0a-8772-4c5e63596473",
+        "66dbd532-ab3e-4557-8d81-787f4fb3712b"
+      ],
+      "context": "Janeiro 2026, in\u00edcio do desenvolvimento",
+      "outcome": "Criou projeto Cortex - sistema de mem\u00f3ria cognitiva para LLMs",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "bfc5082d-f11d-4f9e-b8f9-21c997484861": {
+      "id": "bfc5082d-f11d-4f9e-b8f9-21c997484861",
+      "timestamp": "2026-01-05T14:07:01.934111",
+      "action": "designed_architecture",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "65863005-e4cb-4c0a-8772-4c5e63596473",
+        "3a683576-d163-4adc-b3f9-7efa6151dfa8",
+        "f1fe7f06-7a30-4a39-b021-c065c9a15eb1"
+      ],
+      "context": "Discuss\u00e3o sobre estrutura do projeto",
+      "outcome": "Definiu arquitetura em 3 camadas: Core, Services, API/MCP",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "4f186878-9b0c-4d7c-8f5e-efc2370b9c93": {
+      "id": "4f186878-9b0c-4d7c-8f5e-efc2370b9c93",
+      "timestamp": "2026-01-05T14:07:01.938334",
+      "action": "implemented_core",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "b35f1611-c76a-48e8-b95c-d4a32f3306cd",
+        "76c9e81e-dcd2-4cd6-a8ec-192b6901ae5f"
+      ],
+      "context": "",
+      "outcome": "Implementou Entity, Episode, Relation e MemoryGraph",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "92e757b2-ff97-44fe-b94b-e6f107370f2a": {
+      "id": "92e757b2-ff97-44fe-b94b-e6f107370f2a",
+      "timestamp": "2026-01-05T14:07:01.942519",
+      "action": "found_bug",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "facbc44d-47c7-414c-bcfa-18826f7d3181",
+        "4d160675-8071-43b1-9a12-f862ea24126c"
+      ],
+      "context": "Debug de persist\u00eancia",
+      "outcome": "Descobriu que MCP n\u00e3o estava persistindo - env PATH n\u00e3o herdado",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "b731fab2-0472-4ad6-bc85-7d587b40dcb1": {
+      "id": "b731fab2-0472-4ad6-bc85-7d587b40dcb1",
+      "timestamp": "2026-01-05T14:07:01.945114",
+      "action": "resolved_bug",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973",
+        "facbc44d-47c7-414c-bcfa-18826f7d3181"
+      ],
+      "context": "",
+      "outcome": "Corrigiu herdando env completo com os.environ.copy()",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "9b9bd240-8f99-413f-81b6-cdee8d07f5c8": {
+      "id": "9b9bd240-8f99-413f-81b6-cdee8d07f5c8",
+      "timestamp": "2026-01-05T14:07:01.948032",
+      "action": "conversed_about: Ol\u00e1, meu nome \u00e9 Jhony",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Prazer em conhec\u00ea-lo!",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "1a392bd6-eea4-45cd-8ad2-03b8fa66162b": {
+      "id": "1a392bd6-eea4-45cd-8ad2-03b8fa66162b",
+      "timestamp": "2026-01-05T14:07:01.949521",
+      "action": "conversed_about: Trabalho com IA e machine learning",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Interessante \u00e1rea!",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "940fb9a7-8764-43e2-8264-0f5195e5bab5": {
+      "id": "940fb9a7-8764-43e2-8264-0f5195e5bab5",
+      "timestamp": "2026-01-05T14:07:01.950983",
+      "action": "conversed_about: Estou desenvolvendo um sistema de mem\u00f3ri",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Parece um projeto fascinante",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "e06caf01-0fce-4064-b6ff-bf9507c34b38": {
+      "id": "e06caf01-0fce-4064-b6ff-bf9507c34b38",
+      "timestamp": "2026-01-05T14:07:01.952446",
+      "action": "conversed_about: Uso Python e FastMCP",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "\u00d3timas escolhas tecnol\u00f3gicas",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.9320653479069899,
+      "metadata": {}
+    },
+    "c509429d-1b77-4649-a4da-294c3769ce42": {
+      "id": "c509429d-1b77-4649-a4da-294c3769ce42",
+      "timestamp": "2026-01-05T14:07:01.954183",
+      "action": "conversed_about: O projeto se chama Cortex",
+      "participants": [
+        "1daeb255-5729-4dab-88d1-c2aa6d010973"
+      ],
+      "context": "",
+      "outcome": "Nome muito apropriado para mem\u00f3ria",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "6dd541c7-9d33-4e4d-b93a-db424bd2f18a": {
+      "id": "6dd541c7-9d33-4e4d-b93a-db424bd2f18a",
+      "timestamp": "2026-01-05T14:07:01.975338",
+      "action": "learned_ml_concepts",
+      "participants": [
+        "47d079ee-4eeb-4494-89d2-8534f3506106",
+        "36ca91b8-2402-4048-9cf8-4416c2f24cc0",
+        "3a23a287-4775-422a-987e-f14e3e26fae3",
+        "f519e84c-4c96-4097-a656-7ae6baf1d0c8",
+        "55b8608a-5d14-4ac2-8dc5-a040d26c8a78"
+      ],
+      "context": "",
+      "outcome": "Estudou conceitos fundamentais de ML",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.47781019702293787,
+      "metadata": {}
+    },
+    "102e22aa-49a9-460d-9994-76558bad37f8": {
+      "id": "102e22aa-49a9-460d-9994-76558bad37f8",
+      "timestamp": "2026-01-05T14:07:01.985137",
+      "action": "applied_concepts",
+      "participants": [
+        "65863005-e4cb-4c0a-8772-4c5e63596473",
+        "f1fe7f06-7a30-4a39-b021-c065c9a15eb1",
+        "3a23a287-4775-422a-987e-f14e3e26fae3"
+      ],
+      "context": "",
+      "outcome": "Aplicou conceitos de ML no Cortex",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "7efdf739-879c-4d6b-adb8-c49567b96590": {
+      "id": "7efdf739-879c-4d6b-adb8-c49567b96590",
+      "timestamp": "2026-01-05T14:12:44.037563",
+      "action": "learned_python",
+      "participants": [
+        "990a6fc4-10ba-4d89-8e2c-157c9d7b215a"
+      ],
+      "context": "",
+      "outcome": "Aprendeu Python b\u00e1sico",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.9320653479069899,
+      "metadata": {}
+    },
+    "e0198fb2-abff-44d9-b390-0e0a466e251a": {
+      "id": "e0198fb2-abff-44d9-b390-0e0a466e251a",
+      "timestamp": "2026-01-05T14:12:44.039276",
+      "action": "learned_javascript",
+      "participants": [
+        "990a6fc4-10ba-4d89-8e2c-157c9d7b215a"
+      ],
+      "context": "",
+      "outcome": "Aprendeu JavaScript",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.43437290638448905,
+      "metadata": {}
+    },
+    "75840244-226e-45e0-8b0a-1b6225071f37": {
+      "id": "75840244-226e-45e0-8b0a-1b6225071f37",
+      "timestamp": "2026-01-05T14:12:48.765534",
+      "action": "learned_python",
+      "participants": [
+        "990a6fc4-10ba-4d89-8e2c-157c9d7b215a"
+      ],
+      "context": "",
+      "outcome": "Aprendeu Python b\u00e1sico",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.46603267395349496,
+      "metadata": {}
+    },
+    "b4b71467-ffea-4aaa-aa62-be318d614063": {
+      "id": "b4b71467-ffea-4aaa-aa62-be318d614063",
+      "timestamp": "2026-01-05T14:12:48.768648",
+      "action": "learned_javascript",
+      "participants": [
+        "990a6fc4-10ba-4d89-8e2c-157c9d7b215a"
+      ],
+      "context": "",
+      "outcome": "Aprendeu JavaScript",
+      "occurrence_count": 1,
+      "consolidated_from": [],
+      "importance": 0.46603267395349496,
+      "metadata": {}
+    }
+  },
+  "relations": {
+    "b9b106f9-d95e-49ba-8e60-c4c8441ec9c8": {
+      "id": "b9b106f9-d95e-49ba-8e60-c4c8441ec9c8",
+      "from_id": "1daeb255-5729-4dab-88d1-c2aa6d010973",
+      "relation_type": "created",
+      "to_id": "65863005-e4cb-4c0a-8772-4c5e63596473",
+      "strength": 0.521247487661387,
+      "context": {},
+      "created_at": "2026-01-05T14:06:34.299043",
+      "updated_at": "2026-01-05T14:12:48.807649",
+      "reinforced_count": 1
+    },
+    "44aeba1b-0b7d-40a8-a74f-7652adb5d96d": {
+      "id": "44aeba1b-0b7d-40a8-a74f-7652adb5d96d",
+      "from_id": "65863005-e4cb-4c0a-8772-4c5e63596473",
+      "relation_type": "implements",
+      "to_id": "66dbd532-ab3e-4557-8d81-787f4fb3712b",
+      "strength": 0.521247487661387,
+      "context": {},
+      "created_at": "2026-01-05T14:06:34.299631",
+      "updated_at": "2026-01-05T14:12:48.807653",
+      "reinforced_count": 1
+    },
+    "29322025-0e9f-4d82-a109-9d88b056d9af": {
+      "id": "29322025-0e9f-4d82-a109-9d88b056d9af",
+      "from_id": "65863005-e4cb-4c0a-8772-4c5e63596473",
+      "relation_type": "uses",
+      "to_id": "3a683576-d163-4adc-b3f9-7efa6151dfa8",
+      "strength": 0.521247487661387,
+      "context": {},
+      "created_at": "2026-01-05T14:06:34.302356",
+      "updated_at": "2026-01-05T14:12:48.807654",
+      "reinforced_count": 1
+    },
+    "96017004-2417-4ca0-8b72-56317a2daab1": {
+      "id": "96017004-2417-4ca0-8b72-56317a2daab1",
+      "from_id": "65863005-e4cb-4c0a-8772-4c5e63596473",
+      "relation_type": "based_on",
+      "to_id": "f1fe7f06-7a30-4a39-b021-c065c9a15eb1",
+      "strength": 0.521247487661387,
+      "context": {},
+      "created_at": "2026-01-05T14:06:34.303062",
+      "updated_at": "2026-01-05T14:12:48.807655",
+      "reinforced_count": 1
+    },
+    "30b6a82c-6c5d-4712-a539-47d87b04e86f": {
+      "id": "30b6a82c-6c5d-4712-a539-47d87b04e86f",
+      "from_id": "1daeb255-5729-4dab-88d1-c2aa6d010973",
+      "relation_type": "coded",
+      "to_id": "b35f1611-c76a-48e8-b95c-d4a32f3306cd",
+      "strength": 0.521247487661387,
+      "context": {},
+      "created_at": "2026-01-05T14:06:34.306501",
+      "updated_at": "2026-01-05T14:12:48.807656",
+      "reinforced_count": 1
+    },
+    "1cf0b75b-d1ee-43b2-808c-d1cc01b25327": {
+      "id": "1cf0b75b-d1ee-43b2-808c-d1cc01b25327",
+      "from_id": "b35f1611-c76a-48e8-b95c-d4a32f3306cd",
+      "relation_type": "depends_on",
+      "to_id": "76c9e81e-dcd2-4cd6-a8ec-192b6901ae5f",
+      "strength": 0.521247487661387,
+      "context": {},
+      "created_at": "2026-01-05T14:06:34.307435",
+      "updated_at": "2026-01-05T14:12:48.807657",
+      "reinforced_count": 1
+    },
+    "aee3b49b-441f-4dc5-a39f-c8b57ed8858d": {
+      "id": "aee3b49b-441f-4dc5-a39f-c8b57ed8858d",
+      "from_id": "facbc44d-47c7-414c-bcfa-18826f7d3181",
+      "relation_type": "found_in",
+      "to_id": "4d160675-8071-43b1-9a12-f862ea24126c",
+      "strength": 0.521247487661387,
+      "context": {},
+      "created_at": "2026-01-05T14:06:34.311386",
+      "updated_at": "2026-01-05T14:12:48.807658",
+      "reinforced_count": 1
+    },
+    "7bf44b8a-8299-434a-8ec3-8a42bc9d8a3e": {
+      "id": "7bf44b8a-8299-434a-8ec3-8a42bc9d8a3e",
+      "from_id": "1daeb255-5729-4dab-88d1-c2aa6d010973",
+      "relation_type": "fixed",
+      "to_id": "facbc44d-47c7-414c-bcfa-18826f7d3181",
+      "strength": 0.521247487661387,
+      "context": {},
+      "created_at": "2026-01-05T14:06:34.313481",
+      "updated_at": "2026-01-05T14:12:48.807659",
+      "reinforced_count": 1
+    },
+    "e8e6eb9a-0cad-4aae-a30d-17bc2e1df313": {
+      "id": "e8e6eb9a-0cad-4aae-a30d-17bc2e1df313",
+      "from_id": "36ca91b8-2402-4048-9cf8-4416c2f24cc0",
+      "relation_type": "is_subset_of",
+      "to_id": "47d079ee-4eeb-4494-89d2-8534f3506106",
+      "strength": 0.43437290638448905,
+      "context": {},
+      "created_at": "2026-01-05T14:07:01.977256",
+      "updated_at": "2026-01-05T14:12:48.807660",
+      "reinforced_count": 0
+    },
+    "203a17bf-7583-4db9-8589-a5b7e525da71": {
+      "id": "203a17bf-7583-4db9-8589-a5b7e525da71",
+      "from_id": "3a23a287-4775-422a-987e-f14e3e26fae3",
+      "relation_type": "enables",
+      "to_id": "36ca91b8-2402-4048-9cf8-4416c2f24cc0",
+      "strength": 0.43437290638448905,
+      "context": {},
+      "created_at": "2026-01-05T14:07:01.979143",
+      "updated_at": "2026-01-05T14:12:48.807661",
+      "reinforced_count": 0
+    },
+    "09c74a0d-e0b5-49bf-9178-a676fea9e263": {
+      "id": "09c74a0d-e0b5-49bf-9178-a676fea9e263",
+      "from_id": "f519e84c-4c96-4097-a656-7ae6baf1d0c8",
+      "relation_type": "uses",
+      "to_id": "55b8608a-5d14-4ac2-8dc5-a040d26c8a78",
+      "strength": 0.43437290638448905,
+      "context": {},
+      "created_at": "2026-01-05T14:07:01.981097",
+      "updated_at": "2026-01-05T14:12:48.807662",
+      "reinforced_count": 0
+    },
+    "3e3b4056-cb4b-4c8f-8657-5faeb283550f": {
+      "id": "3e3b4056-cb4b-4c8f-8657-5faeb283550f",
+      "from_id": "f519e84c-4c96-4097-a656-7ae6baf1d0c8",
+      "relation_type": "is_type_of",
+      "to_id": "3a23a287-4775-422a-987e-f14e3e26fae3",
+      "strength": 0.43437290638448905,
+      "context": {},
+      "created_at": "2026-01-05T14:07:01.983079",
+      "updated_at": "2026-01-05T14:12:48.807663",
+      "reinforced_count": 0
+    },
+    "c5b31afc-30ec-4a80-bdcd-3f466ea406ad": {
+      "id": "c5b31afc-30ec-4a80-bdcd-3f466ea406ad",
+      "from_id": "65863005-e4cb-4c0a-8772-4c5e63596473",
+      "relation_type": "inspired_by",
+      "to_id": "3a23a287-4775-422a-987e-f14e3e26fae3",
+      "strength": 0.43437290638448905,
+      "context": {},
+      "created_at": "2026-01-05T14:07:01.987116",
+      "updated_at": "2026-01-05T14:12:48.807664",
+      "reinforced_count": 0
+    },
+    "addc9c7c-c65c-44f5-9a20-ee239ff5d23e": {
+      "id": "addc9c7c-c65c-44f5-9a20-ee239ff5d23e",
+      "from_id": "f1fe7f06-7a30-4a39-b021-c065c9a15eb1",
+      "relation_type": "similar_to",
+      "to_id": "3a23a287-4775-422a-987e-f14e3e26fae3",
+      "strength": 0.43437290638448905,
+      "context": {},
+      "created_at": "2026-01-05T14:07:01.989102",
+      "updated_at": "2026-01-05T14:12:48.807665",
+      "reinforced_count": 0
+    },
+    "32cbb384-8192-4d6f-b003-5d991b0d357d": {
+      "id": "32cbb384-8192-4d6f-b003-5d991b0d357d",
+      "from_id": "990a6fc4-10ba-4d89-8e2c-157c9d7b215a",
+      "relation_type": "participated_in",
+      "to_id": "7efdf739-879c-4d6b-adb8-c49567b96590",
+      "strength": 0.8845756965534814,
+      "context": {
+        "auto_created": true
+      },
+      "created_at": "2026-01-05T14:12:44.037631",
+      "updated_at": "2026-01-05T14:12:48.807666",
+      "reinforced_count": 10
+    },
+    "e017ba69-abf3-479e-9d04-8476df77634e": {
+      "id": "e017ba69-abf3-479e-9d04-8476df77634e",
+      "from_id": "990a6fc4-10ba-4d89-8e2c-157c9d7b215a",
+      "relation_type": "participated_in",
+      "to_id": "e0198fb2-abff-44d9-b390-0e0a466e251a",
+      "strength": 0.43437290638448905,
+      "context": {
+        "auto_created": true
+      },
+      "created_at": "2026-01-05T14:12:44.039322",
+      "updated_at": "2026-01-05T14:12:48.807667",
+      "reinforced_count": 0
+    },
+    "4ea14e47-580d-4df1-92ad-542b9686b4e8": {
+      "id": "4ea14e47-580d-4df1-92ad-542b9686b4e8",
+      "from_id": "990a6fc4-10ba-4d89-8e2c-157c9d7b215a",
+      "relation_type": "participated_in",
+      "to_id": "75840244-226e-45e0-8b0a-1b6225071f37",
+      "strength": 0.46603267395349496,
+      "context": {
+        "auto_created": true
+      },
+      "created_at": "2026-01-05T14:12:48.765654",
+      "updated_at": "2026-01-05T14:12:48.807668",
+      "reinforced_count": 0
+    },
+    "b6c7c598-014c-446e-9ab7-3ad52e900a08": {
+      "id": "b6c7c598-014c-446e-9ab7-3ad52e900a08",
+      "from_id": "990a6fc4-10ba-4d89-8e2c-157c9d7b215a",
+      "relation_type": "participated_in",
+      "to_id": "b4b71467-ffea-4aaa-aa62-be318d614063",
+      "strength": 0.46603267395349496,
+      "context": {
+        "auto_created": true
+      },
+      "created_at": "2026-01-05T14:12:48.768737",
+      "updated_at": "2026-01-05T14:12:48.807670",
+      "reinforced_count": 0
+    }
+  },
+  "saved_at": "2026-01-05T14:12:48.807930"
+}

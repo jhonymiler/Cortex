@@ -50,7 +50,13 @@ pip install cortex-memory[api]
 pip install cortex-memory[all]
 
 # Desenvolvimento
+git clone https://github.com/seu-usuario/cortex.git
+cd cortex
 pip install -e ".[all,dev]"
+
+# Configure ambiente (opcional)
+cp .env.example .env
+# Edite .env com GOOGLE_API_KEY, CORTEX_DATA_DIR, etc.
 ```
 
 ---
@@ -187,13 +193,43 @@ ruff check src/
 ruff format src/
 ```
 
+### Agentes de Teste
+
+Dois agentes de teste disponíveis em [`teste-llm/`](teste-llm/):
+
+#### 1. Agente Google GenAI (agent.py) ⭐ PRINCIPAL
+- Google Gemini 2.0 com function calling automático
+- Cortex como tools nativas
+- Integração perfeita (Gemini decide quando usar memória)
+
+```bash
+cd teste-llm
+export GOOGLE_API_KEY=sua-chave
+python agent.py --interactive
+```
+
+#### 2. Agente CrewAI (crew_agent.py)
+- Framework CrewAI profissional
+- Ollama local como LLM customizado
+- Cortex via custom tools
+
+```bash
+cd teste-llm
+pip install -r requirements-crew.txt
+python crew_agent.py --interactive
+```
+
+Veja [teste-llm/README.md](teste-llm/README.md) para mais detalhes.
+
 ---
 
 ## 📖 Documentação
 
-- [Arquitetura](docs/ARCHITECTURE.md)
-- [API Reference](docs/API.md)
-- [MCP Integration](docs/MCP.md)
+- [Visão Geral](docs/VISION.md) - Filosofia e conceitos fundamentais
+- [Arquitetura](docs/ARCHITECTURE.md) - Estrutura e design
+- [API Reference](docs/API.md) - Endpoints REST
+- [MCP Integration](docs/MCP.md) - Integração Claude Desktop
+- [Environment](docs/ENVIRONMENT.md) - Configuração de variáveis de ambiente
 
 ---
 

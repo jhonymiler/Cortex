@@ -227,6 +227,10 @@ class MemoryGraph:
         
         # Adiciona normal
         self._episodes[episode.id] = episode
+        
+        # Cria relações automáticas episódio ↔ participantes
+        self._create_episode_relations(episode)
+        
         self._save()
         return episode
     
@@ -672,12 +676,8 @@ class MemoryGraph:
             if most_consolidated:
                 # Atualiza o consolidado
                 most_consolidated.occurrence_count += 1
-                most_consolidated.is_consolidated = True
-                most_consolidated.consolidation_level = most_consolidated.occurrence_count
                 
-                # Adiciona ID do novo como consolidado
-                if not most_consolidated.consolidated_from:
-                    most_consolidated.consolidated_from = []
+                # Adiciona ID do novo como consolidado (isso faz is_consolidated retornar True)
                 most_consolidated.consolidated_from.append(episode.id)
                 
                 # Salva
@@ -723,6 +723,363 @@ class MemoryGraph:
             "entities_by_type": entities_by_type,
         }
     
+    # ==================== GRAPH ANALYSIS ====================
+    
+    def get_node_weight(self, node_id: str) -> float:
+        """
+        Calcula o peso/importância de um nó baseado em conexões.
+        
+        Peso = (conexões de entrada * 0.6) + (conexões de saída * 0.4) + (força média * 0.5)
+        
+        Nós com mais conexões têm maior peso.
+        """
+        incoming = self.get_relations(to_id=node_id)
+        outgoing = self.get_relations(from_id=node_id)
+        
+        total_connections = len(incoming) + len(outgoing)
+        if total_connections == 0:
+            return 0.1  # Peso mínimo para nós isolados
+        
+        # Calcula força média das conexões
+        all_relations = incoming + outgoing
+        avg_strength = sum(r.strength for r in all_relations) / len(all_relations)
+        
+        # Peso final
+        weight = (len(incoming) * 0.6) + (len(outgoing) * 0.4) + (avg_strength * 0.5)
+        
+        # Normaliza para 0-1 (aproximado)
+        return min(1.0, weight / 10.0)
+    
+    def get_graph_data(self) -> dict[str, Any]:
+        """
+        Exporta dados do grafo para visualização.
+        
+        Retorna estrutura compatível com bibliotecas de visualização
+        (NetworkX, PyVis, D3.js, etc.)
+        """
+        nodes = []
+        edges = []
+        
+        # Adiciona entidades como nós
+        for entity in self._entities.values():
+            weight = self.get_node_weight(entity.id)
+            nodes.append({
+                "id": entity.id,
+                "label": entity.name,
+                "type": "entity",
+                "subtype": entity.type,
+                "weight": weight,
+                "size": 10 + (weight * 40),  # Tamanho proporcional ao peso
+                "color": self._get_node_color(entity.type),
+                "access_count": entity.access_count,
+                "created_at": entity.created_at.isoformat(),
+            })
+        
+        # Adiciona episódios como nós
+        for episode in self._episodes.values():
+            weight = self.get_node_weight(episode.id)
+            nodes.append({
+                "id": episode.id,
+                "label": episode.action[:30] + "..." if len(episode.action) > 30 else episode.action,
+                "type": "episode",
+                "subtype": "consolidated" if episode.is_consolidated else "normal",
+                "weight": weight,
+                "size": 8 + (weight * 30),
+                "color": "#FFD700" if episode.is_consolidated else "#90EE90",
+                "occurrence_count": episode.occurrence_count,
+                "outcome": episode.outcome[:100],
+                "created_at": episode.timestamp.isoformat(),
+            })
+        
+        # Adiciona relações como arestas
+        for relation in self._relations.values():
+            edges.append({
+                "id": relation.id,
+                "from": relation.from_id,
+                "to": relation.to_id,
+                "label": relation.relation_type,
+                "weight": relation.strength,
+                "width": 1 + (relation.strength * 5),  # Largura proporcional à força
+                "color": self._get_edge_color(relation.strength),
+                "reinforced_count": relation.reinforced_count,
+            })
+        
+        return {
+            "nodes": nodes,
+            "edges": edges,
+            "stats": self.stats(),
+        }
+    
+    def _get_node_color(self, entity_type: str) -> str:
+        """Retorna cor baseada no tipo de entidade."""
+        colors = {
+            "person": "#FF6B6B",
+            "user": "#FF6B6B",
+            "file": "#4ECDC4",
+            "concept": "#45B7D1",
+            "character": "#96CEB4",
+            "product": "#FFEAA7",
+            "project": "#DDA0DD",
+            "error": "#FF7675",
+            "task": "#74B9FF",
+        }
+        return colors.get(entity_type.lower(), "#95A5A6")
+    
+    def _get_edge_color(self, strength: float) -> str:
+        """Retorna cor baseada na força da relação."""
+        if strength >= 0.8:
+            return "#27AE60"  # Verde forte
+        elif strength >= 0.5:
+            return "#F39C12"  # Laranja
+        else:
+            return "#95A5A6"  # Cinza
+
+    # ==================== MEMORY DYNAMICS ====================
+    
+    def _create_episode_relations(self, episode: Episode) -> None:
+        """
+        Cria relações automáticas entre episódio e seus participantes.
+        
+        Isso conecta episódios às entidades, evitando "memórias soltas".
+        """
+        for participant_id in episode.participants:
+            if participant_id in self._entities:
+                # Relação: entidade "participated_in" episódio
+                relation = Relation(
+                    from_id=participant_id,
+                    relation_type="participated_in",
+                    to_id=episode.id,
+                    strength=0.5,
+                    context={"auto_created": True},
+                )
+                self._add_relation_internal(relation)
+    
+    def _add_relation_internal(self, relation: Relation) -> None:
+        """Adiciona relação sem salvar (para uso interno em batch)."""
+        existing = self._find_existing_relation(
+            relation.from_id, relation.relation_type, relation.to_id
+        )
+        if existing:
+            existing.reinforce(0.1)
+        else:
+            self._relations[relation.id] = relation
+            self._index_relation(relation)
+    
+    def apply_temporal_decay(self, hours_passed: float = 24.0) -> dict[str, int]:
+        """
+        Aplica decay temporal a todas as memórias.
+        
+        Deve ser chamado periodicamente (ex: a cada hora ou dia).
+        
+        Args:
+            hours_passed: Horas desde o último decay
+            
+        Returns:
+            Estatísticas do decay aplicado
+        """
+        decay_factor = 0.99 ** (hours_passed / 24)  # ~1% decay por dia
+        
+        stats = {
+            "entities_decayed": 0,
+            "episodes_decayed": 0,
+            "relations_decayed": 0,
+            "entities_forgotten": 0,
+            "episodes_forgotten": 0,
+            "relations_forgotten": 0,
+        }
+        
+        # Decay em episódios (importance)
+        episodes_to_remove = []
+        for episode in self._episodes.values():
+            episode.decay_importance(decay_factor)
+            stats["episodes_decayed"] += 1
+            
+            # Esquecimento: importance muito baixa + não consolidado
+            if episode.importance < 0.1 and not episode.is_consolidated:
+                episodes_to_remove.append(episode.id)
+        
+        # Decay em relações (strength)
+        relations_to_remove = []
+        for relation in self._relations.values():
+            relation.decay(decay_factor)
+            stats["relations_decayed"] += 1
+            
+            # Esquecimento: relação muito fraca
+            if relation.is_weak(0.05):
+                relations_to_remove.append(relation.id)
+        
+        # Remove memórias esquecidas
+        for eid in episodes_to_remove:
+            self._forget_episode(eid)
+            stats["episodes_forgotten"] += 1
+        
+        for rid in relations_to_remove:
+            self._forget_relation(rid)
+            stats["relations_forgotten"] += 1
+        
+        # Entidades órfãs (sem conexões) também podem ser esquecidas
+        orphan_entities = self._find_orphan_entities()
+        for entity_id in orphan_entities:
+            entity = self._entities.get(entity_id)
+            if entity and entity.access_count < 2:  # Pouco acessada + órfã
+                self._forget_entity(entity_id)
+                stats["entities_forgotten"] += 1
+        
+        self._save()
+        return stats
+    
+    def reinforce_on_recall(self, entity_ids: list[str], episode_ids: list[str]) -> None:
+        """
+        Reforça memórias que foram lembradas (recall).
+        
+        Memórias acessadas se fortalecem - uso real = maior importância.
+        """
+        # Reforça entidades
+        for eid in entity_ids:
+            entity = self._entities.get(eid)
+            if entity:
+                entity.touch()
+        
+        # Reforça episódios
+        for eid in episode_ids:
+            episode = self._episodes.get(eid)
+            if episode:
+                episode.boost_importance(0.05)
+        
+        # Reforça relações envolvidas
+        all_ids = set(entity_ids + episode_ids)
+        for relation in self._relations.values():
+            if relation.from_id in all_ids or relation.to_id in all_ids:
+                relation.reinforce(0.05)
+        
+        self._save()
+    
+    def _forget_episode(self, episode_id: str) -> None:
+        """Remove um episódio e suas relações."""
+        if episode_id in self._episodes:
+            del self._episodes[episode_id]
+        
+        # Remove relações conectadas
+        relations_to_remove = [
+            rid for rid, r in self._relations.items()
+            if r.from_id == episode_id or r.to_id == episode_id
+        ]
+        for rid in relations_to_remove:
+            self._forget_relation(rid)
+    
+    def _forget_relation(self, relation_id: str) -> None:
+        """Remove uma relação dos índices."""
+        relation = self._relations.pop(relation_id, None)
+        if relation:
+            # Remove dos índices
+            if relation.from_id in self._relations_by_from:
+                self._relations_by_from[relation.from_id] = [
+                    r for r in self._relations_by_from[relation.from_id] if r != relation_id
+                ]
+            if relation.to_id in self._relations_by_to:
+                self._relations_by_to[relation.to_id] = [
+                    r for r in self._relations_by_to[relation.to_id] if r != relation_id
+                ]
+    
+    def _forget_entity(self, entity_id: str) -> None:
+        """Remove uma entidade órfã."""
+        entity = self._entities.pop(entity_id, None)
+        if entity:
+            # Remove dos índices
+            name_key = entity.name.lower()
+            if name_key in self._entity_by_name:
+                self._entity_by_name[name_key] = [
+                    e for e in self._entity_by_name[name_key] if e != entity_id
+                ]
+            type_key = entity.type.lower()
+            if type_key in self._entity_by_type:
+                self._entity_by_type[type_key] = [
+                    e for e in self._entity_by_type[type_key] if e != entity_id
+                ]
+    
+    def _find_orphan_entities(self) -> list[str]:
+        """Encontra entidades sem nenhuma conexão."""
+        connected_ids = set()
+        
+        # IDs conectados via relações
+        for relation in self._relations.values():
+            connected_ids.add(relation.from_id)
+            connected_ids.add(relation.to_id)
+        
+        # IDs participantes de episódios
+        for episode in self._episodes.values():
+            connected_ids.update(episode.participants)
+        
+        # Entidades sem conexão
+        orphans = [
+            eid for eid in self._entities.keys()
+            if eid not in connected_ids
+        ]
+        
+        return orphans
+    
+    def get_memory_health(self) -> dict[str, Any]:
+        """
+        Retorna métricas de saúde da memória.
+        
+        Útil para debug e entender o estado do grafo.
+        """
+        orphan_entities = self._find_orphan_entities()
+        
+        # Episódios sem participantes
+        lonely_episodes = [
+            e for e in self._episodes.values()
+            if not e.participants
+        ]
+        
+        # Relações fracas
+        weak_relations = [
+            r for r in self._relations.values()
+            if r.strength < 0.2
+        ]
+        
+        # Importância média dos episódios
+        if self._episodes:
+            avg_importance = sum(e.importance for e in self._episodes.values()) / len(self._episodes)
+        else:
+            avg_importance = 0
+        
+        # Força média das relações
+        if self._relations:
+            avg_strength = sum(r.strength for r in self._relations.values()) / len(self._relations)
+        else:
+            avg_strength = 0
+        
+        return {
+            "total_entities": len(self._entities),
+            "total_episodes": len(self._episodes),
+            "total_relations": len(self._relations),
+            "orphan_entities": len(orphan_entities),
+            "lonely_episodes": len(lonely_episodes),
+            "weak_relations": len(weak_relations),
+            "avg_episode_importance": round(avg_importance, 3),
+            "avg_relation_strength": round(avg_strength, 3),
+            "health_score": self._calculate_health_score(
+                orphan_entities, lonely_episodes, weak_relations
+            ),
+        }
+    
+    def _calculate_health_score(
+        self,
+        orphan_entities: list[str],
+        lonely_episodes: list[Episode],
+        weak_relations: list[Relation],
+    ) -> float:
+        """Calcula um score de saúde do grafo (0-100)."""
+        total = len(self._entities) + len(self._episodes) + len(self._relations)
+        if total == 0:
+            return 100.0
+        
+        problems = len(orphan_entities) + len(lonely_episodes) + len(weak_relations)
+        health = max(0, 100 - (problems / total * 100))
+        
+        return round(health, 1)
+
     def __repr__(self) -> str:
         stats = self.stats()
         return (

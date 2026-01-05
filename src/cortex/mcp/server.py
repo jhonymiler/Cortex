@@ -24,6 +24,7 @@ Configuration (claude_desktop_config.json):
 """
 
 import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -42,8 +43,12 @@ def get_data_dir() -> Path:
     """Get the Cortex data directory from environment or default."""
     data_dir = os.environ.get("CORTEX_DATA_DIR")
     if data_dir:
-        return Path(data_dir)
-    return Path.home() / ".cortex"
+        path = Path(data_dir)
+        print(f"[cortex-mcp] Data dir from env: {path}", file=sys.stderr)
+        return path
+    default_path = Path.home() / ".cortex"
+    print(f"[cortex-mcp] Using default data dir: {default_path}", file=sys.stderr)
+    return default_path
 
 
 # Initialize MCP server
@@ -76,7 +81,10 @@ def get_service() -> MemoryService:
     """Get or create the memory service instance."""
     global _service
     if _service is None:
-        _service = MemoryService(storage_path=get_data_dir())
+        data_dir = get_data_dir()
+        print(f"[cortex-mcp] Creating MemoryService with path: {data_dir}", file=sys.stderr)
+        _service = MemoryService(storage_path=data_dir)
+        print(f"[cortex-mcp] Service created, graph has {len(_service.graph._entities)} entities", file=sys.stderr)
     return _service
 
 
@@ -187,7 +195,9 @@ def cortex_store(
         context=context,
         relations=parsed_relations,
     )
+    print(f"[cortex-mcp] Storing: action={action[:50]}, participants={len(parsed_participants)}", file=sys.stderr)
     response = service.store(request)
+    print(f"[cortex-mcp] Store result: success={response.success}, episode={response.episode_id[:8]}", file=sys.stderr)
     return response.model_dump()
 
 
@@ -208,6 +218,54 @@ def cortex_stats() -> dict[str, Any]:
     service = get_service()
     response = service.stats()
     return response.model_dump()
+
+
+@mcp.tool()
+def cortex_health() -> dict[str, Any]:
+    """
+    Get memory health metrics.
+    
+    Returns info about the quality of the memory graph:
+    - orphan_entities: Entities with no connections
+    - lonely_episodes: Episodes with no participants
+    - weak_relations: Relations with low strength
+    - avg_episode_importance: Average importance of memories
+    - avg_relation_strength: Average strength of connections
+    - health_score: Overall health 0-100
+    
+    Use this to understand if memories are well-connected.
+    """
+    service = get_service()
+    return service.get_health()
+
+
+@mcp.tool()
+def cortex_decay(hours_passed: float = 24.0) -> dict[str, Any]:
+    """
+    Apply temporal decay to memories.
+    
+    Simulates the passage of time - memories not used weaken.
+    Very weak memories are forgotten (removed).
+    
+    Args:
+        hours_passed: Hours of simulated time (default: 24 = 1 day)
+    
+    Returns:
+        Statistics about what was decayed/forgotten:
+        - episodes_decayed: Episodes that weakened
+        - relations_decayed: Relations that weakened
+        - episodes_forgotten: Episodes removed (too weak)
+        - relations_forgotten: Relations removed (too weak)
+        - entities_forgotten: Orphan entities removed
+    
+    Call this periodically to simulate natural forgetting.
+    Important memories (used often) will survive; trivial ones fade.
+    """
+    service = get_service()
+    print(f"[cortex-mcp] Applying decay for {hours_passed}h", file=sys.stderr)
+    result = service.apply_decay(hours_passed)
+    print(f"[cortex-mcp] Decay result: {result}", file=sys.stderr)
+    return result
 
 
 # ==================== MCP RESOURCES ====================

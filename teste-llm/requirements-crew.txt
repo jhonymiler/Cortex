@@ -1,0 +1,4 @@
+# Dependências para CrewAI Agent
+requests>=2.31.0
+crewai>=0.80.0
+crewai-tools>=0.10.0

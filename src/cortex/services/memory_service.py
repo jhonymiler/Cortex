@@ -199,12 +199,20 @@ class MemoryService:
         Recall relevant memories for a query.
         
         This is called BEFORE responding to the user to get context.
+        Memories that are recalled get reinforced (use = strength).
         """
         result = self.graph.recall(
             query=request.query,
             context=request.context,
             limit=request.limit,
         )
+        
+        # Reforça memórias que foram lembradas (uso real = fortalecimento)
+        if result.entities or result.episodes:
+            self.graph.reinforce_on_recall(
+                entity_ids=[e.id for e in result.entities],
+                episode_ids=[ep.id for ep in result.episodes],
+            )
         
         return RecallResponse(
             entities_found=len(result.entities),
@@ -245,6 +253,25 @@ class MemoryService:
             consolidated_episodes=raw_stats.get("consolidated_episodes", 0),
             storage_path=str(self.graph.storage_path) if self.graph.storage_path else None,
         )
+    
+    def apply_decay(self, hours_passed: float = 24.0) -> dict[str, Any]:
+        """
+        Apply temporal decay to all memories.
+        
+        Should be called periodically (e.g., hourly or daily).
+        Memories that aren't accessed will weaken over time.
+        Very weak memories are forgotten (removed).
+        """
+        return self.graph.apply_temporal_decay(hours_passed)
+    
+    def get_health(self) -> dict[str, Any]:
+        """
+        Get memory health metrics.
+        
+        Returns info about orphan entities, lonely episodes,
+        weak relations, and overall health score.
+        """
+        return self.graph.get_memory_health()
     
     def clear(self) -> dict[str, Any]:
         """Clear all memories. Use with caution!"""
