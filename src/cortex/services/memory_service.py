@@ -187,7 +187,7 @@ class MemoryService:
                     relation_type=rel_input.relation_type,
                     to_id=to_entity.id,
                 )
-                self.graph.add_relation(relation)
+                _, _ = self.graph.add_relation(relation)
                 relations_created += 1
         
         return StoreResponse(

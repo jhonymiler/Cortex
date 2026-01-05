@@ -619,7 +619,9 @@ def render_relations(graph: MemoryGraph):
                         to_id=to_node,
                         strength=strength,
                     )
-                    graph.add_relation(relation)
+                    result, resolution = graph.add_relation(relation)
+                    if resolution:
+                        st.info(f"Contradição detectada e resolvida: {resolution.action_taken}")
                     st.success("Relação criada!")
                     st.rerun()
             else:
