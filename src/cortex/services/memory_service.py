@@ -254,15 +254,18 @@ class MemoryService:
             storage_path=str(self.graph.storage_path) if self.graph.storage_path else None,
         )
     
-    def apply_decay(self, hours_passed: float = 24.0) -> dict[str, Any]:
+    def apply_manual_decay(self, decay_factor: float = 0.95) -> dict[str, Any]:
         """
-        Apply temporal decay to all memories.
+        Apply manual decay to all non-accessed memories.
         
-        Should be called periodically (e.g., hourly or daily).
-        Memories that aren't accessed will weaken over time.
-        Very weak memories are forgotten (removed).
+        Use this for testing or manual cleanup. In normal operation,
+        decay happens automatically during recall().
+        
+        Args:
+            decay_factor: How much to decay (0.95 = 5% loss)
         """
-        return self.graph.apply_temporal_decay(hours_passed)
+        # Decay everything (no IDs = nothing was accessed)
+        return self.graph.apply_access_decay([], [], decay_factor)
     
     def get_health(self) -> dict[str, Any]:
         """

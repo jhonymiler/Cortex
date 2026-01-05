@@ -240,15 +240,17 @@ def cortex_health() -> dict[str, Any]:
 
 
 @mcp.tool()
-def cortex_decay(hours_passed: float = 24.0) -> dict[str, Any]:
+def cortex_decay(decay_factor: float = 0.95) -> dict[str, Any]:
     """
-    Apply temporal decay to memories.
+    Apply manual decay to all memories.
     
-    Simulates the passage of time - memories not used weaken.
-    Very weak memories are forgotten (removed).
+    NOTE: In normal operation, decay happens AUTOMATICALLY during recall().
+    Memories that are accessed strengthen, others weaken.
+    
+    Use this tool only for manual cleanup or testing.
     
     Args:
-        hours_passed: Hours of simulated time (default: 24 = 1 day)
+        decay_factor: How much to decay (0.95 = 5% loss, 0.90 = 10% loss)
     
     Returns:
         Statistics about what was decayed/forgotten:
@@ -256,14 +258,12 @@ def cortex_decay(hours_passed: float = 24.0) -> dict[str, Any]:
         - relations_decayed: Relations that weakened
         - episodes_forgotten: Episodes removed (too weak)
         - relations_forgotten: Relations removed (too weak)
-        - entities_forgotten: Orphan entities removed
     
-    Call this periodically to simulate natural forgetting.
-    Important memories (used often) will survive; trivial ones fade.
+    The system naturally forgets unimportant memories over many accesses.
     """
     service = get_service()
-    print(f"[cortex-mcp] Applying decay for {hours_passed}h", file=sys.stderr)
-    result = service.apply_decay(hours_passed)
+    print(f"[cortex-mcp] Applying manual decay with factor {decay_factor}", file=sys.stderr)
+    result = service.apply_manual_decay(decay_factor)
     print(f"[cortex-mcp] Decay result: {result}", file=sys.stderr)
     return result
 

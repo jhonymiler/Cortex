@@ -865,48 +865,81 @@ class MemoryGraph:
             self._relations[relation.id] = relation
             self._index_relation(relation)
     
-    def apply_temporal_decay(self, hours_passed: float = 24.0) -> dict[str, int]:
+    def apply_access_decay(
+        self, 
+        accessed_entity_ids: list[str],
+        accessed_episode_ids: list[str],
+        decay_factor: float = 0.98,
+    ) -> dict[str, int]:
         """
-        Aplica decay temporal a todas as memórias.
+        Aplica decay baseado em ACESSO, não em tempo.
         
-        Deve ser chamado periodicamente (ex: a cada hora ou dia).
+        Memórias ACESSADAS se fortalecem.
+        Memórias NÃO ACESSADAS decaem um pouco.
+        
+        Isso cria competição natural - relevantes sobem, irrelevantes descem.
         
         Args:
-            hours_passed: Horas desde o último decay
+            accessed_entity_ids: IDs de entidades que foram acessadas (recall)
+            accessed_episode_ids: IDs de episódios que foram acessados (recall)
+            decay_factor: Fator de decay para não-acessados (0.98 = 2% de perda)
             
         Returns:
             Estatísticas do decay aplicado
         """
-        decay_factor = 0.99 ** (hours_passed / 24)  # ~1% decay por dia
+        accessed_entities = set(accessed_entity_ids)
+        accessed_episodes = set(accessed_episode_ids)
         
         stats = {
+            "entities_reinforced": 0,
             "entities_decayed": 0,
+            "episodes_reinforced": 0,
             "episodes_decayed": 0,
+            "relations_reinforced": 0,
             "relations_decayed": 0,
-            "entities_forgotten": 0,
             "episodes_forgotten": 0,
             "relations_forgotten": 0,
         }
         
-        # Decay em episódios (importance)
+        # Processa entidades
+        for entity in self._entities.values():
+            if entity.id in accessed_entities:
+                entity.touch()  # Reforça
+                stats["entities_reinforced"] += 1
+            else:
+                # Decay: diminui access_count (mas nunca abaixo de 0)
+                entity.access_count = max(0, entity.access_count - 1)
+                stats["entities_decayed"] += 1
+        
+        # Processa episódios
         episodes_to_remove = []
         for episode in self._episodes.values():
-            episode.decay_importance(decay_factor)
-            stats["episodes_decayed"] += 1
-            
-            # Esquecimento: importance muito baixa + não consolidado
-            if episode.importance < 0.1 and not episode.is_consolidated:
-                episodes_to_remove.append(episode.id)
+            if episode.id in accessed_episodes:
+                episode.boost_importance(0.05)  # Reforça
+                stats["episodes_reinforced"] += 1
+            else:
+                episode.decay_importance(decay_factor)  # Decay
+                stats["episodes_decayed"] += 1
+                
+                # Esquecimento: importance muito baixa + não consolidado
+                if episode.importance < 0.1 and not episode.is_consolidated:
+                    episodes_to_remove.append(episode.id)
         
-        # Decay em relações (strength)
+        # Processa relações
         relations_to_remove = []
+        all_accessed = accessed_entities | accessed_episodes
         for relation in self._relations.values():
-            relation.decay(decay_factor)
-            stats["relations_decayed"] += 1
-            
-            # Esquecimento: relação muito fraca
-            if relation.is_weak(0.05):
-                relations_to_remove.append(relation.id)
+            # Relação é "acessada" se conecta a algo acessado
+            if relation.from_id in all_accessed or relation.to_id in all_accessed:
+                relation.reinforce(0.02)  # Reforça menos que entidade direta
+                stats["relations_reinforced"] += 1
+            else:
+                relation.decay(decay_factor)
+                stats["relations_decayed"] += 1
+                
+                # Esquecimento: relação muito fraca
+                if relation.is_weak(0.05):
+                    relations_to_remove.append(relation.id)
         
         # Remove memórias esquecidas
         for eid in episodes_to_remove:
@@ -917,42 +950,62 @@ class MemoryGraph:
             self._forget_relation(rid)
             stats["relations_forgotten"] += 1
         
-        # Entidades órfãs (sem conexões) também podem ser esquecidas
-        orphan_entities = self._find_orphan_entities()
-        for entity_id in orphan_entities:
-            entity = self._entities.get(entity_id)
-            if entity and entity.access_count < 2:  # Pouco acessada + órfã
-                self._forget_entity(entity_id)
-                stats["entities_forgotten"] += 1
-        
         self._save()
         return stats
     
-    def reinforce_on_recall(self, entity_ids: list[str], episode_ids: list[str]) -> None:
+    def reinforce_on_recall(
+        self, 
+        entity_ids: list[str], 
+        episode_ids: list[str],
+        apply_decay_to_others: bool = True,
+    ) -> dict[str, Any]:
         """
-        Reforça memórias que foram lembradas (recall).
+        Reforça memórias lembradas E aplica decay nas não-acessadas.
         
-        Memórias acessadas se fortalecem - uso real = maior importância.
+        Este é o coração do sistema de memória:
+        - Memórias úteis (acessadas) se fortalecem
+        - Memórias ignoradas (não acessadas) enfraquecem
+        - Cria competição natural por relevância
+        
+        Args:
+            entity_ids: IDs de entidades retornadas no recall
+            episode_ids: IDs de episódios retornados no recall
+            apply_decay_to_others: Se True, aplica decay nas não-acessadas
+            
+        Returns:
+            Estatísticas de reforço e decay
         """
-        # Reforça entidades
+        if apply_decay_to_others:
+            # Usa o sistema unificado de reforço + decay
+            return self.apply_access_decay(entity_ids, episode_ids)
+        
+        # Modo simples: só reforça, não decai (para testes)
+        stats = {
+            "entities_reinforced": 0,
+            "episodes_reinforced": 0,
+            "relations_reinforced": 0,
+        }
+        
         for eid in entity_ids:
             entity = self._entities.get(eid)
             if entity:
                 entity.touch()
+                stats["entities_reinforced"] += 1
         
-        # Reforça episódios
         for eid in episode_ids:
             episode = self._episodes.get(eid)
             if episode:
                 episode.boost_importance(0.05)
+                stats["episodes_reinforced"] += 1
         
-        # Reforça relações envolvidas
         all_ids = set(entity_ids + episode_ids)
         for relation in self._relations.values():
             if relation.from_id in all_ids or relation.to_id in all_ids:
                 relation.reinforce(0.05)
+                stats["relations_reinforced"] += 1
         
         self._save()
+        return stats
     
     def _forget_episode(self, episode_id: str) -> None:
         """Remove um episódio e suas relações."""

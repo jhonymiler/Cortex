@@ -131,12 +131,14 @@ def render_sidebar():
                 st.success("Memórias limpas!")
                 st.rerun()
     
-    # Decay temporal
+    # Decay manual (para testes)
     st.sidebar.markdown("---")
-    st.sidebar.subheader("⏰ Decay Temporal")
-    decay_hours = st.sidebar.slider("Horas para simular", 1, 168, 24)
-    if st.sidebar.button("🕐 Aplicar Decay", use_container_width=True):
-        result = graph.apply_temporal_decay(decay_hours)
+    st.sidebar.subheader("🔧 Decay Manual")
+    st.sidebar.caption("⚠️ O decay acontece automaticamente durante o recall. Use apenas para testes.")
+    decay_factor = st.sidebar.slider("Fator de decay", 0.80, 0.99, 0.95, 0.01)
+    if st.sidebar.button("🧹 Aplicar Decay", use_container_width=True):
+        graph = load_graph()
+        result = graph.apply_access_decay([], [], decay_factor)
         reload_graph()
         st.sidebar.success(f"Decay aplicado! Esquecido: {result['episodes_forgotten']} eps, {result['relations_forgotten']} rels")
         st.rerun()
