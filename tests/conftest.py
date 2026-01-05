@@ -12,9 +12,10 @@ def reset_service_singleton():
     from cortex.api import app as api_app
     
     # Reset MCP singleton
-    mcp_server._service = None
+    mcp_server._namespaced_service = None
+    mcp_server._namespace = None
     
     # Reset API singleton
-    api_app._service = None
+    api_app._namespaced_service = None
     
     yield

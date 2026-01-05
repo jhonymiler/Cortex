@@ -25,7 +25,8 @@ async def chat_with_mcp(
     message: str,
     model: str | None = None,
     ollama_url: str | None = None,
-    user_name: str = "user"
+    user_name: str = "user",
+    namespace: str | None = None,
 ) -> str:
     """
     Conversa usando MCP REAL para memória Cortex.
@@ -35,6 +36,7 @@ async def chat_with_mcp(
         model: Modelo Ollama (usa OLLAMA_MODEL do .env se None)
         ollama_url: URL do Ollama (usa OLLAMA_URL do .env se None)
         user_name: Nome do usuário
+        namespace: Namespace para isolamento (usa CORTEX_NAMESPACE do .env se None)
     
     Returns:
         Resposta do assistente
@@ -50,6 +52,12 @@ async def chat_with_mcp(
     # Herda ambiente atual e adiciona config do Cortex
     mcp_env = os.environ.copy()
     mcp_env["CORTEX_DATA_DIR"] = os.getenv("CORTEX_DATA_DIR", str(Path.home() / ".cortex"))
+    
+    # Define namespace para isolamento de memórias
+    # Pode ser: "agent:user", "bot:cliente", "projeto:contexto", etc.
+    if namespace is None:
+        namespace = os.getenv("CORTEX_NAMESPACE", "default")
+    mcp_env["CORTEX_NAMESPACE"] = namespace
     
     # Parâmetros do servidor MCP Cortex
     server_params = StdioServerParameters(
@@ -129,6 +137,7 @@ def main():
     parser.add_argument("--ollama-url", default=None, help="URL do Ollama (usa OLLAMA_URL do .env se não especificado)")
     parser.add_argument("-i", "--interactive", action="store_true", help="Modo interativo")
     parser.add_argument("--user", default="user", help="Nome do usuário")
+    parser.add_argument("--namespace", default=None, help="Namespace para isolamento (ex: 'agent:user', usa CORTEX_NAMESPACE do .env se não especificado)")
     parser.add_argument("--debug", action="store_true", help="Debug LiteLLM")
     parser.add_argument("message", nargs="*", help="Mensagem")
     
@@ -138,9 +147,11 @@ def main():
         litellm.set_verbose = True
     
     model_name = args.model or os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+    namespace = args.namespace or os.getenv("CORTEX_NAMESPACE", "default")
     
     print("🔌 Agente com MCP REAL (cliente MCP Python)")
     print(f"🚀 Usando modelo {model_name}")
+    print(f"📦 Namespace: {namespace}")
     print("✅ Pronto!\n")
     
     async def interactive_loop():
@@ -162,7 +173,8 @@ def main():
                     user_input,
                     model=args.model,
                     ollama_url=args.ollama_url,
-                    user_name=args.user
+                    user_name=args.user,
+                    namespace=args.namespace,
                 )
                 print(f"{response}\n")
             
@@ -184,7 +196,8 @@ def main():
             message,
             model=args.model,
             ollama_url=args.ollama_url,
-            user_name=args.user
+            user_name=args.user,
+            namespace=args.namespace,
         )
         print(f"{response}\n")
     

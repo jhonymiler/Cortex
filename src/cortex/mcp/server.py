@@ -1,7 +1,8 @@
 """
-Cortex MCP Server - FastMCP integration.
+Cortex MCP Server - FastMCP integration with namespace isolation.
 
 This server exposes Cortex memory functions to LLM agents via MCP protocol.
+Supports multi-tenant scenarios via CORTEX_NAMESPACE environment variable.
 
 Usage:
     # Run directly
@@ -16,11 +17,15 @@ Configuration (claude_desktop_config.json):
             "cortex": {
                 "command": "cortex-mcp",
                 "env": {
-                    "CORTEX_DATA_DIR": "/path/to/data"
+                    "CORTEX_DATA_DIR": "/path/to/data",
+                    "CORTEX_NAMESPACE": "agent_001:user_123"
                 }
             }
         }
     }
+
+Namespace is set via environment at server startup and used for ALL operations.
+This matches the pattern in agent_with_mcp.py where mcp_env is passed to StdioServerParameters.
 """
 
 import os
@@ -31,6 +36,7 @@ from typing import Any
 from fastmcp import FastMCP
 
 from cortex.services.memory_service import (
+    NamespacedMemoryService,
     MemoryService,
     StoreRequest,
     RecallRequest,
@@ -49,6 +55,28 @@ def get_data_dir() -> Path:
     default_path = Path.home() / ".cortex"
     print(f"[cortex-mcp] Using default data dir: {default_path}", file=sys.stderr)
     return default_path
+
+
+def get_namespace() -> str:
+    """
+    Get namespace from environment variable.
+    
+    Set CORTEX_NAMESPACE in the env passed to StdioServerParameters:
+    
+        mcp_env = os.environ.copy()
+        mcp_env["CORTEX_NAMESPACE"] = "agent_001:user_123"
+        
+        server_params = StdioServerParameters(
+            command="python",
+            args=["-m", "cortex.mcp.server"],
+            env=mcp_env
+        )
+    
+    Returns "default" if not set.
+    """
+    namespace = os.environ.get("CORTEX_NAMESPACE", "default")
+    print(f"[cortex-mcp] Using namespace: {namespace}", file=sys.stderr)
+    return namespace
 
 
 # Initialize MCP server
@@ -70,22 +98,36 @@ mcp = FastMCP(
        - relations: causal connections discovered
     
     NEVER skip these steps. Memory enables continuity across sessions.
+    
+    ## Namespace Isolation
+    
+    This server uses the CORTEX_NAMESPACE environment variable for isolation.
+    All operations are scoped to the namespace defined at server startup.
+    No data leakage between different namespaces.
     """,
 )
 
 # Initialize service (lazy loading)
-_service: MemoryService | None = None
+_namespaced_service: NamespacedMemoryService | None = None
+_namespace: str | None = None
 
 
 def get_service() -> MemoryService:
-    """Get or create the memory service instance."""
-    global _service
-    if _service is None:
+    """
+    Get the memory service for the configured namespace.
+    
+    Namespace is determined at startup from CORTEX_NAMESPACE env var.
+    """
+    global _namespaced_service, _namespace
+    
+    if _namespaced_service is None:
         data_dir = get_data_dir()
-        print(f"[cortex-mcp] Creating MemoryService with path: {data_dir}", file=sys.stderr)
-        _service = MemoryService(storage_path=data_dir)
-        print(f"[cortex-mcp] Service created, graph has {len(_service.graph._entities)} entities", file=sys.stderr)
-    return _service
+        _namespace = get_namespace()
+        print(f"[cortex-mcp] Creating NamespacedMemoryService", file=sys.stderr)
+        print(f"[cortex-mcp] Path: {data_dir}, Namespace: {_namespace}", file=sys.stderr)
+        _namespaced_service = NamespacedMemoryService(base_path=data_dir)
+    
+    return _namespaced_service.get_service(_namespace)
 
 
 # ==================== MCP TOOLS ====================
@@ -268,6 +310,33 @@ def cortex_decay(decay_factor: float = 0.95) -> dict[str, Any]:
     return result
 
 
+@mcp.tool()
+def cortex_namespace_info() -> dict[str, Any]:
+    """
+    Get information about the current namespace.
+    
+    Returns:
+        Dictionary with:
+        - namespace: Current namespace name
+        - data_dir: Base data directory
+        - storage_path: Full path to namespace storage
+    """
+    global _namespace
+    service = get_service()  # Ensures initialization
+    stats = service.stats()
+    
+    return {
+        "namespace": _namespace,
+        "data_dir": str(get_data_dir()),
+        "storage_path": stats.storage_path,
+        "stats": {
+            "entities": stats.total_entities,
+            "episodes": stats.total_episodes,
+            "relations": stats.total_relations,
+        }
+    }
+
+
 # ==================== MCP RESOURCES ====================
 
 
@@ -279,6 +348,7 @@ def get_stats_resource() -> str:
     return f"""
 Cortex Memory Statistics
 ========================
+Namespace: {_namespace}
 Entities: {stats.total_entities}
 Episodes: {stats.total_episodes}
 Relations: {stats.total_relations}
@@ -287,11 +357,29 @@ Storage: {stats.storage_path or 'In-memory only'}
 """
 
 
+@mcp.resource("cortex://namespace")
+def get_namespace_resource() -> str:
+    """Current namespace information."""
+    global _namespace
+    get_service()  # Ensures initialization
+    return f"""
+Cortex Namespace
+================
+Current: {_namespace}
+Data Dir: {get_data_dir()}
+
+Set CORTEX_NAMESPACE env var to change namespace.
+"""
+
+
 # ==================== ENTRY POINT ====================
 
 
 def main() -> None:
     """Run the MCP server."""
+    print(f"[cortex-mcp] Starting Cortex MCP Server", file=sys.stderr)
+    print(f"[cortex-mcp] Namespace: {get_namespace()}", file=sys.stderr)
+    print(f"[cortex-mcp] Data dir: {get_data_dir()}", file=sys.stderr)
     mcp.run()
 
 

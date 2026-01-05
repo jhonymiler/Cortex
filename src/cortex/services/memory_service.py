@@ -3,6 +3,11 @@ MemoryService - Main orchestrator for memory operations.
 
 This service is the single source of truth for memory operations.
 Both MCP and REST API use this service to ensure consistent behavior.
+
+Supports namespace isolation for multi-tenant scenarios:
+- Each namespace has its own isolated memory graph
+- No data leakage between namespaces
+- User defines namespace format (e.g., "agent:user", "bot:client")
 """
 
 from pathlib import Path
@@ -11,6 +16,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from cortex.core import Entity, Episode, MemoryGraph, Relation
+from cortex.core.namespace import NamespacedMemoryManager
 
 
 # ==================== REQUEST/RESPONSE MODELS ====================
@@ -280,3 +286,95 @@ class MemoryService:
         """Clear all memories. Use with caution!"""
         self.graph.clear()
         return {"success": True, "message": "All memories cleared"}
+
+
+class NamespacedMemoryService:
+    """
+    Memory service with namespace isolation.
+    
+    Each namespace has its own isolated memory graph.
+    Perfect for multi-tenant scenarios:
+    - Multiple agents sharing same Cortex instance
+    - Single agent serving multiple users
+    - Different projects/contexts
+    
+    Usage:
+        service = NamespacedMemoryService(base_path="./data")
+        
+        # Store for user A
+        service.store("agent:user_a", StoreRequest(...))
+        
+        # Store for user B (completely isolated)
+        service.store("agent:user_b", StoreRequest(...))
+        
+        # Recall only sees user A's memories
+        service.recall("agent:user_a", RecallRequest(...))
+    """
+    
+    def __init__(self, base_path: Path | str | None = None):
+        """
+        Initialize the namespaced service.
+        
+        Args:
+            base_path: Base directory for all namespace data.
+                       Each namespace creates a subdirectory.
+        """
+        self.manager = NamespacedMemoryManager(base_path=base_path)
+        self.base_path = Path(base_path) if base_path else None
+        self._services: dict[str, MemoryService] = {}
+    
+    def get_service(self, namespace: str) -> MemoryService:
+        """
+        Get or create a MemoryService for a namespace.
+        
+        Args:
+            namespace: Unique identifier (e.g., "agent:user", "bot:client")
+        
+        Returns:
+            Isolated MemoryService for this namespace
+        """
+        if namespace not in self._services:
+            graph = self.manager.get_graph(namespace)
+            service = MemoryService.__new__(MemoryService)
+            service.graph = graph
+            self._services[namespace] = service
+        
+        return self._services[namespace]
+    
+    def store(self, namespace: str, request: StoreRequest) -> StoreResponse:
+        """Store memory in a specific namespace."""
+        return self.get_service(namespace).store(request)
+    
+    def recall(self, namespace: str, request: RecallRequest) -> RecallResponse:
+        """Recall memories from a specific namespace."""
+        return self.get_service(namespace).recall(request)
+    
+    def stats(self, namespace: str) -> StatsResponse:
+        """Get stats for a specific namespace."""
+        return self.get_service(namespace).stats()
+    
+    def get_health(self, namespace: str) -> dict[str, Any]:
+        """Get health metrics for a specific namespace."""
+        return self.get_service(namespace).get_health()
+    
+    def clear(self, namespace: str) -> dict[str, Any]:
+        """Clear all memories in a specific namespace."""
+        return self.get_service(namespace).clear()
+    
+    def list_namespaces(self) -> list[str]:
+        """List all active namespaces."""
+        return self.manager.list_namespaces()
+    
+    def list_persisted_namespaces(self) -> list[str]:
+        """List all namespaces with persisted data."""
+        return self.manager.list_persisted_namespaces()
+    
+    def delete_namespace(self, namespace: str) -> bool:
+        """Delete a namespace and all its data."""
+        if namespace in self._services:
+            del self._services[namespace]
+        return self.manager.delete_namespace(namespace)
+    
+    def global_stats(self) -> dict[str, Any]:
+        """Get aggregated stats across all namespaces."""
+        return self.manager.get_stats()

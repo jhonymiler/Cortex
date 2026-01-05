@@ -98,17 +98,19 @@ class Entity:
         - Match exato: 1.0
         - Match por nome: 0.8
         - Match por identificador: 0.7
-        - Match por atributos: 0.5
-        - Contexto compatível: +0.2
+        - Match por tipo: 0.3
+        - Match por tokens: soma de tokens encontrados
+        - Contexto compatível: +0.1
         """
         score = 0.0
         query_lower = query.lower()
+        name_lower = self.name.lower()
         
         # Match exato por ID ou nome
-        if query == self.id or query_lower == self.name.lower():
+        if query == self.id or query_lower == name_lower:
             score = 1.0
         # Match parcial por nome
-        elif query_lower in self.name.lower():
+        elif query_lower in name_lower:
             score = 0.8
         # Match por identificador
         elif any(query_lower in ident.lower() for ident in self.identifiers):
@@ -116,6 +118,17 @@ class Entity:
         # Match por tipo
         elif query_lower == self.type.lower():
             score = 0.3
+        else:
+            # Tokeniza a query e busca matches parciais
+            # "apache log" -> ["apache", "log"]
+            tokens = self._tokenize(query_lower)
+            name_tokens = self._tokenize(name_lower)
+            
+            # Conta quantos tokens da query estão no nome
+            matched = sum(1 for t in tokens if any(t in nt or nt in t for nt in name_tokens))
+            if matched > 0:
+                # Score proporcional aos tokens encontrados
+                score = min(0.75, 0.3 + (matched / len(tokens)) * 0.45)
         
         # Bonus por contexto
         if context and score > 0:
@@ -130,6 +143,14 @@ class Entity:
                         break
         
         return score
+    
+    def _tokenize(self, text: str) -> list[str]:
+        """Tokeniza texto em palavras, removendo caracteres especiais."""
+        import re
+        # Divide por espaços, pontos, underscores, hífens
+        tokens = re.split(r'[\s._\-/\\]+', text)
+        # Remove tokens vazios e muito curtos (1 char)
+        return [t for t in tokens if len(t) > 1]
     
     def to_dict(self) -> dict[str, Any]:
         """Serializa para dicionário."""

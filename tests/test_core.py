@@ -106,7 +106,7 @@ class TestRelation:
         assert relation.from_id == "entity_1"
         assert relation.relation_type == "caused_by"
         assert relation.to_id == "entity_2"
-        assert relation.strength == 1.0  # default
+        assert relation.strength == 0.5  # default is 0.5
     
     def test_relation_serialization(self) -> None:
         """Test relation to_dict and from_dict."""
