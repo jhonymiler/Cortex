@@ -37,25 +37,75 @@ class RecallResult:
             "context_summary": self.context_summary,
         }
     
-    def to_prompt_context(self) -> str:
-        """Gera texto para injetar no prompt do LLM."""
+    def to_prompt_context(self, format: str = "yaml") -> str:
+        """
+        Gera contexto compacto para injetar no prompt do LLM.
+        
+        Formato YAML: máxima densidade informacional com mínimo de tokens.
+        Cada linha carrega significado, não estrutura.
+        
+        Args:
+            format: "yaml" (default, compacto) ou "text" (legível)
+        """
         if not self.entities and not self.episodes:
             return ""
         
+        if format == "yaml":
+            return self._to_yaml_context()
+        return self._to_text_context()
+    
+    def _to_yaml_context(self) -> str:
+        """Formato YAML ultra-compacto para LLMs."""
+        lines = ["# MEMÓRIA DO USUÁRIO"]
+        
+        if self.entities:
+            lines.append("conhecidos:")
+            for e in self.entities[:5]:
+                # Formato: "- nome (tipo): atributos principais"
+                attrs = ", ".join(f"{k}={v}" for k, v in list(e.attributes.items())[:3])
+                if attrs:
+                    lines.append(f"  - {e.name} ({e.type}): {attrs}")
+                else:
+                    lines.append(f"  - {e.name} ({e.type})")
+        
+        if self.episodes:
+            lines.append("histórico:")
+            for ep in self.episodes[:5]:
+                # Formato compacto: ação + resultado em uma linha
+                if ep.is_consolidated:
+                    lines.append(f"  - [{ep.occurrence_count}x] {ep.action}: {ep.outcome}")
+                else:
+                    lines.append(f"  - {ep.action}: {ep.outcome}")
+        
+        if self.relations:
+            # Só mostra relações fortes e relevantes
+            strong_rels = [r for r in self.relations if r.strength > 0.5][:3]
+            if strong_rels:
+                lines.append("conexões:")
+                for r in strong_rels:
+                    lines.append(f"  - {r.relation_type}")
+        
+        if self.context_summary:
+            lines.append(f"resumo: {self.context_summary}")
+        
+        return "\n".join(lines)
+    
+    def _to_text_context(self) -> str:
+        """Formato texto legível (mais tokens, mais claro)."""
         parts = ["[MEMORY CONTEXT]"]
         
         if self.entities:
-            parts.append("\nEntities known:")
-            for entity in self.entities[:5]:  # Limita para não explodir o prompt
+            parts.append("\nEntidades conhecidas:")
+            for entity in self.entities[:5]:
                 parts.append(f"  - {entity.name} ({entity.type})")
         
         if self.episodes:
-            parts.append("\nRelevant past experiences:")
-            for episode in self.episodes[:3]:  # Limita
+            parts.append("\nExperiências relevantes:")
+            for episode in self.episodes[:3]:
                 parts.append(f"  - {episode.to_summary()}")
         
         if self.context_summary:
-            parts.append(f"\nSummary: {self.context_summary}")
+            parts.append(f"\nResumo: {self.context_summary}")
         
         return "\n".join(parts)
 
