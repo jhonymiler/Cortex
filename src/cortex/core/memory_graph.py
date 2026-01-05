@@ -7,6 +7,7 @@ O MemoryGraph é o coração do Cortex:
 - Conecta tudo via relações
 - Busca por relevância contextual
 - Consolida episódios repetidos
+- Detecta e resolve contradições
 """
 
 import json
@@ -18,6 +19,13 @@ from typing import Any
 from cortex.core.entity import Entity
 from cortex.core.episode import Episode
 from cortex.core.relation import Relation
+from cortex.core.contradiction import (
+    ContradictionDetector,
+    Contradiction,
+    ResolutionStrategy,
+    ResolutionResult,
+    create_default_detector,
+)
 
 
 @dataclass
@@ -132,6 +140,7 @@ class MemoryGraph:
         
         Args:
             storage_path: Caminho para persistência (None = apenas memória)
+            contradiction_strategy: Estratégia para resolver contradições
         """
         self.storage_path = Path(storage_path) if storage_path else None
         
@@ -145,6 +154,9 @@ class MemoryGraph:
         self._entity_by_type: dict[str, list[str]] = {}  # type -> [entity_ids]
         self._relations_by_from: dict[str, list[str]] = {}  # from_id -> [relation_ids]
         self._relations_by_to: dict[str, list[str]] = {}  # to_id -> [relation_ids]
+        
+        # Detector de contradições
+        self._contradiction_detector = create_default_detector()
         
         # Carrega se existir
         if self.storage_path:
@@ -344,11 +356,24 @@ class MemoryGraph:
     
     # ==================== RELATION OPERATIONS ====================
     
-    def add_relation(self, relation: Relation) -> Relation:
+    def add_relation(
+        self,
+        relation: Relation,
+        check_contradiction: bool = True,
+    ) -> tuple[Relation, ResolutionResult | None]:
         """
         Adiciona ou reforça uma relação.
+        
+        Se check_contradiction=True e houver contradição, resolve automaticamente.
+        
+        Args:
+            relation: Relação a adicionar
+            check_contradiction: Se deve verificar contradições
+            
+        Returns:
+            Tupla (relação final, resultado da resolução ou None)
         """
-        # Verifica se já existe
+        # Verifica se já existe relação idêntica (mesma tripla + mesma polaridade)
         existing = self._find_existing_relation(
             relation.from_id,
             relation.relation_type,
@@ -356,15 +381,107 @@ class MemoryGraph:
         )
         
         if existing:
-            existing.reinforce()
-            self._save()
-            return existing
+            # Se polaridade é similar, apenas reforça
+            polarity_diff = abs(existing.polarity - relation.polarity)
+            if polarity_diff < 0.5:
+                existing.reinforce()
+                self._save()
+                return existing, None
+            
+            # Polaridades diferentes = possível contradição
+            if check_contradiction and relation.contradicts(existing):
+                contradiction = Contradiction(
+                    relation_a=existing,
+                    relation_b=relation,
+                )
+                result = self._contradiction_detector.resolve(contradiction)
+                
+                if result.winner and result.loser:
+                    # Remove perdedora, mantém vencedora
+                    if result.loser == existing:
+                        self.remove_relation(existing.id)
+                        self._relations[relation.id] = relation
+                        self._index_relation(relation)
+                        self._save()
+                        return relation, result
+                    else:
+                        # Existente venceu
+                        self._save()
+                        return existing, result
+                elif result.action_taken == "marked_conflict":
+                    # Mantém ambas como conflito
+                    self._relations[relation.id] = relation
+                    self._index_relation(relation)
+                    self._save()
+                    return relation, result
+        
+        # Verifica contradição com outras relações se não encontrou existente
+        if check_contradiction:
+            existing_relations = list(self._relations.values())
+            contradiction = self._contradiction_detector.check_for_contradiction(
+                relation, existing_relations
+            )
+            
+            if contradiction:
+                result = self._contradiction_detector.resolve(contradiction)
+                
+                if result.winner and result.loser:
+                    if result.loser != relation:
+                        # Nova relação venceu, remove a antiga
+                        self.remove_relation(result.loser.id)
+                    else:
+                        # Relação existente venceu, não adiciona a nova
+                        return result.winner, result
+                elif result.action_taken == "marked_conflict":
+                    # Mantém ambas
+                    pass
         
         # Adiciona nova
         self._relations[relation.id] = relation
         self._index_relation(relation)
         self._save()
-        return relation
+        return relation, None
+    
+    def add_relation_simple(self, relation: Relation) -> Relation:
+        """
+        Adiciona relação sem verificar contradições.
+        
+        Mantém compatibilidade com código existente.
+        """
+        result, _ = self.add_relation(relation, check_contradiction=False)
+        return result
+    
+    def remove_relation(self, relation_id: str) -> bool:
+        """
+        Remove uma relação por ID.
+        
+        Args:
+            relation_id: ID da relação a remover
+            
+        Returns:
+            True se removida, False se não encontrada
+        """
+        if relation_id not in self._relations:
+            return False
+        
+        relation = self._relations[relation_id]
+        
+        # Remove dos índices
+        if relation.from_id in self._relations_by_from:
+            self._relations_by_from[relation.from_id] = [
+                rid for rid in self._relations_by_from[relation.from_id]
+                if rid != relation_id
+            ]
+        if relation.to_id in self._relations_by_to:
+            self._relations_by_to[relation.to_id] = [
+                rid for rid in self._relations_by_to[relation.to_id]
+                if rid != relation_id
+            ]
+        
+        # Remove do dicionário principal
+        del self._relations[relation_id]
+        self._save()
+        return True
     
     def get_relations(
         self,
@@ -771,7 +888,40 @@ class MemoryGraph:
                 1 for e in self._episodes.values() if e.is_consolidated
             ),
             "entities_by_type": entities_by_type,
+            "contradiction_stats": self._contradiction_detector.stats(),
         }
+    
+    # ==================== CONTRADICTION MANAGEMENT ====================
+    
+    def set_contradiction_strategy(self, strategy: ResolutionStrategy) -> None:
+        """
+        Define a estratégia de resolução de contradições.
+        
+        Args:
+            strategy: Nova estratégia (MOST_RECENT, STRONGEST, etc.)
+        """
+        self._contradiction_detector.strategy = strategy
+    
+    def find_contradictions(self) -> list[Contradiction]:
+        """
+        Encontra todas as contradições no grafo.
+        
+        Útil para auditoria e limpeza.
+        
+        Returns:
+            Lista de contradições encontradas
+        """
+        return self._contradiction_detector.find_all_contradictions(
+            list(self._relations.values())
+        )
+    
+    def get_contradiction_history(self) -> list[Contradiction]:
+        """Retorna histórico de contradições detectadas."""
+        return self._contradiction_detector.get_history()
+    
+    def get_pending_contradictions(self) -> list[Contradiction]:
+        """Retorna contradições pendentes de resolução."""
+        return self._contradiction_detector.get_unresolved()
     
     # ==================== GRAPH ANALYSIS ====================
     

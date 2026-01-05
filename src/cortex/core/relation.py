@@ -6,10 +6,16 @@ Relações formam o grafo de conhecimento:
 - Conexões associativas (related_to, similar_to)
 - Conexões semânticas (loves, hates, prefers)
 - Conexões temporais (followed_by, preceded_by)
+
+Polaridade:
+- +1.0 = afirmativo ("Maria gosta de pizza")
+- -1.0 = negativo ("Maria NÃO gosta de pizza")
+- 0.0 = neutro/incerto
 """
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 from typing import Any
 from uuid import uuid4
 
@@ -27,6 +33,7 @@ class Relation:
     - "similar_to", "related_to" (associação)
     
     A força da relação (strength) é reforçada com o uso.
+    A polaridade indica se é afirmativa (+1) ou negativa (-1).
     
     Attributes:
         id: Identificador único
@@ -34,25 +41,29 @@ class Relation:
         relation_type: Tipo da relação (verbo livre)
         to_id: ID do destino (Entity ou Episode)
         strength: Força da conexão (0.0 - 1.0)
+        polarity: Polaridade (-1.0 negativo, 0.0 neutro, +1.0 positivo)
         context: Metadados sobre quando/como foi criada
         created_at: Quando foi criada
         reinforced_count: Quantas vezes foi reforçada
         
     Examples:
-        # Causal
-        Relation(from_id="error_404", relation_type="caused_by", to_id="missing_route")
+        # Afirmativo (polarity=1.0)
+        Relation(from_id="maria", relation_type="likes", to_id="pizza", polarity=1.0)
         
-        # Afetiva
-        Relation(from_id="elena", relation_type="loves", to_id="marcus", strength=0.9)
+        # Negativo (polarity=-1.0)  
+        Relation(from_id="maria", relation_type="likes", to_id="sushi", polarity=-1.0)
+        # Significa: Maria NÃO gosta de sushi
         
-        # Resolução
-        Relation(from_id="bug_123", relation_type="resolved_by", to_id="episode_fix_456")
+        # Incerto (polarity próximo de 0)
+        Relation(from_id="maria", relation_type="likes", to_id="pasta", polarity=0.3)
+        # Significa: Maria talvez goste de pasta
     """
     
     from_id: str
     relation_type: str
     to_id: str
     strength: float = 0.5
+    polarity: float = 1.0  # -1.0 a +1.0
     context: dict[str, Any] = field(default_factory=dict)
     id: str = field(default_factory=lambda: str(uuid4()))
     created_at: datetime = field(default_factory=datetime.now)
@@ -81,6 +92,47 @@ class Relation:
     def is_weak(self, threshold: float = 0.1) -> bool:
         """Retorna True se a relação está fraca (candidata a remoção)."""
         return self.strength < threshold
+    
+    def is_positive(self) -> bool:
+        """Retorna True se a polaridade é positiva (> 0.3)."""
+        return self.polarity > 0.3
+    
+    def is_negative(self) -> bool:
+        """Retorna True se a polaridade é negativa (< -0.3)."""
+        return self.polarity < -0.3
+    
+    def is_neutral(self) -> bool:
+        """Retorna True se a polaridade é neutra/incerta (-0.3 a 0.3)."""
+        return -0.3 <= self.polarity <= 0.3
+    
+    def contradicts(self, other: "Relation") -> bool:
+        """
+        Verifica se esta relação contradiz outra.
+        
+        Contradição ocorre quando:
+        - Mesmo from_id, to_id e relation_type
+        - Polaridades opostas (uma positiva, outra negativa)
+        
+        Args:
+            other: Outra relação para comparar
+            
+        Returns:
+            True se são contraditórias
+        """
+        if not self._same_triple(other):
+            return False
+        
+        # Polaridades opostas = contradição
+        return (self.is_positive() and other.is_negative()) or \
+               (self.is_negative() and other.is_positive())
+    
+    def _same_triple(self, other: "Relation") -> bool:
+        """Verifica se representa a mesma tripla (from, type, to)."""
+        return (
+            self.from_id == other.from_id and
+            self.to_id == other.to_id and
+            self.relation_type.lower() == other.relation_type.lower()
+        )
     
     def matches(
         self,
@@ -113,6 +165,7 @@ class Relation:
             "relation_type": self.relation_type,
             "to_id": self.to_id,
             "strength": self.strength,
+            "polarity": self.polarity,
             "context": self.context,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
@@ -128,6 +181,7 @@ class Relation:
             relation_type=data["relation_type"],
             to_id=data["to_id"],
             strength=data.get("strength", 0.5),
+            polarity=data.get("polarity", 1.0),
             context=data.get("context", {}),
             created_at=datetime.fromisoformat(data["created_at"]),
             updated_at=datetime.fromisoformat(data["updated_at"]),
@@ -136,7 +190,8 @@ class Relation:
     
     def to_triple(self) -> str:
         """Retorna representação como tripla: (from) -[type]-> (to)"""
-        return f"({self.from_id[:8]}) -[{self.relation_type}]-> ({self.to_id[:8]})"
+        polarity_symbol = "+" if self.polarity > 0 else "-" if self.polarity < 0 else "~"
+        return f"({self.from_id[:8]}) -[{polarity_symbol}{self.relation_type}]-> ({self.to_id[:8]})"
     
     def __repr__(self) -> str:
         return f"Relation({self.from_id[:8]}... -{self.relation_type}-> {self.to_id[:8]}..., strength={self.strength:.2f})"
