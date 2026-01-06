@@ -42,6 +42,9 @@ from cortex.services.memory_service import (
     RecallRequest,
     ParticipantInput,
     RelationInput,
+    # W5H models
+    RememberRequest,
+    ForgetRequest,
 )
 
 
@@ -83,27 +86,42 @@ def get_namespace() -> str:
 mcp = FastMCP(
     "cortex-memory",
     instructions="""
-    Cortex Memory System - MANDATORY WORKFLOW
+    Cortex Memory System - W5H Model
     
-    You MUST follow this workflow for EVERY user interaction:
+    Cortex uses the W5H memory model for storing interactions:
+    - WHO: Participants involved
+    - WHAT: What happened
+    - WHY: Why it happened
+    - WHEN: (automatic timestamp)
+    - WHERE: Namespace/context
+    - HOW: Outcome/result
     
-    1. BEFORE responding: Call cortex_recall with the user's message
-       - This retrieves relevant context from past interactions
-       - Use the returned context to inform your response
+    ## MANDATORY WORKFLOW
     
-    2. AFTER responding: Call cortex_store to save the interaction
-       - action: what you did (analyzed, explained, resolved, etc.)
-       - outcome: the result or conclusion
-       - participants: entities mentioned (people, files, concepts)
-       - relations: causal connections discovered
+    1. BEFORE responding: Call cortex_recall
+       - Retrieves relevant context from past interactions
+       - Use returned context to inform your response
     
-    NEVER skip these steps. Memory enables continuity across sessions.
+    2. AFTER responding: Call cortex_remember (preferred) or cortex_store
+       - who: participants involved (names, emails, systems)
+       - what: what you did (analyzed, explained, resolved)
+       - why: cause or reason (if applicable)
+       - how: outcome or result
     
-    ## Namespace Isolation
+    3. If user asks to forget: Call cortex_forget
+       - Marks memory as forgotten (excluded from recalls)
     
-    This server uses the CORTEX_NAMESPACE environment variable for isolation.
-    All operations are scoped to the namespace defined at server startup.
-    No data leakage between different namespaces.
+    NEVER skip recall/remember. Memory enables continuity.
+    
+    ## Available Tools
+    
+    - cortex_recall: Search past memories (BEFORE responding)
+    - cortex_remember: Store W5H memory (AFTER responding) [PREFERRED]
+    - cortex_store: Store legacy format (still works)
+    - cortex_forget: Mark memory as forgotten
+    - cortex_stats: Memory statistics
+    - cortex_health: Memory health metrics
+    - cortex_decay: Manual decay (testing only)
     """,
 )
 
@@ -259,6 +277,103 @@ def cortex_stats() -> dict[str, Any]:
     """
     service = get_service()
     response = service.stats()
+    return response.model_dump()
+
+
+# ==================== W5H TOOLS ====================
+
+
+@mcp.tool()
+def cortex_remember(
+    who: list[str],
+    what: str,
+    why: str = "",
+    how: str = "",
+    where: str = "default",
+    importance: float = 0.5,
+) -> dict[str, Any]:
+    """
+    Store a W5H memory after interacting with the user.
+    
+    Uses the W5H model:
+    - WHO: Participants involved
+    - WHAT: What happened (action/fact)
+    - WHY: Why it happened (cause/reason)
+    - WHERE: Namespace/context
+    - HOW: How it was resolved (outcome)
+    
+    Args:
+        who: List of participant names (people, systems, concepts)
+        what: What happened - the main action or fact
+        why: Why it happened - the cause or reason (optional)
+        how: How it was resolved - the outcome (optional)
+        where: Namespace for organization (default: "default")
+        importance: How important 0.0-1.0 (default: 0.5)
+    
+    Returns:
+        Dictionary with:
+        - success: Whether storage succeeded
+        - memory_id: ID of the created memory
+        - who_resolved: Entity IDs for participants
+        - consolidated: Whether this merged with similar memories
+        - retrievability: How easily this memory can be recalled
+    
+    Example:
+        cortex_remember(
+            who=["maria@email.com", "payment_system"],
+            what="reported payment error",
+            why="expired card",
+            how="guided to update card details",
+            importance=0.7
+        )
+    """
+    service = get_service()
+    request = RememberRequest(
+        who=who,
+        what=what,
+        why=why,
+        how=how,
+        where=where,
+        importance=importance,
+    )
+    print(f"[cortex-mcp] Remember: what={what[:50]}, who={who}", file=sys.stderr)
+    response = service.remember(request)
+    print(f"[cortex-mcp] Remember result: id={response.memory_id[:8]}", file=sys.stderr)
+    return response.model_dump()
+
+
+@mcp.tool()
+def cortex_forget(
+    memory_id: str,
+    reason: str = "",
+) -> dict[str, Any]:
+    """
+    Forget a specific memory.
+    
+    Forgotten memories are not deleted but excluded from recalls.
+    Use this when:
+    - User asks to forget something
+    - Information is outdated/incorrect
+    - Memory should be superseded
+    
+    Args:
+        memory_id: ID of the memory to forget
+        reason: Why it's being forgotten (for audit)
+    
+    Returns:
+        Dictionary with:
+        - success: Whether operation succeeded
+        - memory_id: The memory ID
+        - was_forgotten: True if already forgotten
+        - message: Human-readable status
+    """
+    service = get_service()
+    request = ForgetRequest(
+        memory_id=memory_id,
+        reason=reason,
+    )
+    print(f"[cortex-mcp] Forget: id={memory_id[:8]}, reason={reason}", file=sys.stderr)
+    response = service.forget(request)
     return response.model_dump()
 
 

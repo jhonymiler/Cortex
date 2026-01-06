@@ -8,14 +8,24 @@ Supports namespace isolation for multi-tenant scenarios:
 - Each namespace has its own isolated memory graph
 - No data leakage between namespaces
 - User defines namespace format (e.g., "agent:user", "bot:client")
+
+W5H Memory Model:
+- WHO: Participants involved
+- WHAT: Action/fact
+- WHY: Cause/reason
+- WHEN: Timestamp + temporal context
+- WHERE: Namespace + spatial context
+- HOW: Outcome/result
 """
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
 from cortex.core import Entity, Episode, MemoryGraph, Relation
+from cortex.core.memory import Memory
+from cortex.core.decay import DecayManager, create_default_decay_manager
 from cortex.core.namespace import NamespacedMemoryManager
 
 
@@ -107,7 +117,69 @@ class StatsResponse(BaseModel):
     total_relations: int
     entities_by_type: dict[str, int]
     consolidated_episodes: int
-    storage_path: str | None
+    storage_path: Optional[str] = None
+
+
+# ==================== W5H REQUEST/RESPONSE MODELS ====================
+
+
+class RememberRequest(BaseModel):
+    """
+    W5H Request to store a memory.
+    
+    Fields follow the W5H model:
+    - WHO: who (participants)
+    - WHAT: what (action/fact)
+    - WHY: why (cause/reason)
+    - WHEN: (automatic timestamp)
+    - WHERE: where (namespace)
+    - HOW: how (outcome/result)
+    """
+    
+    who: list[str] = Field(default_factory=list, description="Participants: names or identifiers")
+    what: str = Field(..., description="What happened (action/fact)")
+    why: str = Field(default="", description="Why it happened (cause/reason)")
+    how: str = Field(default="", description="How it was resolved (outcome/result)")
+    where: str = Field(default="default", description="Namespace/context")
+    importance: float = Field(default=0.5, ge=0.0, le=1.0, description="Importance 0.0-1.0")
+
+
+class RememberResponse(BaseModel):
+    """Response from storing a W5H memory."""
+    
+    success: bool
+    memory_id: str
+    who_resolved: list[str]  # Entity IDs created/found
+    consolidated: bool
+    consolidation_count: int
+    retrievability: float
+
+
+class ForgetRequest(BaseModel):
+    """Request to forget a memory."""
+    
+    memory_id: str = Field(..., description="ID of memory to forget")
+    reason: str = Field(default="", description="Why it's being forgotten")
+
+
+class ForgetResponse(BaseModel):
+    """Response from forgetting a memory."""
+    
+    success: bool
+    memory_id: str
+    was_forgotten: bool  # True if already forgotten
+    message: str
+
+
+class RecallW5HRequest(BaseModel):
+    """W5H-aware recall request with filters."""
+    
+    query: str = Field(..., description="The topic to search for")
+    who: Optional[list[str]] = Field(default=None, description="Filter by participants")
+    where: Optional[str] = Field(default=None, description="Filter by namespace")
+    min_importance: float = Field(default=0.0, ge=0.0, le=1.0, description="Minimum importance")
+    include_forgotten: bool = Field(default=False, description="Include forgotten memories")
+    limit: int = Field(default=10, ge=1, le=100, description="Maximum results")
 
 
 # ==================== SERVICE ====================
@@ -286,6 +358,109 @@ class MemoryService:
         """Clear all memories. Use with caution!"""
         self.graph.clear()
         return {"success": True, "message": "All memories cleared"}
+    
+    # ==================== W5H METHODS ====================
+    
+    def remember(self, request: RememberRequest) -> RememberResponse:
+        """
+        Store a W5H memory.
+        
+        Uses the new Memory model with WHO, WHAT, WHY, WHEN, WHERE, HOW.
+        
+        Args:
+            request: RememberRequest with W5H fields
+        
+        Returns:
+            RememberResponse with memory_id and status
+        """
+        # 1. Resolve entities from WHO
+        who_resolved: list[str] = []
+        for participant_name in request.who:
+            entity = self.graph.resolve_entity(name=participant_name)
+            if entity:
+                entity.touch()
+            else:
+                entity = Entity(
+                    type="participant",  # Generic type
+                    name=participant_name,
+                )
+                self.graph.add_entity(entity)
+            who_resolved.append(entity.id)
+        
+        # 2. Create Memory object
+        memory = Memory(
+            who=request.who,  # Store names for readability
+            what=request.what,
+            why=request.why,
+            how=request.how,
+            where=request.where,
+            importance=request.importance,
+        )
+        
+        # 3. Store as Episode (compatibility layer)
+        # Map W5H to Episode fields
+        episode = Episode(
+            id=memory.id,
+            action=memory.what,
+            outcome=memory.how,
+            context=memory.why,  # WHY stored in context
+            participants=who_resolved,
+            importance=memory.importance,
+        )
+        
+        # Store in metadata for full W5H access
+        episode.metadata["w5h"] = memory.to_w5h_dict()
+        episode.metadata["where"] = memory.where
+        
+        # 4. Add with consolidation check
+        consolidated, consolidation_count = self.graph.add_episode_with_consolidation(episode)
+        
+        return RememberResponse(
+            success=True,
+            memory_id=memory.id,
+            who_resolved=who_resolved,
+            consolidated=consolidated,
+            consolidation_count=consolidation_count,
+            retrievability=memory.retrievability,
+        )
+    
+    def forget(self, request: ForgetRequest) -> ForgetResponse:
+        """
+        Forget a memory (mark as forgotten).
+        
+        Forgotten memories are not deleted but excluded from recalls.
+        
+        Args:
+            request: ForgetRequest with memory_id
+        
+        Returns:
+            ForgetResponse with status
+        """
+        # Try to find as episode
+        episode = self.graph.get_episode(request.memory_id)
+        
+        if not episode:
+            return ForgetResponse(
+                success=False,
+                memory_id=request.memory_id,
+                was_forgotten=False,
+                message=f"Memory not found: {request.memory_id}",
+            )
+        
+        # Check if already forgotten
+        was_forgotten = episode.metadata.get("forgotten", False)
+        
+        # Mark as forgotten
+        episode.metadata["forgotten"] = True
+        episode.metadata["forget_reason"] = request.reason
+        episode.importance = 0.0
+        
+        return ForgetResponse(
+            success=True,
+            memory_id=request.memory_id,
+            was_forgotten=was_forgotten,
+            message="Memory forgotten" if not was_forgotten else "Memory was already forgotten",
+        )
 
 
 class NamespacedMemoryService:
