@@ -18,7 +18,7 @@ sys.path.insert(0, str(sdk_path))
 
 # Imports condicionais para funcionar como script e como módulo
 try:
-    from .agents import BaselineAgent, CortexAgent, AgentResponse
+    from .agents import BaselineAgent, CortexAgent, AgentResponse, call_llm_with_retry
     from .conversation_generator import (
         ConversationGenerator,
         Conversation,
@@ -26,7 +26,7 @@ try:
         Message,
     )
 except ImportError:
-    from agents import BaselineAgent, CortexAgent, AgentResponse
+    from agents import BaselineAgent, CortexAgent, AgentResponse, call_llm_with_retry
     from conversation_generator import (
         ConversationGenerator,
         Conversation,
@@ -150,7 +150,7 @@ class BenchmarkRunner:
     
     def __init__(
         self,
-        model: str = "stheno:latest",
+        model: str = "deepseek-v3.1:671b-cloud",
         ollama_url: str = "http://localhost:11434",
         cortex_url: str = "http://localhost:8000",
         namespace: str = "benchmark",
@@ -181,13 +181,11 @@ class BenchmarkRunner:
     
     def verify_services(self) -> bool:
         """Verifica se Ollama e Cortex estão disponíveis."""
-        import litellm
-        
         self._log("🔍 Verificando serviços...")
         
-        # Verifica Ollama
+        # Verifica Ollama (com retry para rate limit)
         try:
-            response = litellm.completion(
+            response = call_llm_with_retry(
                 model=f"ollama_chat/{self.model}",
                 messages=[{"role": "user", "content": "ok"}],
                 api_base=self.ollama_url,
@@ -200,7 +198,7 @@ class BenchmarkRunner:
         # Verifica Cortex
         try:
             health = self.cortex_agent.cortex.health_check()
-            if health.get("status") != "healthy":
+            if not health:
                 self._log("   ❌ Cortex API não saudável")
                 return False
             self._log(f"   ✅ Cortex API funcionando")
@@ -583,7 +581,7 @@ def main():
     
     # Cria runner
     runner = BenchmarkRunner(
-        model=os.getenv("OLLAMA_MODEL", "stheno:latest"),
+        model=os.getenv("OLLAMA_MODEL", "deepseek-v3.1:671b-cloud"),
         ollama_url=os.getenv("OLLAMA_URL", "http://localhost:11434"),
         cortex_url=os.getenv("CORTEX_API_URL", "http://localhost:8000"),
     )

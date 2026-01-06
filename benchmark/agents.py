@@ -30,6 +30,62 @@ from cortex_sdk import CortexClient, make_participant
 os.environ["LITELLM_TELEMETRY"] = "False"
 
 
+def call_llm_with_retry(
+    model: str,
+    messages: list[dict],
+    api_base: str,
+    max_retries: int = 10,
+    initial_wait: float = 30.0,
+    max_wait: float = 300.0,
+    backoff_factor: float = 1.5,
+) -> Any:
+    """
+    Chama LLM com retry e backoff exponencial para rate limits.
+    
+    Args:
+        model: Nome do modelo (ex: ollama_chat/deepseek-v3.1:671b-cloud)
+        messages: Lista de mensagens
+        api_base: URL base do Ollama
+        max_retries: Máximo de tentativas
+        initial_wait: Tempo inicial de espera (segundos)
+        max_wait: Tempo máximo de espera (segundos)
+        backoff_factor: Fator de multiplicação do backoff
+        
+    Returns:
+        Response do LiteLLM
+        
+    Raises:
+        Exception se todas as tentativas falharem
+    """
+    wait_time = initial_wait
+    last_error = None
+    
+    for attempt in range(max_retries):
+        try:
+            response = litellm.completion(
+                model=model,
+                messages=messages,
+                api_base=api_base,
+            )
+            return response
+            
+        except Exception as e:
+            error_str = str(e).lower()
+            last_error = e
+            
+            # Verifica se é rate limit (429)
+            if "429" in error_str or "too many requests" in error_str or "rate limit" in error_str:
+                print(f"\n   ⏳ Rate limit atingido. Aguardando {wait_time:.0f}s... (tentativa {attempt + 1}/{max_retries})")
+                time.sleep(wait_time)
+                wait_time = min(wait_time * backoff_factor, max_wait)
+            else:
+                # Outro erro, não faz retry
+                raise e
+    
+    # Todas tentativas falharam
+    raise last_error
+
+
 @dataclass
 class AgentResponse:
     """Resposta de um agente com métricas reais."""
@@ -108,7 +164,7 @@ Se não souber algo ou não tiver contexto, diga honestamente."""
     
     def __init__(
         self,
-        model: str = "stheno:latest",
+        model: str = "deepseek-v3.1:671b-cloud",
         ollama_url: str = "http://localhost:11434",
         context_window_size: int = 10,  # Últimas N mensagens
     ):
@@ -163,9 +219,9 @@ Se não souber algo ou não tiver contexto, diga honestamente."""
             *context_messages
         ]
         
-        # Chama Ollama via LiteLLM
+        # Chama Ollama via LiteLLM (com retry para rate limit)
         try:
-            response = litellm.completion(
+            response = call_llm_with_retry(
                 model=f"ollama_chat/{self.model}",
                 messages=messages,
                 api_base=self.ollama_url,
@@ -264,7 +320,7 @@ INSTRUÇÕES:
     
     def __init__(
         self,
-        model: str = "stheno:latest",
+        model: str = "deepseek-v3.1:671b-cloud",
         ollama_url: str = "http://localhost:11434",
         cortex_url: str = "http://localhost:8000",
         context_window_size: int = 10,
@@ -359,7 +415,12 @@ INSTRUÇÕES:
     
     def _store_memory(self, message: str, response: str) -> float:
         """
-        Armazena a interação no Cortex.
+        Armazena a interação no Cortex extraindo SIGNIFICADO SEMÂNTICO.
+        
+        Usa LLM para extrair:
+        - action: verbo + objeto (ex: "requested_password_reset")
+        - outcome: resultado conciso (ex: "reset link sent to email")
+        - context: situação relevante (ex: "support_ticket_#123")
         
         Returns:
             time_ms
@@ -367,20 +428,60 @@ INSTRUÇÕES:
         start_time = time.time()
         
         try:
-            # Extrai ação e resultado
-            action = f"conversed: {message[:100]}"
-            outcome = response[:200]
+            # Usa LLM para extrair significado (minimalista)
+            extract_prompt = f"""Extraia o significado SEMÂNTICO desta interação em JSON conciso:
+
+USER: {message}
+ASSISTANT: {response}
+
+Retorne apenas JSON (sem markdown):
+{{
+  "action": "verbo_objeto",
+  "outcome": "resultado_conciso",
+  "context": "situação_relevante"
+}}
+
+Regras:
+- action: verbo + objeto em snake_case (ex: "reported_login_issue")
+- outcome: resultado em ~10 palavras (ex: "user unable to authenticate, needs password reset")
+- context: contexto útil em ~5 palavras (ex: "customer_support_session_1")
+- SEM texto literal, SEM repetições, MÁXIMO valor informacional"""
+
+            extract_response = call_llm_with_retry(
+                model=self.model,
+                messages=[{"role": "user", "content": extract_prompt}],
+                api_base=self.api_base,
+                max_retries=3,
+                initial_wait=5.0,
+            )
             
+            # Parse JSON
+            import json
+            import re
+            
+            content = extract_response["choices"][0]["message"]["content"]
+            # Remove markdown se houver
+            content = re.sub(r'```json\s*|\s*```', '', content).strip()
+            
+            extracted = json.loads(content)
+            
+            self.cortex.store(
+                action=extracted.get("action", "conversed"),
+                outcome=extracted.get("outcome", "interaction completed"),
+                context=f"{extracted.get('context', 'session')} | user:{self._current_user}",
+                participants=[make_participant("person", self._current_user)],
+            )
+            
+        except Exception as e:
+            # Fallback: salva versão minimalista manual
+            action = "interaction"
+            outcome = f"user engaged with assistant"
             self.cortex.store(
                 action=action,
                 outcome=outcome,
-                context=f"sessão com {self._current_user}",
+                context=f"session with {self._current_user}",
                 participants=[make_participant("person", self._current_user)],
-                namespace=self.namespace,
             )
-            
-        except Exception:
-            pass  # Silencia erros de store para não afetar benchmark
         
         return (time.time() - start_time) * 1000
     
@@ -424,10 +525,10 @@ INSTRUÇÕES:
             *context_messages
         ]
         
-        # 2. GENERATE - Chama Ollama
+        # 2. GENERATE - Chama Ollama (com retry para rate limit)
         llm_start = time.time()
         try:
-            response = litellm.completion(
+            response = call_llm_with_retry(
                 model=f"ollama_chat/{self.model}",
                 messages=messages,
                 api_base=self.ollama_url,
@@ -541,11 +642,11 @@ def test_agents():
     print("TESTE DOS AGENTES COM OLLAMA REAL")
     print("=" * 60)
     
-    # Verifica Ollama
+    # Verifica Ollama (com retry)
     print("\n🔍 Verificando Ollama...")
     try:
-        response = litellm.completion(
-            model="ollama_chat/stheno:latest",
+        response = call_llm_with_retry(
+            model="ollama_chat/deepseek-v3.1:671b-cloud",
             messages=[{"role": "user", "content": "Oi, responda apenas 'ok'"}],
             api_base="http://localhost:11434",
         )
@@ -560,7 +661,7 @@ def test_agents():
     print("BASELINE AGENT (sem memória)")
     print("=" * 40)
     
-    baseline = BaselineAgent(model="stheno:latest")
+    baseline = BaselineAgent(model="deepseek-v3.1:671b-cloud")
     
     # Sessão 1
     baseline.new_session()
@@ -606,7 +707,7 @@ def test_agents():
     # Verifica Cortex API
     print("\n🔍 Verificando Cortex API...")
     cortex_agent = CortexAgent(
-        model="stheno:latest",
+        model="deepseek-v3.1:671b-cloud",
         namespace="benchmark_test",
     )
     

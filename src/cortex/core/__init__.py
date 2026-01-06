@@ -3,8 +3,16 @@
 from cortex.core.entity import Entity
 from cortex.core.episode import Episode
 from cortex.core.relation import Relation
+from cortex.core.memory import Memory  # W5H memory model
 from cortex.core.memory_graph import MemoryGraph, RecallResult
 from cortex.core.namespace import NamespacedMemoryManager, get_memory_manager, reset_memory_manager
+from cortex.core.decay import (
+    DecayManager,
+    DecayConfig,
+    create_default_decay_manager,
+    create_aggressive_decay_manager,
+    create_gentle_decay_manager,
+)
 from cortex.core.identity import (
     IdentityKernel,
     JailbreakPattern,
@@ -32,11 +40,18 @@ __all__ = [
     "Entity",
     "Episode",
     "Relation",
+    "Memory",  # W5H memory model
     "MemoryGraph",
     "RecallResult",
     "NamespacedMemoryManager",
     "get_memory_manager",
     "reset_memory_manager",
+    # Decay / Forgetting
+    "DecayManager",
+    "DecayConfig",
+    "create_default_decay_manager",
+    "create_aggressive_decay_manager",
+    "create_gentle_decay_manager",
     # Identity / Anti-jailbreak
     "IdentityKernel",
     "JailbreakPattern",

@@ -101,7 +101,7 @@ Requisitos:
     parser.add_argument(
         "--model",
         type=str,
-        default=os.getenv("OLLAMA_MODEL", "stheno:latest"),
+        default=os.getenv("OLLAMA_MODEL", "deepseek-v3.1:671b-cloud"),
         help="Modelo Ollama a usar",
     )
     parser.add_argument(
