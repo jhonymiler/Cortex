@@ -114,7 +114,7 @@ class AblationRunner:
     
     def __init__(
         self,
-        model: str = "deepseek-v3.1:671b-cloud",
+        model: str = "ministral-3:3b",
         ollama_url: str = "http://localhost:11434",
         cortex_url: str = "http://localhost:8000",
         output_dir: Path | str = None,
@@ -401,7 +401,7 @@ def main():
     )
     parser.add_argument(
         "--model",
-        default=os.getenv("OLLAMA_MODEL", "deepseek-v3.1:671b-cloud"),
+        default=os.getenv("OLLAMA_MODEL", "ministral-3:3b"),
         help="Modelo Ollama",
     )
     parser.add_argument(

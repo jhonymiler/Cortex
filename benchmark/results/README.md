@@ -168,7 +168,7 @@ print(len(graph['episodes']), "episódios")
 ```json
 {
   "overview": {
-    "model": "deepseek-v3.1:671b-cloud",
+    "model": "ministral-3:3b",
     "duration_seconds": 71.89,
     "total_conversations": 1,
     "total_messages": 5

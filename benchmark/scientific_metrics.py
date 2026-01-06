@@ -115,7 +115,7 @@ class ScientificMetricsEvaluator:
     
     def __init__(
         self,
-        judge_model: str = "ollama_chat/deepseek-v3.1:671b-cloud",
+        judge_model: str = "ollama_chat/ministral-3:3b",
         ollama_url: str = "http://localhost:11434",
     ):
         """
@@ -546,7 +546,7 @@ class BenchmarkAnnotator:
     @staticmethod
     def generate_ground_truth_with_llm(
         conversation: dict,
-        model: str = "ollama_chat/deepseek-v3.1:671b-cloud",
+        model: str = "ollama_chat/ministral-3:3b",
         ollama_url: str = "http://localhost:11434",
     ) -> dict:
         """
@@ -589,7 +589,7 @@ def evaluate_benchmark_scientifically(
     benchmark_result: dict,
     ground_truth: dict | None = None,
     use_llm_judge: bool = False,
-    judge_model: str = "ollama_chat/deepseek-v3.1:671b-cloud",
+    judge_model: str = "ollama_chat/ministral-3:3b",
     ollama_url: str = "http://localhost:11434",
 ) -> dict:
     """

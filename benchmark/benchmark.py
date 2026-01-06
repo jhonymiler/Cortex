@@ -150,7 +150,7 @@ class BenchmarkRunner:
     
     def __init__(
         self,
-        model: str = "deepseek-v3.1:671b-cloud",
+        model: str = "ministral-3:3b",
         ollama_url: str = "http://localhost:11434",
         cortex_url: str = "http://localhost:8000",
         namespace: str = "benchmark",
@@ -581,7 +581,7 @@ def main():
     
     # Cria runner
     runner = BenchmarkRunner(
-        model=os.getenv("OLLAMA_MODEL", "deepseek-v3.1:671b-cloud"),
+        model=os.getenv("OLLAMA_MODEL", "ministral-3:3b"),
         ollama_url=os.getenv("OLLAMA_URL", "http://localhost:11434"),
         cortex_url=os.getenv("CORTEX_API_URL", "http://localhost:8000"),
     )

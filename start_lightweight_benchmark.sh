@@ -51,10 +51,10 @@ fi
 echo "   ✓ Ollama OK"
 
 # Verifica modelo
-echo "🔍 Verificando modelo deepseek-v3.1:671b-cloud..."
-if ! ollama list | grep -q "deepseek-v3.1:671b-cloud"; then
+echo "🔍 Verificando modelo ministral-3:3b..."
+if ! ollama list | grep -q "ministral-3:3b"; then
     echo "⚠️  Modelo não encontrado. Baixando..."
-    ollama pull deepseek-v3.1:671b-cloud
+    ollama pull ministral-3:3b
 fi
 echo "   ✓ Modelo OK"
 

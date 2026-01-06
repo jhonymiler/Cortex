@@ -43,7 +43,7 @@ def call_llm_with_retry(
     Chama LLM com retry e backoff exponencial para rate limits.
     
     Args:
-        model: Nome do modelo (ex: ollama_chat/deepseek-v3.1:671b-cloud)
+        model: Nome do modelo (ex: ollama_chat/ministral-3:3b)
         messages: Lista de mensagens
         api_base: URL base do Ollama
         max_retries: Máximo de tentativas
@@ -164,7 +164,7 @@ Se não souber algo ou não tiver contexto, diga honestamente."""
     
     def __init__(
         self,
-        model: str = "deepseek-v3.1:671b-cloud",
+        model: str = "ministral-3:3b",
         ollama_url: str = "http://localhost:11434",
         context_window_size: int = 10,  # Últimas N mensagens
     ):
