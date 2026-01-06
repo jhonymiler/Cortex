@@ -103,16 +103,68 @@ Endpoints HTTP:
 ### Store
 
 ```
-Request → Validate → Resolve Entities → Create Episode → 
-  Check Consolidation → Create Relations → Persist → Response
+Request → Validate → Resolve Entities → Create Memory → 
+  Check Consolidation → Create Relations → Apply Decay → Persist → Response
 ```
 
 ### Recall
 
 ```
-Query → Extract Concepts → Search Entities → Search Episodes →
-  Filter by Context → Rank by Relevance → Format Response
+Query → Extract Concepts → Search Entities → Search Memories →
+  Filter by Retrievability → Rank by Relevance → Format Response
 ```
+
+## Modelo W5H
+
+O Cortex usa o modelo **W5H** para estruturar memórias de forma agnóstica:
+
+| Campo | Significado | Exemplo |
+|-------|-------------|---------|
+| WHO | Participantes | `["maria@email.com", "sistema_pagamentos"]` |
+| WHAT | Ação/fato | `"reportou erro de pagamento"` |
+| WHY | Causa/razão | `"cartão expirado"` |
+| WHEN | Timestamp | `"2026-01-06T10:30:00"` |
+| WHERE | Namespace | `"suporte_cliente"` |
+| HOW | Resultado | `"orientada a atualizar dados"` |
+
+### Por que W5H?
+
+1. **Unifica** semantic/episodic/procedural em um modelo
+2. **Explicita** causa (WHY) que normalmente fica implícita
+3. **Organiza** por namespace (WHERE) naturalmente
+4. **Agnóstico** de domínio (dev, chatbot, roleplay)
+
+Ver detalhes em [W5H_DESIGN.md](W5H_DESIGN.md).
+
+## Decaimento (Ebbinghaus)
+
+Memórias seguem a **Curva de Esquecimento** de Ebbinghaus:
+
+```
+R = e^(-t/S)
+
+Onde:
+  R = retrievability (facilidade de recuperação)
+  t = tempo desde último acesso (dias)
+  S = stability (modificada por acessos, consolidação, centralidade)
+```
+
+### Fatores que aumentam Stability:
+
+| Fator | Bonus | Descrição |
+|-------|-------|-----------|
+| Access Count | `1 + log(access_count)` | Cada acesso reforça |
+| Consolidação | `2.0x` | Memórias consolidadas são mais duráveis |
+| Hub Centrality | `1.5x` | Memórias muito referenciadas decaem menos |
+| High Importance | `1.3x` | Importância > 0.7 recebe bonus |
+
+### Lifecycle de Memória:
+
+```
+Fresh (R > 0.7) → Stable (R > 0.4) → Fading (R > 0.1) → Forgotten
+```
+
+Memórias "forgotten" não são deletadas, apenas marcadas e excluídas de recalls normais.
 
 ## Consolidação
 
