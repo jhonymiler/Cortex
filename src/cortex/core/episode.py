@@ -71,6 +71,10 @@ class Episode:
     importance: float = 0.5
     metadata: dict[str, Any] = field(default_factory=dict)
     
+    # Context tracking (para recall melhorado)
+    conversation_id: str | None = None
+    session_id: str | None = None
+    
     @property
     def is_consolidated(self) -> bool:
         """Retorna True se este episódio é resultado de consolidação."""

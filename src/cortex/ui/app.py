@@ -62,25 +62,89 @@ st.markdown("""
 
 # ==================== DATA ====================
 
-def get_data_dir() -> Path:
-    """Retorna o diretório de dados do Cortex."""
+def get_available_namespaces() -> list[str]:
+    """Retorna lista de namespaces disponíveis em ./data."""
+    data_root = Path(__file__).parent.parent.parent.parent / "data"
+    if not data_root.exists():
+        return ["default"]
+    
+    namespaces = []
+    for item in data_root.iterdir():
+        if item.is_dir() and not item.name.startswith('.'):
+            namespaces.append(item.name)
+    
+    return sorted(namespaces) if namespaces else ["default"]
+
+
+def get_data_dir(namespace: str = "default") -> Path:
+    """Retorna o diretório de dados do Cortex para o namespace especificado."""
     data_dir = os.environ.get("CORTEX_DATA_DIR")
     if data_dir:
         return Path(data_dir)
-    return Path.home() / ".cortex"
+    
+    # Usa ./data/<namespace> no projeto
+    data_root = Path(__file__).parent.parent.parent.parent / "data" / namespace
+    data_root.mkdir(parents=True, exist_ok=True)
+    return data_root
 
 
-@st.cache_resource
-def load_graph() -> MemoryGraph:
-    """Carrega o grafo de memória."""
-    data_dir = get_data_dir()
+@st.cache_resource(ttl=60)
+def load_graph(namespace: str = "default") -> MemoryGraph:
+    """Carrega o grafo de memória para o namespace especificado."""
+    if namespace == "Todas":
+        # Carrega e mescla todos os namespaces
+        return load_all_namespaces()
+    
+    data_dir = get_data_dir(namespace)
     return MemoryGraph(storage_path=data_dir)
 
 
-def reload_graph() -> MemoryGraph:
+@st.cache_data(ttl=30)
+def get_cached_graph_data(namespace: str) -> dict:
+    """Cache dos dados do grafo para visualização."""
+    graph = load_graph(namespace)
+    return graph.get_graph_data()
+
+
+def load_all_namespaces() -> MemoryGraph:
+    """Carrega e mescla memórias de todos os namespaces."""
+    data_root = Path(__file__).parent.parent.parent.parent / "data"
+    merged_graph = MemoryGraph(storage_path=None)  # Grafo em memória
+    
+    if not data_root.exists():
+        return merged_graph
+    
+    # Itera por todas as pastas em data/
+    for namespace_dir in data_root.iterdir():
+        if namespace_dir.is_dir() and not namespace_dir.name.startswith('.'):
+            graph_file = namespace_dir / "memory_graph.json"
+            if graph_file.exists():
+                namespace_graph = MemoryGraph(storage_path=namespace_dir)
+                
+                # Adiciona todas as entidades
+                for entity_id, entity in namespace_graph._entities.items():
+                    if entity_id not in merged_graph._entities:
+                        merged_graph._entities[entity_id] = entity
+                        merged_graph._index_entity(entity)
+                
+                # Adiciona todos os episódios (sem método de indexação específico)
+                for episode_id, episode in namespace_graph._episodes.items():
+                    if episode_id not in merged_graph._episodes:
+                        merged_graph._episodes[episode_id] = episode
+                
+                # Adiciona todas as relações
+                for relation_id, relation in namespace_graph._relations.items():
+                    if relation_id not in merged_graph._relations:
+                        merged_graph._relations[relation_id] = relation
+                        merged_graph._index_relation(relation)
+    
+    return merged_graph
+
+
+def reload_graph(namespace: str = "default") -> MemoryGraph:
     """Recarrega o grafo (limpa cache)."""
     st.cache_resource.clear()
-    return load_graph()
+    return load_graph(namespace)
 
 
 # ==================== SIDEBAR ====================
@@ -90,18 +154,41 @@ def render_sidebar():
     st.sidebar.title("🧠 Cortex")
     st.sidebar.markdown("---")
     
-    # Seletor de diretório
-    data_dir = st.sidebar.text_input(
-        "📁 Diretório de dados",
-        value=str(get_data_dir()),
-        help="Caminho para os dados do Cortex"
+    # Inicializa session_state se não existir
+    if "namespace" not in st.session_state:
+        st.session_state.namespace = "default"
+    
+    # Seletor de namespace
+    available_namespaces = get_available_namespaces()
+    # Adiciona opção "Todas" no início
+    namespace_options = ["Todas"] + available_namespaces
+    
+    # Determina o índice atual
+    if st.session_state.namespace in namespace_options:
+        current_index = namespace_options.index(st.session_state.namespace)
+    else:
+        current_index = 0
+    
+    selected_namespace = st.sidebar.selectbox(
+        "📁 Namespace (Pasta de Dados)",
+        options=namespace_options,
+        index=current_index,
+        help="Escolha 'Todas' para visualizar todos os namespaces, ou selecione uma pasta específica em ./data"
     )
     
-    if data_dir != str(get_data_dir()):
-        os.environ["CORTEX_DATA_DIR"] = data_dir
-        if st.sidebar.button("🔄 Recarregar"):
-            reload_graph()
-            st.rerun()
+    # Se mudou o namespace, atualiza e recarrega
+    if selected_namespace != st.session_state.namespace:
+        st.session_state.namespace = selected_namespace
+        reload_graph(selected_namespace)
+        st.rerun()
+    
+    # Mostra o caminho atual
+    if st.session_state.namespace == "Todas":
+        current_path = get_data_dir("default").parent  # Mostra ./data
+        st.sidebar.caption(f"📂 {current_path} (todas as pastas)")
+    else:
+        current_path = get_data_dir(st.session_state.namespace)
+        st.sidebar.caption(f"📂 {current_path}")
     
     st.sidebar.markdown("---")
     
@@ -120,14 +207,17 @@ def render_sidebar():
     col1, col2 = st.sidebar.columns(2)
     with col1:
         if st.button("🔄 Atualizar", use_container_width=True):
-            reload_graph()
+            reload_graph(st.session_state.namespace)
             st.rerun()
     with col2:
         if st.button("🗑️ Limpar", use_container_width=True, type="secondary"):
-            if st.sidebar.checkbox("Confirmar limpeza"):
-                graph = load_graph()
+            # Não permite limpar quando "Todas" está selecionado
+            if st.session_state.namespace == "Todas":
+                st.sidebar.error("⚠️ Não é possível limpar quando 'Todas' está selecionado. Escolha um namespace específico.")
+            elif st.sidebar.checkbox("Confirmar limpeza"):
+                graph = load_graph(st.session_state.namespace)
                 graph.clear()
-                reload_graph()
+                reload_graph(st.session_state.namespace)
                 st.success("Memórias limpas!")
                 st.rerun()
     
@@ -135,13 +225,18 @@ def render_sidebar():
     st.sidebar.markdown("---")
     st.sidebar.subheader("🔧 Decay Manual")
     st.sidebar.caption("⚠️ O decay acontece automaticamente durante o recall. Use apenas para testes.")
-    decay_factor = st.sidebar.slider("Fator de decay", 0.80, 0.99, 0.95, 0.01)
-    if st.sidebar.button("🧹 Aplicar Decay", use_container_width=True):
-        graph = load_graph()
-        result = graph.apply_access_decay([], [], decay_factor)
-        reload_graph()
-        st.sidebar.success(f"Decay aplicado! Esquecido: {result['episodes_forgotten']} eps, {result['relations_forgotten']} rels")
-        st.rerun()
+    
+    # Desabilita decay quando "Todas" está selecionado
+    if st.session_state.namespace == "Todas":
+        st.sidebar.caption("🔒 Decay desabilitado no modo 'Todas'")
+    else:
+        decay_factor = st.sidebar.slider("Fator de decay", 0.80, 0.99, 0.95, 0.01)
+        if st.sidebar.button("🧹 Aplicar Decay", use_container_width=True):
+            graph = load_graph(st.session_state.namespace)
+            result = graph.apply_access_decay([], [], decay_factor)
+            reload_graph(st.session_state.namespace)
+            st.sidebar.success(f"Decay aplicado! Esquecido: {result['episodes_forgotten']} eps, {result['relations_forgotten']} rels")
+            st.rerun()
     
     return page
 
@@ -152,8 +247,9 @@ def render_dashboard(graph: MemoryGraph):
     """Página principal com estatísticas."""
     st.title("📊 Dashboard")
     
+    # Cache stats para melhor performance
     stats = graph.stats()
-    graph_data = graph.get_graph_data()
+    graph_data = get_cached_graph_data(st.session_state.namespace)
     health = graph.get_memory_health()
     
     # Métricas principais
@@ -235,23 +331,33 @@ def render_graph_visual(graph: MemoryGraph):
     """Visualização interativa do grafo."""
     st.title("🕸️ Grafo de Memória")
     
-    graph_data = graph.get_graph_data()
+    # Usa cache para dados do grafo
+    graph_data = get_cached_graph_data(st.session_state.namespace)
     
     if not graph_data["nodes"]:
         st.info("Grafo vazio. Crie algumas memórias primeiro!")
         return
     
-    # Controles
-    col1, col2, col3 = st.columns(3)
+    # Controles principais
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
         show_entities = st.checkbox("🎯 Entidades", value=True)
     with col2:
         show_episodes = st.checkbox("📝 Episódios", value=True)
     with col3:
         physics_enabled = st.checkbox("🌀 Física", value=True)
+    with col4:
+        min_weight = st.slider("Peso mín", 0.0, 1.0, 0.0, 0.1)
     
-    # Filtro por peso mínimo
-    min_weight = st.slider("Peso mínimo", 0.0, 1.0, 0.0, 0.1)
+    # Controles de espaçamento (expansível)
+    with st.expander("⚙️ Ajustar Espaçamento"):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            node_distance = st.slider("Distância entre nós", 100, 800, 500, 50)
+        with col2:
+            spring_length = st.slider("Comprimento mola", 100, 600, 400, 50)
+        with col3:
+            repulsion = st.slider("Repulsão", 500, 5000, 2000, 500)
     
     # Prepara nós e arestas
     nodes = []
@@ -286,16 +392,25 @@ def render_graph_visual(graph: MemoryGraph):
                 color=edge["color"],
             ))
     
-    # Configuração do grafo
+    # Configuração do grafo com parâmetros ajustáveis
     config = Config(
-        width=1200,
-        height=600,
+        width=1400,
+        height=800,
         directed=True,
         physics=physics_enabled,
         hierarchical=False,
         nodeHighlightBehavior=True,
         highlightColor="#F7A7A6",
         collapsible=False,
+        # Parâmetros de física para maior separação
+        nodeDistance=node_distance,
+        springLength=spring_length,
+        springStrength=0.01,
+        centralGravity=0.001,
+        avoidOverlap=1.0,
+        # Parâmetros adicionais de repulsão
+        damping=0.09,
+        minVelocity=0.75,
     )
     
     # Renderiza
@@ -679,8 +794,12 @@ def render_search(graph: MemoryGraph):
 
 def main():
     """Função principal."""
+    # Inicializa session_state se não existir
+    if "namespace" not in st.session_state:
+        st.session_state.namespace = "default"
+    
     # Carrega grafo
-    graph = load_graph()
+    graph = load_graph(st.session_state.namespace)
     
     # Renderiza sidebar e obtém página selecionada
     page = render_sidebar()

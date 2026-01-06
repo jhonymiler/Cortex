@@ -571,24 +571,55 @@ class MemoryGraph:
         
         Este é o método principal para agentes obterem contexto.
         
+        MELHORIAS:
+        - Busca participantes frequentes do namespace
+        - Filtra por conversation_id se fornecido
+        - Prioriza episódios recentes da mesma conversa
+        
         Args:
             query: Texto da pergunta/contexto do usuário
-            context: Informações adicionais (entidades conhecidas, etc.)
+            context: Informações adicionais:
+                - conversation_id: ID da conversa ativa
+                - session_id: ID da sessão atual
+                - namespace: Namespace para busca
+                - entity_ids: IDs de entidades conhecidas
             limit: Máximo de resultados por tipo
             
         Returns:
             RecallResult com entidades, episódios e relações relevantes
         """
         context = context or {}
+        conversation_id = context.get("conversation_id")
+        session_id = context.get("session_id")
+        namespace = context.get("namespace", "default")
         
-        # Busca entidades
+        # 1. Busca entidades diretamente mencionadas na query
         entities = self.find_entities(query=query, limit=limit)
-        
-        # Extrai IDs para contexto
         entity_ids = [e.id for e in entities]
-        enriched_context = {**context, "entity_ids": entity_ids}
         
-        # Busca episódios
+        # 2. Adiciona participantes FREQUENTES do namespace (top 5)
+        frequent_participants = self._get_frequent_participants(namespace, top_n=5)
+        for participant in frequent_participants:
+            if participant.id not in entity_ids:
+                entities.append(participant)
+                entity_ids.append(participant.id)
+        
+        # 3. Se há conversa ativa, adiciona participantes dessa conversa
+        if conversation_id:
+            conversation_participants = self._get_conversation_participants(
+                conversation_id, limit=10
+            )
+            for participant in conversation_participants:
+                if participant.id not in entity_ids:
+                    entities.append(participant)
+                    entity_ids.append(participant.id)
+        
+        # Limita entidades ao máximo
+        entities = entities[:limit * 2]  # 2x limit para entidades
+        entity_ids = [e.id for e in entities]
+        
+        # 4. Busca episódios
+        enriched_context = {**context, "entity_ids": entity_ids}
         episodes = self.find_episodes(
             query=query,
             participant_ids=entity_ids if entity_ids else None,
@@ -596,7 +627,23 @@ class MemoryGraph:
             context=enriched_context,
         )
         
-        # Busca relações entre os encontrados
+        # 5. Se há conversa ativa, prioriza episódios dessa conversa
+        if conversation_id:
+            conversation_episodes = [
+                ep for ep in self._episodes.values()
+                if ep.conversation_id == conversation_id
+            ]
+            # Merge com episódios encontrados
+            episode_ids = {ep.id for ep in episodes}
+            for ep in conversation_episodes[:limit]:
+                if ep.id not in episode_ids:
+                    episodes.append(ep)
+                    episode_ids.add(ep.id)
+        
+        # Limita episódios
+        episodes = episodes[:limit]
+        
+        # 6. Busca relações entre os encontrados
         all_ids = entity_ids + [ep.id for ep in episodes]
         relations = []
         for id_ in all_ids:
@@ -1295,27 +1342,79 @@ class MemoryGraph:
         if self._episodes:
             avg_importance = sum(e.importance for e in self._episodes.values()) / len(self._episodes)
         else:
-            avg_importance = 0
-        
-        # Força média das relações
-        if self._relations:
-            avg_strength = sum(r.strength for r in self._relations.values()) / len(self._relations)
-        else:
-            avg_strength = 0
+            avg_importance = 0.0
         
         return {
-            "total_entities": len(self._entities),
-            "total_episodes": len(self._episodes),
-            "total_relations": len(self._relations),
-            "orphan_entities": len(orphan_entities),
-            "lonely_episodes": len(lonely_episodes),
-            "weak_relations": len(weak_relations),
-            "avg_episode_importance": round(avg_importance, 3),
-            "avg_relation_strength": round(avg_strength, 3),
+            "orphan_entities_count": len(orphan_entities),
+            "orphan_entity_ids": orphan_entities[:10],  # Primeiros 10
+            "lonely_episodes_count": len(lonely_episodes),
+            "weak_relations_count": len(weak_relations),
+            "avg_episode_importance": avg_importance,
             "health_score": self._calculate_health_score(
-                orphan_entities, lonely_episodes, weak_relations
+                len(orphan_entities),
+                len(lonely_episodes),
+                len(weak_relations),
             ),
         }
+    
+    def _get_frequent_participants(self, namespace: str, top_n: int = 5) -> list[Entity]:
+        """
+        Retorna entidades que participaram em muitos episódios do namespace.
+        
+        Usado para recall contextual - entidades frequentes são importantes.
+        """
+        from collections import defaultdict
+        
+        participant_counts = defaultdict(int)
+        
+        # Conta participações
+        for episode in self._episodes.values():
+            # Filtra por namespace se fornecido
+            if namespace and namespace != "default":
+                # Assume que namespace está em metadata ou context
+                episode_namespace = episode.metadata.get("namespace", "default")
+                if episode_namespace != namespace:
+                    continue
+            
+            for participant_id in episode.participants:
+                if participant_id in self._entities:
+                    participant_counts[participant_id] += 1
+        
+        # Ordena por frequência
+        top_participants = sorted(
+            participant_counts.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )[:top_n]
+        
+        # Retorna entidades
+        return [self._entities[pid] for pid, _ in top_participants]
+    
+    def _get_conversation_participants(
+        self, 
+        conversation_id: str, 
+        limit: int = 10
+    ) -> list[Entity]:
+        """
+        Retorna entidades que participaram na conversa específica.
+        
+        Usado para recall contextual - manter continuidade da conversa.
+        """
+        participant_ids = set()
+        
+        for episode in self._episodes.values():
+            if episode.conversation_id == conversation_id:
+                participant_ids.update(episode.participants)
+        
+        # Retorna entidades (ordenadas por access_count descendente)
+        participants = [
+            self._entities[pid] 
+            for pid in participant_ids 
+            if pid in self._entities
+        ]
+        participants.sort(key=lambda e: e.access_count, reverse=True)
+        
+        return participants[:limit]
     
     def _calculate_health_score(
         self,

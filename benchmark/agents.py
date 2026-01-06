@@ -23,7 +23,7 @@ import litellm
 sdk_path = Path(__file__).parent.parent / "sdk" / "python"
 sys.path.insert(0, str(sdk_path))
 
-from cortex_sdk import CortexClient, make_participant
+from cortex_sdk import CortexClient
 
 
 # Desabilita telemetria do LiteLLM
@@ -292,6 +292,19 @@ Se não souber algo ou não tiver contexto, diga honestamente."""
                 if self._total_messages > 0 else 0
             ),
         }
+    
+    def test_connection(self) -> bool:
+        """Testa se o Ollama está acessível."""
+        try:
+            response = litellm.completion(
+                model=f"ollama_chat/{self.model}",
+                messages=[{"role": "user", "content": "test"}],
+                api_base=self.ollama_url,
+                max_tokens=1,
+            )
+            return True
+        except Exception:
+            return False
 
 
 class CortexAgent(BaseAgent):
@@ -320,7 +333,7 @@ INSTRUÇÕES:
     
     def __init__(
         self,
-        model: str = "deepseek-v3.1:671b-cloud",
+        model: str = "ministral-3:3b",
         ollama_url: str = "http://localhost:11434",
         cortex_url: str = "http://localhost:8000",
         context_window_size: int = 10,
@@ -335,8 +348,8 @@ INSTRUÇÕES:
         # Configura LiteLLM
         os.environ["OLLAMA_API_BASE"] = ollama_url
         
-        # Cliente Cortex
-        self.cortex = CortexClient(base_url=cortex_url)
+        # Cliente Cortex com namespace para isolamento
+        self.cortex = CortexClient(base_url=cortex_url, namespace=namespace)
         
         # Estado da sessão atual
         self._session_history: list[dict] = []
@@ -361,9 +374,19 @@ INSTRUÇÕES:
         self._current_user = user_id
         self._sessions_count += 1
     
-    def _recall_memory(self, query: str) -> tuple[str, int, int, int, float]:
+    def _recall_memory(
+        self, 
+        query: str,
+        conversation_id: str | None = None,
+        session_id: str | None = None,
+    ) -> tuple[str, int, int, int, float]:
         """
         Busca memórias relevantes no Cortex.
+        
+        Args:
+            query: Query de busca
+            conversation_id: ID da conversa ativa
+            session_id: ID da sessão atual
         
         Returns:
             (context_text, num_entities, num_episodes, num_relations, time_ms)
@@ -371,19 +394,24 @@ INSTRUÇÕES:
         start_time = time.time()
         
         try:
+            # Chama recall com conversation_id e session_id
             result = self.cortex.recall(
                 query=query,
-                context={"namespace": self.namespace, "user": self._current_user},
+                who=[self._current_user] if self._current_user else None,
+                where=self.namespace,
+                conversation_id=conversation_id,
+                session_id=session_id,
+                limit=10,
             )
             
             recall_time = (time.time() - start_time) * 1000
             
-            if not result.get("success"):
-                return "", 0, 0, 0, recall_time
-            
+            # A nova API não retorna "success", retorna diretamente os dados
             entities = result.get("entities", [])
             episodes = result.get("episodes", [])
-            relations = result.get("relations", [])
+            
+            # Não há relations no novo modelo, use contagem zero
+            relations_count = result.get("relations_found", 0)
             
             # Formata contexto para o prompt
             context_parts = []
@@ -391,23 +419,25 @@ INSTRUÇÕES:
             if entities:
                 context_parts.append("📋 ENTIDADES CONHECIDAS:")
                 for e in entities[:5]:
-                    attrs = e.get("attributes", {})
-                    attr_str = ", ".join(f"{k}={v}" for k, v in attrs.items()) if attrs else ""
-                    context_parts.append(f"  • {e['name']} ({e['type']}){': ' + attr_str if attr_str else ''}")
+                    context_parts.append(f"  • {e.get('name', '?')} ({e.get('type', 'unknown')})")
             
             if episodes:
                 context_parts.append("\n📝 HISTÓRICO RELEVANTE:")
                 for ep in episodes[:5]:
-                    context_parts.append(f"  • {ep['action']}: {ep['outcome']}")
+                    action = ep.get("action", "unknown")
+                    outcome = ep.get("outcome", "")
+                    context_parts.append(f"  • {action}: {outcome}" if outcome else f"  • {action}")
             
-            if relations:
-                context_parts.append("\n🔗 RELAÇÕES:")
-                for r in relations[:3]:
-                    context_parts.append(f"  • {r.get('from_name', '?')} → {r['relation_type']} → {r.get('to_name', '?')}")
+            # Usa prompt_context se disponível (mais conciso)
+            prompt_ctx = result.get("prompt_context", "")
+            if prompt_ctx and prompt_ctx.strip():
+                context_text = prompt_ctx
+            elif context_parts:
+                context_text = "\n".join(context_parts)
+            else:
+                context_text = "Nenhuma memória relevante encontrada."
             
-            context_text = "\n".join(context_parts) if context_parts else "Nenhuma memória relevante encontrada."
-            
-            return context_text, len(entities), len(episodes), len(relations), recall_time
+            return context_text, len(entities), len(episodes), relations_count, recall_time
             
         except Exception as e:
             recall_time = (time.time() - start_time) * 1000
@@ -415,12 +445,14 @@ INSTRUÇÕES:
     
     def _store_memory(self, message: str, response: str) -> float:
         """
-        Armazena a interação no Cortex extraindo SIGNIFICADO SEMÂNTICO.
+        Armazena a interação no Cortex extraindo SIGNIFICADO SEMÂNTICO COMPLETO.
         
         Usa LLM para extrair:
         - action: verbo + objeto (ex: "requested_password_reset")
         - outcome: resultado conciso (ex: "reset link sent to email")
         - context: situação relevante (ex: "support_ticket_#123")
+        - entities: entidades mencionadas na conversa
+        - relations: relações semânticas descobertas
         
         Returns:
             time_ms
@@ -428,8 +460,8 @@ INSTRUÇÕES:
         start_time = time.time()
         
         try:
-            # Usa LLM para extrair significado (minimalista)
-            extract_prompt = f"""Extraia o significado SEMÂNTICO desta interação em JSON conciso:
+            # Usa LLM para extrair significado ENRIQUECIDO
+            extract_prompt = f"""Extraia o significado SEMÂNTICO COMPLETO desta interação em JSON:
 
 USER: {message}
 ASSISTANT: {response}
@@ -438,19 +470,47 @@ Retorne apenas JSON (sem markdown):
 {{
   "action": "verbo_objeto",
   "outcome": "resultado_conciso",
-  "context": "situação_relevante"
+  "context": "situação_relevante",
+  "entities": [
+    {{"type": "tipo", "name": "nome"}}
+  ],
+  "relations": [
+    {{"from": "origem", "type": "relação", "to": "destino"}}
+  ]
 }}
 
 Regras:
 - action: verbo + objeto em snake_case (ex: "reported_login_issue")
-- outcome: resultado em ~10 palavras (ex: "user unable to authenticate, needs password reset")
-- context: contexto útil em ~5 palavras (ex: "customer_support_session_1")
-- SEM texto literal, SEM repetições, MÁXIMO valor informacional"""
+- outcome: resultado em ~10 palavras
+- context: contexto útil em ~5 palavras
+- entities: TODOS conceitos, produtos, tecnologias, tópicos mencionados
+  - types válidos: concept, product, technology, topic, feature, problem, solution
+- relations: conexões semânticas descobertas (use nomes das entidades)
+  - tipos de relação: interested_in, has_issue_with, requested, learned_about, 
+    prefers, dislikes, works_with, needs, solved, caused_by, related_to
+- Inclua o usuário nas relations quando relevante (use "{self._current_user}" como nome)
+- SEM texto literal, MÁXIMO valor informacional
+
+Exemplo extraído:
+{{
+  "action": "asked_about_fastapi",
+  "outcome": "explained async routing and dependency injection",
+  "context": "python_web_development",
+  "entities": [
+    {{"type": "technology", "name": "FastAPI"}},
+    {{"type": "concept", "name": "async_routing"}},
+    {{"type": "concept", "name": "dependency_injection"}}
+  ],
+  "relations": [
+    {{"from": "{self._current_user}", "type": "interested_in", "to": "FastAPI"}},
+    {{"from": "FastAPI", "type": "has_feature", "to": "async_routing"}}
+  ]
+}}"""
 
             extract_response = call_llm_with_retry(
-                model=self.model,
+                model=f"ollama_chat/{self.model}",
                 messages=[{"role": "user", "content": extract_prompt}],
-                api_base=self.api_base,
+                api_base=self.ollama_url,
                 max_retries=3,
                 initial_wait=5.0,
             )
@@ -459,28 +519,32 @@ Regras:
             import json
             import re
             
-            content = extract_response["choices"][0]["message"]["content"]
+            content = extract_response.choices[0].message.content
             # Remove markdown se houver
             content = re.sub(r'```json\s*|\s*```', '', content).strip()
             
             extracted = json.loads(content)
             
-            self.cortex.store(
-                action=extracted.get("action", "conversed"),
-                outcome=extracted.get("outcome", "interaction completed"),
-                context=f"{extracted.get('context', 'session')} | user:{self._current_user}",
-                participants=[make_participant("person", self._current_user)],
+            # Extrai nomes das entidades para o campo 'who'
+            entity_names = [
+                e.get("name", "").strip() 
+                for e in extracted.get("entities", []) 
+                if e.get("name") and e.get("name", "").strip().lower() != self._current_user.lower()
+            ]
+            
+            self.cortex.remember(
+                who=[self._current_user] + entity_names,
+                what=extracted.get("action", "conversed"),
+                why=extracted.get("context", "session interaction"),
+                how=extracted.get("outcome", "interaction completed"),
             )
             
         except Exception as e:
             # Fallback: salva versão minimalista manual
-            action = "interaction"
-            outcome = f"user engaged with assistant"
-            self.cortex.store(
-                action=action,
-                outcome=outcome,
-                context=f"session with {self._current_user}",
-                participants=[make_participant("person", self._current_user)],
+            self.cortex.remember(
+                who=[self._current_user],
+                what="interaction",
+                how="user engaged with assistant",
             )
         
         return (time.time() - start_time) * 1000
@@ -627,10 +691,62 @@ Regras:
             ),
         }
     
+    def test_connection(self) -> bool:
+        """Testa se Ollama e Cortex estão acessíveis."""
+        try:
+            # Testa Ollama
+            litellm.completion(
+                model=f"ollama_chat/{self.model}",
+                messages=[{"role": "user", "content": "test"}],
+                api_base=self.ollama_url,
+                max_tokens=1,
+            )
+            
+            # Testa Cortex (método correto é stats, não get_stats)
+            self.cortex.stats()
+            
+            return True
+        except Exception:
+            return False
+    
+    def recall(
+        self,
+        query: str,
+        conversation_id: str | None = None,
+        session_id: str | None = None,
+    ) -> dict:
+        """Recall público para lightweight benchmark."""
+        try:
+            return self.cortex.recall(
+                query=query,
+                who=[self._current_user] if self._current_user else None,
+                where=self.namespace,
+                limit=10,
+            )
+        except Exception as e:
+            return {
+                "entities_found": 0,
+                "episodes_found": 0,
+                "prompt_context": "Nenhuma memória encontrada.",
+                "entities": [],
+                "episodes": [],
+                "error": str(e),
+            }
+    
+    def store(
+        self,
+        user_message: str,
+        assistant_response: str,
+        conversation_id: str | None = None,
+        session_id: str | None = None,
+    ) -> dict:
+        """Store público para lightweight benchmark."""
+        return self._store_memory(user_message, assistant_response)
+    
     def clear_namespace(self) -> bool:
         """Limpa o namespace de benchmark no Cortex."""
         try:
-            result = self.cortex.clear(namespace=self.namespace)
+            result = self.cortex.clear()
             return result.get("success", False)
         except Exception:
             return False
@@ -646,7 +762,7 @@ def test_agents():
     print("\n🔍 Verificando Ollama...")
     try:
         response = call_llm_with_retry(
-            model="ollama_chat/deepseek-v3.1:671b-cloud",
+            model="ollama_chat/ministral-3:3b",
             messages=[{"role": "user", "content": "Oi, responda apenas 'ok'"}],
             api_base="http://localhost:11434",
         )
@@ -661,7 +777,7 @@ def test_agents():
     print("BASELINE AGENT (sem memória)")
     print("=" * 40)
     
-    baseline = BaselineAgent(model="deepseek-v3.1:671b-cloud")
+    baseline = BaselineAgent(model="ministral-3:3b")
     
     # Sessão 1
     baseline.new_session()
@@ -707,7 +823,7 @@ def test_agents():
     # Verifica Cortex API
     print("\n🔍 Verificando Cortex API...")
     cortex_agent = CortexAgent(
-        model="deepseek-v3.1:671b-cloud",
+        model="ministral-3:3b",
         namespace="benchmark_test",
     )
     

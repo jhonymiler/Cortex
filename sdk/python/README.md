@@ -1,6 +1,7 @@
 # Cortex Python SDK
 
 SDK Python para comunicação com a API REST do Cortex.
+Usa modelo W5H (Who, What, Why, When, Where, How).
 
 ## Instalação
 
@@ -15,34 +16,50 @@ export PYTHONPATH=/path/to/cortex/sdk/python:$PYTHONPATH
 ## Uso Básico
 
 ```python
-from cortex_sdk import CortexClient, make_participant
+from cortex_sdk import CortexClient
 
-# Conectar ao Cortex
-client = CortexClient("http://localhost:8000")
+# Conectar ao Cortex com namespace
+client = CortexClient(
+    base_url="http://localhost:8000",
+    namespace="meu_agente:usuario_123"
+)
 
 # Verificar conexão
 if client.health_check():
     print("✅ Conectado!")
 
-# Recall - Buscar memórias
+# ANTES de responder - Recall
 memories = client.recall(
-    query="Como fazer autenticação?",
-    context={"source": "my_app"}
+    query="problema com pagamento",
+    who=["usuario_123"],  # Filtrar por participantes
+    limit=5
 )
 
-# Store - Armazenar episódio
-result = client.store(
-    action="implemented_auth",
-    outcome="JWT authentication working",
-    participants=[
-        make_participant("user", "developer", ["dev@email.com"])
-    ],
-    context="new feature development"
+print(f"Encontradas {memories['episodes_found']} memórias")
+print(memories['prompt_context'])  # Injetar no prompt
+
+# APÓS responder - Remember (W5H)
+result = client.remember(
+    who=["usuario_123", "sistema_pagamentos"],
+    what="reportou erro de pagamento",
+    why="cartão expirado",
+    how="orientado a atualizar dados do cartão",
+    importance=0.7
 )
 
-# Stats - Estatísticas
+print(f"Memória {result['memory_id']} criada")
+print(f"Retrievability: {result['retrievability']}")
+
+# Para esquecer
+client.forget(
+    memory_id=result['memory_id'],
+    reason="informação incorreta"
+)
+
+# Estatísticas
 stats = client.stats()
 print(f"Entidades: {stats['total_entities']}")
+print(f"Memórias: {stats['total_episodes']}")
 ```
 
 ## API Reference
@@ -50,41 +67,73 @@ print(f"Entidades: {stats['total_entities']}")
 ### CortexClient
 
 ```python
-client = CortexClient(base_url="http://localhost:8000")
+client = CortexClient(
+    base_url="http://localhost:8000",
+    namespace="default"
+)
 ```
 
-**Métodos:**
+**Métodos W5H (Core):**
 
-- `recall(query: str, context: dict = None) -> dict`
-- `store(action: str, outcome: str, participants: list = None, context: str = "", relations: list = None) -> dict`
-- `stats() -> dict`
-- `clear() -> dict` ⚠️ Perigoso!
-- `health_check() -> bool`
+- `remember(who, what, why="", how="", where="default", importance=0.5) -> dict`
+- `recall(query, who=None, where=None, min_importance=0.0, limit=10) -> dict`
+- `forget(memory_id, reason="") -> dict`
 
-### Helpers
+**Métodos Admin:**
+
+- `stats() -> dict` - Estatísticas do grafo
+- `health() -> dict` - Métricas de saúde
+- `clear() -> dict` ⚠️ Limpa namespace!
+- `health_check() -> bool` - Verifica se API está online
+
+## Modelo W5H
+
+O Cortex usa o modelo W5H para memória semântica:
+
+| Campo | Descrição | Obrigatório |
+|-------|-----------|-------------|
+| **WHO** | Quem participou (nomes, emails, sistemas) | ✅ |
+| **WHAT** | O que aconteceu (ação/fato) | ✅ |
+| **WHY** | Por quê aconteceu (causa/razão) | ❌ |
+| **WHEN** | Quando (automático) | - |
+| **WHERE** | Namespace/contexto | ❌ |
+| **HOW** | Como foi resolvido (resultado) | ❌ |
+
+## Workflow Típico
 
 ```python
-# Criar participante (entidade)
-make_participant(
-    type="user",
-    name="João",
-    identifiers=["joao@email.com"]
-)
+# 1. ANTES de responder ao usuário
+context = client.recall(user_message)
 
-# Criar relação
-make_relation(
-    from_name="bug_123",
-    relation_type="caused_by",
-    to_name="null_pointer"
+# 2. Usar context['prompt_context'] para informar resposta
+
+# 3. APÓS responder
+client.remember(
+    who=[user_id, ...entities],
+    what="ação realizada",
+    why="causa/razão",
+    how="resultado obtido"
 )
 ```
 
-## Exemplos
+## Namespaces
 
-Ver `../../teste-llm/agent.py` para exemplo completo de uso com Ollama.
+Use namespaces para isolar memórias:
+
+```python
+# Atendimento ao cliente
+client = CortexClient(namespace=f"suporte:{user_email}")
+
+# Multi-agente
+client = CortexClient(namespace=f"agent:{agent_id}:user:{user_id}")
+
+# Projetos diferentes
+client = CortexClient(namespace=f"projeto:{project_name}")
+```
 
 ## Documentação Completa
 
 - [API Reference](../../docs/API.md)
+- [W5H Design](../../docs/W5H_DESIGN.md)
 - [Architecture](../../docs/ARCHITECTURE.md)
-- [Vision](../../docs/VISION.md)
+- [MCP Integration](../../docs/MCP.md)

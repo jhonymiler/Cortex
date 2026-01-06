@@ -14,14 +14,15 @@ Usage:
     # Or with uvicorn
     uvicorn cortex.api.app:app --reload
 
-Endpoints:
-    POST /memory/store   - Store a memory after interaction
-    POST /memory/recall  - Recall memories before responding
-    GET  /memory/stats   - Get memory statistics
-    GET  /memory/health  - Get memory health metrics
-    DELETE /memory/clear - Clear all memories in namespace
-    GET  /namespaces     - List all namespaces
-    GET  /health         - Health check
+Endpoints (W5H Model):
+    POST /memory/remember - Store a W5H memory after interaction
+    POST /memory/recall   - Recall memories before responding  
+    POST /memory/forget   - Forget a memory
+    GET  /memory/stats    - Get memory statistics
+    GET  /memory/health   - Get memory health metrics
+    DELETE /memory/clear  - Clear all memories in namespace
+    GET  /namespaces      - List all namespaces
+    GET  /health          - Health check
 
 Headers:
     X-Cortex-Namespace: Optional namespace for isolation (default: "default")
@@ -38,11 +39,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from cortex.services.memory_service import (
     MemoryService,
     NamespacedMemoryService,
-    StoreRequest,
-    StoreResponse,
     RecallRequest,
     RecallResponse,
     StatsResponse,
+    # W5H models
+    RememberRequest,
+    RememberResponse,
+    ForgetRequest,
+    ForgetResponse,
 )
 
 
@@ -105,6 +109,16 @@ app = FastAPI(
     description="""
     Cognitive memory system for LLM agents with namespace isolation.
     
+    ## W5H Memory Model
+    
+    Cortex uses the W5H model for semantic memory:
+    - **WHO**: Participants involved (people, systems, concepts)
+    - **WHAT**: What happened (action/fact)
+    - **WHY**: Why it happened (cause/reason)
+    - **WHEN**: Timestamp (automatic)
+    - **WHERE**: Namespace/context
+    - **HOW**: How it was resolved (outcome)
+    
     ## Multi-Tenant Support
     
     Use the `X-Cortex-Namespace` header to isolate memories:
@@ -113,33 +127,24 @@ app = FastAPI(
     X-Cortex-Namespace: agent_001:user_123
     ```
     
-    Each namespace has completely isolated memories. Perfect for:
-    - Multiple agents sharing same Cortex instance
-    - Single agent serving multiple users
-    - Different projects/contexts
-    
     ## Workflow
     
     1. **Before responding**: Call `/memory/recall` to get relevant context
-    2. **After responding**: Call `/memory/store` to save the interaction
+    2. **After responding**: Call `/memory/remember` to save the interaction
+    3. **To forget**: Call `/memory/forget` when user requests or memory is wrong
     
-    ## Concepts
+    ## Example
     
-    - **Entity**: Any "thing" (person, file, concept, character, product)
-    - **Episode**: Any "event" (action + participants + outcome)
-    - **Relation**: Any "connection" (caused_by, resolved_by, related_to)
-    
-    ## Context Format
-    
-    The `prompt_context` field returns YAML format for minimal tokens:
-    
-    ```yaml
-    # MEMÓRIA DO USUÁRIO
-    conhecidos:
-      - João (customer): vip=True
-    histórico:
-      - [4x] login_issue: VPN blocking access
-    resumo: User has recurring VPN problems
+    ```python
+    # Remember (W5H)
+    POST /memory/remember
+    {
+        "who": ["maria@email.com", "payment_system"],
+        "what": "reported payment error",
+        "why": "expired credit card",
+        "how": "guided to update card details",
+        "importance": 0.7
+    }
     ```
     """,
     version="3.0.0",
@@ -163,31 +168,6 @@ app.add_middleware(
 async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "healthy", "service": "cortex-memory"}
-
-
-@app.post("/memory/store", response_model=StoreResponse)
-async def store_memory(
-    request: StoreRequest,
-    namespace: str = Depends(get_namespace),
-    service: MemoryService = Depends(get_service),
-) -> StoreResponse:
-    """
-    Store a memory after interaction.
-    
-    Call this AFTER responding to the user to record what happened.
-    
-    Headers:
-        X-Cortex-Namespace: Namespace for isolation (optional, default: "default")
-    
-    The system automatically:
-    - Resolves existing entities (won't create duplicates)
-    - Consolidates repeated patterns (5+ similar = 1 rich memory)
-    - Creates searchable connections
-    """
-    try:
-        return service.store(request)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/memory/recall", response_model=RecallResponse)
@@ -228,6 +208,87 @@ async def get_stats(
         X-Cortex-Namespace: Namespace for isolation (optional, default: "default")
     """
     return service.stats()
+
+
+# ==================== W5H ENDPOINTS ====================
+
+
+@app.post("/memory/remember", response_model=RememberResponse)
+async def remember_w5h(
+    request: RememberRequest,
+    namespace: str = Depends(get_namespace),
+    service: MemoryService = Depends(get_service),
+) -> RememberResponse:
+    """
+    Store a W5H memory after interaction.
+    
+    Call this AFTER responding to the user to record what happened.
+    Uses the W5H model (Who, What, Why, When, Where, How).
+    
+    Headers:
+        X-Cortex-Namespace: Namespace for isolation (optional, default: "default")
+    
+    Body:
+        - who: List of participants (names, emails, systems)
+        - what: What happened (action/fact)
+        - why: Why it happened (cause/reason) - optional
+        - how: Outcome/result - optional
+        - where: Namespace (default: "default")
+        - importance: 0.0-1.0 (default: 0.5)
+    
+    Returns:
+        - success: Whether storage succeeded
+        - memory_id: ID of created memory
+        - who_resolved: Entity IDs for participants
+        - consolidated: Whether merged with similar memories
+        - retrievability: Current retrievability score
+    
+    Example:
+        ```json
+        {
+            "who": ["maria@email.com", "payment_system"],
+            "what": "reported payment error",
+            "why": "expired credit card",
+            "how": "guided user to update card details",
+            "importance": 0.7
+        }
+        ```
+    """
+    try:
+        return service.remember(request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/memory/forget", response_model=ForgetResponse)
+async def forget_memory(
+    request: ForgetRequest,
+    namespace: str = Depends(get_namespace),
+    service: MemoryService = Depends(get_service),
+) -> ForgetResponse:
+    """
+    Forget a memory (mark as forgotten, excluded from recalls).
+    
+    Call this when a user requests to forget something or when
+    a memory is found to be incorrect.
+    
+    Headers:
+        X-Cortex-Namespace: Namespace for isolation (optional, default: "default")
+    
+    Body:
+        - memory_id: ID of memory to forget
+        - reason: Why it's being forgotten (optional)
+    
+    Returns:
+        - success: Whether operation succeeded
+        - memory_id: ID of forgotten memory
+        - was_forgotten: True if already forgotten before
+        - message: Status message
+    """
+    try:
+        return service.forget(request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/memory/health")

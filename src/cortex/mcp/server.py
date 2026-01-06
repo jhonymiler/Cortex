@@ -38,10 +38,7 @@ from fastmcp import FastMCP
 from cortex.services.memory_service import (
     NamespacedMemoryService,
     MemoryService,
-    StoreRequest,
     RecallRequest,
-    ParticipantInput,
-    RelationInput,
     # W5H models
     RememberRequest,
     ForgetRequest,
@@ -102,7 +99,7 @@ mcp = FastMCP(
        - Retrieves relevant context from past interactions
        - Use returned context to inform your response
     
-    2. AFTER responding: Call cortex_remember (preferred) or cortex_store
+    2. AFTER responding: Call cortex_remember
        - who: participants involved (names, emails, systems)
        - what: what you did (analyzed, explained, resolved)
        - why: cause or reason (if applicable)
@@ -116,8 +113,7 @@ mcp = FastMCP(
     ## Available Tools
     
     - cortex_recall: Search past memories (BEFORE responding)
-    - cortex_remember: Store W5H memory (AFTER responding) [PREFERRED]
-    - cortex_store: Store legacy format (still works)
+    - cortex_remember: Store W5H memory (AFTER responding)
     - cortex_forget: Mark memory as forgotten
     - cortex_stats: Memory statistics
     - cortex_health: Memory health metrics
@@ -186,78 +182,6 @@ def cortex_recall(
         limit=limit,
     )
     response = service.recall(request)
-    return response.model_dump()
-
-
-@mcp.tool()
-def cortex_store(
-    action: str,
-    outcome: str,
-    participants: list[dict[str, Any]] | None = None,
-    context: str = "",
-    relations: list[dict[str, Any]] | None = None,
-) -> dict[str, Any]:
-    """
-    MANDATORY: Call AFTER answering the user.
-    
-    Stores the interaction as a memory (episode + entities + relations).
-    
-    Args:
-        action: What was done (verb): analyzed, resolved, discussed, explained, debugged...
-        outcome: The result or conclusion of the interaction
-        participants: Entities involved. Each has:
-            - type: person, file, concept, character, product, etc.
-            - name: Entity name
-            - identifiers: Optional list of IDs (email, path, etc.)
-        context: The situation or scenario (optional)
-        relations: Causal connections discovered. Each has:
-            - from: Source entity name
-            - type: caused_by, resolved_by, related_to, requires, etc.
-            - to: Target entity name
-    
-    Returns:
-        Dictionary with:
-        - success: Whether storage succeeded
-        - episode_id: ID of the created episode
-        - entities_created: New entities added
-        - entities_updated: Existing entities updated
-        - relations_created: New connections added
-        - consolidated: Whether this merged with similar episodes
-        - consolidation_count: How many times this pattern occurred
-    
-    The system automatically:
-    - Resolves existing entities (won't create duplicates)
-    - Consolidates repeated patterns (5+ similar = 1 rich memory)
-    - Creates searchable connections
-    """
-    service = get_service()
-    
-    # Parse participants
-    parsed_participants = []
-    for p in (participants or []):
-        parsed_participants.append(ParticipantInput(
-            type=p.get("type", "unknown"),
-            name=p.get("name", "unknown"),
-            identifiers=p.get("identifiers", []),
-        ))
-    
-    # Parse relations
-    parsed_relations = []
-    for r in (relations or []):
-        parsed_relations.append(RelationInput(
-            **{"from": r.get("from", ""), "type": r.get("type", "related_to"), "to": r.get("to", "")}
-        ))
-    
-    request = StoreRequest(
-        action=action,
-        outcome=outcome,
-        participants=parsed_participants,
-        context=context,
-        relations=parsed_relations,
-    )
-    print(f"[cortex-mcp] Storing: action={action[:50]}, participants={len(parsed_participants)}", file=sys.stderr)
-    response = service.store(request)
-    print(f"[cortex-mcp] Store result: success={response.success}, episode={response.episode_id[:8]}", file=sys.stderr)
     return response.model_dump()
 
 

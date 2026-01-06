@@ -2,8 +2,24 @@
 """
 Cortex SDK - Cliente Python para API REST do Cortex
 
-SDK simples para acessar Cortex remotamente via HTTP.
-Permite testes isolados sem dependência direta do código do Cortex.
+SDK para acessar Cortex remotamente via HTTP.
+Usa modelo W5H (Who, What, Why, When, Where, How).
+
+Exemplo de uso:
+    from cortex_sdk import CortexClient
+    
+    client = CortexClient(namespace="meu_agente:usuario_123")
+    
+    # Antes de responder - buscar contexto
+    context = client.recall("problema com pagamento")
+    
+    # Após responder - memorizar interação
+    client.remember(
+        who=["usuario_123", "sistema_pagamentos"],
+        what="reportou erro de pagamento",
+        why="cartão expirado",
+        how="orientado a atualizar dados do cartão"
+    )
 """
 
 from typing import Any
@@ -13,37 +29,124 @@ import requests
 class CortexClient:
     """Cliente HTTP para comunicação com API Cortex."""
 
-    def __init__(self, base_url: str = "http://localhost:8000"):
+    def __init__(
+        self,
+        base_url: str = "http://localhost:8000",
+        namespace: str = "default",
+    ):
         """
         Inicializa cliente Cortex.
         
         Args:
             base_url: URL base da API Cortex (padrão: http://localhost:8000)
+            namespace: Namespace para isolamento de memórias (padrão: "default")
+                       Use identificador único por usuário/agente:
+                       - Atendimento: f"suporte:{user_id}"
+                       - Subagente: f"agent:{agent_id}"
+                       - Multi-tenant: f"{tenant}:{user}"
         """
         self.base_url = base_url.rstrip('/')
+        self.namespace = namespace
         self.session = requests.Session()
         self.session.headers.update({
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-Cortex-Namespace": namespace,
         })
 
-    def recall(self, query: str, context: dict | None = None) -> dict[str, Any]:
+    # ==================== CORE W5H METHODS ====================
+
+    def remember(
+        self,
+        who: list[str],
+        what: str,
+        why: str = "",
+        how: str = "",
+        where: str = "default",
+        importance: float = 0.5,
+    ) -> dict[str, Any]:
+        """
+        Armazena uma memória W5H.
+        
+        Use APÓS responder ao usuário para memorizar o que aconteceu.
+        
+        Args:
+            who: Lista de participantes (nomes, emails, sistemas)
+            what: O que aconteceu (ação/fato principal)
+            why: Por quê aconteceu (causa/razão) - opcional
+            how: Como foi resolvido (resultado) - opcional
+            where: Namespace para organização (padrão: "default")
+            importance: Importância de 0.0 a 1.0 (padrão: 0.5)
+            
+        Returns:
+            Dict com:
+            - success: Se armazenou com sucesso
+            - memory_id: ID da memória criada
+            - who_resolved: IDs das entidades dos participantes
+            - consolidated: Se consolidou com memórias similares
+            - retrievability: Score de recuperabilidade atual
+            
+        Example:
+            client.remember(
+                who=["maria@email.com", "sistema_pagamentos"],
+                what="reportou erro de pagamento",
+                why="cartão expirado",
+                how="orientada a atualizar dados do cartão",
+                importance=0.7
+            )
+        """
+        url = f"{self.base_url}/memory/remember"
+        payload = {
+            "who": who,
+            "what": what,
+            "why": why,
+            "how": how,
+            "where": where,
+            "importance": importance,
+        }
+        
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
+        
+        return response.json()
+
+    def recall(
+        self,
+        query: str,
+        who: list[str] | None = None,
+        where: str | None = None,
+        min_importance: float = 0.0,
+        limit: int = 10,
+    ) -> dict[str, Any]:
         """
         Busca memórias relevantes para uma query.
         
+        Use ANTES de responder ao usuário para ter contexto.
+        
         Args:
             query: Texto para buscar
-            context: Contexto adicional (opcional)
+            who: Filtrar por participantes específicos (opcional)
+            where: Filtrar por namespace (opcional)
+            min_importance: Importância mínima 0.0-1.0 (padrão: 0.0)
+            limit: Máximo de resultados (padrão: 10)
             
         Returns:
-            Dict com entities, episodes, relations
-            
-        Raises:
-            requests.HTTPError: Se API retornar erro
+            Dict com:
+            - entities_found: Número de entidades conhecidas
+            - episodes_found: Número de episódios relevantes
+            - context_summary: Resumo em texto
+            - prompt_context: YAML para injetar no prompt
+            - entities: Lista de entidades
+            - episodes: Lista de episódios
         """
         url = f"{self.base_url}/memory/recall"
         payload = {
             "query": query,
-            "context": context or {}
+            "context": {
+                "who": who,
+                "where": where,
+                "min_importance": min_importance,
+            },
+            "limit": limit,
         }
         
         response = self.session.post(url, json=payload)
@@ -51,43 +154,40 @@ class CortexClient:
         
         return response.json()
 
-    def store(
+    def forget(
         self,
-        action: str,
-        outcome: str,
-        participants: list[dict] | None = None,
-        context: str = "",
-        relations: list[dict] | None = None
+        memory_id: str,
+        reason: str = "",
     ) -> dict[str, Any]:
         """
-        Armazena um episódio.
+        Esquece uma memória (marca como esquecida, excluída de recalls).
+        
+        Use quando usuário pede para esquecer algo ou quando
+        uma memória é encontrada incorreta.
         
         Args:
-            action: O que foi feito (verbo: "conversed", "analyzed", etc.)
-            outcome: O resultado
-            participants: Lista de participantes (entidades)
-            context: Contexto da ação (opcional)
-            relations: Lista de relações para criar (opcional)
+            memory_id: ID da memória para esquecer
+            reason: Por que está sendo esquecida (opcional)
             
         Returns:
-            Dict com IDs criados e status
-            
-        Raises:
-            requests.HTTPError: Se API retornar erro
+            Dict com:
+            - success: Se operação sucedeu
+            - memory_id: ID da memória esquecida
+            - was_forgotten: True se já estava esquecida antes
+            - message: Mensagem de status
         """
-        url = f"{self.base_url}/memory/store"
+        url = f"{self.base_url}/memory/forget"
         payload = {
-            "action": action,
-            "outcome": outcome,
-            "participants": participants or [],
-            "context": context,
-            "relations": relations or []
+            "memory_id": memory_id,
+            "reason": reason,
         }
         
         response = self.session.post(url, json=payload)
         response.raise_for_status()
         
         return response.json()
+
+    # ==================== ADMIN METHODS ====================
 
     def stats(self) -> dict[str, Any]:
         """
@@ -95,9 +195,6 @@ class CortexClient:
         
         Returns:
             Dict com contagens de entities, episodes, relations, etc.
-            
-        Raises:
-            requests.HTTPError: Se API retornar erro
         """
         url = f"{self.base_url}/memory/stats"
         
@@ -106,15 +203,26 @@ class CortexClient:
         
         return response.json()
 
+    def health(self) -> dict[str, Any]:
+        """
+        Obtém métricas de saúde da memória.
+        
+        Returns:
+            Dict com health_score, orphan_entities, etc.
+        """
+        url = f"{self.base_url}/memory/health"
+        
+        response = self.session.get(url)
+        response.raise_for_status()
+        
+        return response.json()
+
     def clear(self) -> dict[str, Any]:
         """
-        Limpa toda a memória (CUIDADO!).
+        Limpa toda a memória do namespace (CUIDADO!).
         
         Returns:
             Dict com status da operação
-            
-        Raises:
-            requests.HTTPError: Se API retornar erro
         """
         url = f"{self.base_url}/memory/clear"
         
@@ -134,63 +242,15 @@ class CortexClient:
             url = f"{self.base_url}/health"
             response = self.session.get(url, timeout=2)
             return response.status_code == 200
-        except:
+        except Exception:
             return False
 
 
-# Helpers para construção de payloads
-
-def make_participant(
-    type: str,
-    name: str,
-    identifiers: list[str] | None = None
-) -> dict:
-    """
-    Cria payload de participante (entidade).
-    
-    Args:
-        type: Tipo da entidade (livre: "user", "file", "character", etc.)
-        name: Nome da entidade
-        identifiers: IDs alternativos (opcional)
-        
-    Returns:
-        Dict formatado para API
-    """
-    return {
-        "type": type,
-        "name": name,
-        "identifiers": identifiers or []
-    }
-
-
-def make_relation(
-    from_name: str,
-    relation_type: str,
-    to_name: str
-) -> dict:
-    """
-    Cria payload de relação.
-    
-    Args:
-        from_name: Nome da entidade origem
-        relation_type: Tipo da relação (livre: "caused_by", "loves", etc.)
-        to_name: Nome da entidade destino
-        
-    Returns:
-        Dict formatado para API
-    """
-    return {
-        "from": from_name,
-        "type": relation_type,
-        "to": to_name
-    }
-
-
 if __name__ == "__main__":
-    # Teste rápido do SDK
+    # Teste rápido do SDK W5H
     import sys
     
-    print("🧪 Testando Cortex SDK...\n")
+    print("🧪 Testando Cortex SDK (W5H)...\n")
     
     client = CortexClient()
     
@@ -198,36 +258,39 @@ if __name__ == "__main__":
     print("1. Verificando se API está online...")
     if not client.health_check():
         print("❌ API Cortex não está respondendo em http://localhost:8000")
-        print("   Execute: uvicorn cortex.api.app:app --reload")
+        print("   Execute: cortex-api")
         sys.exit(1)
-    print("✓ API online!\n")
+    print("✅ API online!\n")
     
     # 2. Stats inicial
     print("2. Estatísticas iniciais:")
     stats = client.stats()
-    print(f"   Entidades: {stats.get('entity_count', 0)}")
-    print(f"   Episódios: {stats.get('episode_count', 0)}\n")
+    print(f"   Entidades: {stats.get('total_entities', 0)}")
+    print(f"   Memórias: {stats.get('total_episodes', 0)}\n")
     
-    # 3. Store
-    print("3. Armazenando teste...")
-    result = client.store(
-        action="tested_sdk",
-        outcome="SDK funcionando corretamente",
-        participants=[
-            make_participant("user", "test_sdk", identifiers=["sdk_test_001"])
-        ]
+    # 3. Remember (W5H)
+    print("3. Armazenando memória W5H...")
+    result = client.remember(
+        who=["test_sdk", "cortex_api"],
+        what="testou SDK com modelo W5H",
+        why="validar funcionamento do SDK",
+        how="teste passou com sucesso",
+        importance=0.6
     )
-    print(f"✓ Armazenado! Episode ID: {result.get('episode_id', 'N/A')[:8]}...\n")
+    print(f"✅ Armazenado! Memory ID: {result.get('memory_id', 'N/A')[:8]}...")
+    print(f"   Retrievability: {result.get('retrievability', 0):.2f}\n")
     
     # 4. Recall
     print("4. Buscando memória...")
-    memories = client.recall("teste SDK")
-    print(f"✓ Encontradas {len(memories.get('episodes', []))} episódios\n")
+    memories = client.recall("teste SDK W5H")
+    print(f"✅ Encontradas {memories.get('episodes_found', 0)} memórias")
+    if memories.get('prompt_context'):
+        print(f"   Contexto: {memories.get('prompt_context')[:100]}...\n")
     
     # 5. Stats final
     print("5. Estatísticas finais:")
     stats = client.stats()
-    print(f"   Entidades: {stats.get('entity_count', 0)}")
-    print(f"   Episódios: {stats.get('episode_count', 0)}\n")
+    print(f"   Entidades: {stats.get('total_entities', 0)}")
+    print(f"   Memórias: {stats.get('total_episodes', 0)}\n")
     
-    print("✅ SDK funcionando corretamente!")
+    print("✅ SDK W5H funcionando corretamente!")

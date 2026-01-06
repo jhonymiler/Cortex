@@ -56,6 +56,15 @@ class StoreRequest(BaseModel):
     participants: list[ParticipantInput] = Field(default_factory=list, description="Entities involved")
     context: str = Field(default="", description="The situation or scenario")
     relations: list[RelationInput] = Field(default_factory=list, description="Connections discovered")
+    
+    # Context tracking
+    conversation_id: str | None = Field(default=None, description="ID of the active conversation")
+    session_id: str | None = Field(default=None, description="ID of the current session")
+    namespace: str = Field(default="default", description="Namespace for isolation")
+    
+    # Context tracking
+    conversation_id: str | None = Field(default=None, description="ID of the active conversation")
+    session_id: str | None = Field(default=None, description="ID of the current session")
 
 
 class StoreResponse(BaseModel):
@@ -76,6 +85,16 @@ class RecallRequest(BaseModel):
     query: str = Field(..., description="The topic or message to search for")
     context: dict[str, Any] = Field(default_factory=dict, description="Additional context")
     limit: int = Field(default=5, description="Maximum results per category")
+    
+    # Context tracking
+    conversation_id: str | None = Field(default=None, description="ID of the active conversation")
+    session_id: str | None = Field(default=None, description="ID of the current session")
+    namespace: str = Field(default="default", description="Namespace to search in")
+    
+    # Context tracking
+    conversation_id: str | None = Field(default=None, description="ID of the active conversation")
+    session_id: str | None = Field(default=None, description="ID of the current session")
+    namespace: str = Field(default="default", description="Namespace to search in")
 
 
 class EntitySummary(BaseModel):
@@ -241,7 +260,13 @@ class MemoryService:
             participants=participant_ids,
             context=request.context,
             outcome=request.outcome,
+            conversation_id=request.conversation_id,
+            session_id=request.session_id,
         )
+        
+        # Store namespace in metadata
+        if request.namespace and request.namespace != "default":
+            episode.metadata["namespace"] = request.namespace
         
         # 3. Check for consolidation (similar episodes)
         consolidated, consolidation_count = self.graph.add_episode_with_consolidation(episode)
@@ -279,9 +304,17 @@ class MemoryService:
         This is called BEFORE responding to the user to get context.
         Memories that are recalled get reinforced (use = strength).
         """
+        # Enriquece context com conversation_id, session_id e namespace
+        enriched_context = {
+            **request.context,
+            "conversation_id": request.conversation_id,
+            "session_id": request.session_id,
+            "namespace": request.namespace,
+        }
+        
         result = self.graph.recall(
             query=request.query,
-            context=request.context,
+            context=enriched_context,
             limit=request.limit,
         )
         

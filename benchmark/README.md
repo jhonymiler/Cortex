@@ -182,3 +182,61 @@ python benchmark/run_benchmark.py --model llama3.1:8b
 - [ ] Gráficos e visualizações
 - [ ] Benchmark com múltiplos modelos
 - [ ] Teste de carga (muitos usuários simultâneos)
+
+---
+
+## 🔬 Avaliação Científica
+
+O benchmark agora inclui ferramentas para avaliação científica padronizada.
+
+### Métricas Científicas (`scientific_metrics.py`)
+
+```python
+from benchmark.scientific_metrics import ScientificMetricsEvaluator
+
+evaluator = ScientificMetricsEvaluator()
+
+# Métricas de retrieval
+metrics = evaluator.calculate_retrieval_metrics(
+    retrieved=["memória 1", "memória 2"],
+    relevant=["memória 1", "memória 3"],  # ground truth
+)
+print(f"Precision@3: {metrics.precision_at_k[3]}")
+print(f"Recall@5: {metrics.recall_at_k[5]}")
+print(f"MRR: {metrics.mrr}")
+```
+
+### Ablation Study (`ablation_runner.py`)
+
+```bash
+# Teste rápido de ablation
+python benchmark/ablation_runner.py --quick
+
+# Variantes específicas
+python benchmark/ablation_runner.py --variants full no_decay baseline
+
+# Completo
+python benchmark/ablation_runner.py --full
+```
+
+**Variantes disponíveis:**
+- `full`: Cortex completo (W5H + Decay + Centrality + Consolidation)
+- `no_decay`: Sem decaimento Ebbinghaus
+- `no_centrality`: Sem hub detection
+- `no_consolidation`: Sem consolidação de episódios
+- `simple_episodic`: Apenas action/outcome (sem W5H)
+- `baseline`: Sem memória (controle)
+
+### LLM-as-Judge
+
+Usa DeepSeek via Ollama para avaliação qualitativa automática:
+
+```bash
+# Certifique-se que Ollama está rodando
+ollama serve
+
+# Execute o ablation study
+python benchmark/ablation_runner.py --quick
+```
+
+
