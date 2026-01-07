@@ -154,10 +154,10 @@ BENCHMARK_ARGS="--ollama-url $OLLAMA_URL --model $OLLAMA_MODEL -y"
 BENCHMARK_SUCCESS=0
 
 if [ "$1" == "--full" ]; then
-    echo "🚀 Executando benchmark COMPLETO com CortexAgentV2..."
+    echo "🚀 Executando benchmark COMPLETO com CortexAgent..."
     python run_lightweight_benchmark.py --full $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
 elif [ "$1" == "--quick" ]; then
-    echo "🚀 Executando benchmark RÁPIDO com CortexAgentV2..."
+    echo "🚀 Executando benchmark RÁPIDO com CortexAgent..."
     python run_lightweight_benchmark.py --quick $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
 elif [ "$IS_RESUME" = true ]; then
     echo "🚀 Continuando benchmark..."

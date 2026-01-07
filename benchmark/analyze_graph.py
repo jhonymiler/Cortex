@@ -202,12 +202,20 @@ def print_section(title: str, content: Any, indent: int = 0):
         print(f"{prefix}{content}")
 
 
-def find_latest_checkpoint() -> Path | None:
-    """Encontra o checkpoint mais recente."""
+def find_latest_result() -> Path | None:
+    """Encontra o resultado de benchmark mais recente."""
     results_dir = Path("benchmark/results")
+    
+    # Primeiro tenta arquivos finais (sem checkpoint)
+    results = [f for f in results_dir.glob("lightweight_*.json") if ".checkpoint." not in f.name]
+    if results:
+        return max(results, key=lambda p: p.stat().st_mtime)
+    
+    # Fallback para checkpoints (se benchmark foi interrompido)
     checkpoints = list(results_dir.glob("*.checkpoint.json"))
     if checkpoints:
         return max(checkpoints, key=lambda p: p.stat().st_mtime)
+    
     return None
 
 
@@ -224,17 +232,26 @@ def find_memory_graphs() -> list[Path]:
 
 
 def main():
+    import sys
+    
     print("\n" + "=" * 80)
     print(" 🧠 ANÁLISE DO GRAFO DE MEMÓRIA CORTEX")
     print("=" * 80)
     
-    # Encontra checkpoint mais recente
-    checkpoint_path = find_latest_checkpoint()
-    if not checkpoint_path:
-        print("❌ Nenhum checkpoint encontrado em benchmark/results/")
-        return
+    # Aceita argumento CLI ou encontra mais recente
+    if len(sys.argv) > 1:
+        result_path = Path(sys.argv[1])
+        if not result_path.exists():
+            print(f"❌ Arquivo não encontrado: {result_path}")
+            return
+    else:
+        result_path = find_latest_result()
+        if not result_path:
+            print("❌ Nenhum resultado encontrado em benchmark/results/")
+            print("   Execute o benchmark primeiro: ./start_benchmark.sh --quick")
+            return
     
-    print(f"\n📂 Carregando checkpoint: {checkpoint_path.name}")
+    print(f"\n📂 Carregando resultado: {result_path.name}")
     
     # Encontra grafos de memória
     graph_paths = find_memory_graphs()
@@ -245,9 +262,9 @@ def main():
     else:
         print(f"📊 Grafos encontrados: {len(graph_paths)}")
     
-    # Carrega checkpoint
-    with open(checkpoint_path) as f:
-        checkpoint = json.load(f)
+    # Carrega resultado
+    with open(result_path) as f:
+        result = json.load(f)
     
     # Combina todos os grafos em um único
     combined_graph = {"entities": {}, "episodes": {}, "relations": {}}
@@ -264,8 +281,8 @@ def main():
     
     graph = combined_graph
     
-    # Extrai métricas do checkpoint
-    convs = checkpoint.get("conversations", [])
+    # Extrai métricas do resultado
+    convs = result.get("conversations", [])
     total_msgs = sum(len(m) for c in convs for s in c.get("sessions", []) for m in [s.get("messages", [])])
     
     # Calcula métricas
@@ -278,10 +295,10 @@ def main():
     
     # Resumo do benchmark
     print_section("📊 RESUMO DO BENCHMARK", {
-        "Modelo": checkpoint.get("model", "N/A"),
-        "Conversas": f"{checkpoint.get('last_completed', 0)}/{checkpoint.get('total_conversations', 0)}",
+        "Modelo": result.get("model", "N/A"),
+        "Conversas": f"{result.get('total_conversations', len(convs))}",
         "Mensagens": total_msgs,
-        "Namespace": checkpoint.get("namespace", "N/A"),
+        "Namespace": result.get("namespace", "N/A"),
     })
     
     # Métricas de token
@@ -474,8 +491,11 @@ def main():
     if top_hub_count >= 5:
         insights.append(f"✅ Entidades centrais identificadas: top hub com {top_hub_count} conexões")
     
-    # V2 specific
-    if total_extractions > 0 and extraction_rate > 0.7:
+    # V2/Inline extraction (check from result stats)
+    cortex_stats = result.get("cortex_stats", {})
+    total_extractions = cortex_stats.get("total_extractions", 0)
+    extraction_rate = cortex_stats.get("extraction_rate", 0)
+    if total_extractions > 0 and extraction_rate > 0.2:
         insights.append(f"✅ Extração [MEMORY] inline funcionando: {extraction_rate*100:.0f}%")
     
     for insight in insights:

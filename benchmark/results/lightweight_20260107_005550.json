@@ -1,0 +1,1141 @@
+{
+  "started_at": "2026-01-07T00:55:50.778173",
+  "finished_at": "2026-01-07T01:02:58.711788",
+  "duration_seconds": 427.933615,
+  "model": "gemma3:4b",
+  "namespace": "benchmark",
+  "total_conversations": 8,
+  "total_sessions": 16,
+  "total_messages": 69,
+  "baseline_stats": {
+    "type": "baseline",
+    "model": "gemma3:4b",
+    "has_memory": false,
+    "total_messages": 37,
+    "total_prompt_tokens": 41481,
+    "total_completion_tokens": 7957,
+    "total_tokens": 49438,
+    "total_time_ms": 239332.3359489441,
+    "sessions_count": 0,
+    "avg_prompt_tokens": 1121.1081081081081,
+    "avg_completion_tokens": 215.05405405405406,
+    "avg_response_time_ms": 6468.441512133624
+  },
+  "cortex_stats": {
+    "type": "cortex_v2",
+    "model": "gemma3:4b",
+    "has_memory": true,
+    "namespace": "benchmark_financial",
+    "total_messages": 37,
+    "total_prompt_tokens": 37790,
+    "total_completion_tokens": 5465,
+    "total_tokens": 43255,
+    "total_time_ms": 188564.514875412,
+    "total_recall_time_ms": 2130.730152130127,
+    "total_store_time_ms": 359.21478271484375,
+    "total_memory_entities": 369,
+    "total_memory_episodes": 370,
+    "sessions_count": 0,
+    "total_extractions": 37,
+    "successful_extractions": 10,
+    "extraction_rate": 0.2702702702702703,
+    "avg_prompt_tokens": 1021.3513513513514,
+    "avg_completion_tokens": 147.7027027027027,
+    "avg_response_time_ms": 5096.3382398759995
+  },
+  "conversations": [
+    {
+      "conversation_id": "conv_0_customer_support",
+      "domain": "customer_support",
+      "user_profile": {
+        "name": "Pedro Costa",
+        "email": "pedro.costa@email.com",
+        "product": "API Access",
+        "customer_since": "2024-03-15"
+      },
+      "sessions": [
+        {
+          "session_index": 0,
+          "session_id": "session_0",
+          "key_facts": [
+            "nome: Pedro Costa",
+            "produto: API Access",
+            "problema: não consigo fazer login"
+          ],
+          "expected_recalls": [],
+          "messages": [
+            {
+              "message": "Olá, meu nome é Pedro Costa e não consigo fazer login",
+              "message_index": 0,
+              "baseline_response": "Olá Pedro Costa, sinto muito que você esteja tendo problemas para fazer login. Para te ajudar, preciso de um pouco mais de informação. \n\nPoderia me dizer:\n\n*   **Em qual plataforma você está tentando fazer login?** (Ex: Google, Facebook, e-mail da sua empresa, etc.)\n*   **Qual é a mensagem de erro que aparece?** (Copie a mensagem exata, se possível)\n*   **Você já tentou alguma coisa para resolver?** (Ex: redefinir a senha, verificar se o Caps Lock está ligado, etc.)",
+              "baseline_tokens": 188,
+              "baseline_prompt_tokens": 63,
+              "baseline_time_ms": 5173.204660415649,
+              "cortex_response": "Olá Pedro Costa, lembro que você estava tendo problemas para fazer login. O técnico te ligou e resolveu o problema, certo? Ótimo!",
+              "cortex_tokens": 360,
+              "cortex_prompt_tokens": 283,
+              "cortex_time_ms": 2426.32794380188,
+              "cortex_recall_time_ms": 42.375802993774414,
+              "cortex_store_time_ms": 19.767045974731445,
+              "cortex_memory_entities": 8,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: identificou→não conseguiu identificar a causa do problema; resolveu→O técnico me ligou e resolveu!; reported_slow_system→suggested_internet_check_or_device_restart\ncontexto: Known: Pedro Costa, login, Pedro | Last time: não conseguiu identificar a causa do problema | Link: (5672e9eb) -[+participated_in]-> (2caa15ce)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Pedro Costa",
+                "what": "relatou_problema_login",
+                "why": "impossibilidade_de_acesso",
+                "how": "problema_resolvido_tecnico"
+              }
+            },
+            {
+              "message": "Já tentei várias vezes mas não funciona",
+              "message_index": 2,
+              "baseline_response": "Ok, Pedro. Sem a mensagem de erro, fica mais difícil ajudar. \n\n**Tente o seguinte:**\n\n1.  **Verifique se você digitou o nome de usuário (e-mail) e a senha corretamente.** Às vezes, um pequeno erro de digitação é o problema.\n2.  **Certifique-se de que o Caps Lock não está ligado.**\n3.  **Se você esqueceu a senha, tente a opção de \"Esqueci minha senha\"** (geralmente há um link embaixo da caixa de login).\n\nSe nada disso funcionar, por favor, me diga qual é a mensagem de erro que aparece. Assim, podemos tentar outras soluções!",
+              "baseline_tokens": 350,
+              "baseline_prompt_tokens": 205,
+              "baseline_time_ms": 3959.8703384399414,
+              "cortex_response": "Entendo, Pedro Costa. Então, você está enfrentando dificuldades para fazer login novamente. Já verificamos se o problema persiste, correto?",
+              "cortex_tokens": 414,
+              "cortex_prompt_tokens": 347,
+              "cortex_time_ms": 2504.375457763672,
+              "cortex_recall_time_ms": 36.741018295288086,
+              "cortex_store_time_ms": 22.01986312866211,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: identificou→não conseguiu identificar a causa do problema; reported_slow_system→suggested_internet_check_or_device_restart; reported_slow_system→suggested_internet_check_or_device_restart\ncontexto: Known: problemas_tecnicos, resolução de problemas, user | Last time: não conseguiu identificar a causa do problema | Link: (e0ee3b86) -[+participated_in]-> (dc5a6509)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Pedro Costa",
+                "what": "relatou_problema_login",
+                "why": "impossibilidade_acesso",
+                "how": "problema_persistente"
+              }
+            }
+          ]
+        },
+        {
+          "session_index": 1,
+          "session_id": "session_1",
+          "key_facts": [],
+          "expected_recalls": [
+            "nome do usuário",
+            "problema anterior",
+            "produto"
+          ],
+          "messages": [
+            {
+              "message": "Oi, voltei. Aquele problema que relatei continua.",
+              "message_index": 0,
+              "baseline_response": "Entendo, Pedro. Que frustrante! Sem mais informações, é difícil identificar a causa.\n\nPara tentar ajudar, preciso que você me diga:\n\n*   **Em qual plataforma você está tentando fazer login?** (Ex: Google, Facebook, e-mail da sua empresa, etc.)\n*   **Qual é a mensagem de erro que aparece?** (Copie a mensagem exata, se possível)\n\nCom essas informações, posso tentar te dar algumas sugestões mais específicas.",
+              "baseline_tokens": 473,
+              "baseline_prompt_tokens": 372,
+              "baseline_time_ms": 3153.911352157593,
+              "cortex_response": "Olá Pedro Costa, que bom que voltou! Entendo que o problema de login que você relatou ainda persiste. Vamos ver o que podemos fazer para resolver isso de uma vez por todas. O técnico já te ajudou com isso anteriormente, certo?",
+              "cortex_tokens": 471,
+              "cortex_prompt_tokens": 378,
+              "cortex_time_ms": 3048.3462810516357,
+              "cortex_recall_time_ms": 149.20616149902344,
+              "cortex_store_time_ms": 16.642093658447266,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: resolveu→O técnico me ligou e resolveu!; resolveu→Muito obrigado; resolveu→muito obrigado\ncontexto: Known: Problem Reporting, problemas_tecnicos, resolucao_problema | Last time: O técnico me ligou e resolveu! | Link: (ed9bda70) -[+participated_in]-> (a9eae69f)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Pedro Costa",
+                "what": "reportou_problema_login",
+                "why": "incapacidade_acesso",
+                "how": "problema_resolvido_anteriormente"
+              }
+            },
+            {
+              "message": "Não, ainda estou com dificuldades.",
+              "message_index": 2,
+              "baseline_response": "Pedro, sinto muito que você continue com dificuldades. Sem mais informações, minhas sugestões estão sendo inúteis.\n\nNesse caso, sugiro que você entre em contato com o suporte técnico da plataforma que você está tentando acessar. Eles terão as ferramentas necessárias para investigar o problema e te ajudar a resolver.\n\nSe puder, me diga qual plataforma está tentando acessar, e eu posso te ajudar a encontrar o link para o suporte técnico.",
+              "baseline_tokens": 579,
+              "baseline_prompt_tokens": 489,
+              "baseline_time_ms": 2786.6804599761963,
+              "cortex_response": "Certo, Pedro Costa. Então, ainda está com dificuldades para fazer login. Parece que a solução que propusemos anteriormente não funcionou. Vamos verificar se há alguma atualização de software que possa estar afetando o sistema ou, quem sabe, dar um novo passo para identificar a causa do problema.",
+              "cortex_tokens": 533,
+              "cortex_prompt_tokens": 472,
+              "cortex_time_ms": 2314.8388862609863,
+              "cortex_recall_time_ms": 33.15591812133789,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 11,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: reported_slow_system→suggested_internet_check_or_device_restart; reported_slow_system→suggested_internet_check_or_device_restart; reported_issue→suggested_checking_for_updates\ncontexto: Known: atualizações_de_software, resolução de problemas, dificuldades | Last time: suggested_internet_check_or_device_restart | Link: (ea5d7eef) -[+participated_in]-> (05364d57)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "conv_1_code_assistant",
+      "domain": "code_assistant",
+      "user_profile": {
+        "name": "Lucas",
+        "preferred_language": "Go",
+        "current_project": "web app",
+        "framework": "Next.js",
+        "experience_level": "junior"
+      },
+      "sessions": [
+        {
+          "session_index": 0,
+          "session_id": "session_0",
+          "key_facts": [
+            "dev: Lucas",
+            "lang: Go",
+            "framework: Next.js",
+            "projeto: web app"
+          ],
+          "expected_recalls": [],
+          "messages": [
+            {
+              "message": "Oi! Sou Lucas, estou começando um projeto de web app em Go com Next.js.",
+              "message_index": 0,
+              "baseline_response": "Que legal, Lucas! Um projeto combinado Go e Next.js é bem interessante e tem potencial. \n\nPara te ajudar melhor, me diga:\n\n*   **Qual é o objetivo do seu projeto?** (Ex: um blog, uma ferramenta de gerenciamento, um e-commerce, etc.)\n*   **Quais partes você pretende usar o Go e o Next.js?** (Ex: Next.js para a interface do usuário e Go para a lógica do servidor ou para um backend específico.)\n*   **Em que você está tendo dificuldades especificamente?** (Ex: configuração do ambiente, integração entre as duas tecnologias, algum erro específico que você esteja encontrando?)",
+              "baseline_tokens": 749,
+              "baseline_prompt_tokens": 607,
+              "baseline_time_ms": 3943.018913269043,
+              "cortex_response": "Olá Lucas, que bom te ver por aqui! Interessante o seu projeto de web app em Go com Next.js. Como você está progredindo? Conseguimos que Pedro Costa resolvesse o problema com o \"Achei! Era um import errado\" na semana passada, mas me diga, em que posso te ajudar hoje?",
+              "cortex_tokens": 619,
+              "cortex_prompt_tokens": 549,
+              "cortex_time_ms": 2455.406427383423,
+              "cortex_recall_time_ms": 62.57820129394531,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 14,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: identified→Confirmed error message 'Achei! Era um import errado'; discussed→JWT (JSON Web Token) authentication; discussed→JWT (JSON Web Token) authentication\ncontexto: Known: esquema_de_dados, Project Development, API Design | Last time: Confirmed error message 'Achei! Era um import errado' | Link: (e1e2d502) -[+participated_in]-> (7765e7e8)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Sim, quero seguir boas práticas desde o início.",
+              "message_index": 2,
+              "baseline_response": "Ótimo, Lucas! Excelente decisão. Seguir boas práticas desde o início vai economizar tempo e dor de cabeça no futuro.\n\nPara te ajudar a começar com o pé direito, aqui estão algumas recomendações gerais:\n\n*   **Estrutura do Projeto:** Organize seu projeto de forma clara e modular. Use pastas e arquivos de forma consistente.\n*   **Gerenciamento de Pacotes:** Utilize o `go mod` para gerenciar as dependências do Go.\n*   **Boas Práticas de Go:** Siga as convenções de estilo do Go (gofmt, golint) para garantir a legibilidade e manutenibilidade do código.\n*   **Next.js:** Utilize as melhores práticas do Next.js, como Server Components, otimização de imagens e roteamento.\n*   **Testes:** Comece a escrever testes unitários e de integração desde o início.\n\n**Recursos úteis:**\n\n*   **Documentação do Go:** [https://go.dev/](https://go.dev/)\n*   **Documentação do Next.js:** [https://nextjs.org/](https://nextjs.org/)\n*   **Go by Example:** [https://gobyexample.com/](https://gobyexample.com/)\n\nPara te ajudar ainda mais, me diga:\n\n*   **Qual é o seu nível de experiência com Go e Next.js?** (Ex: iniciante, intermediário, avançado)\n*   **Você já tem alguma ideia de arquitetura para o seu projeto?**",
+              "baseline_tokens": 1083,
+              "baseline_prompt_tokens": 751,
+              "baseline_time_ms": 8184.928894042969,
+              "cortex_response": "Ótimo Lucas, começar com boas práticas é fundamental! Vamos estruturar seus dados e definir os endpoints. Para isso, vamos começar recomendando uma estrutura inicial e definindo os endpoints do seu projeto. Que tipo de informação você quer que o seu web app colete e manipule?  Pensando em termos de funcionalidades, quais são as principais?",
+              "cortex_tokens": 739,
+              "cortex_prompt_tokens": 667,
+              "cortex_time_ms": 2640.3677463531494,
+              "cortex_recall_time_ms": 34.66510772705078,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: ['started_project', 'defining_endpoints', 'structuring_data']→['suggesting_initial_steps', 'recommending_structure_and_endpoint_definition']; ['started_project', 'defined_endpoints', 'outlined_data_structure']→['project_using_TypeScript_FastAPI']; seguir→estruturar_dados\ncontexto: Known: boas_praticas, esquema_de_dados, user | Last time: ['suggesting_initial_steps', 'recommending_structure_and_endpoint_definition'] | Link: (aa233e2f) -[+participated_in]-> (7765e7e8)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        },
+        {
+          "session_index": 1,
+          "session_id": "session_1",
+          "key_facts": [
+            "bug de import resolvido",
+            "usar imports absolutos"
+          ],
+          "expected_recalls": [
+            "linguagem",
+            "framework",
+            "tipo de projeto"
+          ],
+          "messages": [
+            {
+              "message": "Estou com um erro estranho: 'TypeError: undefined is not a function'",
+              "message_index": 0,
+              "baseline_response": "Ok, o erro \"TypeError: undefined is not a function\" é um dos mais comuns e pode ser bem frustrante!\n\nPara te ajudar a diagnosticar, preciso de mais detalhes. Quando você está vendo esse erro? Em qual parte do código?\n\nPor favor, me responda:\n\n*   **Onde o erro está acontecendo?** (Meie a linha do código onde o erro está sendo exibido)\n*   **O que você estava tentando fazer naquele momento?** (Qual era a lógica do seu código?)\n*   **Qual é o contexto?** (Você está usando alguma biblioteca específica? Existe alguma variável que pode estar vazia?)\n\nQuanto mais informações você me der, mais fácil será te ajudar a encontrar a solução.",
+              "baseline_tokens": 1123,
+              "baseline_prompt_tokens": 967,
+              "baseline_time_ms": 4700.0732421875,
+              "cortex_response": "Ah, o erro “TypeError: undefined is not a function” é um daqueles que podem ser bem frustrantes! Lucas, vamos tentar entender melhor isso. Você poderia me dar mais detalhes sobre onde exatamente esse erro está aparecendo?  Você já tentou usar o `console.log()` para verificar o valor da variável que está causando o problema?",
+              "cortex_tokens": 739,
+              "cortex_prompt_tokens": 667,
+              "cortex_time_ms": 2713.209629058838,
+              "cortex_recall_time_ms": 44.6009635925293,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 14,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: identified_error→offered_to_help_resolve_the_issue; reported_error→attempting_to_debug; reported_error→discussed_tracking_the_error\ncontexto: Known: TypeError, import_error, Error Handling | Last time: offered_to_help_resolve_the_issue | Link: (0c939cfd) -[+participated_in]-> (921e4096)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Achei! Era um import errado.",
+              "message_index": 2,
+              "baseline_response": "Parabéns, Lucas! É sempre um alívio quando você finalmente encontra o erro! 🥳\n\nQue bom que você identificou que era um import errado. É um dos problemas mais comuns e, às vezes, a mensagem de erro não é muito clara.\n\nSe precisar de ajuda com outros imports ou qualquer outra coisa no seu projeto, não hesite em perguntar! 😉",
+              "baseline_tokens": 1053,
+              "baseline_prompt_tokens": 974,
+              "baseline_time_ms": 3391.2699222564697,
+              "cortex_response": "Excelente, Lucas! Que bom que conseguiu identificar o problema. Parece que o erro \"TypeError: undefined is not a function\" estava relacionado a um import incorreto. É bom que você tenha checado e corrigido. Se tiver mais alguma dúvida ou precisar de ajuda com o seu projeto em Go e Next.js, é só me avisar!",
+              "cortex_tokens": 866,
+              "cortex_prompt_tokens": 749,
+              "cortex_time_ms": 3695.12939453125,
+              "cortex_recall_time_ms": 43.47109794616699,
+              "cortex_store_time_ms": 18.271446228027344,
+              "cortex_memory_entities": 6,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: identified→Confirmed error message 'Achei! Era um import errado'; ['started_project', 'defining_endpoints', 'structuring_data']→['suggesting_initial_steps', 'recommending_structure_and_endpoint_definition']; ['started_project', 'defined_endpoints', 'outlined_data_structure']→['project_using_TypeScript_FastAPI']\ncontexto: Known: import_error, user, authentication | Last time: Confirmed error message 'Achei! Era um import errado' | Link: (1eccf63f) -[+participated_in]-> (75561f51)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Lucas",
+                "what": "identificou_e_corrigiu_erro_importacao",
+                "why": "resolveu_erro_tipo",
+                "how": "utilizou_console_log"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "conv_2_roleplay",
+      "domain": "roleplay",
+      "user_profile": {
+        "player_name": "Casey",
+        "setting": "horror gótico",
+        "character": {
+          "name": "Marcus",
+          "class": "guerreiro",
+          "trait": "honrado"
+        },
+        "campaign_name": "A Saga de Marcus"
+      },
+      "sessions": [
+        {
+          "session_index": 0,
+          "session_id": "session_0",
+          "key_facts": [
+            "jogador: Casey",
+            "personagem: Marcus",
+            "classe: guerreiro",
+            "cenário: horror gótico",
+            "medalhão misterioso"
+          ],
+          "expected_recalls": [],
+          "messages": [
+            {
+              "message": "Olá! Sou Casey e quero jogar como Marcus, uma guerreiro.",
+              "message_index": 0,
+              "baseline_response": "Olá Casey! Que legal que você quer entrar na partida como Marcus, o guerreiro! \n\nPrepare-se para a batalha! O que você gostaria de fazer primeiro?\n\n*   Você quer simplesmente atacar?\n*   Você gostaria de avaliar a situação antes de agir?\n*   Ou você tem alguma outra ideia?",
+              "baseline_tokens": 1026,
+              "baseline_prompt_tokens": 959,
+              "baseline_time_ms": 2767.251491546631,
+              "cortex_response": "Olá Casey, tudo bem? Ótima escolha! Marcus como guerreiro parece ser um personagem interessante. Para começarmos, você quer que ele seja especialista em alguma arma ou estilo de luta específico? Algo que te atraia para a história, como espadas, arcos, ou talvez uma abordagem mais focada em força e armaduras pesadas?",
+              "cortex_tokens": 905,
+              "cortex_prompt_tokens": 833,
+              "cortex_time_ms": 2872.1110820770264,
+              "cortex_recall_time_ms": 55.45377731323242,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: Elena se aproxima do homem misterioso→Movimentos precisos e silenciosos, o homem misterioso está sentado no canto mais escuro da taverna, envolto nas sombras, com um copo de bebida na mão ; recupera a compostura→espada erguida, ilusão da Guarda Real se dissipou; consolidacao_memoria→Elena selecionou o personagem Marcus, designando-o como um guerreiro.  Este é um retorno da seleção anterior de Marcus como personagem, indicando uma escolha intencional do usuário.  A seleção é regis\ncontexto: Known: Marcus, sounds, user | Last time: Movimentos precisos e silenciosos, o homem misterioso está sentado no canto mais escuro da taverna, envolto nas sombras, com um copo de bebida na mão  | Link: (44ae7a8c) -[+participated_in]-> (8acd3418)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Marcus olha ao redor procurando pistas.",
+              "message_index": 2,
+              "baseline_response": "Marcus examina a área com um olhar atento. O sol da tarde banha a clareira em tons dourados, destacando a vegetação densa e a poeira que paira no ar. Ele nota:\n\n*   **Um pedaço de couro desgastado** perto de uma árvore caída. Parece ter sido arrancado de uma armadura.\n*   **Pegadas recentes** na terra macia, que seguem em direção a uma trilha estreita que desaparece na mata. As pegadas parecem de botas pesadas, provavelmente de um guerreiro.\n*   **Um pequeno símbolo gravado na raiz da árvore** - um dragão estilizado com chamas.\n\nO que Marcus faz?\n\nA) Seguir as pegadas na trilha.\nB) Examinar o pedaço de couro com mais cuidado.\nC) Tentar identificar a origem do símbolo no dragão.\nD) Outro? (Especifique sua ação)",
+              "baseline_tokens": 1129,
+              "baseline_prompt_tokens": 924,
+              "baseline_time_ms": 6004.597902297974,
+              "cortex_response": "Marcus, com sua armadura polida e espada desembainhada, varre o olhar pelos arredores. O ar está úmido e carregado de um cheiro sutil de terra e ervas. Ele encontra uma pequena pedra com um símbolo gravado – um círculo interrompido por uma linha. Parece um mapa rudimentar. Você o examina cuidadosamente, Casey? O que você faz com a pedra?",
+              "cortex_tokens": 932,
+              "cortex_prompt_tokens": 801,
+              "cortex_time_ms": 4190.64736366272,
+              "cortex_recall_time_ms": 118.49761009216309,
+              "cortex_store_time_ms": 41.29934310913086,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: consolidacao_memoria→Elena selecionou o personagem Marcus, designando-o como um guerreiro.  Este é um retorno da seleção anterior de Marcus como personagem, indicando uma escolha intencional do usuário.  A seleção é regis; chose_character→selected_the_warrior_class_named_Marcus; requested_character→assigned_class_warrior\ncontexto: Known: Marcus, pistas, user | Last time: Elena selecionou o personagem Marcus, designando-o como um guerreiro.  Este é um retorno da seleção anterior de Marcus como personagem, indicando uma escolha intencional do usuário.  A seleção é regis | Link: (44ae7a8c) -[+participated_in]-> (8acd3418)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Casey",
+                "what": "selecionou_personagem",
+                "why": "desejo_jogar_como_Marcus",
+                "how": "Marcus_definido_como_guerreiro"
+              }
+            }
+          ]
+        },
+        {
+          "session_index": 1,
+          "session_id": "session_1",
+          "key_facts": [
+            "missão: levar medalhão ao Templo Esquecido",
+            "Rainha das Sombras",
+            "mapa recebido"
+          ],
+          "expected_recalls": [
+            "nome do personagem",
+            "classe",
+            "cenário",
+            "medalhão"
+          ],
+          "messages": [
+            {
+              "message": "Marcus se aproxima do homem misterioso.",
+              "message_index": 0,
+              "baseline_response": "Marcus avança com cautela, a mão direita apertando a empunhadura de sua espada. Ele se aproxima do homem misterioso, mantendo uma distância respeitosa, mas atento a qualquer movimento. O homem está sentado em uma pedra, ajeitando uma taça de vinho e observando a paisagem com um olhar pensativo. Ele veste roupas de couro surradas e carrega um arco longo de madeira.\n\nO homem levanta a cabeça e o observa com um sorriso enigmático. \"Bem, bem... um guerreiro solitário. Que sorte a minha. O que te traz a este lugar, viajante?\" ele pergunta, com uma voz calma e um sotaque levemente desconhecido.\n\nEle te oferece um gole da taça de vinho.\n\nO que Marcus faz?\n\nA) Aceita a taça de vinho.\nB) Recusa a taça e pergunta diretamente ao homem quem ele é e o que quer.\nC) Examina o arco do homem com atenção.\nD) Outro? (Especifique sua ação)",
+              "baseline_tokens": 1212,
+              "baseline_prompt_tokens": 986,
+              "baseline_time_ms": 6443.319082260132,
+              "cortex_response": "Marcus se move com cautela, a passos lentos e silenciosos, aproximando-se do homem misterioso. A sombra do homem misterioso se dissipa um pouco, revelando... um rosto marcado por cicatrizes e um olhar intenso que parece penetrar a alma. Ele está envolto em vestes escuras e carrega um cajado de madeira escura. Ele parece estar em silêncio, observando Marcus. Você quebra o silêncio, Marcus? O que você faz?",
+              "cortex_tokens": 935,
+              "cortex_prompt_tokens": 830,
+              "cortex_time_ms": 3595.4089164733887,
+              "cortex_recall_time_ms": 45.8371639251709,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 14,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: se aproxima→Theron se move com um deslizamento, a sombra do homem misterioso se dissipa um pouco.; Theron se aproxima do homem misterioso→A sombra do homem misterioso se dissipa um pouco, revelando...; ['aceita', 'observa', 'ressoa', 'sussurrando']→['a imagem do líder dos bandidos ressoa', 'o silêncio do deserto ainda carregado', 'o terror dos bandidos', 'a revelação sinistra de Kael']\ncontexto: Known: homem misterioso, homem_misterioso, user | Last time: Theron se move com um deslizamento, a sombra do homem misterioso se dissipa um pouco. | Link: (1d213310) -[+participated_in]-> (8acd3418)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Aceito a missão. O que preciso fazer?",
+              "message_index": 2,
+              "baseline_response": "O homem, um sorriso ainda presente em seus lábios, serve um gole generoso de vinho para você. O líquido é tinto, encorpado e com um leve toque de especiarias que arde na garganta. Ao tomar o gole, ele se inclina um pouco para frente.\n\n“Excelente escolha, guerreiro,” ele diz, com um brilho nos olhos. “Sua missão é simples, mas crucial. O Coração da Floresta está sendo corrompido. Uma entidade antiga, o Silvano, está sendo atormentada e, por consequência, a magia da floresta está murchando. Preciso que você encontre a fonte da corrupção e a neutralize.”\n\nEle estende a mão, revelando um pergaminho enrugado. “Este pergaminho contém a chave – um mapa para a Gruta das Lamentações, onde o Silvano está sendo assombrado. A Gruta está localizada a leste, no coração da Floresta Sombria. Tenha cuidado, guerreiro, o caminho estará repleto de perigos. Mas lembre-se, a esperança da floresta reside em suas mãos.\"\n\nEle então te entrega o pergaminho. \"Sua primeira tarefa é encontrar a entrada da Gruta. Uma vez lá dentro, você terá que enfrentar o eco da corrupção.\"\n\n**O que você faz agora?**\n\nA) Começa a seguir o mapa.\nB) Faz mais perguntas sobre o Silvano e a corrupção.\nC) Se prepara para a jornada, verificando sua armadura e equipamento.\nD) Outro? (Especifique sua ação)",
+              "baseline_tokens": 1222,
+              "baseline_prompt_tokens": 873,
+              "baseline_time_ms": 8669.829607009888,
+              "cortex_response": "O homem misterioso, cujo nome é Silas, avalia Marcus com um olhar penetrante, um leve sorriso suavizando suas feições enquanto ele extrai a informação valiosa. \"A Rainha Verdadeira busca o Corvo de Éter\", ele diz, a voz grave e carregada de importância. “Ela acredita que o Corvo é a chave para restaurar o equilíbrio da magia em Eldoria. Esta informação é valiosa, e sua busca pela Rainha Verdadeira é crucial. Você precisa encontrar o antigo templo de Aethelgard, nas Montanhas da Serpente. Dizem que lá reside um fragmento da profecia que pode guiar você. Mas cuidado, o templo está protegido por guardiões... e o Corvo de Éter não será entregue facilmente.\" Ele estende uma pequena esfera de cristal. \"Esta é uma bússola mágica, ela apontará para o templo. Aceita a missão, e Eldoria pode ter uma chance de ser salva.\" Ele aceita, ainda um pouco hesitante.",
+              "cortex_tokens": 1098,
+              "cortex_prompt_tokens": 843,
+              "cortex_time_ms": 7071.112871170044,
+              "cortex_recall_time_ms": 49.92532730102539,
+              "cortex_store_time_ms": 34.8210334777832,
+              "cortex_memory_entities": 8,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: ['inclina', 'é_a_chave', 'a_informação_é_valiosa']→['um leve sorriso suavizando suas feições', 'extrair a informação valiosa']; ['inclina', 'Aceita', 'é_chave']→['informação valiosa', 'ainda']; aceita→Elena analisa Torvin, o olhar fixo no seu. A revelação do Corvo e a menção da 'Rainha Verdadeira' lançam uma nova luz sobre a situação.\ncontexto: Known: quest, ataque, missão | Last time: ['um leve sorriso suavizando suas feições', 'extrair a informação valiosa'] | Link: (1a77313b) -[+participated_in]-> (93cc6beb)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Marcus",
+                "what": "aceita_missao",
+                "why": "salvar_Eldoria",
+                "how": "busca_templo_Aethelgard"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "conv_3_education",
+      "domain": "education",
+      "user_profile": {
+        "student_name": "Beatriz",
+        "subject": "Programação",
+        "level": "pós-graduação",
+        "learning_style": "prático",
+        "goal": "passar na prova"
+      },
+      "sessions": [
+        {
+          "session_index": 0,
+          "session_id": "session_0",
+          "key_facts": [
+            "aluno: Beatriz",
+            "matéria: Programação",
+            "nível: pós-graduação",
+            "dificuldade: algoritmos",
+            "aprende melhor: exemplos práticos"
+          ],
+          "expected_recalls": [],
+          "messages": [
+            {
+              "message": "Oi! Sou Beatriz, estou no pós-graduação e preciso de ajuda com Programação.",
+              "message_index": 0,
+              "baseline_response": "Olá Beatriz! Que bom te conhecer! Programação pode ser um desafio, mas com a ajuda certa, fica muito mais fácil. \n\nEm que posso te ajudar especificamente? Para que eu possa te auxiliar da melhor forma, me diga:\n\n*   **Qual linguagem de programação você está estudando?** (Python, Java, C++, etc.)\n*   **Em qual tópico você está tendo dificuldades?** (Estruturas de dados, algoritmos, debugging, design de software, etc.)\n*   **Você tem alguma pergunta específica que gostaria de fazer?** Ou precisa de ajuda com um problema que está enfrentando?\n\nQuanto mais detalhes você me der, mais eficaz será a minha ajuda. Vamos lá, não hesite em me contar! 😊",
+              "baseline_tokens": 1233,
+              "baseline_prompt_tokens": 1076,
+              "baseline_time_ms": 4934.523105621338,
+              "cortex_response": "Olá Beatriz! Que bom te conhecer. Vejo que você está buscando ajuda com programação, é ótimo ter um contato para trocar ideias e resolver dúvidas!\n\n\n\nCom prazer posso te ajudar. O que está te causando dificuldades no momento? Podemos começar analisando o problema com calma e encontrar uma solução juntos!",
+              "cortex_tokens": 1075,
+              "cortex_prompt_tokens": 971,
+              "cortex_time_ms": 3631.3252449035645,
+              "cortex_recall_time_ms": 43.73645782470703,
+              "cortex_store_time_ms": 76.28417015075684,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: ['discutiu', 'exemplificou']→['usando - o exemplo de Cloreto de Sódio']; tem dificuldade→undefined; consolidacao_memoria→Letícia, uma estudante de pós-graduação, solicitou assistência e estava com dificuldades. O sistema sugeriu que ela revisasse as Leis de Newton para ajudar a resolver seu problema.  A interação foi re\ncontexto: Known: Graduação, graduate_student, complexity | Last time: ['usando - o exemplo de Cloreto de Sódio'] | Link: (fc86c6e1) -[+participated_in]-> (a34b771f)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Beatriz",
+                "what": "solicitou_assistência_programação",
+                "why": "dificuldades_resolução_problemas",
+                "how": "troca_de_conhecimento"
+              }
+            },
+            {
+              "message": "Estou tendo dificuldade com algoritmos.",
+              "message_index": 2,
+              "baseline_response": "Ótimo! Algoritmos são a base da programação. Vamos começar com o básico.\n\nPara te ajudar a superar essa dificuldade, vamos tentar uma abordagem passo a passo.\n\n1.  **Quais tipos de algoritmos te estão causando mais problemas?** (Ex: Ordenação, Busca, etc.)\n2.  **Você consegue explicar qual o conceito do algoritmo que te causa mais dificuldade?** (Mesmo que seja apenas com palavras suas, isso me ajuda a entender o que você já sabe.)\n3.  **Você gostaria de começar com um exemplo simples?** Podemos trabalhar juntos em um exemplo prático para ilustrar o conceito.\n\nPara começarmos, que tal falarmos sobre a **ordenação**? É um dos algoritmos mais comuns e pode ser um bom ponto de partida. Você já conhece algum algoritmo de ordenação? (Ex: Bubble Sort, Insertion Sort, Merge Sort...)",
+              "baseline_tokens": 1336,
+              "baseline_prompt_tokens": 1148,
+              "baseline_time_ms": 5512.642621994019,
+              "cortex_response": "Entendo, Beatriz. Algoritmos podem ser desafiadores, especialmente quando se tenta visualizar o processo e traduzi-lo em código. Para começarmos a desmistificá-los, você poderia me dizer quais tipos de algoritmos estão te dando mais problemas? Por exemplo, você está tendo dificuldades com:\n\n*   **Ordenação?** (Bubble Sort, Quick Sort, Merge Sort...)\n*   **Busca?** (Busca Linear, Busca Binária...)\n*   **Algoritmos recursivos?**\n*   **Algoritmos de Grafos?**\n\nOu talvez você queira apenas uma explicação mais geral sobre o conceito de algoritmos e suas aplicações? Me diga o que te parece mais complicado e podemos começar por aí.",
+              "cortex_tokens": 1083,
+              "cortex_prompt_tokens": 925,
+              "cortex_time_ms": 4850.419998168945,
+              "cortex_recall_time_ms": 43.448448181152344,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 9,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: tem dificuldade→undefined; consolidacao_memoria→Letícia, uma estudante de pós-graduação, solicitou assistência e estava com dificuldades. O sistema sugeriu que ela revisasse as Leis de Newton para ajudar a resolver seu problema.  A interação foi re; requested_help→seeking_assistance\ncontexto: Known: complexity, Compreensao, Compreensão | Last time: undefined | Link: (fc86c6e1) -[+participated_in]-> (a34b771f)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Prefiro exemplos práticos!",
+              "message_index": 4,
+              "baseline_response": "Perfeito! Exemplos práticos são a melhor forma de entender algoritmos. Vamos começar com um exemplo simples: o **Bubble Sort**.\n\n**O que é Bubble Sort?**\n\nBubble Sort é um algoritmo de ordenação simples que funciona comparando pares de elementos adjacentes e trocando-os se estiverem na ordem errada. Ele repete esse processo várias vezes, “borbulhando” os elementos maiores para o final da lista.\n\n**Vamos a um exemplo:**\n\nImagine que temos a seguinte lista de números: `[5, 1, 4, 2, 8]`\n\n**Como o Bubble Sort funciona passo a passo:**\n\n1.  **Primeira Passagem:**\n    *   Compara 5 e 1: 5 > 1, troca. Lista: `[1, 5, 4, 2, 8]`\n    *   Compara 5 e 4: 5 > 4, troca. Lista: `[1, 4, 5, 2, 8]`\n    *   Compara 5 e 2: 5 > 2, troca. Lista: `[1, 4, 2, 5, 8]`\n    *   Compara 5 e 8: 5 < 8, não troca. Lista: `[1, 4, 2, 5, 8]`\n\n2.  **Segunda Passagem:**\n    *   Compara 1 e 4: 1 < 4, não troca. Lista: `[1, 4, 2, 5, 8]`\n    *   Compara 4 e 2: 4 > 2, troca. Lista: `[1, 2, 4, 5, 8]`\n    *   Compara 4 e 5: 4 < 5, não troca. Lista: `[1, 2, 4, 5, 8]`\n    *   Compara 5 e 8: 5 < 8, não troca. Lista: `[1, 2, 4, 5, 8]`\n\n3.  **Terceira Passagem:**\n    *   Compara 1 e 2: 1 < 2, não troca. Lista: `[1, 2, 4, 5, 8]`\n    *   Compara 2 e 4: 2 < 4, não troca. Lista: `[1, 2, 4, 5, 8]`\n\n...e assim por diante, até que a lista esteja completamente ordenada.\n\n**Resultado final:** `[1, 2, 4, 5, 8]`\n\n**Exercício:**\n\nAgora, tente implementar o Bubble Sort em uma linguagem de programação que você conheça (Python, JavaScript, etc.).  Não se preocupe se não der certo de primeira, o importante é entender o processo.\n\n**Quaisquer perguntas sobre o Bubble Sort? Quer que eu te ajude a escrever o código?**\n",
+              "baseline_tokens": 1930,
+              "baseline_prompt_tokens": 1268,
+              "baseline_time_ms": 15991.097450256348,
+              "cortex_response": "Excelente! Entendo que exemplos práticos são a chave para você absorver o conceito. Vamos lá! Que tal começarmos com um problema simples: encontrar o maior número em uma lista de números?\n\n**Problema:** Dada uma lista de números inteiros, o objetivo é encontrar e retornar o maior número da lista.\n\n**Abordagem:** Podemos criar um algoritmo simples que percorre a lista, mantendo o controle do maior número encontrado até o momento.\n\n**Exemplo em Python (para ilustrar):**\n\n```python\ndef encontrar_maior(lista):\n  \"\"\"\n  Encontra o maior número em uma lista de números.\n\n  Args:\n    lista: Uma lista de números inteiros.\n\n  Returns:\n    O maior número da lista.\n  \"\"\"\n  if not lista:\n    return None  # Retorna None se a lista estiver vazia\n\n  maior = lista[0]  # Inicializa o maior com o primeiro elemento\n  for numero in lista:\n    if numero > maior:\n      maior = numero\n  return maior\n\n# Exemplo de uso:\nnumeros = [10, 5, 20, 8, 15]\nmaior_numero = encontrar_maior(numeros)\nprint(f\"O maior número é: {maior_numero}\") # Output: O maior número é: 20\n```\n\n**Explicação:**\n\n1.  **`def encontrar_maior(lista):`**: Define uma função chamada `encontrar_maior` que recebe uma lista como entrada.\n2.  **`if not lista: return None`**:  Verifica se a lista está vazia. Se estiver, retorna `None` para indicar que não há maior número.\n3.  **`maior = lista[0]`**: Inicializa a variável `maior` com o primeiro elemento da lista.  Acreditamos que o primeiro elemento é o maior no começo.\n4.  **`for numero in lista:`**:  Itera sobre cada número na lista.\n5.  **`if numero > maior:`**:  Compara o número atual (`numero`) com o valor armazenado em `maior`.\n6.  **`maior = numero`**: Se o número atual for maior que `maior`, atualiza `maior` para o valor do número atual.\n7.  **`return maior`**:  Após iterar sobre todos os números, retorna o valor de `maior`, que agora contém o maior número encontrado na lista.\n\n**O que achou deste exemplo, Beatriz?**  Podemos começar a partir daqui, se quiser. Você gostaria de tentar implementar um algoritmo similar para outro problema, ou se prefere que eu explique algum aspecto do código com mais detalhes?",
+              "cortex_tokens": 1577,
+              "cortex_prompt_tokens": 980,
+              "cortex_time_ms": 15011.619567871094,
+              "cortex_recall_time_ms": 43.53499412536621,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: requested_help→seeking_assistance; needs_help→postgraduate_student; struggling→suggested reviewing Newton's laws\ncontexto: Known: Exemplos práticos, Exemplos_praticos, user | Last time: seeking_assistance | Link: (fc86c6e1) -[+participated_in]-> (a34b771f)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        },
+        {
+          "session_index": 1,
+          "session_id": "session_1",
+          "key_facts": [
+            "progresso em estruturas de dados",
+            "ainda tem dúvidas"
+          ],
+          "expected_recalls": [
+            "nome do aluno",
+            "estilo de aprendizado",
+            "tópico anterior"
+          ],
+          "messages": [
+            {
+              "message": "Voltei! Pratiquei o que você ensinou sobre estruturas de dados.",
+              "message_index": 0,
+              "baseline_response": "Que ótimo! Fico muito feliz em saber que você praticou o que aprendemos. Agora, conte-me!\n\n*   **Qual estrutura de dados você escolheu para praticar?** (Arrays, Listas Ligadas, Pilhas, Filas, Árvores, Grafos...)\n*   **Qual problema você resolveu usando essa estrutura de dados?** (Ex: Inserir um elemento, remover um elemento, buscar um elemento, etc.)\n*   **Você teve alguma dificuldade?** Se sim, quais foram?\n\nCompartilhe o que você fez, o código que você escreveu (se tiver) e qualquer dificuldade que você encontrou. Assim, podemos discutir e entender melhor o problema. Não tenha medo de errar, a prática é fundamental para aprender!",
+              "baseline_tokens": 1895,
+              "baseline_prompt_tokens": 1732,
+              "baseline_time_ms": 5538.592100143433,
+              "cortex_response": "Que ótimo, Beatriz! Fico muito feliz em saber que você praticou e está se sentindo mais confiante.\n\nSobre as estruturas de dados, você poderia me contar quais estruturas você estudou ou está trabalhando? Por exemplo, você já trabalhou com:\n\n*   **Arrays/Vetores?**\n*   **Listas Encadeadas?**\n*   **Pilhas (Stacks)?**\n*   **Filas (Queues)?**\n*   **Árvores?** (Binárias, de Busca, etc.)\n*   **Grafos?**\n\nOu talvez você tenha alguma dúvida específica sobre alguma dessas estruturas?  Quanto mais detalhes você me der, melhor poderei te ajudar a aprofundar seu conhecimento e resolver suas dificuldades.",
+              "cortex_tokens": 1767,
+              "cortex_prompt_tokens": 1607,
+              "cortex_time_ms": 5391.254901885986,
+              "cortex_recall_time_ms": 42.4959659576416,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: consolidacao_memoria→Letícia, uma estudante de pós-graduação, solicitou assistência e estava com dificuldades. O sistema sugeriu que ela revisasse as Leis de Newton para ajudar a resolver seu problema.  A interação foi re; requested - examples→assistant_response - provided - example - \"considerar o movimento de um carro em uma rampa\"; ['discutiu', 'exemplificou']→['usando - o exemplo de Cloreto de Sódio']\ncontexto: Known: question, questions, graduate_student | Last time: Letícia, uma estudante de pós-graduação, solicitou assistência e estava com dificuldades. O sistema sugeriu que ela revisasse as Leis de Newton para ajudar a resolver seu problema.  A interação foi re | Link: (fc86c6e1) -[+participated_in]-> (a34b771f)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Alguns sim, mas ainda tenho dúvidas em um ponto.",
+              "message_index": 2,
+              "baseline_response": "Perfeito! Dúvidas são ótimas, indicam que você está pensando e se esforçando. Não se preocupe, é normal ter dificuldades.\n\nConte-me: em qual ponto você teve as dúvidas? Descreva o problema que você estava tentando resolver, o que você fez, o que deu errado e qual a sua dúvida específica. Quanto mais detalhes você me der, mais fácil será para eu te ajudar a esclarecer.\n\nVamos lá, não hesite em me contar! 😊",
+              "baseline_tokens": 1773,
+              "baseline_prompt_tokens": 1671,
+              "baseline_time_ms": 3977.6053428649902,
+              "cortex_response": "Perfeito, Beatriz! Vamos lá. Pode me dizer qual é o ponto específico em que você tem dúvidas? Não se preocupe em ser formal, me explique como se estivéssemos conversando. Quanto mais detalhes você me fornecer, mais fácil será para eu te ajudar.",
+              "cortex_tokens": 1655,
+              "cortex_prompt_tokens": 1598,
+              "cortex_time_ms": 3155.017852783203,
+              "cortex_recall_time_ms": 43.21932792663574,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: requested - examples→assistant_response - provided - example - \"considerar o movimento de um carro em uma rampa\"; needs_help→complexidade da história exige um olhar atento e aprofundado; requested_help→seeking_assistance\ncontexto: Known: Exemplos_praticos, Exemplos práticos, Dúvidas | Last time: assistant_response - provided - example - \"considerar o movimento de um carro em uma rampa\" | Link: (fc86c6e1) -[+participated_in]-> (a34b771f)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "conv_4_personal_assistant",
+      "domain": "personal_assistant",
+      "user_profile": {
+        "name": "Carolina",
+        "occupation": "professor",
+        "preferences": {
+          "coffee": "expresso sem açúcar",
+          "meeting_time": "manhã",
+          "communication": "direto ao ponto"
+        },
+        "family": {
+          "spouse": "parceiro(a)",
+          "kids": 1
+        }
+      },
+      "sessions": [
+        {
+          "session_index": 0,
+          "session_id": "session_0",
+          "key_facts": [
+            "nome: Carolina",
+            "profissão: professor",
+            "problema: esquece compromissos",
+            "prefere manhã"
+          ],
+          "expected_recalls": [],
+          "messages": [
+            {
+              "message": "Olá! Sou Carolina, trabalho como professor. Preciso de ajuda para me organizar.",
+              "message_index": 0,
+              "baseline_response": "Olá Carolina! Que bom te conhecer! É ótimo que você esteja buscando ferramentas para se organizar, especialmente como professor. Eu posso ser muito útil nesse processo.\n\nPara te ajudar da melhor forma, preciso entender um pouco mais sobre suas necessidades. Vamos conversar sobre:\n\n1.  **Quais são os seus principais desafios de organização?** (Ex: Gerenciar horários, tarefas, materiais, comunicação com alunos e pais, planejamento de aulas, etc.)\n2.  **Quais ferramentas você já utiliza?** (Ex: Agenda, Google Calendar, Trello, Notion, etc.)\n3.  **Qual o seu estilo de trabalho?** (Ex: Você é mais visual, prefere listas, gosta de ter tudo detalhado ou prefere ter uma visão geral?)\n\nPodemos explorar diferentes técnicas e ferramentas para encontrar as que melhor se adaptam ao seu fluxo de trabalho.\n\nPara começar, me diga: qual é o maior desafio de organização que você enfrenta no momento?",
+              "baseline_tokens": 1624,
+              "baseline_prompt_tokens": 1422,
+              "baseline_time_ms": 6452.810287475586,
+              "cortex_response": "Olá Carolina, que bom te conhecer! É ótimo saber que você é professora, isso mostra que você já tem um ótimo senso de organização. Entendo perfeitamente a necessidade de se organizar, especialmente quando se tem tantas responsabilidades.\n\nPara te ajudar da melhor forma, gostaria de entender um pouco melhor como você está lidando com a organização atualmente. Poderia me dizer:\n\n*   **Quais são os principais desafios que você enfrenta para se organizar?** (Ex: gerenciar horários, planejar aulas, lidar com tarefas administrativas, etc.)\n*   **Quais ferramentas ou métodos você já tentou usar?** (Ex: agendas, aplicativos, listas de tarefas, etc.)\n*   **Em que tipo de ajuda você precisa especificamente?** (Ex: criar um sistema de organização, encontrar aplicativos úteis, aprender a priorizar tarefas, etc.)\n\nNão se preocupe em dar respostas completas de primeira, podemos ir construindo um plano juntos. Vamos lá, me conte um pouco sobre o seu dia a dia!",
+              "cortex_tokens": 1684,
+              "cortex_prompt_tokens": 1469,
+              "cortex_time_ms": 14847.870111465454,
+              "cortex_recall_time_ms": 84.72609519958496,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: scheduled_appointment→Assistant offered options 10h00 or 11h30; agendar→priorizar tarefas de acordo com o pico de produtividade matinal; scheduled_appointment→Perfeito, Amanda! Terça-feira com o Dr. Santos é uma ótima escolha. Vamos agendar para qual horário te convém melhor? Tenho horários disponíveis às 10\ncontexto: Known: gerenciamento de tempo, horário_de_trabalho, gerenciamento_de_tempo | Last time: Assistant offered options 10h00 or 11h30 | Link: (c4e388e1) -[+participated_in]-> (5f332469)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Esqueço compromissos e não consigo priorizar tarefas.",
+              "message_index": 2,
+              "baseline_response": "Entendo perfeitamente! Esquecer compromissos e a dificuldade em priorizar tarefas são problemas muito comuns, especialmente para quem tem uma rotina agitada como professor. Isso é um ótimo ponto de partida para entendermos como posso te ajudar.\n\nVamos focar primeiro em esquecer compromissos. Como você costuma registrar seus compromissos? Você usa uma agenda física, digital, ou uma combinação de ambos? E como você lida com os lembretes? Às vezes você acaba deixando passar, mesmo tendo lembretes?\n\nEnquanto isso, vamos conversar sobre a priorização de tarefas. Quando você se depara com uma lista enorme de tarefas, como você decide o que fazer primeiro? Você se sente sobrecarregado, procrastina, ou tem dificuldade em saber quais tarefas são realmente importantes?\n\nNão se preocupe em dar respostas perfeitas, o objetivo é entender melhor o seu processo de pensamento e identificar os pontos que podemos otimizar.  Respire fundo, e vamos começar por aí. Qual dessas perguntas te parece mais relevante para você agora?",
+              "baseline_tokens": 1693,
+              "baseline_prompt_tokens": 1472,
+              "baseline_time_ms": 7528.974294662476,
+              "cortex_response": "Entendo perfeitamente, Carolina. Esquecer compromissos e dificuldade em priorizar tarefas são desafios muito comuns, especialmente para quem tem uma rotina intensa como professora. Isso pode gerar um sentimento de sobrecarga e desorganização, e é ótimo que você esteja buscando uma solução.\n\nVamos abordar isso de forma gradual. Um dos métodos que posso te sugerir é o **Método Eisenhower (Urgente/Importante)**. Ele pode te ajudar a ter mais clareza sobre suas tarefas e a priorizá-las de forma eficaz.\n\n**O Método Eisenhower (Urgente/Importante) divide suas tarefas em quatro categorias:**\n\n1.  **Urgente e Importante:** Tarefas que precisam ser feitas imediatamente (ex: um compromisso importante, um problema crítico com um aluno).\n2.  **Importante, mas não Urgente:** Tarefas que precisam ser feitas, mas não têm um prazo imediato (ex: planejamento de aulas, preparação de materiais, desenvolvimento profissional).\n3.  **Urgente, mas não Importante:** Tarefas que precisam ser feitas rapidamente, mas não contribuem significativamente para seus objetivos (ex: responder a e-mails menos importantes, atender a reuniões improdutivas).\n4.  **Nem Urgente nem Importante:** Tarefas que não precisam ser feitas (ex: navegar em redes sociais, realizar atividades que não agregam valor).\n\n**Como podemos começar a aplicar isso na sua rotina?**\n\n*   Podemos criar uma matriz Eisenhower com suas tarefas e classificá-las em uma dessas categorias.\n*   Podemos definir um tempo específico para você listar e analisar suas tarefas.\n*   Podemos explorar estratégias para lidar com as tarefas da categoria \"Urgente e Importante\" para que você não se sinta sobrecarregada.\n\nO que você acha? Gostaria de começarmos com a criação da matriz Eisenhower? Ou prefere que eu te explique mais sobre cada uma das categorias?",
+              "cortex_tokens": 1997,
+              "cortex_prompt_tokens": 1582,
+              "cortex_time_ms": 11363.497734069824,
+              "cortex_recall_time_ms": 79.62322235107422,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: esquecimento→sugestão do método Eisenhower (Urgente/Importante); agendar→priorizar tarefas de acordo com o pico de produtividade matinal; needs_help→unsure_of_difficulties\ncontexto: Known: tarefas, Consulta com Dr. Santos (terça-feira), user | Last time: sugestão do método Eisenhower (Urgente/Importante) | Link: (af76fc65) -[+participated_in]-> (17fbf9b8)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Pela manhã, sou mais produtivo de manhã.",
+              "message_index": 4,
+              "baseline_response": "Excelente! Essa informação é fundamental. Saber que você tem um período de maior produtividade pela manhã pode otimizar muito o seu planejamento e, consequentemente, a sua organização.\n\nAgora que sabemos que a manhã é o seu \"horário de ouro\", podemos focar em como aproveitar ao máximo esse tempo e evitar que a falta de priorização te desestimize.\n\nPensando nisso, vamos explorar algumas estratégias:\n\n1.  **Blocos de Tempo:** Podemos dividir seu dia em blocos de tempo focados em tarefas específicas, aproveitando a sua maior produtividade pela manhã.\n2.  **Lista de Prioridades (com foco na manhã):** Criaremos uma lista de tarefas, priorizando aquelas que exigem mais foco e energia para serem realizadas durante esse período.\n3.  **Técnica Pomodoro:** Podemos usar a Técnica Pomodoro (25 minutos de trabalho focado, seguidos de 5 minutos de descanso) para manter o foco e a produtividade durante a manhã.\n\nVocê se sente mais confortável com essa abordagem? Quer que eu te ajude a criar um exemplo de como seria um dia utilizando essas estratégias, ou prefere que eu te faça algumas perguntas mais direcionadas sobre como você organiza a sua rotina pela manhã?",
+              "baseline_tokens": 1772,
+              "baseline_prompt_tokens": 1510,
+              "baseline_time_ms": 7666.000604629517,
+              "cortex_response": "Excelente! Essa informação é crucial, Carolina. Saber que você é mais produtivo pela manhã nos permite otimizar seu tempo e focar nas tarefas mais importantes durante esse período.\n\nCom base nisso, podemos criar uma rotina que maximize sua produtividade matinal. Que tal fazermos o seguinte:\n\n1.  **Agendamento:** Vamos agendar suas tarefas mais importantes para as primeiras horas da manhã, quando você está mais focado.\n2.  **Priorização:** Vamos usar o Método Eisenhower para priorizar suas tarefas, levando em consideração seu pico de produtividade matinal.\n3.  **Bloqueio de Tempo:** Vamos bloquear um tempo específico em sua agenda para cada tarefa, evitando interrupções.\n\nPara começar, poderia me dizer:\n\n*   **Quais são as 3 tarefas mais importantes que você gostaria de realizar pela manhã?** (Pense em tarefas que realmente impactam seu trabalho ou sua vida pessoal)\n*   **Quanto tempo você acha que cada tarefa levará para ser concluída?** (Seja realista)\n\nCom essas informações, podemos começar a construir um plano de ação personalizado para você. Vamos lá!",
+              "cortex_tokens": 2110,
+              "cortex_prompt_tokens": 1869,
+              "cortex_time_ms": 7490.274429321289,
+              "cortex_recall_time_ms": 43.54286193847656,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: scheduled_appointment→Assistant offered options 10h00 or 11h30; agendar→priorizar tarefas de acordo com o pico de produtividade matinal; appointment_scheduled→\"Terça fica agendada com o Dr. Santos, seu médico de confiança\" - confirmed appointment details at 10:00 AM\ncontexto: Known: manhã, produtividade, gerenciamento de tempo | Last time: Assistant offered options 10h00 or 11h30 | Link: (f2130185) -[+participated_in]-> (17fbf9b8)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        },
+        {
+          "session_index": 1,
+          "session_id": "session_1",
+          "key_facts": [
+            "restaurante favorito: Italiano na Paulista"
+          ],
+          "expected_recalls": [
+            "preferência por manhã",
+            "profissão"
+          ],
+          "messages": [
+            {
+              "message": "Bom dia! O que tenho para hoje?",
+              "message_index": 0,
+              "baseline_response": "Bom dia Carolina! Que bom começar o dia com essa pergunta. Para te ajudar a definir o que você tem para hoje, vamos criar uma lista de tarefas priorizada, considerando que você é mais produtivo pela manhã:\n\n**Prioridade 1 (Foco da Manhã - 8:00 - 12:00):**\n\n*   **Planejar as aulas da semana:** (30-45 min) - Dedique um tempo para revisar os planos de aula, preparar materiais e atividades.\n*   **Responder e-mails urgentes dos alunos/pais:** (15-20 min) – Começar o dia com a comunicação é essencial.\n*   **Preparar o material para a primeira aula da tarde:** (60-90 min) – Focar na preparação da aula que você mais precisa ter um bom desempenho.\n\n**Prioridade 2 (Flexível - 12:00 - 14:00):**\n\n*   **Revisar as tarefas não concluídas da manhã:** (30 min) – Se houver algo que não foi finalizado na prioridade 1, reserve um tempo para dar seguimento.\n*   **Organizar o material da sala de aula:** (15-30 min) – Manter o ambiente organizado contribui para a produtividade.\n\n**Prioridade 3 (Se houver tempo - 14:00 em diante):**\n\n*   **Atualizar a plataforma online dos alunos:** (15-30 min) – Publicar tarefas, avisos, etc.\n*   **Planejar atividades extras:** (30 min) - Se houver tempo, planejar atividades complementares para a semana.\n\n**Observações:**\n\n*   Essa é uma lista inicial, podemos ajustá-la conforme suas necessidades.\n*   **Seja realista:** Não se sobrecarregue com tarefas demais. É melhor focar em poucas tarefas e completá-las do que tentar fazer tudo e não concluir nada.\n*   **Flexibilidade:** Imprevistos acontecem, esteja preparado para ajustar a sua agenda.\n\n**Agora, Carolina, o que você acha?** Essa lista te parece adequada para o seu dia? Alguma tarefa você gostaria de alterar ou adicionar? Quer que eu te ajude a definir prazos para cada tarefa?",
+              "baseline_tokens": 1600,
+              "baseline_prompt_tokens": 1103,
+              "baseline_time_ms": 12702.338933944702,
+              "cortex_response": "Bom dia, Carolina! Que bom te ver de novo.\n\nAnalisando o contexto e as nossas conversas anteriores, você tem algumas coisas agendadas para hoje e algumas tarefas pendentes relacionadas à sua dificuldade de ajuda que estamos investigando.\n\n**Agenda:**\n\n*   **10h00:** Reunião com a coordenação pedagógica para discutir o desempenho dos alunos.\n*   **11h30:** Acompanhamento com o Dr. Santos – vamos confirmar os detalhes do agendamento.\n\n**Tarefas Pendentes:**\n\n*   **Revisar o histórico de atendimento do aluno:** Precisamos entender melhor as dificuldades que o aluno está enfrentando.\n*   **Preparar materiais para a próxima aula:** Criar novos exercícios e atividades.\n\nCom essas informações, como você gostaria de priorizar as tarefas para hoje? Queremos garantir que você se concentre no que é mais importante para o seu dia?",
+              "cortex_tokens": 1740,
+              "cortex_prompt_tokens": 1544,
+              "cortex_time_ms": 6826.0626792907715,
+              "cortex_recall_time_ms": 130.85317611694336,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 6,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: scheduled_appointment→Assistant offered options 10h00 or 11h30; scheduled_appointment→Perfeito, Amanda! Terça-feira com o Dr. Santos é uma ótima escolha. Vamos agendar para qual horário te convém melhor? Tenho horários disponíveis às 10; consolidacao_memoria→Amanda buscou atendimento de paciente devido a uma dificuldade (unsure_of_difficulties).  Este atendimento se baseia em um histórico de necessidade de ajuda. O contexto sugere que esta interação ocorr\ncontexto: Known: dia 15, user, Amanda | Last time: Assistant offered options 10h00 or 11h30 | Link: (da9212fb) -[+participated_in]-> (b1f91660)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "O almoço é em qual restaurante mesmo?",
+              "message_index": 2,
+              "baseline_response": "(Risos) Boa pergunta! O almoço é sempre no \"Restaurante do Sabor da Conquista\". É o nosso refúgio de 12h30 em diante! 😉\n\nEnquanto você almoça e recarrega as energias, podemos continuar a organizar o seu dia ou discutir estratégias para a semana. O que você prefere?",
+              "baseline_tokens": 1512,
+              "baseline_prompt_tokens": 1434,
+              "baseline_time_ms": 3832.026481628418,
+              "cortex_response": "Boa pergunta, Carolina! O almoço é no \"Sabor Caseiro\", na Rua das Acácias, número 12. É ali que vamos nos encontrar com o colega de trabalho, Marcos, para alinharmos algumas estratégias. Ele me sugeriu esse lugar, diz que a comida é ótima e o ambiente é tranquilo.\n\nCom essa informação em mente, vamos priorizar as tarefas do dia, certo?",
+              "cortex_tokens": 1679,
+              "cortex_prompt_tokens": 1553,
+              "cortex_time_ms": 5059.232234954834,
+              "cortex_recall_time_ms": 47.167062759399414,
+              "cortex_store_time_ms": 40.31229019165039,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: esquecimento→sugestão do método Eisenhower (Urgente/Importante); scheduled_appointment→Assistant offered options 10h00 or 11h30; scheduled_appointment→Perfeito, Amanda! Terça-feira com o Dr. Santos é uma ótima escolha. Vamos agendar para qual horário te convém melhor? Tenho horários disponíveis às 10\ncontexto: Known: gerenciamento de tempo, time_management, gerenciamento_de_tempo | Last time: sugestão do método Eisenhower (Urgente/Importante) | Link: (c4e388e1) -[+participated_in]-> (5f332469)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Carolina",
+                "what": "perguntou_restaurante",
+                "why": "confere_agenda",
+                "how": "respondeu_local_almoço"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "conv_5_sales_crm",
+      "domain": "sales_crm",
+      "user_profile": {
+        "sales_person": "Roberto",
+        "company": "TechCorp",
+        "contact_role": "Diretor de TI",
+        "contact_name": "Dr. Silva (Diretor de TI)",
+        "product_interest": "API Platform",
+        "deal_value": 432000
+      },
+      "sessions": [
+        {
+          "session_index": 0,
+          "session_id": "session_0",
+          "key_facts": [
+            "empresa: TechCorp",
+            "contato: Dr. Silva (Diretor de TI)",
+            "produto: API Platform",
+            "dor: escalabilidade",
+            "próximo: proposta"
+          ],
+          "expected_recalls": [],
+          "messages": [
+            {
+              "message": "Tive uma call com a TechCorp. O Diretor de TI, Dr. Silva, mostrou interesse no API Platform.",
+              "message_index": 0,
+              "baseline_response": "Que ótimo! Essa é uma notícia fantástica! Registrar essa informação é crucial para o seu planejamento. \n\nVamos adicionar isso à sua lista de tarefas para hoje:\n\n*   **Atualizar o registro de contatos:** Anote detalhadamente a conversa com o Dr. Silva, TechCorp, sobre o API Platform. Inclua:\n    *   Data e hora da call\n    *   Principais pontos discutidos\n    *   Próximos passos acordados (ex: envio de materiais, follow-up, etc.)\n\nIsso garante que você não se esqueça desse contato importante e que tenha tudo registrado para referência futura.\n\nAgora, com essa informação adicionada, como você gostaria de proceder? Quer que eu te ajude a:\n\n*   **Criar um follow-up de e-mail para o Dr. Silva?**\n*   **Adicionar essa oportunidade em um sistema de gestão de leads?**\n*   **Planejar uma estratégia para o próximo contato com a TechCorp?**",
+              "baseline_tokens": 1631,
+              "baseline_prompt_tokens": 1418,
+              "baseline_time_ms": 6746.940851211548,
+              "cortex_response": "Excelente, Carolina! Essa informação é crucial. O interesse do Dr. Silva na API Platform, especialmente em relação à escalabilidade, é um desenvolvimento importante. Isso reforça a importância de focarmos nesse aspecto e de termos uma justificativa sólida para o investimento.\n\nAgora, com essa nova informação, como você gostaria de ajustar o nosso plano para o dia? Queremos garantir que estamos alinhados com as prioridades e que estamos preparados para responder às perguntas do Dr. Silva sobre a API Platform?",
+              "cortex_tokens": 1739,
+              "cortex_prompt_tokens": 1576,
+              "cortex_time_ms": 5582.890272140503,
+              "cortex_recall_time_ms": 64.52441215515137,
+              "cortex_store_time_ms": 35.68267822265625,
+              "cortex_memory_entities": 14,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: demonstrou_interesse_no→Informação adicionada, focando na solução para o problema de escalabilidade; acknowledged_positive_feedback_raised_price_concern→acknowledged price is a key consideration and requires justification; understood→acknowledged the price as a key concern and highlighted the need to be prepared for discussions and justifications\ncontexto: Known: Dr. Silva, attention_to_details, Dr_Silva | Last time: Informação adicionada, focando na solução para o problema de escalabilidade | Link: (3ff9459c) -[+participated_in]-> (15f08228)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Dr. Silva",
+                "what": "mostrou_interesse_no→API Platform",
+                "why": "interesse_exploratório_e_potencial_de_parceria",
+                "how": "apresentação_detalhada_e_discussão_sobre_escalabilidade"
+              }
+            },
+            {
+              "message": "Eles estão tendo problemas de escalabilidade. O sistema atual não aguenta.",
+              "message_index": 2,
+              "baseline_response": "Essa informação é *extremamente* relevante! Saber que a TechCorp está enfrentando problemas de escalabilidade com seu sistema atual muda completamente a prioridade. Isso significa que o API Platform pode ser a solução que eles precisam, e merece um foco ainda maior.\n\nVamos ajustar nossa abordagem:\n\n1.  **Priorizar a análise das necessidades da TechCorp:** Precisamos entender a fundo a magnitude do problema de escalabilidade. Que tipo de crescimento eles preveem? Quais são os gargalos específicos do sistema atual?\n2.  **Preparar uma apresentação/proposta direcionada:** Com essa informação, podemos criar uma apresentação personalizada que destaque como o API Platform pode resolver os problemas de escalabilidade da TechCorp.\n3.  **Agendar uma nova conversa com o Dr. Silva:** Precisamos de um diálogo mais aprofundado para entender as necessidades específicas e demonstrar o valor da nossa plataforma.\n\n**Para avançar, gostaria de saber:**\n\n*   Você consegue obter mais informações sobre os desafios de escalabilidade da TechCorp (ex: número de usuários, volume de dados, etc.)?\n*   Quais são os pontos específicos que o Dr. Silva mencionou sobre o sistema atual? (ex: banco de dados, servidores, etc.)\n\nVamos focar em coletar o máximo de detalhes possível para preparar uma proposta ainda mais eficaz!",
+              "baseline_tokens": 1712,
+              "baseline_prompt_tokens": 1432,
+              "baseline_time_ms": 8059.043884277344,
+              "cortex_response": "Perfeito, Carolina! Essa é a informação mais importante que eu precisava ouvir. Isso confirma a urgência do nosso trabalho e reforça a necessidade de apresentarmos a API Platform como a solução ideal para o problema de escalabilidade da TechCorp.\n\nCom esse dado em mente, podemos ajustar nossa abordagem. O que você acha de focarmos em:\n\n1.  **Documentar detalhadamente os problemas de escalabilidade que a TechCorp está enfrentando?** Isso nos dará um caso de uso claro e convincente para a API Platform.\n2.  **Preparar uma apresentação concisa e objetiva sobre como a API Platform pode resolver esses problemas?** Destaque os benefícios da escalabilidade, da flexibilidade e do desempenho da nossa plataforma.\n\nVamos começar com o primeiro passo: você pode me fornecer um resumo dos principais problemas de escalabilidade que a TechCorp está enfrentando? Qualquer detalhe que você possa me contar será valioso.",
+              "cortex_tokens": 1679,
+              "cortex_prompt_tokens": 1483,
+              "cortex_time_ms": 6241.928815841675,
+              "cortex_recall_time_ms": 54.743289947509766,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: demonstrou_interesse_no→Informação adicionada, focando na solução para o problema de escalabilidade; consolidacao_memoria→O atendimento focou na resolução de um problema de escalabilidade reportado pelo cliente. O cliente lembrou da identificação do problema, que foi subsequentemente resolvido. O CTO demonstrava interess; lembrou→identificação do problema até o fechamento do contrato\ncontexto: Known: Problema de Escalabilidade, Identificação do Problema, escalabilidade | Last time: Informação adicionada, focando na solução para o problema de escalabilidade | Link: (e765f210) -[+participated_in]-> (64d800c6)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Vou mandar proposta semana que vem.",
+              "message_index": 4,
+              "baseline_response": "Ótimo! A semana que vem é um bom prazo. Para otimizar o tempo e garantir que a proposta seja impactante, podemos começar a estruturá-la agora mesmo.\n\nQue tipo de informações você acha que a TechCorp gostaria de ver na proposta? Por exemplo, a proposta deve incluir:\n\n*   **Um resumo executivo** com os principais benefícios do API Platform para a TechCorp, considerando seus problemas de escalabilidade?\n*   **Uma análise detalhada** dos desafios de escalabilidade que eles enfrentam (baseada nas informações que você coletou)?\n*   **Uma demonstração** do API Platform em ação, mostrando como ele pode ser integrado ao sistema deles?\n*   **Um plano de implementação** com os passos necessários para migrar o sistema da TechCorp para o API Platform?\n*   **Um orçamento** detalhado dos custos de implementação e manutenção?\n\nEnquanto definimos esses pontos, podemos começar a criar um *esqueleto* da proposta. O que você acha de começarmos com um resumo executivo? Quer que eu te ajude a redigir o primeiro parágrafo, destacando o valor do API Platform para a TechCorp?",
+              "baseline_tokens": 1737,
+              "baseline_prompt_tokens": 1488,
+              "baseline_time_ms": 7554.613351821899,
+              "cortex_response": "Ótimo, Carolina! Entendo que você pretende enviar a proposta para a TechCorp na próxima semana. Isso nos dá tempo para consolidar nossas informações e aprimorar a apresentação.\n\nPara otimizar o processo, podemos definir um plano de ação para a próxima semana:\n\n*   **Segunda-feira:** Revisar os pontos-chave da proposta e adaptar a apresentação à TechCorp, com foco nos problemas de escalabilidade que eles estão enfrentando.\n*   **Terça-feira:** Elaborar um resumo executivo da proposta para facilitar a compreensão do Dr. Silva.\n*   **Quarta-feira:** Preparar os materiais de apoio para a apresentação, como slides e demonstrações da API Platform.\n\nComo você avalia esse plano? Há algo que você gostaria de ajustar ou adicionar?",
+              "cortex_tokens": 1371,
+              "cortex_prompt_tokens": 1203,
+              "cortex_time_ms": 5599.978446960449,
+              "cortex_recall_time_ms": 166.44620895385742,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: discussed_interest→CTO_showed_interest; discussed_interest→CTO showed interest; identifying_scalability_issues→investigate_infrastructure_and_code_for_bottlenecks\ncontexto: Known: proposta, question, user | Last time: CTO_showed_interest | Link: (50e4c34c) -[+participated_in]-> (15f08228)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        },
+        {
+          "session_index": 1,
+          "session_id": "session_1",
+          "key_facts": [
+            "proposta enviada",
+            "aguardando retorno"
+          ],
+          "expected_recalls": [
+            "empresa",
+            "contato",
+            "dor principal",
+            "produto"
+          ],
+          "messages": [
+            {
+              "message": "Mandei a proposta para TechCorp. Aguardando retorno.",
+              "message_index": 0,
+              "baseline_response": "Excelente! Parabéns pela iniciativa e pelo envio da proposta. Essa é uma etapa crucial! \n\nAgora, vamos acompanhar os próximos passos. Para te ajudar a manter o foco e a preparar o terreno para o retorno da TechCorp, podemos:\n\n*   **Criar um sistema de acompanhamento:** Definir um cronograma de follow-up (ex: enviar um e-mail de acompanhamento em 3 dias, ligar em 7 dias, etc.).\n*   **Preparar respostas para possíveis perguntas:** Antecipar as dúvidas que o Dr. Silva e a TechCorp podem ter e preparar respostas claras e concisas.\n*   **Manter a comunicação aberta:** Avisar o time sobre a proposta e o status do acompanhamento.\n\nEnquanto aguardamos o retorno, podemos começar a pensar em como adaptar a proposta caso o Dr. Silva tenha alguma sugestão ou solicite informações adicionais.\n\n**Qual é o seu próximo passo?** Quer que eu te ajude a:\n\n*   **Definir o cronograma de acompanhamento?**\n*   **Preparar as respostas para possíveis perguntas?**\n*   **Simplesmente registrar o status da proposta (aguardando retorno)?**",
+              "baseline_tokens": 1734,
+              "baseline_prompt_tokens": 1480,
+              "baseline_time_ms": 8184.517621994019,
+              "cortex_response": "Excelente, Carolina! Fico feliz em saber que a proposta foi enviada. Aguardar o retorno da TechCorp é o próximo passo crucial, e com a nossa preparação, vamos estar bem posicionados para apresentar a solução ideal para seus desafios de escalabilidade.\n\nEnquanto aguardamos, podemos revisar os pontos fortes da proposta e antecipar as possíveis perguntas que o Dr. Silva pode ter. Além disso, podemos começar a preparar um plano de contingência caso a proposta não seja aprovada imediatamente.\n\nPara te ajudar a manter o foco e a motivação, como você está se sentindo em relação a essa etapa? Há algo que você gostaria de discutir ou planejar para otimizar o processo de espera?",
+              "cortex_tokens": 1299,
+              "cortex_prompt_tokens": 1152,
+              "cortex_time_ms": 6204.004764556885,
+              "cortex_recall_time_ms": 58.86363983154297,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 10,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: sent→aguardando_retorno; demonstrou_interesse_no→Informação adicionada, focando na solução para o problema de escalabilidade; sent→Amanda will send a proposal to SmartBiz next week, and it will be more targeted with collected information\ncontexto: Known: proposta, attention_to_details, TechCorp | Last time: aguardando_retorno | Link: (549a3255) -[+participated_in]-> (72b03fd8)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Sim! Mostrei como o {product} resolve isso.",
+              "message_index": 2,
+              "baseline_response": "Fantástico! Que notícia incrível! Mostrar como o {product} resolve diretamente o problema de escalabilidade que a TechCorp está enfrentando é um passo gigantesco. Isso demonstra que você realmente entendeu as necessidades deles e sabe como a sua solução pode agregar valor.\n\n**Vamos documentar isso imediatamente:**\n\n*   **Adicionar detalhes específicos:** No seu sistema de gestão de contatos, registre detalhadamente o momento em que você apresentou o {product} como a solução para o problema de escalabilidade.\n*   **Registrar a reação do Dr. Silva:** Anote o que ele disse e como ele reagiu à sua apresentação.\n*   **Anotar qualquer solicitação adicional:** Se ele pediu informações adicionais ou um exemplo específico, registre tudo para não perder nenhum detalhe.\n\n**Próximos passos:**\n\n*   **Definir um novo cronograma de acompanhamento:** Com base no entusiasmo do Dr. Silva, podemos acelerar o processo de follow-up.\n*   **Preparar um material de apoio:** Se ele solicitou informações adicionais, comece a preparar um material de apoio para enviar o mais rápido possível.\n\nParabéns pelo sucesso! Essa é uma ótima vitória! 🎉\n\n**Dica:** Não se esqueça de enviar um e-mail de agradecimento ao Dr. Silva, reforçando o valor do {product} e demonstrando seu interesse em ajudar a TechCorp a resolver seus problemas de escalabilidade.",
+              "baseline_tokens": 1542,
+              "baseline_prompt_tokens": 1240,
+              "baseline_time_ms": 8601.521968841553,
+              "cortex_response": "Perfeito, Carolina! É ótimo que você tenha destacado o papel do {product} como a solução central para os problemas de escalabilidade da TechCorp. Reforçar essa conexão é fundamental para demonstrar o valor da API Platform e como ela se integra perfeitamente às necessidades deles.\n\nAgora que a proposta foi enviada, podemos manter o foco no que podemos controlar: preparar o máximo possível para a possível reunião de acompanhamento com o Dr. Silva. Que tal pensarmos em alguns pontos-chave que podemos abordar para evidenciar ainda mais a relevância do {product} e do nosso produto na solução de seus problemas?",
+              "cortex_tokens": 1209,
+              "cortex_prompt_tokens": 1081,
+              "cortex_time_ms": 4524.639129638672,
+              "cortex_recall_time_ms": 48.03752899169922,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: update_record→record_updated_with_product_as_solution; highlighted→the problem of scalability; highlighted→scalability issues\ncontexto: Known: product, Product Interest, user | Last time: record_updated_with_product_as_solution | Link: (50e4c34c) -[+participated_in]-> (15f08228)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "conv_6_healthcare",
+      "domain": "healthcare",
+      "user_profile": {
+        "patient_name": "Carlos Alberto",
+        "condition": "gestante",
+        "medications": [
+          "Medicamento A",
+          "Medicamento B"
+        ],
+        "doctor": "Dr. Fernandes",
+        "next_appointment": "próxima segunda"
+      },
+      "sessions": [
+        {
+          "session_index": 0,
+          "session_id": "session_0",
+          "key_facts": [
+            "paciente: Carlos Alberto",
+            "condição: gestante",
+            "medicamentos: A manhã, B noite",
+            "precisa de lembretes"
+          ],
+          "expected_recalls": [],
+          "messages": [
+            {
+              "message": "Olá, sou Carlos Alberto. Preciso de ajuda para lembrar meus remédios.",
+              "message_index": 0,
+              "baseline_response": "Olá Carlos Alberto, tudo bem? Que bom que posso ajudar! Lembre-se de que eu posso ser uma ferramenta útil para te lembrar, mas não substituo a orientação do seu médico ou farmacêutico.\n\nPara te ajudar a organizar seus remédios, podemos fazer o seguinte:\n\n1.  **Me diga quais são os remédios que você precisa tomar:** Por favor, liste os nomes dos medicamentos, as doses e os horários em que você deve tomá-los.\n2.  **Definimos um lembrete:** Eu posso te enviar lembretes diários dos remédios que você precisa tomar.\n3.  **Crie uma lista de verificação:** Para garantir que você não esqueça de tomar seus remédios, podemos criar uma lista de verificação com os horários e doses.\n\nVamos começar? Por exemplo, me diga: “Preciso tomar Paracetamol 500mg às 8h e 20h.”",
+              "baseline_tokens": 1656,
+              "baseline_prompt_tokens": 1455,
+              "baseline_time_ms": 6358.314752578735,
+              "cortex_response": "Olá Carlos Alberto, que bom falar com você! Entendo que você está precisando de ajuda para lembrar seus remédios. Sem problemas, vou te ajudar com isso.\n\nVocê já sabe quais são os nomes e horários dos seus medicamentos? Para te ajudar a organizar, podemos começar anotando cada um deles, ok?",
+              "cortex_tokens": 1221,
+              "cortex_prompt_tokens": 1155,
+              "cortex_time_ms": 3027.0955562591553,
+              "cortex_recall_time_ms": 56.99968338012695,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 14,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: identificou→Medicamento A de manhã e B à noite; consolidacao_memoria→Dona Maria procurou assistência, especificamente solicitando informações sobre os nomes de seus medicamentos.  Foi identificado que ela toma o Medicamento A pela manhã e o Medicamento B à noite. Este ; requested_assistance→- seeking_information_on_medication_names\ncontexto: Known: escalabilidade, reminders, reminder | Last time: Medicamento A de manhã e B à noite | Link: (d3a092ae) -[+participated_in]-> (a6b2daa9)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Tenho gestante. Tomo Medicamento A de manhã e B à noite.",
+              "message_index": 2,
+              "baseline_response": "Entendido, Carlos Alberto. Isso é muito importante! Tomar medicamentos durante a gravidez exige muita atenção e cuidado. \n\nPara te ajudar a organizar, vamos detalhar:\n\n*   **Medicamento A:** Você toma qual a dose e o horário? (ex: 1 comprimido de 200mg às 8h da manhã)\n*   **Medicamento B:** Você toma qual a dose e o horário? (ex: 1 comprimido de 100mg à noite)\n\n**Importante:** Eu posso te ajudar a criar lembretes, mas *é fundamental* que você confirme com seu médico ou farmacêutico se esses medicamentos são seguros para a sua gestante e quais são as dosagens corretas.\n\nMe informe a dose e o horário de cada medicamento e eu posso começar a te ajudar a organizar seus lembretes!  Estou aqui para te apoiar nesse processo. 😊",
+              "baseline_tokens": 1637,
+              "baseline_prompt_tokens": 1444,
+              "baseline_time_ms": 6121.640920639038,
+              "cortex_response": "",
+              "cortex_tokens": 1197,
+              "cortex_prompt_tokens": 1145,
+              "cortex_time_ms": 2968.763589859009,
+              "cortex_recall_time_ms": 59.819698333740234,
+              "cortex_store_time_ms": 54.11481857299805,
+              "cortex_memory_entities": 15,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: consolidacao_memoria→Dona Maria procurou assistência, especificamente solicitando informações sobre os nomes de seus medicamentos.  Foi identificado que ela toma o Medicamento A pela manhã e o Medicamento B à noite. Este ; identificou→Medicamento A de manhã e B à noite; está melhorando→Dr. Fernandes disse\ncontexto: Known: medicamentos, escalabilidade, reminders | Last time: Dona Maria procurou assistência, especificamente solicitando informações sobre os nomes de seus medicamentos.  Foi identificado que ela toma o Medicamento A pela manhã e o Medicamento B à noite. Este  | Link: (382e6292) -[+participated_in]-> (a6b2daa9)",
+              "cortex_memory_extracted": true,
+              "cortex_extracted_memory": {
+                "who": "Carlos Alberto",
+                "what": "solicitou_ajuda_lembrar_medicamentos",
+                "why": "gestante",
+                "how": "identificou_Medicamento A (manhã) e B (noite)"
+              }
+            },
+            {
+              "message": "Sim, por favor! Às vezes esqueço.",
+              "message_index": 4,
+              "baseline_response": "Perfeito, Carlos Alberto! Entendo totalmente a importância de ter lembretes, especialmente com a gravidez. Vamos garantir que você não se esqueça de nenhum medicamento.\n\nAgora, me diga:\n\n*   **Medicamento A:** Você toma 1 comprimido de 200mg às 8h da manhã?\n*   **Medicamento B:** Você toma 1 comprimido de 100mg às 20h (8 da noite)?\n\nEu vou te enviar lembretes diários para esses horários. Além disso, posso te ajudar a criar uma lista de verificação para você ter em mãos. \n\nPara te ajudar da melhor forma, posso configurar lembretes no seguinte formato:\n\n*   **8h00:** Medicamento A - 1 comprimido de 200mg\n*   **20h00:** Medicamento B - 1 comprimido de 100mg\n\nQue tal? Quer que eu configure os lembretes agora mesmo? 😊  Lembre-se, sempre confirme com seu médico ou farmacêutico se tiver qualquer dúvida!",
+              "baseline_tokens": 1594,
+              "baseline_prompt_tokens": 1360,
+              "baseline_time_ms": 7060.173988342285,
+              "cortex_response": "Entendo, Carlos Alberto. É muito comum esquecer de tomar os remédios, especialmente quando estamos grávidas, e é ótimo que você esteja buscando ajuda para organizar.\n\nPara te ajudar a evitar esquecimentos, vamos criar uma lista clara e organizada dos seus medicamentos, incluindo o nome de cada um e o horário em que deve ser tomado. Além disso, podemos pensar em algumas estratégias para te lembrar, como:\n\n*   Colocar os remédios em um local visível.\n*   Definir alarmes no celular.\n*   Associar a tomada dos remédios a alguma atividade diária (como escovar os dentes).\n\nVocê gostaria de começar listando os medicamentos que você toma, um por um? Podemos começar com o Medicamento A, que você toma de manhã, certo?",
+              "cortex_tokens": 1062,
+              "cortex_prompt_tokens": 894,
+              "cortex_time_ms": 5185.409784317017,
+              "cortex_recall_time_ms": 133.83007049560547,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 8,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: requested_assistance→- seeking_information_on_medication_names; requested_help→assistance_provided; identificou→Medicamento A de manhã e B à noite\ncontexto: Known: memory_support, treatment_support, support | Last time: - seeking_information_on_medication_names | Link: (35c994ee) -[+participated_in]-> (1adc6184)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        },
+        {
+          "session_index": 1,
+          "session_id": "session_1",
+          "key_facts": [
+            "sintoma: cansaço"
+          ],
+          "expected_recalls": [
+            "nome",
+            "condição",
+            "medicamentos"
+          ],
+          "messages": [
+            {
+              "message": "Bom dia! Já tomei o remédio.",
+              "message_index": 0,
+              "baseline_response": "Bom dia, Carlos Alberto! Que ótimo ouvir isso! É maravilhoso saber que você já tomou o seu Medicamento A. Isso nos ajuda a manter o controle e a garantir que você não se esqueça. \n\nSó pra confirmar, você já tomou 1 comprimido de 200mg às 8h da manhã, certo?\n\nComo está se sentindo hoje? Há algo que você gostaria de me contar ou alguma dúvida que você tenha? Lembre-se, estou aqui para te ajudar no que precisar!",
+              "baseline_tokens": 1451,
+              "baseline_prompt_tokens": 1341,
+              "baseline_time_ms": 4117.664337158203,
+              "cortex_response": "Bom dia, Carlos Alberto! Que bom saber que você já tomou o Medicamento A! É importante manter essa disciplina.\n\nAgora, sobre o Medicamento B, que você toma à noite, qual o horário exato em que você costuma tomar? Para termos certeza de que está tudo certo e poder criar um lembrete adequado.",
+              "cortex_tokens": 994,
+              "cortex_prompt_tokens": 924,
+              "cortex_time_ms": 3072.9596614837646,
+              "cortex_recall_time_ms": 40.16923904418945,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 5,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: identificou→Medicamento A de manhã e B à noite; consolidacao_memoria→Dona Maria procurou assistência, especificamente solicitando informações sobre os nomes de seus medicamentos.  Foi identificado que ela toma o Medicamento A pela manhã e o Medicamento B à noite. Este ; requested_assistance→- seeking_information_on_medication_names\ncontexto: Known: user, Dona Maria, Helena | Last time: Medicamento A de manhã e B à noite | Link: (f0ccb95c) -[+participated_in]-> (1adc6184)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Um pouco cansada, mas bem.",
+              "message_index": 2,
+              "baseline_response": "Entendo, Carlos Alberto. O cansaço é bem comum na gravidez, especialmente com a rotina de tomar medicamentos. É bom que você esteja bem!\n\nVamos continuar monitorando. Me confirme novamente, para eu registrar:\n\n*   **Medicamento A:** Tomado às 8h da manhã.\n*   **Medicamento B:** Tomado às 20h (8 da noite).\n\nE como está o seu dia hoje? Alguma coisa que você gostaria de compartilhar ou alguma dúvida sobre seus medicamentos?  Lembre-se, estou aqui para te dar apoio e te ajudar a manter a organização. 😊",
+              "baseline_tokens": 1323,
+              "baseline_prompt_tokens": 1193,
+              "baseline_time_ms": 5960.36696434021,
+              "cortex_response": "Que bom ouvir isso, Carlos Alberto! É importante cuidar de si mesmo, especialmente quando se está grávido. É ótimo que você esteja se sentindo bem.\n\nSó para confirmar, você toma o Medicamento A pela manhã e o Medicamento B à noite, correto? E qual o horário exato que você costuma tomar o Medicamento B? Podemos adicionar isso à sua lista de lembretes.",
+              "cortex_tokens": 890,
+              "cortex_prompt_tokens": 806,
+              "cortex_time_ms": 3340.080738067627,
+              "cortex_recall_time_ms": 42.943477630615234,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 5,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: requested_assistance→- seeking_information_on_medication_names; requested_help→assistance_provided; identificou→Medicamento A de manhã e B à noite\ncontexto: Known: user, Dona Maria, Helena | Last time: - seeking_information_on_medication_names | Link: (f0ccb95c) -[+participated_in]-> (1adc6184)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "conversation_id": "conv_7_financial",
+      "domain": "financial",
+      "user_profile": {
+        "name": "Priscila",
+        "goal": "educação dos filhos",
+        "monthly_income": 6000,
+        "risk_profile": "moderado",
+        "current_savings": 82000
+      },
+      "sessions": [
+        {
+          "session_index": 0,
+          "session_id": "session_0",
+          "key_facts": [
+            "investidor: Priscila",
+            "meta: educação dos filhos",
+            "renda: R$6,000",
+            "perfil: moderado",
+            "aporte: R$2.000/mês"
+          ],
+          "expected_recalls": [],
+          "messages": [
+            {
+              "message": "Olá! Sou Priscila, ganho R$6,000/mês e quero juntar para educação dos filhos.",
+              "message_index": 0,
+              "baseline_response": "Olá Priscila! Que bom te conhecer! É excelente que você esteja pensando e planejando para o futuro dos seus filhos. R$6.000,00 por mês é um ótimo começo.\n\nCom esse valor, podemos criar algumas estratégias para juntar dinheiro para a educação dos filhos. Algumas opções que podemos explorar são:\n\n*   **Definir um valor mensal para poupar:** Podemos calcular uma porcentagem do seu salário que você pode guardar mensalmente.\n*   **Criar um plano de poupança:** Podemos estabelecer metas de curto, médio e longo prazo.\n*   **Considerar investimentos:** Dependendo do seu perfil de risco, podemos pesquisar opções de investimento que possam rentabilizar o seu dinheiro.\n\nPara te ajudar a definir o melhor plano, gostaria de saber:\n\n*   Qual o valor que você gostaria de poupar mensalmente?\n*   Você tem alguma meta específica para a educação dos filhos (ex: faculdade, intercâmbio)?\n*   Qual o seu perfil de risco em relação a investimentos (conservador, moderado, arrojado)?\n\nVamos conversar um pouco sobre isso para que eu possa te ajudar a criar um plano personalizado! 😊",
+              "baseline_tokens": 1286,
+              "baseline_prompt_tokens": 1033,
+              "baseline_time_ms": 7587.316036224365,
+              "cortex_response": "Olá Priscila! Que bom falar com você! Entendo que você está buscando informações sobre planejamento para a educação dos seus filhos, e com uma renda de R$6.000,00, podemos sim encontrar as melhores opções para você. Isso é uma excelente base para um futuro financeiro tranquilo e com foco no futuro dos seus filhos. Podemos começar a explorar algumas estratégias de investimento e poupança para alcançar seus objetivos, de acordo com suas necessidades e preferências. O que você acha de começarmos a definir quanto você gostaria de poupar mensalmente?",
+              "cortex_tokens": 986,
+              "cortex_prompt_tokens": 869,
+              "cortex_time_ms": 4622.973203659058,
+              "cortex_recall_time_ms": 22.12214469909668,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: consolidacao_memoria→Durante o atendimento, o cliente Gustavo expressou seu interesse em planejamento de aposentadoria, com uma renda mensal de R$29.000.  Este interesse está sendo considerado como uma excelente base para; wants_to_save_for_retirement→excellent_base_for_financial_future; wants_to_save_for_retirement→acknowledged_good_financial_base\ncontexto: Known: Priscila, R$29.000, user | Last time: Durante o atendimento, o cliente Gustavo expressou seu interesse em planejamento de aposentadoria, com uma renda mensal de R$29.000.  Este interesse está sendo considerado como uma excelente base para | Link: (2849c315) -[+participated_in]-> (d6b6870b)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Sou moderado.",
+              "message_index": 2,
+              "baseline_response": "Ótimo, Priscila! Saber que você tem um perfil moderado em relação a investimentos é um ótimo ponto de partida. Isso significa que podemos buscar opções que ofereçam um bom equilíbrio entre segurança e rentabilidade.\n\nCom um salário de R$6.000,00 e um perfil moderado, podemos começar a pensar em algumas opções para a educação dos seus filhos. Para te dar sugestões mais precisas, preciso entender um pouco melhor seus objetivos.\n\n**Vamos focar em algumas perguntas:**\n\n1.  **Pra quanto tempo você está planejando economizar?** (Ex: 5 anos, 10 anos, 15 anos?)\n2.  **Qual o valor estimado que você acha que precisará para a educação dos seus filhos?** (Essa é uma estimativa, não precisa ser exata!)\n3.  **Você já tem alguma reserva de emergência?** (É importante ter uma reserva para imprevistos antes de começar a investir)\n\nCom essas respostas, posso te dar algumas sugestões de investimentos que se encaixem no seu perfil e objetivos.  Pense no seu plano de educação dos filhos como um investimento a longo prazo, e vamos construir algo sólido juntos! 😊\n\nPrimeiramente, vamos responder à primeira pergunta: Pra quanto tempo você está planejando economizar?",
+              "baseline_tokens": 1348,
+              "baseline_prompt_tokens": 1072,
+              "baseline_time_ms": 8211.92717552185,
+              "cortex_response": "Entendo, Priscila. “Moderado” é um ótimo ponto de partida! Isso significa que vamos buscar opções de investimento que ofereçam um equilíbrio entre segurança e potencial de retorno, certo?\n\nConsiderando sua renda de R$6.000,00 e sua abordagem moderada, podemos começar com investimentos mais conservadores, como CDBs, Tesouro Direto (Tesouro Selic), ou até mesmo fundos de renda fixa. O que você acha de explorarmos um pouco mais sobre cada um desses? Ou você prefere que eu apresente algumas opções com diferentes níveis de risco e retorno, para que você possa escolher o que melhor se adapta ao seu perfil?",
+              "cortex_tokens": 975,
+              "cortex_prompt_tokens": 834,
+              "cortex_time_ms": 4599.586486816406,
+              "cortex_recall_time_ms": 19.531726837158203,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 5,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: wants_to_save_for_retirement→excellent_base_for_financial_future; wants_to_save_for_retirement→acknowledged_good_financial_base; agreed_upon_profile→with a monthly income of R$29.000\ncontexto: Known: user, Gustavo, investment | Last time: excellent_base_for_financial_future | Link: (2849c315) -[+participated_in]-> (d6b6870b)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Consigo R$2.000 por mês.",
+              "message_index": 4,
+              "baseline_response": "Ótimo, Priscila! R$2.000,00 por mês é um excelente ponto de partida. Isso nos dá uma base sólida para começarmos a planejar a educação dos seus filhos.\n\nAgora, vamos às outras perguntas:\n\n2.  **Qual o valor estimado que você acha que precisará para a educação dos seus filhos?** (Essa é uma estimativa, não precisa ser exata!)\n3.  **Você já tem alguma reserva de emergência?** (É importante ter uma reserva para imprevistos antes de começar a investir)\n\nPense no valor que você imagina que será necessário para cobrir cursos, materiais, transporte, etc. Não se preocupe em ser preciso, podemos ajustar depois.\n\nE sobre a reserva de emergência, você já tem alguma?  É importante ter uma segurança para imprevistos e não comprometer o seu plano de poupança.\n\nVamos começar com a segunda pergunta: Qual o valor estimado que você acha que precisará para a educação dos seus filhos?",
+              "baseline_tokens": 1372,
+              "baseline_prompt_tokens": 1156,
+              "baseline_time_ms": 6664.463520050049,
+              "cortex_response": "Ótimo, Priscila! R$2.000,00 por mês é um valor muito bom para começar a construir uma base sólida para a educação dos seus filhos. Isso nos dá um excelente ponto de partida para planejar seus investimentos.\n\nCom essa quantia, podemos focar em opções de baixo risco e alta liquidez, como CDBs com boa rentabilidade, Tesouro Selic ou fundos de renda fixa conservadores. A ideia é garantir que você tenha acesso ao dinheiro quando precisar e, ao mesmo tempo, aproveitar o potencial de rentabilidade para acelerar o seu planejamento.\n\nConsiderando o seu perfil moderado e esse valor de R$2.000,00, vamos focar em opções de baixo risco, mas que ainda ofereçam um bom retorno. Que tal começarmos a analisar alguns CDBs com taxas atrativas e Tesouro Selic? Você prefere que eu apresente algumas opções ou você tem alguma preferência inicial?",
+              "cortex_tokens": 1191,
+              "cortex_prompt_tokens": 988,
+              "cortex_time_ms": 6327.312231063843,
+              "cortex_recall_time_ms": 15.53487777709961,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 8,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: wants_to_save_for_retirement→excellent_base_for_financial_future; wants_to_save_for_retirement→acknowledged_good_financial_base; agreed_upon_profile→with a monthly income of R$29.000\ncontexto: Known: R$29.000, portfolio_management, Aporte (Investment) | Last time: excellent_base_for_financial_future | Link: (2849c315) -[+participated_in]-> (d6b6870b)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        },
+        {
+          "session_index": 1,
+          "session_id": "session_1",
+          "key_facts": [
+            "primeiro aporte feito",
+            "projeção: R$150k em 5 anos"
+          ],
+          "expected_recalls": [
+            "meta",
+            "perfil de risco",
+            "aporte"
+          ],
+          "messages": [
+            {
+              "message": "Fiz meu primeiro aporte! R$2.000 como combinamos.",
+              "message_index": 0,
+              "baseline_response": "Parabéns, Priscila! Que notícia fantástica! Fico muito feliz em saber que você colocou em prática o nosso plano e fez o seu primeiro aporte de R$2.000,00! Isso demonstra comprometimento e organização, que são fundamentais para alcançar seus objetivos.\n\nAgora, com esse valor investido, podemos começar a pensar nas opções de investimento que se encaixam no seu perfil moderado e nos seus objetivos de educação dos filhos.\n\nSua iniciativa é inspiradora e me motiva a continuar te ajudando a construir um futuro financeiro mais seguro para você e seus filhos! 🥳\n\nPara continuarmos, gostaria de saber:\n\n*   Em qual tipo de investimento você aplicou esse valor? (Ex: Tesouro Direto, CDB, fundo de investimento, etc.)\n*   Você tem alguma expectativa de rentabilidade para esses investimentos?",
+              "baseline_tokens": 1328,
+              "baseline_prompt_tokens": 1145,
+              "baseline_time_ms": 5706.841945648193,
+              "cortex_response": "Parabéns, Priscila! Que excelente notícia! É muito bom ver que você colocou em prática o nosso plano e fez o seu primeiro aporte de R$2.000,00! Isso demonstra comprometimento e é um passo fundamental para alcançar seus objetivos.\n\nAgora, vamos acompanhar de perto o desempenho do seu investimento e fazer os ajustes necessários para garantir que você continue no caminho certo.  Podemos começar a monitorar os resultados e analisar novas oportunidades de investimento, se surgirem.  Como foi a sensação em relação ao investimento? Teve alguma dúvida ou consideração durante o processo?",
+              "cortex_tokens": 1216,
+              "cortex_prompt_tokens": 1091,
+              "cortex_time_ms": 4456.413745880127,
+              "cortex_recall_time_ms": 14.872312545776367,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 7,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: consolidacao_memoria→Durante o atendimento, o cliente Gustavo expressou seu interesse em planejamento de aposentadoria, com uma renda mensal de R$29.000.  Este interesse está sendo considerado como uma excelente base para; wants_to_save_for_retirement→excellent_base_for_financial_future; wants_to_save_for_retirement→acknowledged_good_financial_base\ncontexto: Known: R$29.000, Aporte (Investment), user | Last time: Durante o atendimento, o cliente Gustavo expressou seu interesse em planejamento de aposentadoria, com uma renda mensal de R$29.000.  Este interesse está sendo considerado como uma excelente base para | Link: (2849c315) -[+participated_in]-> (d6b6870b)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            },
+            {
+              "message": "Será que dá pra acelerar?",
+              "message_index": 2,
+              "baseline_response": "Excelente pergunta, Priscila! Sim, claro que dá para tentar acelerar o processo, mas com responsabilidade e planejamento.\n\nAgora que você já fez o primeiro aporte de R$2.000,00, podemos analisar algumas estratégias para tentar aumentar o ritmo das suas economias:\n\n1.  **Revisar o seu orçamento:** Podemos identificar pequenas despesas que podem ser cortadas ou reduzidas para liberar mais dinheiro para a poupança.\n2.  **Aumentar o valor dos seus aportes:** Se possível, podemos tentar aumentar o valor que você investe mensalmente, mesmo que seja um valor pequeno.\n3.  **Considerar investimentos mais rentáveis:** Podemos explorar opções de investimento que ofereçam um potencial de rentabilidade um pouco maior, levando em conta o seu perfil moderado.\n\nPara te ajudar a determinar o melhor caminho, preciso entender melhor a sua situação financeira atual. Poderia me responder algumas perguntas?\n\n*   **Quais são as suas principais despesas mensais?** (Ex: aluguel, contas, alimentação, transporte, etc.)\n*   **Você tem alguma fonte de renda extra?** (Ex: trabalhos freelance, vendas, etc.)\n*   **Qual o valor máximo que você se sente confortável em economizar por mês, além dos R$2.000,00 já investidos?**\n\nCom essas informações, posso te ajudar a criar um plano mais detalhado e personalizado para acelerar suas economias! 😉",
+              "baseline_tokens": 1532,
+              "baseline_prompt_tokens": 1218,
+              "baseline_time_ms": 9083.066463470459,
+              "cortex_response": "Essa é uma ótima pergunta, Priscila! Entendo a sua vontade de acelerar o processo. Com R$2.000,00 iniciais e uma renda de R$6.000,00, você tem um potencial significativo para poupar e investir.\n\nPara avaliar se podemos acelerar, precisamos analisar algumas coisas. Principalmente, quanto você está confortável em poupar mensalmente além dos R$2.000,00?  Mesmo um pequeno aumento pode fazer uma grande diferença a longo prazo. Além disso, vamos discutir um pouco sobre seus objetivos específicos. Quanto tempo você espera para usar esse dinheiro para a educação dos seus filhos?\n\nPodemos conversar sobre isso com calma e definir um plano que se encaixe no seu orçamento e metas. O que você acha de explorarmos um pouco mais sobre isso?",
+              "cortex_tokens": 1248,
+              "cortex_prompt_tokens": 1072,
+              "cortex_time_ms": 5657.440185546875,
+              "cortex_recall_time_ms": 13.436079025268555,
+              "cortex_store_time_ms": 0.0,
+              "cortex_memory_entities": 5,
+              "cortex_memory_episodes": 10,
+              "cortex_context_used": "histórico: wants_to_save_for_retirement→excellent_base_for_financial_future; wants_to_save_for_retirement→acknowledged_good_financial_base; agreed_upon_profile→with a monthly income of R$29.000\ncontexto: Known: user, Gustavo, investment | Last time: excellent_base_for_financial_future | Link: (2849c315) -[+participated_in]-> (d6b6870b)",
+              "cortex_memory_extracted": false,
+              "cortex_extracted_memory": {}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

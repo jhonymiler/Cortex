@@ -7,7 +7,8 @@ Workers disponíveis:
 Uso:
     from cortex.workers import SleepRefiner
     
-    refiner = SleepRefiner(cortex_url="http://localhost:8000")
+    # Usa variáveis de ambiente: CORTEX_API_URL, OLLAMA_URL, OLLAMA_MODEL
+    refiner = SleepRefiner()
     refiner.refine(namespace="meu_agente")
 """
 

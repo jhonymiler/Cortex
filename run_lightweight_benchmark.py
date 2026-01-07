@@ -162,12 +162,6 @@ Exemplos:
         action="store_true",
         help="Mostrar logs detalhados (inputs, outputs, memória)",
     )
-    parser.add_argument(
-        "--use-v1",
-        action="store_true",
-        help="Usar CortexAgent V1 (com chamada LLM extra para extração)",
-    )
-    
     args = parser.parse_args()
     
     # Detecta URL do Ollama se não fornecida
@@ -185,15 +179,13 @@ Exemplos:
         conv_per_domain = args.conversations or 1
         sessions = args.sessions or 3
     
-    use_v2 = not args.use_v1
-    
     print("\n" + "=" * 80)
-    print("🚀 BENCHMARK CORTEX V2 - [MEMORY] INLINE")
+    print("🚀 BENCHMARK CORTEX - [MEMORY] INLINE")
     print("=" * 80)
     print(f"   Ollama: {args.ollama_url}")
     print(f"   Modelo: {args.model}")
     print(f"   Cortex: {args.cortex_url}")
-    print(f"   Agente: {'CortexAgentV2 (50% menos tokens)' if use_v2 else 'CortexAgent V1 (legado)'}")
+    print(f"   Agente: CortexAgent (extração inline)")
     print(f"   Conversas/domínio: {conv_per_domain}")
     print(f"   Sessões/conversa: {sessions}")
     if args.domain:
@@ -252,7 +244,6 @@ Exemplos:
         verbose=not args.quiet,
         evaluate_responses_llm=args.evaluate,
         detailed_logs=args.detailed_logs,
-        use_v2=use_v2,
     )
     
     # Verifica serviços

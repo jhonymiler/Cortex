@@ -69,8 +69,8 @@ class CortexLangChainMemory(BaseMemory):
         output_key: Chave da resposta (default: "output")
     """
     
-    namespace: str = "default"
-    cortex_url: str = "http://localhost:8000"
+    namespace: str = None  # Usa CORTEX_NAMESPACE ou "default"
+    cortex_url: str = None  # Usa CORTEX_API_URL ou "http://localhost:8000"
     memory_key: str = "history"
     input_key: str = "input"
     output_key: str = "output"
@@ -92,6 +92,9 @@ class CortexLangChainMemory(BaseMemory):
             )
         
         super().__init__(**kwargs)
+        # Usa variáveis de ambiente como fallback
+        self.namespace = self.namespace or os.getenv("CORTEX_NAMESPACE", "default")
+        self.cortex_url = self.cortex_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")
         self._cortex = CortexMemory(
             namespace=self.namespace,
             cortex_url=self.cortex_url,

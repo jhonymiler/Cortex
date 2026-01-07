@@ -246,16 +246,17 @@ Se não souber algo ou não tiver contexto, diga honestamente."""
     
     def __init__(
         self,
-        model: str = "ministral-3:3b",
-        ollama_url: str = "http://localhost:11434",
-        context_window_size: int = 10,  # Últimas N mensagens
+        model: str | None = None,
+        ollama_url: str | None = None,
+        context_window_size: int | None = None,
     ):
-        self.model = model
-        self.ollama_url = ollama_url
-        self.context_window_size = context_window_size
+        # Usa variáveis de ambiente como fallback
+        self.model = model or os.getenv("OLLAMA_MODEL", "gemma3:4b")
+        self.ollama_url = ollama_url or os.getenv("OLLAMA_URL", "http://localhost:11434")
+        self.context_window_size = context_window_size or int(os.getenv("CORTEX_CONTEXT_WINDOW", "10"))
         
         # Configura LiteLLM
-        os.environ["OLLAMA_API_BASE"] = ollama_url
+        os.environ["OLLAMA_API_BASE"] = self.ollama_url
         
         # Estado da sessão atual
         self._session_history: list[dict] = []
@@ -417,24 +418,25 @@ Responda de forma natural e completa."""
     
     def __init__(
         self,
-        model: str = "ministral-3:3b",
-        ollama_url: str = "http://localhost:11434",
-        cortex_url: str = "http://localhost:8000",
-        context_window_size: int = 10,
-        namespace: str = "benchmark",
+        model: str | None = None,
+        ollama_url: str | None = None,
+        cortex_url: str | None = None,
+        context_window_size: int | None = None,
+        namespace: str | None = None,
     ):
-        self.model = model
-        self.ollama_url = ollama_url
-        self.cortex_url = cortex_url
-        self.context_window_size = context_window_size
-        self.namespace = namespace
+        # Usa variáveis de ambiente como fallback
+        self.model = model or os.getenv("OLLAMA_MODEL", "gemma3:4b")
+        self.ollama_url = ollama_url or os.getenv("OLLAMA_URL", "http://localhost:11434")
+        self.cortex_url = cortex_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")
+        self.context_window_size = context_window_size or int(os.getenv("CORTEX_CONTEXT_WINDOW", "10"))
+        self.namespace = namespace or os.getenv("CORTEX_NAMESPACE", "benchmark")
         
         # Configura LiteLLM
-        os.environ["OLLAMA_API_BASE"] = ollama_url
+        os.environ["OLLAMA_API_BASE"] = self.ollama_url
         
         # Cliente Cortex com namespace para isolamento
-        self.cortex = CortexClient(base_url=cortex_url, namespace=namespace)
-        self._cortex_url = cortex_url  # Guarda para recriar cliente
+        self.cortex = CortexClient(base_url=self.cortex_url, namespace=self.namespace)
+        self._cortex_url = self.cortex_url  # Guarda para recriar cliente
         
         # Estado da sessão atual
         self._session_history: list[dict] = []

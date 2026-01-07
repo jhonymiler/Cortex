@@ -1,5 +1,5 @@
 """
-CortexAgentV2 - Agente otimizado com extração [MEMORY] inline.
+CortexAgent - Agente otimizado com extração [MEMORY] inline.
 
 Diferenças do CortexAgent original:
 1. NÃO faz chamada extra de LLM para extração
@@ -231,7 +231,7 @@ def call_llm_with_retry(
 # ==================== CORTEX AGENT V2 ====================
 
 
-class CortexAgentV2:
+class CortexAgent:
     """
     Agente Cortex otimizado com extração [MEMORY] inline.
     
@@ -261,22 +261,23 @@ Responda de forma natural e completa.
     
     def __init__(
         self,
-        model: str = "gemma3:4b",
-        ollama_url: str = "http://localhost:11434",
-        cortex_url: str = "http://localhost:8000",
-        context_window_size: int = 10,
-        namespace: str = "benchmark",
+        model: str | None = None,
+        ollama_url: str | None = None,
+        cortex_url: str | None = None,
+        context_window_size: int | None = None,
+        namespace: str | None = None,
     ):
-        self.model = model
-        self.ollama_url = ollama_url
-        self.cortex_url = cortex_url
-        self.context_window_size = context_window_size
-        self.namespace = namespace
+        # Usa variáveis de ambiente como fallback
+        self.model = model or os.getenv("OLLAMA_MODEL", "gemma3:4b")
+        self.ollama_url = ollama_url or os.getenv("OLLAMA_URL", "http://localhost:11434")
+        self.cortex_url = cortex_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")
+        self.context_window_size = context_window_size or int(os.getenv("CORTEX_CONTEXT_WINDOW", "10"))
+        self.namespace = namespace or os.getenv("CORTEX_NAMESPACE", "benchmark")
         
-        os.environ["OLLAMA_API_BASE"] = ollama_url
+        os.environ["OLLAMA_API_BASE"] = self.ollama_url
         
-        self.cortex = CortexClient(base_url=cortex_url, namespace=namespace)
-        self._cortex_url = cortex_url
+        self.cortex = CortexClient(base_url=self.cortex_url, namespace=self.namespace)
+        self._cortex_url = self.cortex_url
         
         self._session_history: list[dict] = []
         self._session_start: datetime | None = None
@@ -306,6 +307,10 @@ Responda de forma natural e completa.
         """Define namespace e recria cliente."""
         self.namespace = namespace
         self.cortex = CortexClient(base_url=self._cortex_url, namespace=namespace)
+    
+    def set_namespace(self, namespace: str) -> None:
+        """Define namespace (alias público)."""
+        self._set_namespace(namespace)
     
     def _recall_memory(self, query: str) -> tuple[str, int, int, int, float]:
         """Busca memórias relevantes."""
@@ -522,14 +527,6 @@ Responda de forma natural e completa.
             return True
         except Exception:
             return False
-    
-    def recall(self, query: str, **kwargs) -> dict:
-        """Recall público para benchmark."""
-        return self.cortex.recall(query=query, where=self.namespace, limit=10)
-    
-    def remember(self, **kwargs) -> dict:
-        """Remember público para benchmark."""
-        return self.cortex.remember(**kwargs)
     
     def clear_namespace(self) -> bool:
         """Limpa memórias do namespace."""

@@ -20,6 +20,7 @@ Uso:
     print(f"Refinadas: {result.memories_refined}")
 """
 
+import os
 import re
 import requests
 from dataclasses import dataclass, field
@@ -89,13 +90,14 @@ resumo_consolidado: |
     
     def __init__(
         self,
-        cortex_url: str = "http://localhost:8000",
-        llm_url: str = "http://localhost:11434",
-        llm_model: str = "gemma3:4b",
+        cortex_url: str | None = None,
+        llm_url: str | None = None,
+        llm_model: str | None = None,
     ):
-        self.cortex_url = cortex_url.rstrip("/")
-        self.llm_url = llm_url.rstrip("/")
-        self.llm_model = llm_model
+        # Usa variáveis de ambiente como fallback
+        self.cortex_url = (cortex_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")).rstrip("/")
+        self.llm_url = (llm_url or os.getenv("OLLAMA_URL", "http://localhost:11434")).rstrip("/")
+        self.llm_model = llm_model or os.getenv("OLLAMA_MODEL", "gemma3:4b")
         
         self._session = requests.Session()
         self._session.headers.update({"Content-Type": "application/json"})

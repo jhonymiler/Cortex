@@ -21,6 +21,7 @@ Para integrações plug-and-play, veja cortex.integrations.
 NOVO: Extração automática via [MEMORY] block no output do LLM.
 """
 
+import os
 import re
 import requests
 from typing import Any, Callable
@@ -215,8 +216,8 @@ Use a memória para dar continuidade natural à conversa."""
     
     def __init__(
         self,
-        namespace: str = "default",
-        cortex_url: str = "http://localhost:8000",
+        namespace: str | None = None,
+        cortex_url: str | None = None,
         auto_inject: bool = True,
         inject_memory_instruction: bool = True,
         auto_extract: bool = True,
@@ -226,15 +227,15 @@ Use a memória para dar continuidade natural à conversa."""
         Inicializa memória Cortex.
         
         Args:
-            namespace: Identificador único para isolamento
-            cortex_url: URL da API Cortex
+            namespace: Identificador único para isolamento (env: CORTEX_NAMESPACE)
+            cortex_url: URL da API Cortex (env: CORTEX_API_URL)
             auto_inject: Se True, before() retorna contexto formatado
             inject_memory_instruction: Se True, adiciona instrução [MEMORY]
             auto_extract: Se True, after() extrai [MEMORY] do output
             context_template: Template customizado para contexto
         """
-        self.namespace = namespace
-        self.cortex_url = cortex_url.rstrip("/")
+        self.namespace = namespace or os.getenv("CORTEX_NAMESPACE", "default")
+        self.cortex_url = (cortex_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")).rstrip("/")
         self.auto_inject = auto_inject
         self.inject_memory_instruction = inject_memory_instruction
         self.auto_extract = auto_extract
@@ -438,8 +439,8 @@ Use a memória para dar continuidade natural à conversa."""
 
 
 def with_memory(
-    namespace: str = "default",
-    cortex_url: str = "http://localhost:8000",
+    namespace: str | None = None,
+    cortex_url: str | None = None,
     inject_memory_instruction: bool = True,
     auto_extract: bool = True,
 ):

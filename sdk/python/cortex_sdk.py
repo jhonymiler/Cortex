@@ -22,6 +22,7 @@ Exemplo de uso:
     )
 """
 
+import os
 from typing import Any
 import requests
 
@@ -31,26 +32,26 @@ class CortexClient:
 
     def __init__(
         self,
-        base_url: str = "http://localhost:8000",
-        namespace: str = "default",
+        base_url: str | None = None,
+        namespace: str | None = None,
     ):
         """
         Inicializa cliente Cortex.
         
         Args:
-            base_url: URL base da API Cortex (padrão: http://localhost:8000)
-            namespace: Namespace para isolamento de memórias (padrão: "default")
+            base_url: URL base da API Cortex (env: CORTEX_API_URL)
+            namespace: Namespace para isolamento de memórias (env: CORTEX_NAMESPACE)
                        Use identificador único por usuário/agente:
                        - Atendimento: f"suporte:{user_id}"
                        - Subagente: f"agent:{agent_id}"
                        - Multi-tenant: f"{tenant}:{user}"
         """
-        self.base_url = base_url.rstrip('/')
-        self.namespace = namespace
+        self.base_url = (base_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")).rstrip('/')
+        self.namespace = namespace or os.getenv("CORTEX_NAMESPACE", "default")
         self.session = requests.Session()
         self.session.headers.update({
             "Content-Type": "application/json",
-            "X-Cortex-Namespace": namespace,
+            "X-Cortex-Namespace": self.namespace,
         })
 
     # ==================== CORE W5H METHODS ====================

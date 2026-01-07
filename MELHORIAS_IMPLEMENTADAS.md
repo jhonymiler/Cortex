@@ -35,7 +35,7 @@ Simula consolidação de memória durante o sono:
 - Cria resumos consolidados
 - Salva memórias refinadas
 
-### 3. CortexAgentV2 para Benchmark
+### 3. CortexAgent para Benchmark
 
 **Arquivo:** `benchmark/cortex_agent_v2.py`
 

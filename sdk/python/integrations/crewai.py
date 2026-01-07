@@ -47,12 +47,14 @@ class CortexCrewAIMemory:
     
     def __init__(
         self,
-        namespace: str = "crewai",
-        cortex_url: str = "http://localhost:8000",
+        namespace: str | None = None,
+        cortex_url: str | None = None,
     ):
-        self.namespace = namespace
+        # Usa variáveis de ambiente como fallback
+        self.namespace = namespace or os.getenv("CORTEX_NAMESPACE", "crewai")
+        cortex_url = cortex_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")
         self._cortex = CortexMemory(
-            namespace=namespace,
+            namespace=self.namespace,
             cortex_url=cortex_url,
         )
     

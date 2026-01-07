@@ -11,13 +11,14 @@ Análise posterior pode ser feita com um script separado.
 """
 
 import json
+import os
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from benchmark.agents import BaselineAgent, CortexAgent, evaluate_responses
-from benchmark.cortex_agent_v2 import CortexAgentV2
+from benchmark.agents import BaselineAgent, evaluate_responses
+from benchmark.cortex_agent import CortexAgent
 from benchmark.conversation_generator import Conversation
 
 
@@ -26,49 +27,41 @@ class LightweightBenchmarkRunner:
     Runner otimizado que apenas COLETA dados,
     sem fazer comparações ou análises que usem LLM.
     
-    NOVO: Suporta CortexAgentV2 com extração [MEMORY] inline.
+    Usa CortexAgent com extração [MEMORY] inline.
     """
     
     def __init__(
         self,
-        model: str,
-        ollama_url: str = "http://localhost:11434",
-        cortex_url: str = "http://localhost:8000",
-        namespace: str = "benchmark",
+        model: str | None = None,
+        ollama_url: str | None = None,
+        cortex_url: str | None = None,
+        namespace: str | None = None,
         verbose: bool = True,
         evaluate_responses_llm: bool = False,
         detailed_logs: bool = False,
-        use_v2: bool = True,  # NOVO: Usar CortexAgentV2 por padrão
     ):
-        self.model = model
-        self.namespace = namespace
+        # Usa variáveis de ambiente como fallback
+        self.model = model or os.getenv("OLLAMA_MODEL", "gemma3:4b")
+        self.ollama_url = ollama_url or os.getenv("OLLAMA_URL", "http://localhost:11434")
+        cortex_url = cortex_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")
+        self.namespace = namespace or os.getenv("CORTEX_NAMESPACE", "benchmark")
         self.verbose = verbose
-        self.ollama_url = ollama_url
         self.evaluate_responses_llm = evaluate_responses_llm
         self.detailed_logs = detailed_logs
-        self.use_v2 = use_v2
         
         # Cria agentes
         self.baseline = BaselineAgent(
-            model=model,
-            ollama_url=ollama_url,
+            model=self.model,
+            ollama_url=self.ollama_url,
         )
         
-        # Usa V2 com extração [MEMORY] inline (50% menos tokens)
-        if use_v2:
-            self.cortex_agent = CortexAgentV2(
-                model=model,
-                ollama_url=ollama_url,
-                cortex_url=cortex_url,
-                namespace=namespace,
-            )
-        else:
-            self.cortex_agent = CortexAgent(
-                model=model,
-                ollama_url=ollama_url,
-                cortex_url=cortex_url,
-                namespace=namespace,
-            )
+        # CortexAgent com extração [MEMORY] inline
+        self.cortex_agent = CortexAgent(
+            model=self.model,
+            ollama_url=self.ollama_url,
+            cortex_url=cortex_url,
+            namespace=self.namespace,
+        )
     
     def _log(self, message: str, end: str = "\n"):
         """Log condicional."""
@@ -141,34 +134,18 @@ class LightweightBenchmarkRunner:
                 baseline_response = self.baseline.process_message(user_message)
                 baseline_time_ms = (time.time() - baseline_start) * 1000
                 
-                # CORTEX: Recall + Responde + Store
+                # CORTEX V2: process_message faz recall + generate + store em 1 chamada
                 cortex_start = time.time()
                 
-                # Recall
-                recall_start = time.time()
-                recall_result = self.cortex_agent.recall(
-                    query=user_message,
-                    conversation_id=conversation_id,
-                    session_id=session_id,
-                )
-                recall_time_ms = (time.time() - recall_start) * 1000
-                
-                # Responde (com contexto de memória)
                 cortex_response = self.cortex_agent.process_message(
                     message=user_message,
                 )
                 
-                # Store
-                store_start = time.time()
-                store_result = self.cortex_agent.store(
-                    user_message=user_message,
-                    assistant_response=cortex_response.content,
-                    conversation_id=conversation_id,
-                    session_id=session_id,
-                )
-                store_time_ms = (time.time() - store_start) * 1000
-                
                 cortex_time_ms = (time.time() - cortex_start) * 1000
+                
+                # V2 retorna tempos internos
+                recall_time_ms = cortex_response.recall_time_ms
+                store_time_ms = cortex_response.store_time_ms
                 
                 # Coleta dados SEM análise
                 # NOTA: expected_recalls está na SESSION, não na Message
@@ -189,16 +166,13 @@ class LightweightBenchmarkRunner:
                     "cortex_time_ms": cortex_time_ms,
                     "cortex_recall_time_ms": recall_time_ms,
                     "cortex_store_time_ms": store_time_ms,
-                    "cortex_memory_entities": recall_result.get("entities_found", 0),
-                    "cortex_memory_episodes": recall_result.get("episodes_found", 0),
-                    "cortex_context_used": recall_result.get("prompt_context", ""),
+                    "cortex_memory_entities": cortex_response.memory_entities,
+                    "cortex_memory_episodes": cortex_response.memory_episodes,
+                    "cortex_context_used": cortex_response.context_from_memory or "",
                     
-                    # Dados brutos de memória (para análise posterior)
-                    "cortex_entities": recall_result.get("entities", []),
-                    "cortex_episodes": recall_result.get("episodes", []),
-                    
-                    # Store result
-                    "cortex_store_result": store_result if isinstance(store_result, dict) else {},
+                    # V2: Memória extraída do [MEMORY] block
+                    "cortex_memory_extracted": cortex_response.memory_extracted,
+                    "cortex_extracted_memory": cortex_response.extracted_memory or {},
                 }
                 
                 # Avaliação LLM (opcional)
@@ -209,7 +183,7 @@ class LightweightBenchmarkRunner:
                         user_message=user_message,
                         baseline_response=baseline_response.content,
                         cortex_response=cortex_response.content,
-                        memory_context=recall_result.get("prompt_context", ""),
+                        memory_context=cortex_response.context_from_memory or "",
                     )
                     message_result["evaluation"] = eval_result
                     
@@ -222,8 +196,10 @@ class LightweightBenchmarkRunner:
                     self._log(f"\n      📝 User: {user_message[:60]}...")
                     self._log(f"      🅰️ Baseline ({baseline_response.total_tokens}t): {baseline_response.content[:80]}...")
                     self._log(f"      🅱️ Cortex ({cortex_response.total_tokens}t): {cortex_response.content[:80]}...")
-                    if recall_result.get("prompt_context"):
-                        self._log(f"      🧠 Memory: {recall_result.get('prompt_context', '')[:100]}...")
+                    if cortex_response.context_from_memory:
+                        self._log(f"      🧠 Memory: {cortex_response.context_from_memory[:100]}...")
+                    if cortex_response.memory_extracted:
+                        self._log(f"      💾 Extracted: {cortex_response.extracted_memory}")
                 
                 session_result["messages"].append(message_result)
             
