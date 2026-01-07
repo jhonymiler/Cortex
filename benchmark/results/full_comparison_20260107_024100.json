@@ -1,0 +1,1296 @@
+{
+  "timestamp": "2026-01-07T02:26:28.492276",
+  "config": {
+    "domains": [
+      "customer_support",
+      "code_assistant",
+      "roleplay",
+      "education",
+      "personal_assistant",
+      "sales_crm",
+      "healthcare",
+      "financial"
+    ],
+    "conversations_per_domain": 1,
+    "sessions_per_conversation": 2,
+    "consolidate": true,
+    "model": "gemma3:4b",
+    "ollama_url": "http://172.30.64.1:11434",
+    "cortex_url": "http://localhost:8000",
+    "use_chromadb": false
+  },
+  "conversations": [
+    {
+      "domain": "customer_support",
+      "user_id": "user_customer_support",
+      "consolidated": true,
+      "sessions": [
+        {
+          "session_id": 0,
+          "is_returning_user": false,
+          "messages": [
+            {
+              "user_message": "Olá, meu nome é Maria Silva e o sistema está lento",
+              "baseline_response": "Olá Maria Silva! Sinto muito que o sistema esteja lento. Vamos tentar resolver isso. \n\nPara te ajudar melhor, poderia me dizer:\n\n*   **Em que você está trabalhando quando o sistema fica lento?** (Ex: ",
+              "baseline_tokens": 189,
+              "baseline_latency_ms": 3972.384452819824,
+              "baseline_memories": 0,
+              "rag_response": "Olá Maria Silva, tudo bem? Que bom te atender!\n\nSinto muito que o sistema esteja lento. Isso pode ser frustrante, né?\n\nPara tentar te ajudar a resolver isso, preciso de um pouco mais de informação. Po",
+              "rag_tokens": 267,
+              "rag_latency_ms": 4416.991949081421,
+              "rag_memories": 0,
+              "mem0_response": "Olá Maria Silva, é um prazer te conhecer! Que pena que o sistema está lento, isso é bem frustrante. \n\nPara que eu possa tentar ajudar, você poderia me dizer:\n\n*   **Em que você estava trabalhando quan",
+              "mem0_tokens": 228,
+              "mem0_latency_ms": 3766.6015625,
+              "mem0_memories": 0,
+              "cortex_response": "Olá Maria Silva, tudo bem? Entendo que o sistema está lento. Vamos tentar identificar o que está causando isso e ver como podemos resolver. Para começarmos, você poderia me dizer em quais tarefas espe",
+              "cortex_tokens": 298,
+              "cortex_latency_ms": 3049.3016242980957,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Olá Maria Silva! Sou o assistente virtual e vou te ajudar com isso. Vejo que você é cliente do Addon Storage. Pode me dar mais detalhes sobre o problema?",
+              "baseline_response": "Entendo! Sim, sou o assistente virtual e estou aqui para ajudar.\n\nSobre o Addon Storage, o sistema está lento quando estou tentando acessar os arquivos armazenados. Demora um tempo para carregar, mesm",
+              "baseline_tokens": 313,
+              "baseline_latency_ms": 2580.747365951538,
+              "baseline_memories": 0,
+              "rag_response": "Olá Maria Silva! Sou o assistente virtual e vou te ajudar com isso. Vejo que você é cliente do Addon Storage. Pode me dar mais detalhes sobre o problema?\n\nPerfeito! Saber que você é cliente do Addon S",
+              "rag_tokens": 582,
+              "rag_latency_ms": 5391.199350357056,
+              "rag_memories": 1,
+              "mem0_response": "Olá Maria Silva! Que bom te ver de novo! Como o assistente virtual, você já tem uma ótima iniciativa em tentar me ajudar diretamente.\n\nVejo que você é cliente do Addon Storage, isso é ótimo! Para ente",
+              "mem0_tokens": 486,
+              "mem0_latency_ms": 4200.212240219116,
+              "mem0_memories": 1,
+              "cortex_response": "Olá Maria Silva, como vou te ajudar com isso! Vejo que você é cliente do Addon Storage. Pode me dar mais detalhes sobre o problema?",
+              "cortex_tokens": 457,
+              "cortex_latency_ms": 2701.9095420837402,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Já tentei várias vezes mas não funciona",
+              "baseline_response": "Entendo, Maria. É frustrante quando não resolvemos o problema rapidamente.\n\nVamos tentar algumas coisas para ver se conseguimos melhorar a situação com o Addon Storage:\n\n1.  **Reinicie o Addon Storage",
+              "baseline_tokens": 556,
+              "baseline_latency_ms": 5670.7212924957275,
+              "baseline_memories": 0,
+              "rag_response": "Entendo, Maria Silva. Que frustrante tentar várias vezes e não ter sucesso!\n\nPara tentar identificar o que está causando esse problema com o Addon Storage, preciso de mais informações. Poderia me dize",
+              "rag_tokens": 764,
+              "rag_latency_ms": 4730.533838272095,
+              "rag_memories": 1,
+              "mem0_response": "Olá Maria Silva! Entendo que você já tentou algumas vezes, o que é frustrante. \n\nPara me ajudar a entender o que está acontecendo e encontrar uma solução, poderia me fornecer um pouco mais de contexto",
+              "mem0_tokens": 668,
+              "mem0_latency_ms": 4557.136297225952,
+              "mem0_memories": 1,
+              "cortex_response": "Entendo, Maria Silva. Já tentou algumas vezes e o Addon Storage continua lento. Para que eu possa entender melhor a situação e te ajudar a resolver, poderia me dizer:\n\n*   Quando o problema começou a ",
+              "cortex_tokens": 591,
+              "cortex_latency_ms": 4128.039121627808,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 1058,
+            "rag": 1613,
+            "mem0": 1382,
+            "cortex": 1346
+          },
+          "total_latency": {
+            "baseline": 12223.85311126709,
+            "rag": 14538.725137710571,
+            "mem0": 12523.950099945068,
+            "cortex": 9879.250288009644
+          }
+        },
+        {
+          "session_id": 1,
+          "is_returning_user": true,
+          "messages": [
+            {
+              "user_message": "Olá, sou eu de novo. Você lembra de mim?",
+              "baseline_response": "Olá! Sim, lembra-se! É bom te ver de novo. Em que posso te ajudar hoje? 😊\n",
+              "baseline_tokens": 88,
+              "baseline_latency_ms": 1253.5934448242188,
+              "baseline_memories": 0,
+              "rag_response": "Olá Maria Silva! Sim, claro que me lembro de você! Tudo bem? Como posso te ajudar hoje? 😊",
+              "rag_tokens": 269,
+              "rag_latency_ms": 1598.064661026001,
+              "rag_memories": 3,
+              "mem0_response": "Olá Maria Silva! Que bom te ver de novo! É um prazer te atender. 😊",
+              "mem0_tokens": 261,
+              "mem0_latency_ms": 1235.569715499878,
+              "mem0_memories": 3,
+              "cortex_response": "Sim, Maria! É bom falar com você novamente. Lembro que você está relatando um problema de lentidão no sistema e o suporte já está investigando a causa.",
+              "cortex_tokens": 450,
+              "cortex_latency_ms": 3787.7326011657715,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Entendo sua frustração, Maria Silva. Vou verificar sua conta e resolver isso. Pode confirmar seu email cadastrado?",
+              "baseline_response": "Que bom ouvir isso! Sim, meu email cadastrado é: mariasilva123@email.com. 😊\n",
+              "baseline_tokens": 148,
+              "baseline_latency_ms": 1723.2906818389893,
+              "baseline_memories": 0,
+              "rag_response": "Sim, é maria.silva@email.com 😊",
+              "rag_tokens": 315,
+              "rag_latency_ms": 1154.9711227416992,
+              "rag_memories": 3,
+              "mem0_response": "Olá Maria Silva! Sim, meu email cadastrado é mariasilva@email.com. 😊",
+              "mem0_tokens": 315,
+              "mem0_latency_ms": 1334.6519470214844,
+              "mem0_memories": 4,
+              "cortex_response": "Claro! É maria.silva@email.com.",
+              "cortex_tokens": 490,
+              "cortex_latency_ms": 2050.8158206939697,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Oi, voltei. Aquele problema que relatei continua.",
+              "baseline_response": "Ok, Maria. Sinto muito que o problema persista. Pode me dar mais detalhes sobre ele? O que está acontecendo exatamente?",
+              "baseline_tokens": 199,
+              "baseline_latency_ms": 1654.198169708252,
+              "baseline_memories": 0,
+              "rag_response": "Entendo, Maria Silva. Que frustrante tentar várias vezes e não ter sucesso! Vamos investigar o que está acontecendo com o Addon Storage. Pode me dar mais detalhes sobre o problema?",
+              "rag_tokens": 367,
+              "rag_latency_ms": 1785.5420112609863,
+              "rag_memories": 3,
+              "mem0_response": "Olá Maria Silva! Que bom que te contato novamente! Entendo que o problema com a lentidão do sistema persiste. Isso é realmente frustrante, e vou verificar novamente o que está acontecendo. Para te aju",
+              "mem0_tokens": 406,
+              "mem0_latency_ms": 2399.847984313965,
+              "mem0_memories": 4,
+              "cortex_response": "Entendo, Maria. Peço desculpas pela persistência do problema. A equipe de investigação continua trabalhando para identificar a causa da lentidão no sistema. Podemos verificar se houve alguma mudança r",
+              "cortex_tokens": 596,
+              "cortex_latency_ms": 3678.0247688293457,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 435,
+            "rag": 951,
+            "mem0": 982,
+            "cortex": 1536
+          },
+          "total_latency": {
+            "baseline": 4631.08229637146,
+            "rag": 4538.5777950286865,
+            "mem0": 4970.069646835327,
+            "cortex": 9516.573190689087
+          }
+        }
+      ]
+    },
+    {
+      "domain": "code_assistant",
+      "user_id": "user_code_assistant",
+      "consolidated": true,
+      "sessions": [
+        {
+          "session_id": 0,
+          "is_returning_user": false,
+          "messages": [
+            {
+              "user_message": "Oi! Sou Lucas, estou começando um projeto de web app em TypeScript com Next.js.",
+              "baseline_response": "Olá Lucas! Que legal! Next.js com TypeScript é uma ótima combinação. Pode contar comigo para te ajudar no que precisar. \n\nEm que posso te auxiliar hoje? Já tem alguma dúvida específica ou precisa de a",
+              "baseline_tokens": 120,
+              "baseline_latency_ms": 1945.512056350708,
+              "baseline_memories": 0,
+              "rag_response": "Olá Lucas! Que ótimo ouvir isso! É uma combinação poderosa: Next.js oferece uma excelente estrutura e otimizações para o desenvolvimento web, enquanto TypeScript adiciona um nível extra de segurança e",
+              "rag_tokens": 226,
+              "rag_latency_ms": 3698.5480785369873,
+              "rag_memories": 0,
+              "mem0_response": "Olá Lucas! Que legal saber que você está começando um projeto em TypeScript com Next.js! É uma ótima combinação, e Next.js é super popular e poderoso. \n\nPara te ajudar da melhor forma, me diga:\n\n*   *",
+              "mem0_tokens": 235,
+              "mem0_latency_ms": 4004.7447681427,
+              "mem0_memories": 0,
+              "cortex_response": "Olá Lucas, que ótimo ter você por aqui! Um projeto com Next.js e TypeScript é uma excelente escolha, a combinação é poderosa e bem popular no mundo do desenvolvimento web.  \n\nParece que você está bem ",
+              "cortex_tokens": 324,
+              "cortex_latency_ms": 3810.546875,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Olá Lucas! Que legal, web app em TypeScript com Next.js é uma ótima escolha. Posso ajudar com a estrutura inicial?",
+              "baseline_response": "Sim, com certeza! Agradeço a ajuda!\n\nEstou buscando uma estrutura inicial que seja bem organizada e fácil de escalar. Pensando em um projeto de médio porte, a estrutura que estou considerando é:\n\n```\n",
+              "baseline_tokens": 357,
+              "baseline_latency_ms": 5621.839761734009,
+              "baseline_memories": 0,
+              "rag_response": "Sim, Lucas, seria ótimo! A estrutura inicial é super importante para um projeto como o nosso.\n\nUma estrutura básica que costumo recomendar para Next.js com TypeScript é a seguinte:\n\n```\nmeu-projeto/\n├",
+              "rag_tokens": 570,
+              "rag_latency_ms": 6547.2447872161865,
+              "rag_memories": 1,
+              "mem0_response": "Olá Lucas! Que bom que você veio me perguntar! Sim, claro, podemos ajudar com a estrutura inicial. É um passo crucial para qualquer projeto, e com Next.js e TypeScript, ter uma boa estrutura desde o i",
+              "mem0_tokens": 958,
+              "mem0_latency_ms": 15025.595664978027,
+              "mem0_memories": 1,
+              "cortex_response": "Que bom que você está animado para ajudar! Sim, adoraria que você me ajudasse com a estrutura inicial. Poderíamos começar pensando em como organizar os arquivos e pastas do projeto. O que você sugere ",
+              "cortex_tokens": 493,
+              "cortex_latency_ms": 3261.162757873535,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Sim, quero seguir boas práticas desde o início.",
+              "baseline_response": "Ótimo! Concordo plenamente. Para seguir boas práticas, sugiro o seguinte:\n\n1.  **Crie um `tsconfig.json` bem configurado:** Isso é essencial para o TypeScript e Next.js.\n2.  **Utilize uma linter (ESLi",
+              "baseline_tokens": 572,
+              "baseline_latency_ms": 5409.23547744751,
+              "baseline_memories": 0,
+              "rag_response": "Excelente! Seguir boas práticas desde o início é uma ótima estratégia. Para projetos Next.js com TypeScript, algumas recomendações que podem te ajudar são:\n\n*   **Estrutura de Pastas Organizada:** Com",
+              "rag_tokens": 941,
+              "rag_latency_ms": 7935.384035110474,
+              "rag_memories": 2,
+              "mem0_response": "Excelente, Lucas! Seguir boas práticas desde o início é uma ótima decisão. Isso vai economizar muito tempo e dor de cabeça no futuro.\n\nVamos focar em algumas delas agora:\n\n1.  **Typescript:** Já estam",
+              "mem0_tokens": 1355,
+              "mem0_latency_ms": 8708.119869232178,
+              "mem0_memories": 2,
+              "cortex_response": "Perfeito! Seguir boas práticas desde o início é sempre uma ótima ideia. Pensando nisso, o que você sugere em termos de organização de pastas e arquivos para um projeto Next.js com TypeScript, buscando",
+              "cortex_tokens": 552,
+              "cortex_latency_ms": 2776.0300636291504,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 1049,
+            "rag": 1737,
+            "mem0": 2548,
+            "cortex": 1369
+          },
+          "total_latency": {
+            "baseline": 12976.587295532227,
+            "rag": 18181.176900863647,
+            "mem0": 27738.460302352905,
+            "cortex": 9847.739696502686
+          }
+        },
+        {
+          "session_id": 1,
+          "is_returning_user": true,
+          "messages": [
+            {
+              "user_message": "Olá, sou eu de novo. Você lembra de mim?",
+              "baseline_response": "Olá! Sim, lembro de você! É bom falar com você novamente. Em que posso ajudar hoje?",
+              "baseline_tokens": 86,
+              "baseline_latency_ms": 1402.5354385375977,
+              "baseline_memories": 0,
+              "rag_response": "Olá Lucas! Sim, claro que lembro! É ótimo te ver de novo. Como posso te ajudar hoje com seu projeto de web app em TypeScript com Next.js?",
+              "rag_tokens": 270,
+              "rag_latency_ms": 1664.1528606414795,
+              "rag_memories": 3,
+              "mem0_response": "Olá Lucas! Sim, claro que me lembro de você! Que bom te ver de novo. Como posso ajudar com seu projeto de web app em TypeScript com Next.js hoje? 😊\n",
+              "mem0_tokens": 275,
+              "mem0_latency_ms": 1767.075538635254,
+              "mem0_memories": 3,
+              "cortex_response": "Olá Lucas! Sim, claro que me lembro. Você iniciou um projeto web app e está trabalhando na configuração inicial dele. Lembra que conversamos sobre recomendações para a estrutura inicial do projeto?\n\nP",
+              "cortex_tokens": 436,
+              "cortex_latency_ms": 3687.896490097046,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Perfeito! Para TypeScript com Next.js, recomendo a seguinte estrutura...",
+              "baseline_response": "Adoro ouvir recomendações! Pode continuar, estou ouvindo atentamente a sua sugestão de estrutura para TypeScript com Next.js. Pode me dizer mais?",
+              "baseline_tokens": 144,
+              "baseline_latency_ms": 1680.5076599121094,
+              "baseline_memories": 0,
+              "rag_response": "Sim, Lucas, seria ótimo! A estrutura inicial é super importante para o seu projeto de web app em TypeScript com Next.js.",
+              "rag_tokens": 335,
+              "rag_latency_ms": 1600.4273891448975,
+              "rag_memories": 3,
+              "mem0_response": "Ótimo, Lucas! Para TypeScript com Next.js, recomendo a seguinte estrutura... (Por favor, continue, estou ansioso para ouvir sua sugestão!) 😊\n",
+              "mem0_tokens": 337,
+              "mem0_latency_ms": 1812.4463558197021,
+              "mem0_memories": 4,
+              "cortex_response": "Ótimo Lucas, vamos lá! Essa estrutura parece promissora. Pode me detalhar as recomendações que você tem para TypeScript com Next.js? Estou aqui para ouvir e entender como podemos aplicar isso ao seu p",
+              "cortex_tokens": 537,
+              "cortex_latency_ms": 3587.4760150909424,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Estou com um erro estranho: 'TypeError: undefined is not a function'",
+              "baseline_response": "Hum, o erro \"TypeError: undefined is not a function\" é um clássico! Ele geralmente acontece quando você tenta chamar uma função que não existe ou que não foi definida corretamente no contexto em que v",
+              "baseline_tokens": 326,
+              "baseline_latency_ms": 4234.494924545288,
+              "baseline_memories": 0,
+              "rag_response": "Oh, Lucas! Que frustrante! O erro \"TypeError: undefined is not a function\" pode ser bem confuso. Para te ajudar a resolver isso, preciso de um pouco mais de informação. \n\nPoderia me dizer:\n\n*   **Onde",
+              "rag_tokens": 506,
+              "rag_latency_ms": 4430.306196212769,
+              "rag_memories": 3,
+              "mem0_response": "Ah, Lucas, que chato! O erro \"TypeError: undefined is not a function\" pode ser bem frustrante. Deixa eu ver se consigo te ajudar a resolver isso. \n\nLembra que estávamos falando sobre seguir boas práti",
+              "mem0_tokens": 489,
+              "mem0_latency_ms": 3872.018814086914,
+              "mem0_memories": 5,
+              "cortex_response": "Ah, que chato, Lucas! O erro \"TypeError: undefined is not a function\" pode ser bem frustrante. Para te ajudar a resolver isso, preciso de mais detalhes. Onde exatamente você está encontrando esse erro",
+              "cortex_tokens": 621,
+              "cortex_latency_ms": 3356.7097187042236,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 556,
+            "rag": 1111,
+            "mem0": 1101,
+            "cortex": 1594
+          },
+          "total_latency": {
+            "baseline": 7317.538022994995,
+            "rag": 7694.8864459991455,
+            "mem0": 7451.54070854187,
+            "cortex": 10632.082223892212
+          }
+        }
+      ]
+    },
+    {
+      "domain": "roleplay",
+      "user_id": "user_roleplay",
+      "consolidated": true,
+      "sessions": [
+        {
+          "session_id": 0,
+          "is_returning_user": false,
+          "messages": [
+            {
+              "user_message": "Olá! Sou Jordan e quero jogar como Marcus, uma guerreiro.",
+              "baseline_response": "Olá Jordan! Que bom te conhecer! Marcus é um ótimo guerreiro! \n\nPara começarmos a jogar como ele, preciso de algumas informações:\n\n*   **Que tipo de jogo estamos jogando?** (RPG, videogame, etc.)\n*   ",
+              "baseline_tokens": 211,
+              "baseline_latency_ms": 3997.9066848754883,
+              "baseline_memories": 0,
+              "rag_response": "Olá Jordan! Que legal que você quer jogar como Marcus, o guerreiro! É um personagem forte e habilidoso.\n\nPara começarmos a sua jornada, preciso de algumas informações para criar uma experiência person",
+              "rag_tokens": 278,
+              "rag_latency_ms": 5049.714088439941,
+              "rag_memories": 0,
+              "mem0_response": "Olá Jordan! Que ótimo te conhecer! É sempre bom começar uma nova aventura. Então, você quer jogar como Marcus, o guerreiro? Ótima escolha!\n\nEu me lembro que você gosta de jogos de RPG, e Marcus parece",
+              "mem0_tokens": 275,
+              "mem0_latency_ms": 5122.8578090667725,
+              "mem0_memories": 0,
+              "cortex_response": "Olá Jordan! Que bom te ver! Ótima escolha, Marcus é um guerreiro muito habilidoso. Vamos lá, prepare-se para a aventura! \n\nPara começarmos, você já tem alguma ideia de como Marcus é? Ele é um guerreir",
+              "cortex_tokens": 315,
+              "cortex_latency_ms": 3800.886631011963,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Bem-vindo, Jordan! Marcus acorda em uma taverna decadente. O cenário de cyberpunk se desenrola à sua volta...",
+              "baseline_response": "Ok, Jordan!\n\nVocê abre os olhos, a luz neon da Taverna 'O Último Suspiro' te atinge em cheio. O cheiro de cerveja barata, óleo queimado e desespero impregna o ar. A taverna é pequena, com mesas de met",
+              "baseline_tokens": 485,
+              "baseline_latency_ms": 6207.685947418213,
+              "baseline_memories": 0,
+              "rag_response": "Bem-vindo, Jordan!\n\nA luz fraca da taverna \"O Cromo Roto\" mal consegue penetrar a névoa de fumaça de cigarro e óleo queimado. O ar está denso com o cheiro de álcool barato, suor e algo indefinidamente",
+              "rag_tokens": 609,
+              "rag_latency_ms": 6663.583755493164,
+              "rag_memories": 1,
+              "mem0_response": "Bem-vindo, Jordan! Que reviravolta! Marcus acorda em uma taverna decadente... o cenário de cyberpunk se desenrola à sua volta... \n\nO cheiro de cerveja barata, óleo queimado e algo vagamente metálico i",
+              "mem0_tokens": 738,
+              "mem0_latency_ms": 9643.94497871399,
+              "mem0_memories": 1,
+              "cortex_response": "Bem-vindo, Jordan! É sempre bom ter um novo companheiro nessa jornada.\n\nMarcus acorda em uma taverna decadente... Que cenário intrigante! A fumaça de nicotina paira no ar, misturada ao cheiro de cerve",
+              "cortex_tokens": 564,
+              "cortex_latency_ms": 5420.8362102508545,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Marcus olha ao redor procurando pistas.",
+              "baseline_response": "Você ergue a cabeça, os olhos varrendo a taverna. Os olhares dos outros frequentadores parecem te ignorar, absorvidos em suas próprias preocupações. A fumaça da nicotina paira no ar, misturada com o c",
+              "baseline_tokens": 799,
+              "baseline_latency_ms": 8212.518215179443,
+              "baseline_memories": 0,
+              "rag_response": "Marcus se espreguiça, sentindo o peso da armadura e o latejar da dor em sua cabeça. Ele abre os olhos lentamente, absorvendo o caos da taverna \"O Cromo Roto\". Seus olhos percorrem o ambiente com atenç",
+              "rag_tokens": 991,
+              "rag_latency_ms": 8477.962255477905,
+              "rag_memories": 2,
+              "mem0_response": "Marcus se espreguiça, sentindo os músculos doloridos se alongarem sob a camisa de couro. Ele olha ao redor, absorvendo o caos da taverna com atenção. Os hologramas piscam, criando um efeito visual con",
+              "mem0_tokens": 1333,
+              "mem0_latency_ms": 13370.741128921509,
+              "mem0_memories": 2,
+              "cortex_response": "Marcus lentamente se senta no balcão, a cabeça girando um pouco. Com um gemido de esforço, ele observa o ambiente com atenção. A taverna, chamada “O Último Suspiro”, é um lugar miserável, repleto de f",
+              "cortex_tokens": 874,
+              "cortex_latency_ms": 8026.841402053833,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 1495,
+            "rag": 1878,
+            "mem0": 2346,
+            "cortex": 1753
+          },
+          "total_latency": {
+            "baseline": 18418.110847473145,
+            "rag": 20191.26009941101,
+            "mem0": 28137.54391670227,
+            "cortex": 17248.56424331665
+          }
+        },
+        {
+          "session_id": 1,
+          "is_returning_user": true,
+          "messages": [
+            {
+              "user_message": "Olá, sou eu de novo. Você lembra de mim?",
+              "baseline_response": "Olá! Sim, me lembro de você! É bom falar com você novamente. 😊 Em que posso te ajudar hoje?",
+              "baseline_tokens": 89,
+              "baseline_latency_ms": 1514.3144130706787,
+              "baseline_memories": 0,
+              "rag_response": "Olá Jordan! Claro que me lembro de você! É ótimo ter você de volta. Como está indo sua aventura como Marcus, o guerreiro?",
+              "rag_tokens": 287,
+              "rag_latency_ms": 2079.005241394043,
+              "rag_memories": 3,
+              "mem0_response": "Olá Jordan! Que bom te ver de novo! Claro que me lembro, você é Marcus, o guerreiro que está acordando em uma taverna decadente de cyberpunk, certo? Como está se sentindo?",
+              "mem0_tokens": 286,
+              "mem0_latency_ms": 2097.836494445801,
+              "mem0_memories": 3,
+              "cortex_response": "Sim, Marcus Guerreiro! É ótimo te ver novamente. Lembro que você queria jogar um roleplay com o sistema Jordan, e que já interagimos antes. Como foi sua última experiência?",
+              "cortex_tokens": 419,
+              "cortex_latency_ms": 2791.3031578063965,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Você nota um homem misterioso no canto, ele segura um medalhão antigo.",
+              "baseline_response": "Sim, percebi. Ele está ali, no canto, e realmente parece estar segurando um medalhão antigo. Uma observação notável! Posso prestar atenção nele enquanto continuamos a nossa interação?",
+              "baseline_tokens": 155,
+              "baseline_latency_ms": 1912.693738937378,
+              "baseline_memories": 0,
+              "rag_response": "Marcus olha para o canto da taverna, onde um homem solitário está sentado, absorto em seu próprio pensamento. Ele segura um medalhão antigo, e a luz fraca da taverna parece se concentrar sobre sua sup",
+              "rag_tokens": 369,
+              "rag_latency_ms": 3077.0673751831055,
+              "rag_memories": 3,
+              "mem0_response": "Marcus se espreguiça, sentindo os músculos doloridos se alongarem sob a camisa de couro. Ele olha ao redor, absorvendo o caos da taverna com atenção. E agora, ele nota um homem misterioso no canto, en",
+              "mem0_tokens": 383,
+              "mem0_latency_ms": 2702.413320541382,
+              "mem0_memories": 4,
+              "cortex_response": "A sala era relativamente silenciosa, o crepitar da lareira o único som perceptível, até que seus olhos pousaram sobre ele. Um homem no canto, envolto em sombras, que observava a tudo com uma intensida",
+              "cortex_tokens": 552,
+              "cortex_latency_ms": 4067.5480365753174,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Marcus se aproxima do homem misterioso.",
+              "baseline_response": "Ok, Marcus se aproximou do homem misterioso. Que reação ele tem? O homem está reagindo à aproximação de Marcus? Descreva o que acontece!",
+              "baseline_tokens": 208,
+              "baseline_latency_ms": 1784.477949142456,
+              "baseline_memories": 0,
+              "rag_response": "Marcus se aproxima do homem no canto, sua armadura fazendo um leve rangido enquanto ele se movia com cautela. Ele para a uma distância respeitosa, avaliando o homem: ele parece cansado, talvez até um ",
+              "rag_tokens": 492,
+              "rag_latency_ms": 3553.903341293335,
+              "rag_memories": 3,
+              "mem0_response": "Marcus se aproxima do homem misterioso, a camisa de couro rangendo levemente enquanto ele se move pela movimentada taverna. Ele se aproxima com cautela, o olhar fixo no medalhão que o homem segura com",
+              "mem0_tokens": 536,
+              "mem0_latency_ms": 4307.050704956055,
+              "mem0_memories": 5,
+              "cortex_response": "Você se move com a precisão de alguém que já conhece o terreno, e com um senso de cautela. Aproxime-se do homem no canto, mantendo uma distância respeitosa, mas não evitando o contato visual. Ele pare",
+              "cortex_tokens": 805,
+              "cortex_latency_ms": 6661.285400390625,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 452,
+            "rag": 1148,
+            "mem0": 1205,
+            "cortex": 1776
+          },
+          "total_latency": {
+            "baseline": 5211.486101150513,
+            "rag": 8709.975957870483,
+            "mem0": 9107.300519943237,
+            "cortex": 13520.136594772339
+          }
+        }
+      ]
+    },
+    {
+      "domain": "education",
+      "user_id": "user_education",
+      "consolidated": true,
+      "sessions": [
+        {
+          "session_id": 0,
+          "is_returning_user": false,
+          "messages": [
+            {
+              "user_message": "Oi! Sou Camila, estou no graduação e preciso de ajuda com Programação.",
+              "baseline_response": "Olá Camila! Que bom te conhecer! Ficarei feliz em ajudar no que precisar com programação. 😊\n\nMe diga, em que tipo de programação você precisa de ajuda? Tem alguma linguagem específica em mente? E qual",
+              "baseline_tokens": 142,
+              "baseline_latency_ms": 2532.588243484497,
+              "baseline_memories": 0,
+              "rag_response": "Olá Camila! Que bom te encontrar por aqui! É ótimo que você esteja buscando ajuda com programação, é uma jornada que pode ser muito gratificante. 😊\n\nEu posso te ajudar bastante, seja com dicas, explic",
+              "rag_tokens": 301,
+              "rag_latency_ms": 5844.945192337036,
+              "rag_memories": 0,
+              "mem0_response": "Oi Camila! Que legal te conhecer! É ótimo saber que você está estudando programação – que caminho desafiador e recompensador! \n\nÉ bom saber que você precisa de ajuda, e eu tô aqui para isso. Para te a",
+              "mem0_tokens": 284,
+              "mem0_latency_ms": 5553.539276123047,
+              "mem0_memories": 0,
+              "cortex_response": "Olá Camila! Que bom te encontrar! Vejo que você está cursando alguma graduação e precisa de ajuda com programação, certo? É ótimo que esteja buscando apoio nessa área, que é superestimada!\n\nEm que pos",
+              "cortex_tokens": 300,
+              "cortex_latency_ms": 3533.1315994262695,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Olá Camila! Vou te ajudar com Programação. Qual parte está mais difícil?",
+              "baseline_response": "Olá! Que bom que você quer me ajudar! 😊\n\nNo momento, estou com algumas dificuldades em entender a lógica de programação e como estruturar um código de forma eficiente. Estou aprendendo a usar estrutur",
+              "baseline_tokens": 255,
+              "baseline_latency_ms": 2903.041124343872,
+              "baseline_memories": 0,
+              "rag_response": "Olá! Que bom que você vai me ajudar com programação! 😊\n\nNo momento, eu estou tentando entender melhor o conceito de **estruturas de dados** e como elas se encaixam em algoritmos. Estou lendo sobre lis",
+              "rag_tokens": 497,
+              "rag_latency_ms": 3671.395778656006,
+              "rag_memories": 1,
+              "mem0_response": "Olá! Que bom saber que você vai me ajudar também! 😊\n\nNo momento, a parte que está mais difícil é a lógica de programação. Estou com um pouco de dificuldade em traduzir os problemas do dia a dia em alg",
+              "mem0_tokens": 490,
+              "mem0_latency_ms": 3890.1565074920654,
+              "mem0_memories": 1,
+              "cortex_response": "Olá! Que bom ter você por aqui também!\n\nEntão, Camila, como você já sabe, estou aqui para te ajudar com programação. Para começarmos, qual parte está te causando mais dificuldades no momento? É em alg",
+              "cortex_tokens": 495,
+              "cortex_latency_ms": 4476.597547531128,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Estou tendo dificuldade com algoritmos.",
+              "baseline_response": "Sem problemas! Algoritmos podem ser desafiadores no começo. \n\nPara começarmos, qual tipo de algoritmo você está tendo mais dificuldade? Por exemplo:\n\n*   **Ordenação:** (Bubble Sort, Insertion Sort, M",
+              "baseline_tokens": 403,
+              "baseline_latency_ms": 4542.790174484253,
+              "baseline_memories": 0,
+              "rag_response": "Olá! Que bom que você vai me ajudar com programação! 😊\n\nNo momento, eu estou tentando entender melhor o conceito de **estruturas de dados** e como elas se encaixam em algoritmos. Estou lendo sobre lis",
+              "rag_tokens": 838,
+              "rag_latency_ms": 7856.857776641846,
+              "rag_memories": 2,
+              "mem0_response": "Ah, algoritmos! Essa é uma área que costuma dar um trabalhinho para muita gente, inclusive eu! 😉\n\nEntendo que você está tendo dificuldades com algoritmos. É super comum, especialmente no começo. A gra",
+              "mem0_tokens": 907,
+              "mem0_latency_ms": 9359.984397888184,
+              "mem0_memories": 2,
+              "cortex_response": "Entendo, Camila! Algoritmos podem ser um pouco desafiadores no começo, mas com a prática e uma boa explicação, fica mais claro. \n\nVocê poderia me dizer quais aspectos dos algoritmos estão te dando mai",
+              "cortex_tokens": 647,
+              "cortex_latency_ms": 5271.67272567749,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 800,
+            "rag": 1636,
+            "mem0": 1681,
+            "cortex": 1442
+          },
+          "total_latency": {
+            "baseline": 9978.419542312622,
+            "rag": 17373.198747634888,
+            "mem0": 18803.680181503296,
+            "cortex": 13281.401872634888
+          }
+        },
+        {
+          "session_id": 1,
+          "is_returning_user": true,
+          "messages": [
+            {
+              "user_message": "Olá, sou eu de novo. Você lembra de mim?",
+              "baseline_response": "Olá! Sim, lembra-se! É bom revê-lo novamente. 😊 Como posso ajudar você hoje?",
+              "baseline_tokens": 86,
+              "baseline_latency_ms": 1345.6230163574219,
+              "baseline_memories": 0,
+              "rag_response": "Olá Camila! Sim, claro que me lembro de você! 😊 Que bom te encontrar de novo! Como posso te ajudar hoje com programação?",
+              "rag_tokens": 268,
+              "rag_latency_ms": 1798.2814311981201,
+              "rag_memories": 3,
+              "mem0_response": "Olá Camila! Que bom te ver de novo! Claro que me lembro, você é a Camila que está no graduação e precisa de ajuda com programação, certo? 😊 Como você está indo com os algoritmos? Alguma coisa em parti",
+              "mem0_tokens": 292,
+              "mem0_latency_ms": 2210.2415561676025,
+              "mem0_memories": 3,
+              "cortex_response": "Olá! Sim, claro que me lembro de você, Camila! Percebo que você está com dificuldades em programação novamente e buscando orientação para resolver esses problemas, certo? Como conversamos anteriorment",
+              "cortex_tokens": 448,
+              "cortex_latency_ms": 3808.7518215179443,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Entendi! Vamos começar pelo básico de algoritmos. Como você aprende melhor: com exemplos práticos ou explicação teórica primeiro?",
+              "baseline_response": "Para aprendizado, exemplos práticos são geralmente mais eficazes para algoritmos! A teoria pode ser um pouco abstrata no começo. \n\nEntão, vamos começar com exemplos práticos! Você gostaria de ver um e",
+              "baseline_tokens": 185,
+              "baseline_latency_ms": 2386.213779449463,
+              "baseline_memories": 0,
+              "rag_response": "Olá! Que bom que você vai me ajudar com programação! 😊\n\nEu gosto de começar com exemplos práticos. Acredito que é mais fácil entender um conceito quando vemos como ele se aplica em um problema real. M",
+              "rag_tokens": 376,
+              "rag_latency_ms": 2695.469379425049,
+              "rag_memories": 3,
+              "mem0_response": "Olá Camila! Que bom que você entendeu! 😊\n\nEu gosto de começar com exemplos práticos! Acredito que é mais fácil e divertido aprender quando você já consegue ver o algoritmo funcionando e como ele resol",
+              "mem0_tokens": 447,
+              "mem0_latency_ms": 3906.632423400879,
+              "mem0_memories": 4,
+              "cortex_response": "Ótimo que você entendeu! Para começarmos a te ajudar com os algoritmos, podemos ir pela abordagem que for mais eficaz para você. Você prefere começar com exemplos práticos, vendo como os algoritmos fu",
+              "cortex_tokens": 554,
+              "cortex_latency_ms": 4162.788391113281,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Prefiro exemplos práticos!",
+              "baseline_response": "Ótimo! Que tal começarmos com um exemplo simples: **ordenar uma lista de números em ordem crescente**?\n\nPodemos usar um algoritmo chamado **Bubble Sort** para isso. Ele é bem fácil de entender e imple",
+              "baseline_tokens": 855,
+              "baseline_latency_ms": 16250.181198120117,
+              "baseline_memories": 0,
+              "rag_response": "Ótimo! Vamos começar com um exemplo prático então!\n\nQue tal a seguinte situação: Imagine que você precisa organizar uma lista de compras. Você quer ir ao supermercado e, ao chegar lá, encontrar todos ",
+              "rag_tokens": 627,
+              "rag_latency_ms": 6619.8883056640625,
+              "rag_memories": 3,
+              "mem0_response": "Ótimo! Adoro exemplos práticos! 😊\n\nQue tal começarmos com um algoritmo simples: o cálculo da tabuada do número 5?\n\n**O Algoritmo:**\n\nO algoritmo vai multiplicar o número 5 por alguns números de 1 a 10",
+              "mem0_tokens": 655,
+              "mem0_latency_ms": 7869.154214859009,
+              "mem0_memories": 1,
+              "cortex_response": "Perfeito! Entendo. Vamos então começar com um exemplo prático bem simples. Que tal a busca linear em um array? É um ótimo ponto de partida para entender a lógica de um algoritmo.\n\nImagine que temos um",
+              "cortex_tokens": 612,
+              "cortex_latency_ms": 3853.6529541015625,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 1126,
+            "rag": 1271,
+            "mem0": 1394,
+            "cortex": 1614
+          },
+          "total_latency": {
+            "baseline": 19982.017993927002,
+            "rag": 11113.639116287231,
+            "mem0": 13986.02819442749,
+            "cortex": 11825.193166732788
+          }
+        }
+      ]
+    },
+    {
+      "domain": "personal_assistant",
+      "user_id": "user_personal_assistant",
+      "consolidated": true,
+      "sessions": [
+        {
+          "session_id": 0,
+          "is_returning_user": false,
+          "messages": [
+            {
+              "user_message": "Olá! Sou Felipe, trabalho como advogado. Preciso de ajuda para me organizar.",
+              "baseline_response": "Olá Felipe! Que bom ter você por aqui! É ótimo que você esteja buscando ajuda para se organizar. \n\nCom prazer te ajudo. Para começarmos, me diga:\n\n*   **Quais são as principais áreas de trabalho que v",
+              "baseline_tokens": 218,
+              "baseline_latency_ms": 4446.620225906372,
+              "baseline_memories": 0,
+              "rag_response": "Olá Felipe, prazer em conhecê-lo! Que bom que você veio aqui em busca de ajuda, organização é fundamental para um advogado, especialmente com a carga de trabalho que você deve ter. 😊\n\nEntendo que você",
+              "rag_tokens": 554,
+              "rag_latency_ms": 11815.120697021484,
+              "rag_memories": 0,
+              "mem0_response": "Olá Felipe! Que bom te conhecer! É ótimo que você esteja buscando ajuda para se organizar, especialmente como advogado, uma profissão que exige muita atenção e organização. \n\nLembrei que você menciono",
+              "mem0_tokens": 323,
+              "mem0_latency_ms": 6486.50050163269,
+              "mem0_memories": 0,
+              "cortex_response": "Olá Felipe, que bom te encontrar! É ótimo que esteja buscando formas de se organizar. Como advogado, com certeza a organização é fundamental para o seu trabalho. \n\nO que você gostaria de organizar esp",
+              "cortex_tokens": 324,
+              "cortex_latency_ms": 4290.726184844971,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Olá Felipe! Prazer em conhecê-lo. Como advogado, imagino que tenha uma agenda cheia. Quais são suas maiores dificuldades de organização?",
+              "baseline_response": "Olá, prazer em conhecê-lo também!\n\nMinhas maiores dificuldades de organização, honestamente, são:\n\n*   **Gerenciar múltiplos casos simultaneamente:** Tenho prazos, compromissos e informações variando ",
+              "baseline_tokens": 415,
+              "baseline_latency_ms": 4625.997304916382,
+              "baseline_memories": 0,
+              "rag_response": "Olá! O prazer é meu! E você tem toda razão, a agenda é sempre uma batalha, com prazos e demandas que parecem infinitas.\n\nMinhas maiores dificuldades de organização giram em torno de três pontos princi",
+              "rag_tokens": 891,
+              "rag_latency_ms": 7046.9818115234375,
+              "rag_memories": 1,
+              "mem0_response": "Prazer em te conhecer também, Felipe! É bom saber que você reconhece a importância de uma boa organização, especialmente com a sua rotina como advogado.\n\nQuanto às suas maiores dificuldades de organiz",
+              "mem0_tokens": 653,
+              "mem0_latency_ms": 6967.874765396118,
+              "mem0_memories": 1,
+              "cortex_response": "Prazer em conhecê-lo também, Felipe! Sim, a agenda está sempre cheia, e eu imagino que seja uma realidade para muitos advogados.\n\nRefletindo sobre isso, minhas maiores dificuldades de organização gira",
+              "cortex_tokens": 537,
+              "cortex_latency_ms": 4617.088317871094,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Esqueço compromissos e não consigo priorizar tarefas.",
+              "baseline_response": "Entendo perfeitamente, Felipe. É um problema comum, especialmente para profissionais ocupados como advogados.\n\nVamos focar nessas duas áreas:\n\n**1. Esquecer compromissos:**\n\n*   **Sugestão:** Que tal ",
+              "baseline_tokens": 757,
+              "baseline_latency_ms": 8634.235143661499,
+              "baseline_memories": 0,
+              "rag_response": "Entendo perfeitamente, Felipe! Esquecer compromissos e dificuldade em priorizar tarefas são desafios muito comuns entre advogados, e são pontos cruciais para a organização. É ótimo que você esteja rec",
+              "rag_tokens": 1267,
+              "rag_latency_ms": 9420.136451721191,
+              "rag_memories": 2,
+              "mem0_response": "Entendo, Felipe! Esquece compromissos e não consegue priorizar tarefas – isso é um problema muito comum, especialmente em áreas como a advocacia, onde a pressão por prazos e a grande quantidade de dem",
+              "mem0_tokens": 1056,
+              "mem0_latency_ms": 9480.418920516968,
+              "mem0_memories": 2,
+              "cortex_response": "Entendo perfeitamente, Felipe. Esquecer compromissos e dificuldade em priorizar tarefas são problemas muito comuns, especialmente quando se tem uma agenda tão dinâmica como a de um advogado.\n\nEntão, v",
+              "cortex_tokens": 736,
+              "cortex_latency_ms": 5525.909900665283,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 1390,
+            "rag": 2712,
+            "mem0": 2032,
+            "cortex": 1597
+          },
+          "total_latency": {
+            "baseline": 17706.852674484253,
+            "rag": 28282.238960266113,
+            "mem0": 22934.794187545776,
+            "cortex": 14433.724403381348
+          }
+        },
+        {
+          "session_id": 1,
+          "is_returning_user": true,
+          "messages": [
+            {
+              "user_message": "Olá, sou eu de novo. Você lembra de mim?",
+              "baseline_response": "Olá! Sim, lembro de você. É bom falar com você de novo. Em que posso te ajudar hoje?",
+              "baseline_tokens": 88,
+              "baseline_latency_ms": 2278.323173522949,
+              "baseline_memories": 0,
+              "rag_response": "Olá Felipe, prazer em revê-lo! Claro que me lembro de você, é ótimo ter você de volta. Como está indo a busca por organização?",
+              "rag_tokens": 279,
+              "rag_latency_ms": 2523.8919258117676,
+              "rag_memories": 3,
+              "mem0_response": "Olá Felipe! Que bom te ver de novo! Claro que me lembro, você é o advogado que estava buscando ajuda para se organizar e mencionou esquecer compromissos e não conseguir priorizar tarefas, certo? Como ",
+              "mem0_tokens": 290,
+              "mem0_latency_ms": 2920.9084510803223,
+              "mem0_memories": 3,
+              "cortex_response": "Sim, Felipe! É ótimo falar com você novamente. Lembra-se que você havia solicitado uma reunião para discutirmos estratégias de organização, seguindo uma conversa anterior sobre o assunto. Como seu ass",
+              "cortex_tokens": 451,
+              "cortex_latency_ms": 3878.053665161133,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Entendi! Vou te ajudar com lembretes e priorização. Prefere receber lembretes pela manhã ou noite anterior?",
+              "baseline_response": "Prefiro lembretes pela manhã. Assim, consigo planejar o meu dia com mais calma!",
+              "baseline_tokens": 144,
+              "baseline_latency_ms": 1595.428705215454,
+              "baseline_memories": 0,
+              "rag_response": "Que ótimo que você vai me ajudar! Prefiro lembretes pela manhã, Felipe. Assim, você começa o dia com mais clareza sobre o que precisa ser feito. 😊",
+              "rag_tokens": 352,
+              "rag_latency_ms": 2155.580759048462,
+              "rag_memories": 3,
+              "mem0_response": "Que ótimo, Felipe! Fico muito feliz em saber que você vai tentar colocar isso em prática. Receber lembretes antes do compromisso é uma excelente ideia.\n\nConsiderando que você é um advogado, com uma ag",
+              "mem0_tokens": 415,
+              "mem0_latency_ms": 3033.7910652160645,
+              "mem0_memories": 4,
+              "cortex_response": "Ótimo! A priorização e os lembretes são um excelente ponto de partida. Para os lembretes, prefiro que sejam enviados pela manhã, para que você possa começar o dia com tudo planejado. Isso te ajudará a",
+              "cortex_tokens": 537,
+              "cortex_latency_ms": 3935.589075088501,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Pela manhã, sou mais produtivo de manhã.",
+              "baseline_response": "Ótimo! Então, definimos: lembretes pela manhã. Me diga, qual é a primeira tarefa ou lembrete que você gostaria que eu adicionasse à sua lista?",
+              "baseline_tokens": 203,
+              "baseline_latency_ms": 2098.5360145568848,
+              "baseline_memories": 0,
+              "rag_response": "Excelente! Então, vamos agendar os lembretes para a manhã, Felipe. Isso deve te ajudar a começar o dia com o pé direito e manter o foco na priorização. 😊",
+              "rag_tokens": 418,
+              "rag_latency_ms": 2182.939291000366,
+              "rag_memories": 3,
+              "mem0_response": "Excelente! Então, lembretes no dia anterior, e especificamente pela manhã, para você começar o dia com a tarefa mais importante em mente. Isso faz muito sentido considerando que você é mais produtivo ",
+              "mem0_tokens": 554,
+              "mem0_latency_ms": 4333.598852157593,
+              "mem0_memories": 5,
+              "cortex_response": "Perfeito! Então, definimos: lembretes diários pela manhã. Isso te ajudará a começar o dia com o pé direito e focando nas prioridades. Para começarmos a estruturar isso, quais são as principais áreas e",
+              "cortex_tokens": 624,
+              "cortex_latency_ms": 3761.2435817718506,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 435,
+            "rag": 1049,
+            "mem0": 1259,
+            "cortex": 1612
+          },
+          "total_latency": {
+            "baseline": 5972.287893295288,
+            "rag": 6862.411975860596,
+            "mem0": 10288.29836845398,
+            "cortex": 11574.886322021484
+          }
+        }
+      ]
+    },
+    {
+      "domain": "sales_crm",
+      "user_id": "user_sales_crm",
+      "consolidated": true,
+      "sessions": [
+        {
+          "session_id": 0,
+          "is_returning_user": false,
+          "messages": [
+            {
+              "user_message": "Tive uma call com a InnovaLab. O Diretor de TI, Dr. Silva, mostrou interesse no Security Shield.",
+              "baseline_response": "Ótimo! É bom saber que o Dr. Silva da InnovaLab demonstrou interesse no Security Shield. Isso é um bom sinal. Posso ajudar em algo relacionado a essa conversa ou ao Security Shield?\n",
+              "baseline_tokens": 123,
+              "baseline_latency_ms": 2820.1682567596436,
+              "baseline_memories": 0,
+              "rag_response": "Que ótimo! Parece que a InnovaLab está demonstrando interesse no Security Shield. É sempre bom ouvir que nosso produto está chamando a atenção de líderes como o Dr. Silva. \n\nPosso ajudar em algo relac",
+              "rag_tokens": 201,
+              "rag_latency_ms": 3840.691328048706,
+              "rag_memories": 0,
+              "mem0_response": "Ótimo! Que bom que você teve uma call produtiva com a InnovaLab e o Dr. Silva. É interessante que ele tenha demonstrado interesse no Security Shield. \n\nPosso te ajudar com algo relacionado a essa conv",
+              "mem0_tokens": 182,
+              "mem0_latency_ms": 2971.5869426727295,
+              "mem0_memories": 0,
+              "cortex_response": "Que bom que a call com a InnovaLab foi produtiva! É ótimo saber que o Dr. Silva demonstrou interesse no Security Shield. Parece que você está fazendo um ótimo trabalho na prospecção de clientes.",
+              "cortex_tokens": 287,
+              "cortex_latency_ms": 3816.1323070526123,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Ótimo, Patrícia! A InnovaLab é uma boa oportunidade. Qual foi a principal dor que o Diretor de TI mencionou?",
+              "baseline_response": "Com certeza! O Dr. Silva mencionou principalmente a necessidade de proteger dados sensíveis de clientes, especialmente devido ao aumento de ataques cibernéticos e à conformidade com regulamentações de",
+              "baseline_tokens": 228,
+              "baseline_latency_ms": 2743.654251098633,
+              "baseline_memories": 0,
+              "rag_response": "Infelizmente, as informações que tenho disponíveis não detalham a principal dor específica que o Dr. Silva da InnovaLab mencionou durante a conversa. Apenas notei que ele demonstrou interesse no Secur",
+              "rag_tokens": 387,
+              "rag_latency_ms": 3311.58447265625,
+              "rag_memories": 1,
+              "mem0_response": "Patrícia, lembrando da sua call com o Dr. Silva da InnovaLab, ele mencionou que a principal dor da empresa é a crescente ameaça de ataques cibernéticos e a dificuldade de manter uma postura de seguran",
+              "mem0_tokens": 414,
+              "mem0_latency_ms": 4179.570436477661,
+              "mem0_memories": 1,
+              "cortex_response": "Com o devido respeito, Patrícia, a call com a InnovaLab foi documentada como Security_Shield → Security_Shield (93ba5eba) -[+participated_in]-> (11ebdcfa). A documentação não inclui detalhes sobre as ",
+              "cortex_tokens": 422,
+              "cortex_latency_ms": 3482.893943786621,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Eles estão tendo problemas de escalabilidade. O sistema atual não aguenta.",
+              "baseline_response": "Entendi! A escalabilidade do sistema atual foi uma grande preocupação. Isso indica que o Security Shield pode ser uma solução relevante para atender às necessidades de crescimento da InnovaLab. Podemo",
+              "baseline_tokens": 302,
+              "baseline_latency_ms": 2182.8813552856445,
+              "baseline_memories": 0,
+              "rag_response": "Entendi! Que bom que você conseguiu essa informação. Então, o Dr. Silva da InnovaLab está enfrentando problemas de escalabilidade com seu sistema atual, o que é uma preocupação comum para empresas em ",
+              "rag_tokens": 561,
+              "rag_latency_ms": 4123.968839645386,
+              "rag_memories": 2,
+              "mem0_response": "Perfeito! Patrícia, então, o Dr. Silva também mencionou que a InnovaLab está enfrentando problemas de escalabilidade com o sistema atual, o que está limitando sua capacidade de crescimento e gerando g",
+              "mem0_tokens": 623,
+              "mem0_latency_ms": 3977.92649269104,
+              "mem0_memories": 2,
+              "cortex_response": "Entendo, problemas de escalabilidade são muito comuns. Saber que o sistema atual da InnovaLab não está conseguindo suportar a demanda é crucial para a gente apresentar o Security Shield como uma soluç",
+              "cortex_tokens": 507,
+              "cortex_latency_ms": 2710.7760906219482,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 653,
+            "rag": 1149,
+            "mem0": 1219,
+            "cortex": 1216
+          },
+          "total_latency": {
+            "baseline": 7746.703863143921,
+            "rag": 11276.244640350342,
+            "mem0": 11129.08387184143,
+            "cortex": 10009.802341461182
+          }
+        },
+        {
+          "session_id": 1,
+          "is_returning_user": true,
+          "messages": [
+            {
+              "user_message": "Olá, sou eu de novo. Você lembra de mim?",
+              "baseline_response": "Olá! Sim, lembra mesmo! É ótimo te ver de novo. Em que posso ajudar hoje? 😊\n",
+              "baseline_tokens": 86,
+              "baseline_latency_ms": 1601.0024547576904,
+              "baseline_memories": 0,
+              "rag_response": "Olá! Sim, claro que me lembro de você! Foi ótimo conversar com você sobre a InnovaLab e o Security Shield. Em que posso te ajudar hoje?",
+              "rag_tokens": 278,
+              "rag_latency_ms": 2175.2076148986816,
+              "rag_memories": 3,
+              "mem0_response": "Olá! Sim, Patrícia, é ótimo falar com você novamente! Lembrei que você teve uma call com a InnovaLab e o Dr. Silva. Como você está?",
+              "mem0_tokens": 292,
+              "mem0_latency_ms": 1852.2884845733643,
+              "mem0_memories": 3,
+              "cortex_response": "Sim, claro! Sou o assistente que conversou com você anteriormente sobre o Security Shield da InnovaLab. Lembra-se do evento (93ba5eba) que registrou essa interação?",
+              "cortex_tokens": 429,
+              "cortex_latency_ms": 3011.396884918213,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Perfeito para o Security Shield! Anoto: InnovaLab, Dr. Silva (Diretor de TI), problema de escalabilidade. Qual o próximo passo?",
+              "baseline_response": "O próximo passo seria agendar uma reunião com o Dr. Silva para entender melhor o problema de escalabilidade da InnovaLab. \n\nSeria útil perguntar:\n\n*   Quais os sintomas específicos do problema?\n*   Qu",
+              "baseline_tokens": 211,
+              "baseline_latency_ms": 3289.0803813934326,
+              "baseline_memories": 0,
+              "rag_response": "Ótimo! Anotação perfeita. Com base no que conversamos, o próximo passo seria investigar mais a fundo o problema de escalabilidade que o Dr. Silva da InnovaLab está enfrentando. \n\nGostaria que detalhas",
+              "rag_tokens": 491,
+              "rag_latency_ms": 4700.07061958313,
+              "rag_memories": 3,
+              "mem0_response": "Ótimo, Patrícia! Lembrei que a InnovaLab, com o Dr. Silva, está enfrentando problemas de escalabilidade com o sistema atual. \n\nConsiderando isso, o próximo passo seria elaborar uma proposta de demonst",
+              "mem0_tokens": 478,
+              "mem0_latency_ms": 4465.904712677002,
+              "mem0_memories": 4,
+              "cortex_response": "Ótimo! Então, para recapitular, você está registrando que o Dr. Silva, Diretor de TI, identificou um problema de escalabilidade com o Security Shield da InnovaLab. \n\nO próximo passo seria, provavelmen",
+              "cortex_tokens": 636,
+              "cortex_latency_ms": 5415.001153945923,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Vou mandar proposta semana que vem.",
+              "baseline_response": "Ótimo! Assim que enviar a proposta, me avise para que eu possa acompanhá-la e ajudar a analisá-la. 😉",
+              "baseline_tokens": 259,
+              "baseline_latency_ms": 1764.650821685791,
+              "baseline_memories": 0,
+              "rag_response": "Perfeito! Fique à vontade para me atualizar sobre a proposta que você vai enviar na semana que vem. Podemos discutir os detalhes e ver se há algo que eu possa fazer para te ajudar a prepará-la. 😉",
+              "rag_tokens": 554,
+              "rag_latency_ms": 2254.1439533233643,
+              "rag_memories": 3,
+              "mem0_response": "Perfeito, Patrícia! Semana que vem, com a proposta organizada, podemos agendar uma nova conversa para avaliarmos os próximos passos. Fique tranquila, estou aqui para te ajudar em cada etapa. 😊",
+              "mem0_tokens": 553,
+              "mem0_latency_ms": 2257.0507526397705,
+              "mem0_memories": 5,
+              "cortex_response": "Entendido. Agradeço a informação e ficarei atento à proposta que você enviará na semana seguinte. Caso precise de algo para te ajudar a elaborar, me diga!",
+              "cortex_tokens": 639,
+              "cortex_latency_ms": 3330.6472301483154,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 556,
+            "rag": 1323,
+            "mem0": 1323,
+            "cortex": 1704
+          },
+          "total_latency": {
+            "baseline": 6654.733657836914,
+            "rag": 9129.422187805176,
+            "mem0": 8575.243949890137,
+            "cortex": 11757.045269012451
+          }
+        }
+      ]
+    },
+    {
+      "domain": "healthcare",
+      "user_id": "user_healthcare",
+      "consolidated": true,
+      "sessions": [
+        {
+          "session_id": 0,
+          "is_returning_user": false,
+          "messages": [
+            {
+              "user_message": "Olá, sou Dona Maria. Preciso de ajuda para lembrar meus remédios.",
+              "baseline_response": "Olá, Dona Maria! Que bom que procurou ajuda. Ficarei feliz em te ajudar a lembrar seus remédios. Para começar, pode me dizer:\n\n1.  **Quais são os remédios que você precisa tomar?** (Nome do medicament",
+              "baseline_tokens": 213,
+              "baseline_latency_ms": 4476.932048797607,
+              "baseline_memories": 0,
+              "rag_response": "Olá, Dona Maria! Que bom que procurou ajuda. Lembre-se que a gente pode trabalhar juntos para organizar seus remédios e garantir que você não se esqueça de nenhum. \n\nPara te ajudar da melhor forma, pr",
+              "rag_tokens": 279,
+              "rag_latency_ms": 5275.079727172852,
+              "rag_memories": 0,
+              "mem0_response": "Olá, Dona Maria! Que bom te ver! É ótimo que esteja buscando ajuda para organizar seus remédios, isso é fundamental para sua saúde. \n\nPara te ajudar a lembrar, vamos começar a construir uma rotina. Pa",
+              "mem0_tokens": 278,
+              "mem0_latency_ms": 5419.975996017456,
+              "mem0_memories": 0,
+              "cortex_response": "Olá, Dona Maria! Que bom te ver. Vejo que precisa de ajuda para lembrar seus remédios. Sem problemas, vamos ver como podemos organizar isso. O que exatamente está te causando dificuldade com a lembran",
+              "cortex_tokens": 303,
+              "cortex_latency_ms": 3785.789728164673,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Olá Dona Maria! Claro, vou te ajudar. Qual sua condição de saúde?",
+              "baseline_response": "Olá Dona Maria! Como assistente virtual, eu não tenho informações sobre sua condição de saúde. Essa é uma informação pessoal e importante que só você pode fornecer.\n\nEu posso te ajudar a organizar seu",
+              "baseline_tokens": 302,
+              "baseline_latency_ms": 2469.0027236938477,
+              "baseline_memories": 0,
+              "rag_response": "Olá, Dona Maria! Claro, vou te ajudar. Qual sua condição de saúde?\n\nEssa é uma ótima pergunta! Para que eu possa te ajudar a organizar seus remédios de forma mais eficaz, preciso saber qual a sua cond",
+              "rag_tokens": 444,
+              "rag_latency_ms": 3267.7369117736816,
+              "rag_memories": 1,
+              "mem0_response": "Olá, Dona Maria! Que bom que você quer me ajudar! \n\nEu lembro que você é Dona Maria e que está buscando ajuda para organizar seus remédios. \n\nQuanto à sua pergunta, qual é a sua condição de saúde? É i",
+              "mem0_tokens": 444,
+              "mem0_latency_ms": 3014.3942832946777,
+              "mem0_memories": 1,
+              "cortex_response": "Olá, Dona Maria! Que bom te ver! Vejo que precisa de ajuda para lembrar seus remédios. Sem problemas, vamos ver como podemos organizar isso. O que exatamente está te causando dificuldade com a lembran",
+              "cortex_tokens": 474,
+              "cortex_latency_ms": 3818.584203720093,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Tenho acompanhamento geral. Tomo Medicamento A de manhã e B à noite.",
+              "baseline_response": "Ok, Dona Maria! Então você toma:\n\n*   **Medicamento A:** de manhã\n*   **Medicamento B:** à noite\n\nPara te ajudar melhor, preciso saber:\n\n*   **Qual a dose de cada um?** (Ex: 1 comprimido de A, 2 cápsu",
+              "baseline_tokens": 448,
+              "baseline_latency_ms": 3738.776922225952,
+              "baseline_memories": 0,
+              "rag_response": "Ótimo, Dona Maria! Que bom saber que você tem acompanhamento geral e toma Medicamento A de manhã e Medicamento B à noite. \n\nAgora que já temos essas informações, podemos começar a organizar seus lembr",
+              "rag_tokens": 665,
+              "rag_latency_ms": 4688.1422996521,
+              "rag_memories": 2,
+              "mem0_response": "Olá, Dona Maria! Que bom saber! Medicamento A de manhã e B à noite – isso já é um ótimo começo! \n\nSó para ter certeza de que estou tudo certo, poderia me dizer:\n\n*   **Qual é o nome de cada um dos med",
+              "mem0_tokens": 696,
+              "mem0_latency_ms": 5438.86923789978,
+              "mem0_memories": 2,
+              "cortex_response": "Entendi, Dona Maria. Então você toma o Medicamento A pela manhã e o Medicamento B à noite. Vamos tentar organizar isso para que fique mais fácil de lembrar. Você gostaria de criar uma lista com os hor",
+              "cortex_tokens": 566,
+              "cortex_latency_ms": 4569.445610046387,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 963,
+            "rag": 1388,
+            "mem0": 1418,
+            "cortex": 1343
+          },
+          "total_latency": {
+            "baseline": 10684.711694717407,
+            "rag": 13230.958938598633,
+            "mem0": 13873.239517211914,
+            "cortex": 12173.819541931152
+          }
+        },
+        {
+          "session_id": 1,
+          "is_returning_user": true,
+          "messages": [
+            {
+              "user_message": "Olá, sou eu de novo. Você lembra de mim?",
+              "baseline_response": "Olá! Sim, lembra! É ótimo te ver de novo. Como posso ajudar você hoje?",
+              "baseline_tokens": 83,
+              "baseline_latency_ms": 1413.4864807128906,
+              "baseline_memories": 0,
+              "rag_response": "Olá, Dona Maria! Claro que me lembro de você! Que bom que procurou ajuda novamente. Como posso te ajudar hoje?",
+              "rag_tokens": 280,
+              "rag_latency_ms": 1894.4947719573975,
+              "rag_memories": 3,
+              "mem0_response": "Olá, Dona Maria! Que bom te ver de novo! Claro que me lembro, você está buscando ajuda para lembrar seus remédios, não é mesmo? 😊",
+              "mem0_tokens": 283,
+              "mem0_latency_ms": 1753.6306381225586,
+              "mem0_memories": 3,
+              "cortex_response": "Olá! Sim, Maria, lembro de você! Você estava procurando ajuda para organizar seus medicamentos, certo? Estávamos avaliando algumas opções de organização e como você poderia precisar de alguma informaç",
+              "cortex_tokens": 455,
+              "cortex_latency_ms": 3280.975103378296,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Anotado! acompanhamento geral, Medicamento A manhã, B noite. Quer que eu te lembre nos horários?",
+              "baseline_response": "Ótimo! Anotado:\n\n*   **Medicamento A:** Manhã\n*   **Medicamento B:** Noite\n\nDeseja que eu te lembre dos horários para tomar os medicamentos? Se sim, em que horários você gostaria de ser lembrado?",
+              "baseline_tokens": 179,
+              "baseline_latency_ms": 3091.3045406341553,
+              "baseline_memories": 0,
+              "rag_response": "Que bom que anotou, Dona Maria! Sim, adoraria te lembrar dos horários para tomar seus Medicamentos A de manhã e B à noite. Para que eu possa te ajudar da melhor forma, qual seria a melhor forma de lem",
+              "rag_tokens": 380,
+              "rag_latency_ms": 2554.6789169311523,
+              "rag_memories": 3,
+              "mem0_response": "Que ótimo que você anotou, Dona Maria! Medicamento A de manhã e B à noite – isso já é um ótimo começo! Sim, adoraria te lembrar nos horários. Que tal começarmos com o Medicamento A pela manhã? Quer qu",
+              "mem0_tokens": 379,
+              "mem0_latency_ms": 2685.051202774048,
+              "mem0_memories": 4,
+              "cortex_response": "Ótimo! Então, vamos confirmar: Medicamento A pela manhã e Medicamento B à noite. Que bom que chegamos a um acordo! \n\nGostaria que eu te lembrasse nos horários? Podemos definir os horários exatos para ",
+              "cortex_tokens": 518,
+              "cortex_latency_ms": 2620.18084526062,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Sim, por favor! Às vezes esqueço.",
+              "baseline_response": "Sem problemas! Para te ajudar a não esquecer, me diga:\n\n*   **Medicamento A:** À que horas você toma de manhã?\n*   **Medicamento B:** À que horas você toma à noite?",
+              "baseline_tokens": 246,
+              "baseline_latency_ms": 2165.1318073272705,
+              "baseline_memories": 0,
+              "rag_response": "Perfeito, Dona Maria! Entendo que às vezes esquece, então vamos configurar um lembrete para o Medicamento A de manhã e o Medicamento B à noite. Para que eu possa te lembrar, qual o horário exato em qu",
+              "rag_tokens": 484,
+              "rag_latency_ms": 3118.042469024658,
+              "rag_memories": 3,
+              "mem0_response": "Perfeito, Dona Maria! Anotei: “Lembrete para tomar o Medicamento A às 8h”. Que ótimo que você anotou, isso ajuda muito! 😊 Quer que eu te envie um lembrete agora mesmo?",
+              "mem0_tokens": 451,
+              "mem0_latency_ms": 2397.428274154663,
+              "mem0_memories": 3,
+              "cortex_response": "Sem problemas! Para garantir que você não se esqueça, podemos definir um lembrete para o Medicamento A às 8h da manhã e para o Medicamento B às 20h (8 da noite). Isso seria suficiente para você?",
+              "cortex_tokens": 644,
+              "cortex_latency_ms": 3693.6585903167725,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 508,
+            "rag": 1144,
+            "mem0": 1113,
+            "cortex": 1617
+          },
+          "total_latency": {
+            "baseline": 6669.922828674316,
+            "rag": 7567.216157913208,
+            "mem0": 6836.1101150512695,
+            "cortex": 9594.814538955688
+          }
+        }
+      ]
+    },
+    {
+      "domain": "financial",
+      "user_id": "user_financial",
+      "consolidated": true,
+      "sessions": [
+        {
+          "session_id": 0,
+          "is_returning_user": false,
+          "messages": [
+            {
+              "user_message": "Olá! Sou Eduardo, ganho R$28,000/mês e quero juntar para educação dos filhos.",
+              "baseline_response": "Olá Eduardo, muito bom saber que você tem uma renda sólida e está planejando o futuro dos filhos! R$28.000 por mês é uma ótima base para começar a poupar para a educação deles.\n\nPara te ajudar a defin",
+              "baseline_tokens": 301,
+              "baseline_latency_ms": 6279.125690460205,
+              "baseline_memories": 0,
+              "rag_response": "Olá Eduardo, tudo bem? Que ótimo que você está pensando em investir no futuro dos seus filhos! R$28.000 de salário é uma excelente base para começar a planejar a educação deles.\n\nPara te ajudar a dire",
+              "rag_tokens": 461,
+              "rag_latency_ms": 9388.17572593689,
+              "rag_memories": 0,
+              "mem0_response": "Olá Eduardo, é um prazer te conhecer! R$28.000 por mês é uma excelente base para começar a planejar a educação dos seus filhos. Que bom que você já tem um objetivo claro. \n\nCom essa renda, você tem ba",
+              "mem0_tokens": 374,
+              "mem0_latency_ms": 7488.263130187988,
+              "mem0_memories": 0,
+              "cortex_response": "Olá Eduardo, que bom te ver! Entendo que você é um profissional que recebe R$28.000 por mês e está buscando formas de juntar dinheiro para investir na educação dos seus filhos. Isso é um objetivo muit",
+              "cortex_tokens": 359,
+              "cortex_latency_ms": 5031.200885772705,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Olá Eduardo! Meta de educação dos filhos é muito importante. Qual seu perfil de risco: conservador, moderado ou arrojado?",
+              "baseline_response": "Olá! Essa é uma ótima pergunta. Como um modelo de linguagem, eu não tenho perfil de risco pessoal. Mas, para te ajudar a entender as opções, eu opero com um perfil de risco **moderado**.\n\nIsso signifi",
+              "baseline_tokens": 476,
+              "baseline_latency_ms": 4336.50803565979,
+              "baseline_memories": 0,
+              "rag_response": "Olá Eduardo! Meta de educação dos filhos é muito importante. Meu perfil de risco é moderado. Acredito em um equilíbrio entre segurança e potencial de retorno, buscando investimentos que me permitam al",
+              "rag_tokens": 641,
+              "rag_latency_ms": 3228.881597518921,
+              "rag_memories": 1,
+              "mem0_response": "Olá Eduardo! Concordo plenamente, meta de educação dos filhos é fundamental.\n\nEm relação ao seu perfil de risco, considerando sua renda de R$28.000/mês e seu foco na educação dos filhos, eu diria que ",
+              "mem0_tokens": 741,
+              "mem0_latency_ms": 7297.40309715271,
+              "mem0_memories": 1,
+              "cortex_response": "Olá Eduardo, como sabemos que você tem um foco em educação dos filhos, e considerando sua renda de R$28.000, vamos pensar em como otimizar esse investimento. Para isso, preciso entender melhor sua tol",
+              "cortex_tokens": 526,
+              "cortex_latency_ms": 3455.491542816162,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Sou arrojado.",
+              "baseline_response": "Entendido, Eduardo! Com um perfil de risco arrojado, podemos explorar opções de investimento que tenham um potencial de retorno maior, mas que também possam apresentar maior volatilidade.\n\nAlgumas opç",
+              "baseline_tokens": 754,
+              "baseline_latency_ms": 7475.3851890563965,
+              "baseline_memories": 0,
+              "rag_response": "Entendo, Eduardo! Um perfil arrojado é ótimo para buscar maiores retornos a longo prazo. Isso significa que você está disposto a correr um pouco mais de risco em troca de chances de obter rendimentos ",
+              "rag_tokens": 832,
+              "rag_latency_ms": 5539.9487018585205,
+              "rag_memories": 1,
+              "mem0_response": "Excelente, Eduardo! Que bom saber que você se considera um investidor arrojado. Com R$28.000/mês, é ótimo ver que você busca um potencial de retorno mais elevado para a educação dos seus filhos.\n\nUm p",
+              "mem0_tokens": 1184,
+              "mem0_latency_ms": 11505.497455596924,
+              "mem0_memories": 1,
+              "cortex_response": "Entendi, Eduardo! Com um perfil arrojado e uma renda de R$28.000, podemos explorar algumas opções de investimento com maior potencial de retorno, mas também com maior volatilidade. Isso significa que ",
+              "cortex_tokens": 662,
+              "cortex_latency_ms": 4175.451040267944,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 1531,
+            "rag": 1934,
+            "mem0": 2299,
+            "cortex": 1547
+          },
+          "total_latency": {
+            "baseline": 18091.01891517639,
+            "rag": 18157.00602531433,
+            "mem0": 26291.163682937622,
+            "cortex": 12662.143468856812
+          }
+        },
+        {
+          "session_id": 1,
+          "is_returning_user": true,
+          "messages": [
+            {
+              "user_message": "Olá, sou eu de novo. Você lembra de mim?",
+              "baseline_response": "Olá! Sim, me lembrei de você! É bom falar com você novamente. Como posso te ajudar hoje?",
+              "baseline_tokens": 88,
+              "baseline_latency_ms": 1448.1518268585205,
+              "baseline_memories": 0,
+              "rag_response": "Olá Eduardo! Sim, claro que me lembro! É ótimo falar com você novamente. Como posso ajudar hoje?",
+              "rag_tokens": 280,
+              "rag_latency_ms": 1509.190559387207,
+              "rag_memories": 3,
+              "mem0_response": "Olá Eduardo! Que bom te ver de novo! Claro que me lembro, você é o Eduardo que ganha R$28.000 por mês e quer juntar para a educação dos filhos. Como você está se sentindo hoje?",
+              "mem0_tokens": 311,
+              "mem0_latency_ms": 2242.547035217285,
+              "mem0_memories": 3,
+              "cortex_response": "Olá! Sim, claro que me lembro de você, Eduardo. Como está indo sua busca por ideias para juntar dinheiro para a educação dos seus filhos? Ainda está explorando opções, certo?",
+              "cortex_tokens": 437,
+              "cortex_latency_ms": 3233.515977859497,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Perfeito! Para educação dos filhos com perfil arrojado, recomendo: 30% renda fixa, 50% multimercado, 20% ações. Quanto pode investir por mês?",
+              "baseline_response": "Essa alocação (30% renda fixa, 50% multimercado, 20% ações) é uma boa para um perfil arrojado e com foco no longo prazo.\n\nQuanto pode investir por mês depende muito da sua renda e objetivos. Mas, para",
+              "baseline_tokens": 328,
+              "baseline_latency_ms": 5560.73260307312,
+              "baseline_memories": 0,
+              "rag_response": "Entendo, Eduardo! Com um perfil arrojado e R$28.000 de renda mensal, a recomendação de 30% em renda fixa, 50% em multimercado e 20% em ações parece excelente para buscar maiores retornos a longo prazo",
+              "rag_tokens": 520,
+              "rag_latency_ms": 5523.439884185791,
+              "rag_memories": 3,
+              "mem0_response": "Excelente, Eduardo! Concordo que, com seu perfil arrojado e seus objetivos, essa alocação é uma ótima base. \n\nConsiderando seus R$28.000 mensais, com 30% em renda fixa, 50% em multimercado e 20% em aç",
+              "mem0_tokens": 495,
+              "mem0_latency_ms": 4370.106220245361,
+              "mem0_memories": 4,
+              "cortex_response": "Essa é uma ótima abordagem, Eduardo! Essa alocação - 30% em renda fixa, 50% em multimercado e 20% em ações - parece bem adequada para um perfil arrojado e com o objetivo de investir para a educação do",
+              "cortex_tokens": 669,
+              "cortex_latency_ms": 6201.606750488281,
+              "cortex_memories": 0
+            },
+            {
+              "user_message": "Consigo R$2.000 por mês.",
+              "baseline_response": "Com R$2.000 por mês e essa alocação (30% renda fixa, 50% multimercado, 20% ações), você pode começar a investir!\n\n**Sugestão:**\n\n*   **Renda Fixa (30%):** R$600 – Invista em títulos indexados à inflaç",
+              "baseline_tokens": 582,
+              "baseline_latency_ms": 7464.923143386841,
+              "baseline_memories": 0,
+              "rag_response": "Ótimo, Eduardo! R$2.000 por mês é um excelente começo e demonstra seu comprometimento com o futuro dos seus filhos. Com essa quantia, podemos seguir com a sua alocação recomendada de 30% em renda fixa",
+              "rag_tokens": 726,
+              "rag_latency_ms": 6810.6818199157715,
+              "rag_memories": 2,
+              "mem0_response": "Entendo, Eduardo! R$2.000 por mês é um excelente ponto de partida, especialmente com a nossa estratégia arrojada. Com essa quantia, podemos ajustar a alocação para melhor se adequar ao seu orçamento.\n",
+              "mem0_tokens": 720,
+              "mem0_latency_ms": 7034.512758255005,
+              "mem0_memories": 4,
+              "cortex_response": "Ótimo, R$2.000 por mês é um excelente ponto de partida! Com essa quantia e a alocação que propusemos – 30% em renda fixa, 50% em multimercado e 20% em ações – podemos começar a traçar um plano.\n\nConsi",
+              "cortex_tokens": 790,
+              "cortex_latency_ms": 6000.282526016235,
+              "cortex_memories": 0
+            }
+          ],
+          "total_tokens": {
+            "baseline": 998,
+            "rag": 1526,
+            "mem0": 1526,
+            "cortex": 1896
+          },
+          "total_latency": {
+            "baseline": 14473.807573318481,
+            "rag": 13843.31226348877,
+            "mem0": 13647.166013717651,
+            "cortex": 15435.405254364014
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_conversations": 8,
+    "total_sessions": 16,
+    "total_messages": 48,
+    "consolidated_conversations": 8,
+    "baseline_total_tokens": 14005,
+    "rag_total_tokens": 23570,
+    "mem0_total_tokens": 24828,
+    "cortex_total_tokens": 24962,
+    "rag_vs_baseline_pct": 68.3,
+    "mem0_vs_baseline_pct": 77.28,
+    "cortex_vs_baseline_pct": 78.24,
+    "rag_total_memories_retrieved": 93,
+    "mem0_total_memories_retrieved": 110,
+    "cortex_total_memories_retrieved": 0
+  }
+}

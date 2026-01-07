@@ -21,6 +21,7 @@ Uso:
 
 import argparse
 import json
+import logging
 import os
 import sys
 import time
@@ -28,6 +29,14 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+# Silencia logs verbosos do LiteLLM
+logging.getLogger("LiteLLM").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+# Força flush imediato para ver output em tempo real
+import functools
+print = functools.partial(print, flush=True)
 
 # Adiciona paths
 benchmark_path = Path(__file__).parent
@@ -42,7 +51,7 @@ from agents import BaselineAgent
 from cortex_agent import CortexAgent
 from rag_agent import RAGAgent
 from mem0_agent import Mem0Agent
-from conversation_generator import ConversationGenerator, BENCHMARK_SCENARIOS
+from conversation_generator import ConversationGenerator
 
 # Import SleepRefiner
 try:
@@ -234,11 +243,11 @@ class FullComparisonBenchmark:
         start_time = time.time()
         
         if agent_name == "baseline":
-            response = agent.get_response(user_message)
+            response = agent.process_message(user_message)
             return AgentResult(
                 response=response.content,
                 tokens=response.total_tokens,
-                latency_ms=(time.time() - start_time) * 1000,
+                latency_ms=response.response_time_ms,
             )
         
         elif agent_name == "rag":
@@ -264,11 +273,11 @@ class FullComparisonBenchmark:
         elif agent_name == "cortex":
             response = agent.process_message(user_message)
             return AgentResult(
-                response=response.response,
+                response=response.content,
                 tokens=response.total_tokens,
-                latency_ms=response.total_time_ms,
-                context_used=response.cortex_context or "",
-                memories_retrieved=response.entities_retrieved + response.episodes_retrieved,
+                latency_ms=response.response_time_ms,
+                context_used=response.context_from_memory or "",
+                memories_retrieved=response.memory_entities + response.memory_episodes,
             )
     
     def run_conversation(
@@ -298,7 +307,14 @@ class FullComparisonBenchmark:
         )
         
         # Gera mensagens para o domínio
-        messages = self._conversation_gen.generate_conversation(domain)
+        conversations = self._conversation_gen.generate_domain(domain, count=1, sessions=num_sessions)
+        
+        # Extrai mensagens de todas as sessões
+        messages = []
+        if conversations:
+            for session in conversations[0].sessions:
+                for msg in session.messages:
+                    messages.append({"role": msg.role, "content": msg.content})
         
         for session_idx in range(num_sessions):
             is_returning = session_idx > 0
@@ -307,9 +323,13 @@ class FullComparisonBenchmark:
                 print(f"\n📍 {domain} - Sessão {session_idx + 1}/{num_sessions} {'(volta)' if is_returning else ''}")
             
             # Nova sessão para cada agente
-            for agent in self._agents.values():
+            for agent_name, agent in self._agents.items():
                 if hasattr(agent, 'new_session'):
-                    agent.new_session(user_id=user_id)
+                    try:
+                        agent.new_session(user_id=user_id)
+                    except TypeError:
+                        # BaselineAgent não aceita user_id
+                        agent.new_session()
             
             session = SessionResult(
                 session_id=session_idx,
@@ -383,7 +403,7 @@ class FullComparisonBenchmark:
             sessions_per_conversation: Sessões por conversa (2+ testa volta)
             consolidate: Se deve consolidar entre sessões
         """
-        domains = domains or list(BENCHMARK_SCENARIOS.keys())
+        domains = domains or list(ConversationGenerator.GENERATORS.keys())
         
         self.results.config = {
             "domains": domains,
@@ -537,7 +557,7 @@ def main():
     
     # Confirmação
     if not args.yes:
-        total_calls = (len(domains or BENCHMARK_SCENARIOS) * conversations * sessions * 
+        total_calls = (len(domains or ConversationGenerator.GENERATORS) * conversations * sessions * 
                       len(FullComparisonBenchmark.AGENTS) * 3)  # ~3 msgs/sessão
         print(f"\n⚠️ Este benchmark fará aproximadamente {total_calls} chamadas LLM.")
         response = input("Continuar? (s/N): ")

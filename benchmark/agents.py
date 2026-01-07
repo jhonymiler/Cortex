@@ -26,6 +26,10 @@ import yaml
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("cortex.benchmark")
 
+# Silencia logs verbosos do LiteLLM
+logging.getLogger("LiteLLM").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 # Adiciona SDK ao path
 sdk_path = Path(__file__).parent.parent / "sdk" / "python"
 sys.path.insert(0, str(sdk_path))

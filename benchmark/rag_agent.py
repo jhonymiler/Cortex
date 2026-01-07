@@ -24,7 +24,10 @@ except ImportError:
     CHROMADB_AVAILABLE = False
     chromadb = None
 
-from benchmark.agents import call_llm_with_retry
+try:
+    from benchmark.agents import call_llm_with_retry
+except ImportError:
+    from agents import call_llm_with_retry
 
 
 @dataclass
