@@ -297,9 +297,12 @@ class FullComparisonBenchmark:
         namespace = f"bench_{domain}_{datetime.now().strftime('%H%M%S')}"
         user_id = f"user_{domain}"
         
-        # Limpa e configura namespace
-        self._clear_all_memories(namespace)
+        # PRIMEIRO configura o novo namespace, DEPOIS limpa
+        # (cada namespace é único, então não há dados para limpar)
         self._set_namespace(namespace)
+        # Limpa apenas RAG e Mem0 (namespace novo do Cortex já está vazio)
+        self._agents["rag"].clear_memory()
+        self._agents["mem0"].clear_memory()
         
         conversation = ConversationResult(
             domain=domain,
@@ -475,6 +478,10 @@ class FullComparisonBenchmark:
         
         total_conversations = len(domains) * conversations_per_domain
         
+        checkpoint_dir = benchmark_path / "results"
+        checkpoint_dir.mkdir(exist_ok=True)
+        checkpoint_file = checkpoint_dir / f"full_comparison_{datetime.now().strftime('%Y%m%d_%H%M%S')}.checkpoint.json"
+        
         for domain_idx, domain in enumerate(domains):
             print(f"\n{'─' * 40}")
             print(f"📂 Domínio: {domain} ({domain_idx + 1}/{len(domains)})")
@@ -486,8 +493,15 @@ class FullComparisonBenchmark:
                     consolidate_between_sessions=consolidate,
                 )
                 self.results.conversations.append(conversation)
+            
+            # Checkpoint após cada domínio (evita perda de dados)
+            self._calculate_summary()
+            with open(checkpoint_file, "w") as f:
+                json.dump(self.results.to_dict(), f, indent=2, ensure_ascii=False)
+            if self.verbose:
+                print(f"   💾 Checkpoint salvo ({len(self.results.conversations)} conversas)")
         
-        # Calcula sumário
+        # Calcula sumário final
         self._calculate_summary()
         
         return self.results
@@ -630,6 +644,34 @@ def main():
     print(f"\n📁 Resultados salvos em: {output_path}")
     
     benchmark.print_summary()
+    
+    # Verificação final de integridade
+    print("\n" + "=" * 60)
+    print(" 🔍 VERIFICAÇÃO DE INTEGRIDADE")
+    print("=" * 60)
+    
+    # Verifica grafos salvos
+    data_dir = Path(__file__).parent.parent / "data"
+    saved_graphs = list(data_dir.glob("bench_*/memory_graph.json"))
+    valid_graphs = [g for g in saved_graphs if g.stat().st_size > 100]
+    
+    print(f"\n📊 Grafos de Memória:")
+    print(f"   Total de pastas: {len(list(data_dir.glob('bench_*')))}")
+    print(f"   Com dados: {len(valid_graphs)}")
+    
+    if len(valid_graphs) == 0:
+        print("   ⚠️  ALERTA: Nenhum grafo com dados! Verifique bug de persistência.")
+    else:
+        print(f"   ✅ Grafos salvos corretamente")
+    
+    # Verifica JSON de resultado
+    if Path(output_path).exists():
+        size = Path(output_path).stat().st_size
+        print(f"\n📄 Arquivo de Resultado:")
+        print(f"   Tamanho: {size:,} bytes")
+        print(f"   ✅ Salvo com sucesso")
+    
+    print("\n" + "=" * 60)
 
 
 if __name__ == "__main__":

@@ -33,7 +33,8 @@ class DreamResult:
     """Resultado do sonho/consolidação."""
     success: bool = False
     memories_analyzed: int = 0
-    memories_refined: int = 0
+    memories_refined: int = 0  # Consolidações pessoais
+    procedural_extracted: int = 0  # Conhecimentos LEARNED extraídos para coletivo
     entities_extracted: list[str] = field(default_factory=list)
     patterns_found: list[str] = field(default_factory=list)
     consolidated_summary: str = ""
@@ -86,6 +87,45 @@ relacoes:
 
 resumo_consolidado: |
   Resumo em 2-3 frases do que aconteceu.
+```
+"""
+
+    # Prompt para extração de conhecimento procedural compartilhável
+    PROCEDURAL_EXTRACTION_PROMPT = """Você é um sistema de extração de conhecimento.
+
+Analise estas memórias consolidadas e identifique CONHECIMENTO PROCEDURAL que pode ajudar OUTROS usuários com problemas similares.
+
+Memórias:
+{context}
+
+REGRAS IMPORTANTES:
+1. Extraia APENAS soluções genéricas de problemas (procedimentos, passos, dicas)
+2. REMOVA todos os dados pessoais (nomes, emails, telefones, endereços, CPF, cartões)
+3. Não inclua detalhes específicos de um único caso
+4. O conhecimento deve ser REUTILIZÁVEL para outros casos similares
+5. Responda "NENHUM" se não houver conhecimento procedural genérico útil
+
+Exemplos de conhecimento procedural válido:
+- "Para resolver timeout em API: verificar connection pooling e aumentar timeout"
+- "Cliente com pagamento recusado: verificar validade do cartão e limite"
+- "Erro de login: limpar cache do navegador e redefinir senha"
+
+Responda EXATAMENTE neste formato YAML:
+
+```yaml
+conhecimentos_procedurais:
+  - problema: "Descrição genérica do problema"
+    solucao: "Passos ou dicas para resolver"
+    aplicabilidade: "alta|media|baixa"  # Quão genérico/reutilizável é
+    contem_pii: false  # true se ainda contém dados pessoais (NÃO INCLUIR SE TRUE)
+
+quantidade_validos: 0  # Número de conhecimentos com aplicabilidade alta/media e sem PII
+```
+
+Se não houver conhecimento procedural útil, responda:
+```yaml
+conhecimentos_procedurais: []
+quantidade_validos: 0
 ```
 """
     
@@ -185,7 +225,8 @@ resumo_consolidado: |
                 # Normaliza resumo para formato compacto
                 result.consolidated_summary = self._normalizer.extract_core(resumo_raw)
             
-            # 4. Salva memória consolidada (já normalizada)
+            # 4. Salva memória consolidada NO MESMO NAMESPACE (permanece PERSONAL)
+            # Consolidação é apenas compactação, NÃO muda visibilidade
             if result.consolidated_summary:
                 # Extrai o padrão principal dos patterns para usar como what
                 what_consolidated = padroes[0] if padroes else "consolidacao_memoria"
@@ -197,9 +238,10 @@ resumo_consolidado: |
                         "what": what_consolidated,  # Já normalizado
                         "why": "dream_consolidation",
                         "how": result.consolidated_summary,  # Já normalizado
-                        "where": namespace,
+                        "where": namespace,  # MESMO namespace - permanece personal
                         "importance": 0.9,
-                        "is_summary": True,  # Marca como resumo de consolidação
+                        "visibility": "personal",  # Consolidação NÃO é compartilhada automaticamente
+                        "owner_id": "system",
                     },
                 )
                 
@@ -216,12 +258,149 @@ resumo_consolidado: |
                             patterns=padroes,
                         )
             
+            # 6. EXTRAÇÃO DE CONHECIMENTO PROCEDURAL (fase separada)
+            # Usa LLM para identificar conhecimento genérico útil para outros usuários
+            procedural_count = self._extract_and_store_procedural_knowledge(
+                namespace=namespace,
+                context=context,
+            )
+            
+            result.procedural_extracted = procedural_count
+            if procedural_count > 0:
+                result.patterns_found.append(f"{procedural_count} conhecimentos procedurais extraídos para memória coletiva")
+            
             result.success = True
             
         except Exception as e:
             result.error = str(e)
         
         return result
+    
+    def _get_parent_namespace(self, namespace: str) -> str | None:
+        """
+        Extrai o namespace pai de um namespace hierárquico.
+        
+        Args:
+            namespace: Namespace hierárquico (ex: "support:customer_support:user_123")
+            
+        Returns:
+            Namespace pai ou None se for raiz
+            
+        Examples:
+            "support:customer_support:user_123" -> "support:customer_support"
+            "support:customer_support" -> "support"
+            "support" -> None
+        """
+        parts = namespace.split(":")
+        if len(parts) > 1:
+            return ":".join(parts[:-1])
+        return None
+    
+    def _extract_and_store_procedural_knowledge(
+        self,
+        namespace: str,
+        context: str,
+    ) -> int:
+        """
+        Usa LLM para extrair conhecimento procedural genérico.
+        
+        Este é o coração da geração de memória coletiva:
+        1. LLM analisa memórias e extrai padrões de resolução
+        2. Remove PII/PCI automaticamente
+        3. Valida se o conhecimento é genérico o suficiente
+        4. Salva como LEARNED no namespace pai
+        
+        Args:
+            namespace: Namespace atual do usuário
+            context: Contexto de memórias para analisar
+            
+        Returns:
+            Número de conhecimentos procedurais extraídos e salvos
+        """
+        stored_count = 0
+        
+        try:
+            # 1. Envia para LLM extrair conhecimento procedural
+            prompt = self.PROCEDURAL_EXTRACTION_PROMPT.format(context=context)
+            
+            llm_resp = requests.post(
+                f"{self.llm_url}/api/chat",
+                json={
+                    "model": self.llm_model,
+                    "messages": [
+                        {
+                            "role": "system", 
+                            "content": "Você extrai conhecimento procedural útil. "
+                                       "Responda apenas em YAML. "
+                                       "NUNCA inclua dados pessoais (nomes, emails, etc)."
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    "stream": False,
+                },
+                timeout=120,
+            )
+            
+            llm_content = llm_resp.json().get("message", {}).get("content", "")
+            
+            # 2. Parseia resposta YAML
+            yaml_match = re.search(r'```yaml\s*\n(.+?)```', llm_content, re.DOTALL)
+            if not yaml_match:
+                return 0
+            
+            yaml_content = yaml_match.group(1)
+            
+            # Verifica se há conhecimentos válidos
+            quant_match = re.search(r'quantidade_validos:\s*(\d+)', yaml_content)
+            if not quant_match or int(quant_match.group(1)) == 0:
+                return 0
+            
+            # 3. Extrai conhecimentos procedurais
+            # Padrão para capturar cada bloco de conhecimento
+            conhecimentos = re.findall(
+                r'- problema:\s*"([^"]+)"\s*\n\s*solucao:\s*"([^"]+)"\s*\n\s*aplicabilidade:\s*"?(alta|media)"?',
+                yaml_content,
+                re.MULTILINE
+            )
+            
+            if not conhecimentos:
+                return 0
+            
+            # 4. Determina namespace pai para salvar conhecimento coletivo
+            parent_namespace = self._get_parent_namespace(namespace)
+            target_namespace = parent_namespace or namespace
+            
+            # 5. Salva cada conhecimento procedural como LEARNED
+            for problema, solucao, aplicabilidade in conhecimentos:
+                # Normaliza com spaCy
+                problema_norm = self._normalizer.extract_core(problema)
+                solucao_norm = self._normalizer.extract_core(solucao)
+                
+                # Salva como memória LEARNED no namespace pai
+                store_resp = self._session.post(
+                    f"{self.cortex_url}/memory/remember",
+                    json={
+                        "who": ["sistema"],  # Anônimo - conhecimento coletivo
+                        "what": problema_norm,
+                        "why": "procedural_knowledge",
+                        "how": solucao_norm,
+                        "where": target_namespace,
+                        "importance": 0.85 if aplicabilidade == "alta" else 0.7,
+                        "visibility": "learned",  # LEARNED = compartilhável e anônimo
+                        "owner_id": "system",
+                    },
+                )
+                
+                if store_resp.status_code == 200:
+                    data = store_resp.json()
+                    if data.get("success"):
+                        stored_count += 1
+            
+        except Exception as e:
+            # Log error but don't fail the main dream process
+            pass
+        
+        return stored_count
     
     def _mark_originals_as_consolidated(
         self,

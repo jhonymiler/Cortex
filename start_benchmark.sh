@@ -158,7 +158,16 @@ echo ""
 BENCHMARK_ARGS="--ollama-url $OLLAMA_URL --model $OLLAMA_MODEL -y"
 BENCHMARK_SUCCESS=0
 
-if [ "$1" == "--compare" ]; then
+if [ "$1" == "--collective" ]; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🧠 BENCHMARK DE MEMÓRIA COLETIVA E DECAIMENTO"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "   Testa: Isolamento, LEARNED sharing, Decaimento"
+    echo ""
+    python benchmark/collective_memory_benchmark.py && BENCHMARK_SUCCESS=1
+
+elif [ "$1" == "--compare" ]; then
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "🔬 BENCHMARK DE COMPARAÇÃO COMPLETA"
@@ -176,11 +185,23 @@ if [ "$1" == "--compare" ]; then
     fi
     
 elif [ "$1" == "--full" ]; then
-    echo "🚀 Executando benchmark COMPLETO com CortexAgent..."
-    python run_lightweight_benchmark.py --full $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
+    if [ -n "$2" ]; then
+        echo "🚀 Executando benchmark FULL COMPARISON para domínio: $2"
+        echo "   Inclui: Baseline, RAG, Mem0, Cortex + DreamAgent"
+        python benchmark/full_comparison_benchmark.py --full --domains "$2" -y && BENCHMARK_SUCCESS=1
+    else
+        echo "🚀 Executando benchmark COMPLETO com CortexAgent..."
+        python run_lightweight_benchmark.py --full $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
+    fi
 elif [ "$1" == "--quick" ]; then
-    echo "🚀 Executando benchmark RÁPIDO com CortexAgent..."
-    python run_lightweight_benchmark.py --quick $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
+    if [ -n "$2" ]; then
+        echo "🚀 Executando benchmark QUICK para domínio: $2"
+        echo "   Inclui: Baseline vs Cortex"
+        python run_lightweight_benchmark.py --domain "$2" --conversations 1 $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
+    else
+        echo "🚀 Executando benchmark RÁPIDO com CortexAgent..."
+        python run_lightweight_benchmark.py --quick $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
+    fi
 elif [ "$IS_RESUME" = true ]; then
     echo "🚀 Continuando benchmark..."
     python run_lightweight_benchmark.py "$@" $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1

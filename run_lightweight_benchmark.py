@@ -229,11 +229,11 @@ Exemplos:
     print(f"\n⏱️  Tempo estimado: {est_total_time // 60} min")
     
     if not args.yes:
-    try:
-        input("\n⏸️  Pressione ENTER para iniciar (Ctrl+C para cancelar)...")
+        try:
+            input("\n⏸️  Pressione ENTER para iniciar (Ctrl+C para cancelar)...")
         except (KeyboardInterrupt, EOFError):
-        print("\n\n❌ Cancelado.")
-        return
+            print("\n\n❌ Cancelado.")
+            return
     
     # Cria runner
     runner = LightweightBenchmarkRunner(

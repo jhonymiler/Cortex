@@ -234,17 +234,10 @@ class MemoryNormalizer:
     
     def _fallback_normalize(self, text: str) -> str:
         """Fallback quando spaCy não está disponível."""
-        # Remove pontuação
-        text = re.sub(r'[^\w\s]', ' ', text)
+        from cortex.core.language import tokenize
         
-        # Stopwords básicas
-        stopwords = {
-            'o', 'a', 'os', 'as', 'um', 'uma', 'de', 'da', 'do', 'em', 'na', 'no',
-            'para', 'com', 'por', 'que', 'e', 'ou', 'se', 'seu', 'sua',
-            'the', 'a', 'an', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
-        }
-        
-        words = [w for w in text.lower().split() if w not in stopwords and len(w) > 2]
+        # Usa tokenização centralizada (já remove stopwords)
+        words = tokenize(text)
         
         result = "_".join(words[:5])
         return unidecode(result)

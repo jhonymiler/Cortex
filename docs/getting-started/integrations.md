@@ -9,10 +9,10 @@
 | Método | Melhor para | Complexidade |
 |--------|-------------|--------------|
 | [MCP](#mcp-claude-desktop) | Claude Desktop, Cursor | ⭐ Fácil |
-| [Decorator](#decorator) | Scripts Python simples | ⭐ Fácil |
+| [SDK Python](#sdk-python) | Scripts e agentes Python | ⭐ Fácil |
 | [LangChain](#langchain) | Chains existentes | ⭐⭐ Médio |
 | [CrewAI](#crewai) | Multi-agentes | ⭐⭐ Médio |
-| [Core Genérico](#core-genérico) | Controle total | ⭐⭐⭐ Avançado |
+| [Google ADK](#google-adk) | Gemini / Google Agents | ⭐⭐ Médio |
 | [REST API](#rest-api) | Qualquer linguagem | ⭐⭐⭐ Avançado |
 
 ---
@@ -65,33 +65,46 @@ Exemplo de cortex_remember:
 
 ---
 
-## Decorator
+## SDK Python
 
-O método mais simples para scripts Python:
+O método mais simples para agentes Python:
 
 ```python
-from cortex_memory import with_memory
+from cortex_memory_sdk import CortexMemorySDK
 
-@with_memory(namespace="meu_agente")
-def meu_agente(msg: str, context: str = "") -> str:
-    """
-    context: Automaticamente preenchido com memórias relevantes
-    Retorno: Armazenado automaticamente como memória
-    """
-    return f"Respondendo com contexto: {context}"
+# Cria cliente
+sdk = CortexMemorySDK(
+    namespace="support:user_123",
+    api_url="http://localhost:8000",  # ou env CORTEX_API_URL
+)
 
-# Uso
-resposta = meu_agente("Olá, sou João!")
+# Armazena memória estruturada
+sdk.remember({
+    "verb": "solicitou",
+    "subject": "carlos",
+    "object": "reembolso",
+    "modifiers": ["urgente"],
+})
+
+# Busca memórias relevantes
+result = sdk.recall("Carlos")
+print(result.to_prompt_context())
+# Output: who:carlos what:solicitou_reembolso how:urgente
 ```
 
-### Parâmetros
+### Processamento Automático
 
 ```python
-@with_memory(
-    namespace="meu_agente",        # Namespace para isolamento
-    cortex_url="http://localhost:8000",  # URL da API
-    context_window=5               # Máximo de memórias no contexto
-)
+# Tenta extrair Action do texto ou armazena como observação
+response, tipo = sdk.process("Cliente Carlos pediu reembolso")
+# tipo: "event" (se extraiu) ou "observation" (se não)
+```
+
+### Limpar Resposta
+
+```python
+# Remove marcadores [MEMORY] da resposta antes de enviar ao usuário
+clean = sdk.clean_response(response_with_memory_block)
 ```
 
 ---
@@ -101,15 +114,16 @@ resposta = meu_agente("Olá, sou João!")
 Integração plug-and-play com LangChain:
 
 ```python
-from cortex.integrations import CortexLangChainMemory
+from cortex_memory_sdk import CortexMemorySDK
+from integrations import CortexLangChainMemory
 from langchain.chains import ConversationChain
 from langchain.llms import OpenAI
 
+# Cria SDK
+sdk = CortexMemorySDK(namespace="lc_agent:user_123")
+
 # Configurar memória
-memory = CortexLangChainMemory(
-    namespace="lc_agent",
-    cortex_url="http://localhost:8000"
-)
+memory = CortexLangChainMemory(sdk=sdk)
 
 # Usar com chain
 chain = ConversationChain(
@@ -126,19 +140,6 @@ response = chain.run("Qual é meu nome?")
 # "Seu nome é Maria" - recuperado da memória!
 ```
 
-### Com Chat Models
-
-```python
-from langchain.chat_models import ChatOpenAI
-from langchain.chains import ConversationChain
-
-memory = CortexLangChainMemory(namespace="chat_agent")
-chain = ConversationChain(
-    llm=ChatOpenAI(model="gpt-4"),
-    memory=memory
-)
-```
-
 ---
 
 ## CrewAI
@@ -146,54 +147,81 @@ chain = ConversationChain(
 Memória de longo prazo para crews:
 
 ```python
-from cortex.integrations import CortexCrewAIMemory
+from cortex_memory_sdk import CortexMemorySDK
+from integrations import CortexCrewAIMemory
 from crewai import Agent, Task, Crew
 
-# Configurar memória compartilhada
-memory = CortexCrewAIMemory(namespace="minha_crew")
+# Cria SDK
+sdk = CortexMemorySDK(namespace="crew:mission_1")
+memory = CortexCrewAIMemory(sdk)
 
 # Criar agentes
-researcher = Agent(
-    role="Pesquisador",
-    goal="Encontrar informações",
-    backstory="Especialista em pesquisa"
+researcher = Agent(role="Pesquisador", goal="Encontrar informações")
+writer = Agent(role="Escritor", goal="Escrever conteúdo")
+
+# Usar memória para contexto
+task_description = memory.enrich_task_description(
+    "Pesquisar tendências de mercado"
 )
 
-writer = Agent(
-    role="Escritor",
-    goal="Escrever conteúdo",
-    backstory="Escritor experiente"
-)
+task = Task(description=task_description, agent=researcher)
 
-# Criar crew com memória
-crew = Crew(
-    agents=[researcher, writer],
-    long_term_memory=memory  # ← Cortex aqui!
-)
+# Armazenar resultado
+memory.remember_task("Pesquisa", "5 tendências encontradas", "Researcher")
+```
 
-# Executar
-result = crew.kickoff()
-# Memórias compartilhadas entre agentes!
+---
+
+## Google ADK
+
+Integração com Google Agent Development Kit:
+
+```python
+from cortex_memory_sdk import CortexMemorySDK
+from integrations import CortexADKMemory
+
+# Cria SDK
+sdk = CortexMemorySDK(namespace="adk_agent:user_123")
+memory = CortexADKMemory(sdk)
+
+# Busca contexto antes de responder
+context = memory.get_context("histórico do cliente")
+
+# Após resposta do agente
+memory.after_response(user_input, agent_response)
+
+# Limpa resposta (remove [MEMORY] se houver)
+clean = memory.clean_response(agent_response)
+```
+
+### Com Wrapper Automático
+
+```python
+# Wrapa agente para memória automática
+wrapped_agent = memory.wrap_agent(my_adk_agent)
+
+# Usa normalmente - recall/store automáticos
+response = wrapped_agent.run("Olá, sou Carlos")
 ```
 
 ---
 
 ## Core Genérico
 
-Controle total sobre o fluxo:
+Controle total sobre o fluxo com `CortexMemorySDK`:
 
 ```python
-from cortex_memory import CortexMemory
+from cortex_memory_sdk import CortexMemorySDK
 
-cortex = CortexMemory(
-    namespace="meu_agente",
-    cortex_url="http://localhost:8000",
-    context_window=10
+sdk = CortexMemorySDK(
+    namespace="meu_agente:user_123",
+    api_url="http://localhost:8000"
 )
 
 def meu_agente(user_message: str) -> str:
     # 1. Buscar memória relevante
-    context = cortex.before(user_message)
+    result = sdk.recall(user_message, limit=5)
+    context = result.to_prompt_context()
     
     # 2. Processar com seu LLM
     prompt = f"""
@@ -205,8 +233,15 @@ def meu_agente(user_message: str) -> str:
     """
     response = meu_llm.generate(prompt)
     
-    # 3. Armazenar memória
-    cortex.after(user_message, response)
+    # 3. Armazenar memória (opção A: estruturada)
+    sdk.remember({
+        "verb": "respondeu",
+        "subject": "usuario",
+        "object": "pergunta",
+    })
+    
+    # 3b. Ou opção B: process (best-effort)
+    # sdk.process(user_message)
     
     return response
 ```
@@ -215,10 +250,13 @@ def meu_agente(user_message: str) -> str:
 
 | Método | Descrição |
 |--------|-----------|
-| `before(msg)` | Busca memórias relevantes |
-| `after(msg, response)` | Armazena com extração W5H |
-| `recall(query)` | Busca manual |
-| `remember(who, what, ...)` | Armazena W5H manual |
+| `remember(action)` | Armazena Action estruturada |
+| `observe(text)` | Armazena observação bruta |
+| `process(text)` | Extrai Action ou armazena observação |
+| `recall(query)` | Busca memórias relevantes |
+| `clean_response(text)` | Remove marcadores [MEMORY] |
+| `health()` | Verifica API online |
+| `stats()` | Estatísticas do namespace |
 
 ---
 

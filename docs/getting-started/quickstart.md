@@ -64,37 +64,48 @@ curl http://localhost:8000/health
 
 ## 4. Use em Seu Código (50 segundos)
 
-### Opção A: Decorator (mais simples)
+### Opção A: SDK Python (recomendado)
 
 ```python
-from cortex_memory import with_memory
+from cortex_memory_sdk import CortexMemorySDK
 
-@with_memory(namespace="meu_agente")
-def meu_agente(msg: str, context: str = "") -> str:
-    # context já contém memórias relevantes!
-    return f"[Com contexto: {context}] Resposta para: {msg}"
+# Cria cliente
+sdk = CortexMemorySDK(namespace="meu_agente:user_123")
 
-# Uso
-resposta = meu_agente("Olá, sou João!")
-# Memória armazenada automaticamente
+# Armazena memória estruturada
+sdk.remember({
+    "verb": "apresentou",
+    "subject": "joao",
+    "object": "nome",
+})
+
+# Busca memórias
+result = sdk.recall("João")
+print(result.to_prompt_context())
+# Output: who:joao what:apresentou_nome
 ```
 
-### Opção B: Core Genérico
+### Opção B: Integração Completa
 
 ```python
-from cortex_memory import CortexMemory
+from cortex_memory_sdk import CortexMemorySDK
 
-cortex = CortexMemory(namespace="meu_agente")
+sdk = CortexMemorySDK(namespace="meu_agente:user_123")
 
 def meu_agente(user_msg):
     # 1. Busca memória
-    context = cortex.before(user_msg)
+    result = sdk.recall(user_msg, limit=5)
+    context = result.to_prompt_context()
     
     # 2. Seu LLM aqui
-    response = meu_llm.generate(context + user_msg)
+    response = meu_llm.generate(f"Contexto:\n{context}\n\n{user_msg}")
     
-    # 3. Armazena memória
-    cortex.after(user_msg, response)
+    # 3. Armazena memória (estruturada)
+    sdk.remember({
+        "verb": "respondeu",
+        "subject": "agente",
+        "object": "pergunta",
+    })
     
     return response
 ```

@@ -105,11 +105,19 @@ class ExtractedMemory:
 class MemoryExtractor:
     """Extrai e normaliza memórias do output do LLM."""
     
+    # Padrões para capturar diferentes formatos de memória
     PATTERNS = [
-        r'\[MEMORY\]\s*\n(.+?)\[/MEMORY\]',  # [MEMORY]...[/MEMORY]
-        r'\[MEMORY\]\s*\n(.+?)$',  # [MEMORY]... (sem fechamento)
-        r'\[MEMORY\](.+?)\[/MEMORY\]',  # Sem quebra de linha
-        r'```memory\s*\n(.+?)```',  # Code block
+        # Formato padrão [MEMORY]...[/MEMORY]
+        r'\[MEMORY\]\s*\n(.+?)\[/MEMORY\]',
+        r'\[MEMORY\]\s*\n(.+?)$',
+        r'\[MEMORY\](.+?)\[/MEMORY\]',
+        # Formato alternativo (MEMÓRIA) ou (MEMORY)
+        r'\(MEM[ÓO]RIA\)\s*(.+?)(?:\[/MEM[ÓO]RIA\]|\(/MEM[ÓO]RIA\)|$)',
+        r'\(MEMORY\)\s*(.+?)(?:\[/MEMORY\]|\(/MEMORY\)|$)',
+        # Formato com code block
+        r'```memory\s*\n(.+?)```',
+        # Formato inline no início ou fim da resposta
+        r'^(?:\(MEM[ÓO]RIA\)|\[MEMORY\])\s*who:\s*(.+?)(?=\n\n|\Z)',
     ]
     
     @classmethod

@@ -3,14 +3,15 @@ Cortex Integrations - Adaptadores plug-and-play para frameworks populares.
 
 Integrações disponíveis:
 - LangChain: CortexLangChainMemory
-- CrewAI: (em desenvolvimento)
-- LangGraph: (em desenvolvimento)
+- CrewAI: CortexCrewAIMemory
+- Google ADK: CortexADKMemory
 
 Uso:
-    from cortex.integrations import CortexLangChainMemory
+    from cortex_memory_sdk import CortexMemorySDK
+    from integrations import CortexADKMemory
     
-    memory = CortexLangChainMemory(namespace="meu_agente")
-    chain = LLMChain(llm=llm, memory=memory)  # Plug and play!
+    sdk = CortexMemorySDK(namespace="meu_agente:user_123")
+    memory = CortexADKMemory(sdk)
 """
 
 # Importações lazy para evitar dependências obrigatórias
@@ -23,11 +24,16 @@ def __getattr__(name):
         from .crewai import CortexCrewAIMemory
         return CortexCrewAIMemory
     
-    raise AttributeError(f"module 'cortex.integrations' has no attribute '{name}'")
+    if name == "CortexADKMemory":
+        from .google_adk import CortexADKMemory
+        return CortexADKMemory
+    
+    raise AttributeError(f"module 'integrations' has no attribute '{name}'")
 
 
 __all__ = [
     "CortexLangChainMemory",
     "CortexCrewAIMemory",
+    "CortexADKMemory",
 ]
 

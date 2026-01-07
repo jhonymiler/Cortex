@@ -1,0 +1,70 @@
+[project]
+name = "cortex-memory-sdk"
+version = "0.1.0"
+description = "SDK Python para serviço Cortex Memory"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Cortex Team"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = ["memory", "llm", "agent", "cortex", "w5h"]
+
+dependencies = [
+    "requests>=2.28.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+unidecode = [
+    "unidecode>=1.3.0",
+]
+langchain = [
+    "langchain-core>=0.1.0",
+]
+crewai = [
+    "crewai>=0.1.0",
+]
+all = [
+    "unidecode>=1.3.0",
+    "langchain-core>=0.1.0",
+    "crewai>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/cortex-memory/cortex"
+Documentation = "https://cortex-memory.github.io/docs"
+Repository = "https://github.com/cortex-memory/cortex"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/cortex_memory_sdk",
+    "/integrations",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["cortex_memory_sdk", "integrations"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+asyncio_mode = "auto"
+
+

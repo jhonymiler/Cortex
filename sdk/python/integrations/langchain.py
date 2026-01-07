@@ -2,12 +2,16 @@
 Cortex LangChain Integration - Plug-and-play memory for LangChain.
 
 Uso:
-    from cortex.integrations import CortexLangChainMemory
+    from cortex_memory_sdk import CortexMemorySDK
+    from integrations import CortexLangChainMemory
     from langchain.chains import LLMChain
     from langchain_openai import ChatOpenAI
     
+    # Cria SDK
+    sdk = CortexMemorySDK(namespace="meu_agente:usuario_123")
+    
     # Cria memória Cortex
-    memory = CortexLangChainMemory(namespace="meu_agente:usuario_123")
+    memory = CortexLangChainMemory(sdk=sdk)
     
     # Usa normalmente com LangChain
     llm = ChatOpenAI()
@@ -22,7 +26,9 @@ Compatível com:
 - LCEL (LangChain Expression Language)
 """
 
-from typing import Any, Dict, List
+import sys
+import os
+from typing import Any
 
 # Importação condicional do LangChain
 try:
@@ -39,15 +45,12 @@ except ImportError:
         BaseMemory = object
         Field = lambda **kwargs: None
 
-import sys
-import os
-
 # Adiciona path do SDK
 sdk_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if sdk_path not in sys.path:
     sys.path.insert(0, sdk_path)
 
-from cortex_memory import CortexMemory
+from cortex_memory_sdk import CortexMemorySDK, extract_action
 
 
 class CortexLangChainMemory(BaseMemory):
@@ -63,121 +66,147 @@ class CortexLangChainMemory(BaseMemory):
     - Com extração automática de W5H
     
     Attributes:
-        namespace: Identificador para isolamento de memórias
+        sdk: Instância do CortexMemorySDK
         memory_key: Chave usada no prompt (default: "history")
         input_key: Chave da mensagem do usuário (default: "input")
         output_key: Chave da resposta (default: "output")
     """
     
-    namespace: str = None  # Usa CORTEX_NAMESPACE ou "default"
-    cortex_url: str = None  # Usa CORTEX_API_URL ou "http://localhost:8000"
+    sdk: CortexMemorySDK = None
     memory_key: str = "history"
     input_key: str = "input"
     output_key: str = "output"
     return_messages: bool = False
+    context_limit: int = 3
     
-    # Internal
-    _cortex: CortexMemory = None
-    _last_context: str = ""
-    
-    class Config:
-        arbitrary_types_allowed = True
-        underscore_attrs_are_private = True
-    
-    def __init__(self, **kwargs):
-        if not LANGCHAIN_AVAILABLE:
-            raise ImportError(
-                "LangChain não está instalado. "
-                "Instale com: pip install langchain langchain-core"
-            )
+    def __init__(
+        self,
+        sdk: CortexMemorySDK | None = None,
+        namespace: str = "default",
+        memory_key: str = "history",
+        input_key: str = "input",
+        output_key: str = "output",
+        **kwargs,
+    ):
+        """
+        Inicializa memória LangChain com Cortex.
         
+        Args:
+            sdk: Instância do CortexMemorySDK (ou cria um novo)
+            namespace: Namespace se sdk não fornecido
+            memory_key: Chave para memória no prompt
+            input_key: Chave para entrada do usuário
+            output_key: Chave para resposta do LLM
+        """
         super().__init__(**kwargs)
-        # Usa variáveis de ambiente como fallback
-        self.namespace = self.namespace or os.getenv("CORTEX_NAMESPACE", "default")
-        self.cortex_url = self.cortex_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")
-        self._cortex = CortexMemory(
-            namespace=self.namespace,
-            cortex_url=self.cortex_url,
-        )
+        
+        self.sdk = sdk or CortexMemorySDK(namespace=namespace)
+        self.memory_key = memory_key
+        self.input_key = input_key
+        self.output_key = output_key
     
     @property
-    def memory_variables(self) -> List[str]:
-        """Variáveis de memória disponíveis para o prompt."""
+    def memory_variables(self) -> list[str]:
+        """Retorna variáveis de memória para o prompt."""
         return [self.memory_key]
     
-    def load_memory_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+    def load_memory_variables(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
-        Carrega memória ANTES da geração.
+        Carrega memórias relevantes para o prompt.
         
-        Chamado automaticamente pelo LangChain antes de gerar resposta.
-        Busca contexto relevante no Cortex.
-        
-        Args:
-            inputs: Dict com inputs da chain (inclui mensagem do usuário)
-            
-        Returns:
-            Dict com {memory_key: contexto}
+        Chamado automaticamente pelo LangChain antes de executar.
         """
-        # Extrai mensagem do usuário
-        user_input = inputs.get(self.input_key, "")
-        if not user_input:
-            # Tenta encontrar em outras chaves
-            for key in ["question", "query", "human_input", "text"]:
-                if key in inputs:
-                    user_input = inputs[key]
-                    break
+        query = inputs.get(self.input_key, "")
         
-        # Busca contexto
-        context = self._cortex.before(str(user_input))
-        self._last_context = context
+        result = self.sdk.recall(query, limit=self.context_limit)
         
         if self.return_messages:
-            # Retorna como mensagens (para ChatModels)
             from langchain_core.messages import SystemMessage
-            if context:
-                return {self.memory_key: [SystemMessage(content=context)]}
-            return {self.memory_key: []}
+            return {
+                self.memory_key: [SystemMessage(content=result.to_prompt_context())]
+            }
         
-        # Retorna como string (para LLMs)
-        return {self.memory_key: context}
+        return {self.memory_key: result.to_prompt_context()}
     
-    def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, str]) -> None:
+    def save_context(self, inputs: dict[str, Any], outputs: dict[str, str]) -> None:
         """
-        Salva contexto DEPOIS da geração.
+        Salva contexto da interação na memória.
         
-        Chamado automaticamente pelo LangChain após gerar resposta.
-        Armazena a interação no Cortex com extração automática de W5H.
-        
-        Args:
-            inputs: Dict com inputs (mensagem do usuário)
-            outputs: Dict com outputs (resposta do LLM)
+        Chamado automaticamente pelo LangChain após resposta.
         """
-        # Extrai mensagem do usuário
-        user_input = inputs.get(self.input_key, "")
-        if not user_input:
-            for key in ["question", "query", "human_input", "text"]:
-                if key in inputs:
-                    user_input = inputs[key]
-                    break
+        input_text = inputs.get(self.input_key, "")
+        output_text = outputs.get(self.output_key, "")
         
-        # Extrai resposta
-        assistant_output = outputs.get(self.output_key, "")
-        if not assistant_output:
-            for key in ["answer", "response", "text", "output"]:
-                if key in outputs:
-                    assistant_output = outputs[key]
-                    break
+        # Tenta extrair do output primeiro (marcadores)
+        action = extract_action(output_text)
+        if action:
+            self.sdk.remember(action)
+            return
         
-        # Armazena
-        if user_input and assistant_output:
-            self._cortex.after(str(user_input), str(assistant_output))
+        # Senão, processa input como best-effort
+        self.sdk.process(input_text)
     
     def clear(self) -> None:
-        """Limpa memória do namespace."""
-        self._cortex.clear()
+        """Limpa histórico da sessão (não limpa memória persistente)."""
+        pass
     
-    @property
-    def cortex(self) -> CortexMemory:
-        """Acesso ao cliente Cortex subjacente."""
-        return self._cortex
+    @classmethod
+    def from_namespace(cls, namespace: str, **kwargs) -> "CortexLangChainMemory":
+        """
+        Cria instância a partir de namespace.
+        
+        Args:
+            namespace: Identificador único (ex: "support:user_123")
+        """
+        sdk = CortexMemorySDK(namespace=namespace)
+        return cls(sdk=sdk, **kwargs)
 
+
+# ============================================
+# Exemplos de uso
+# ============================================
+
+def example_langchain_usage():
+    """
+    Exemplo completo de uso com LangChain.
+    
+    Requer:
+        pip install langchain langchain-openai
+    """
+    if not LANGCHAIN_AVAILABLE:
+        print("❌ LangChain não instalado")
+        return
+    
+    from cortex_memory_sdk import CortexMemorySDK
+    
+    # 1. Cria SDK
+    sdk = CortexMemorySDK(
+        namespace="example:user_123",
+        api_url="http://localhost:8000",
+    )
+    
+    # 2. Cria memória
+    memory = CortexLangChainMemory(sdk=sdk)
+    
+    # 3. Simula uso
+    print("📝 Simulando LangChain...")
+    
+    # Load (antes de responder)
+    context = memory.load_memory_variables({"input": "Olá, sou Carlos"})
+    print(f"Contexto: {context}")
+    
+    # Save (após responder)
+    memory.save_context(
+        {"input": "Olá, sou Carlos"},
+        {"output": "Olá Carlos! Como posso ajudar?"}
+    )
+    
+    print("✅ Memória salva!")
+    
+    # Verifica recall
+    context2 = memory.load_memory_variables({"input": "Qual era meu nome?"})
+    print(f"Recall: {context2}")
+
+
+if __name__ == "__main__":
+    example_langchain_usage()

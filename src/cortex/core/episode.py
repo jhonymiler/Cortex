@@ -134,28 +134,43 @@ class Episode:
     def similarity_score(self, query: str, context: dict[str, Any] | None = None) -> float:
         """
         Calcula score de relevância (0.0 - 1.0) para uma query.
-        """
-        score = 0.0
-        query_lower = query.lower()
-        query_words = set(query_lower.split())
         
-        # Match por ação
-        if query_lower in self.action.lower():
-            score = max(score, 0.7)
+        OTIMIZADO v2:
+        - Usa tokenização consistente (remove stopwords)
+        - Match por todos os campos (action, context, outcome)
+        - Boost por importância e consolidação
+        """
+        from cortex.core.language import tokenize_to_set
+        
+        query_tokens = tokenize_to_set(query)
+        if not query_tokens:
+            return 0.0
+        
+        score = 0.0
+        
+        # Match por ação (peso maior)
+        action_tokens = tokenize_to_set(self.action)
+        if action_tokens:
+            overlap = len(query_tokens & action_tokens) / len(query_tokens)
+            if overlap > 0:
+                # Base 0.4 + até 0.4 de overlap
+                score = max(score, 0.4 + (overlap * 0.4))
         
         # Match por contexto
-        context_words = set(self.context.lower().split())
-        if query_words & context_words:
-            overlap = len(query_words & context_words) / len(query_words)
-            score = max(score, 0.5 + (overlap * 0.3))
+        context_tokens = tokenize_to_set(self.context)
+        if context_tokens:
+            overlap = len(query_tokens & context_tokens) / len(query_tokens)
+            if overlap > 0:
+                score = max(score, 0.3 + (overlap * 0.3))
         
         # Match por outcome
-        outcome_words = set(self.outcome.lower().split())
-        if query_words & outcome_words:
-            overlap = len(query_words & outcome_words) / len(query_words)
-            score = max(score, 0.4 + (overlap * 0.3))
+        outcome_tokens = tokenize_to_set(self.outcome)
+        if outcome_tokens:
+            overlap = len(query_tokens & outcome_tokens) / len(query_tokens)
+            if overlap > 0:
+                score = max(score, 0.3 + (overlap * 0.3))
         
-        # Boost por importância
+        # Boost por importância (0.5 a 1.0)
         score *= (0.5 + self.importance * 0.5)
         
         # Boost por consolidação (episódios consolidados são mais relevantes)

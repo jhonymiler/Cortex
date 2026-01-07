@@ -124,16 +124,31 @@ class AgentResponse:
 class MemoryExtractor:
     """Extrai e normaliza memórias do output do LLM."""
     
+    # Padrões para capturar diferentes formatos de memória
     PATTERNS = [
+        # Formato padrão [MEMORY]...[/MEMORY]
         r'\[MEMORY\]\s*\n(.+?)\[/MEMORY\]',
         r'\[MEMORY\]\s*\n(.+?)$',
         r'\[MEMORY\](.+?)\[/MEMORY\]',
+        # Formato alternativo (MEMÓRIA) ou (MEMORY)
+        r'\(MEM[ÓO]RIA\)\s*(.+?)(?:\[/MEM[ÓO]RIA\]|\(/MEM[ÓO]RIA\)|$)',
+        r'\(MEMORY\)\s*(.+?)(?:\[/MEMORY\]|\(/MEMORY\)|$)',
+        # Formato com code block
+        r'```memory\s*\n(.+?)```',
+        # Formato inline no início ou fim da resposta
+        r'^(?:\(MEM[ÓO]RIA\)|\[MEMORY\])\s*who:\s*(.+?)(?=\n\n|\Z)',
     ]
     
     @classmethod
     def extract(cls, content: str) -> tuple[str, dict | None]:
         """
         Extrai memória do output e retorna resposta limpa.
+        
+        Captura diferentes formatos:
+        - [MEMORY]...[/MEMORY]
+        - (MEMÓRIA)...[/MEMÓRIA]
+        - (MEMORY)...[/MEMORY]
+        - ```memory...```
         
         Returns:
             Tuple (resposta_limpa, memória_dict ou None)

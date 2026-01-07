@@ -27,6 +27,12 @@ from cortex.core import Entity, Episode, MemoryGraph, Relation
 from cortex.core.memory import Memory
 from cortex.core.decay import DecayManager, create_default_decay_manager
 from cortex.core.namespace import NamespacedMemoryManager
+from cortex.core.shared_memory import (
+    SharedMemoryManager, 
+    SharedMemoryContext, 
+    MemoryVisibility,
+    NamespaceConfig,
+)
 
 
 # ==================== REQUEST/RESPONSE MODELS ====================
@@ -153,6 +159,11 @@ class RememberRequest(BaseModel):
     - WHEN: (automatic timestamp)
     - WHERE: where (namespace)
     - HOW: how (outcome/result)
+    
+    Visibility levels:
+    - personal: Only visible to this user/namespace (default)
+    - shared: Visible to all in the parent namespace (team knowledge)
+    - learned: Visible to all, anonymous (extracted patterns, high-value)
     """
     
     who: list[str] = Field(default_factory=list, description="Participants: names or identifiers")
@@ -161,6 +172,11 @@ class RememberRequest(BaseModel):
     how: str = Field(default="", description="How it was resolved (outcome/result)")
     where: str = Field(default="default", description="Namespace/context")
     importance: float = Field(default=0.5, ge=0.0, le=1.0, description="Importance 0.0-1.0")
+    visibility: str = Field(
+        default="personal", 
+        description="Visibility: personal, shared, or learned"
+    )
+    owner_id: str = Field(default="", description="Owner ID for personal memories")
 
 
 class RememberResponse(BaseModel):
@@ -210,16 +226,32 @@ class MemoryService:
     
     This is the single entry point for all memory operations.
     Both MCP and REST API use this service.
+    
+    Supports hierarchical namespaces for shared memory:
+    - PERSONAL: User-specific memories (isolated)
+    - SHARED: Team/namespace knowledge (visible to all in namespace)
+    - LEARNED: Patterns extracted from consolidation (anonymous, high-value)
+    
+    Namespace hierarchy example:
+    - "support" (parent) -> SHARED/LEARNED memories
+    - "support:user_123" (child) -> PERSONAL memories + inherits from parent
     """
     
-    def __init__(self, storage_path: Path | str | None = None):
+    def __init__(
+        self, 
+        storage_path: Path | str | None = None,
+        shared_memory_manager: SharedMemoryManager | None = None,
+    ):
         """
         Initialize the memory service.
         
         Args:
             storage_path: Path for data persistence. None = in-memory only.
+            shared_memory_manager: Optional SharedMemoryManager for visibility control.
+                                   If None, a new one is created.
         """
         self.graph = MemoryGraph(storage_path=storage_path)
+        self.shared_manager = shared_memory_manager or SharedMemoryManager()
     
     def store(self, request: StoreRequest) -> StoreResponse:
         """
@@ -303,6 +335,15 @@ class MemoryService:
         
         This is called BEFORE responding to the user to get context.
         Memories that are recalled get reinforced (use = strength).
+        
+        Supports hierarchical namespace inheritance:
+        - First searches in current namespace (PERSONAL memories)
+        - Then searches in parent namespace for SHARED/LEARNED memories
+        
+        Example: namespace "support:customer_support:user_123"
+        - Searches in "support:customer_support:user_123" (personal)
+        - Then in "support:customer_support" (domain shared/learned)
+        - Then in "support" (global shared/learned)
         """
         # Enriquece context com conversation_id, session_id e namespace
         enriched_context = {
@@ -312,11 +353,28 @@ class MemoryService:
             "namespace": request.namespace,
         }
         
+        # 1. Busca memórias do namespace atual (PERSONAL)
         result = self.graph.recall(
             query=request.query,
             context=enriched_context,
             limit=request.limit,
         )
+        
+        # 2. Busca memórias do namespace pai (SHARED/LEARNED)
+        parent_episodes = self._recall_from_parent_namespaces(
+            query=request.query,
+            namespace=request.namespace,
+            limit=max(3, request.limit // 2),  # Menos memórias do pai
+        )
+        
+        # 3. Combina resultados (pai tem prioridade menor)
+        if parent_episodes:
+            # Adiciona episódios do pai que não estão duplicados
+            existing_ids = {ep.id for ep in result.episodes}
+            for ep in parent_episodes:
+                if ep.id not in existing_ids:
+                    result.episodes.append(ep)
+                    existing_ids.add(ep.id)
         
         # Reforça memórias que foram lembradas (uso real = fortalecimento)
         if result.entities or result.episodes:
@@ -351,6 +409,69 @@ class MemoryService:
                 for ep in result.episodes
             ],
         )
+    
+    def _recall_from_parent_namespaces(
+        self,
+        query: str,
+        namespace: str,
+        limit: int = 3,
+    ) -> list[Episode]:
+        """
+        Busca memórias SHARED/LEARNED dos namespaces pai.
+        
+        Percorre a hierarquia de namespaces buscando memórias de alto valor
+        que podem ser úteis para o usuário atual.
+        
+        Args:
+            query: Query de busca
+            namespace: Namespace atual (ex: "support:customer_support:user_123")
+            limit: Máximo de memórias do pai
+            
+        Returns:
+            Lista de episódios SHARED/LEARNED dos namespaces pai
+        """
+        parent_episodes: list[Episode] = []
+        
+        # Extrai namespaces pai da hierarquia
+        # "support:customer_support:user_123" -> ["support:customer_support", "support"]
+        parts = namespace.split(":")
+        parent_namespaces = []
+        for i in range(len(parts) - 1, 0, -1):
+            parent_ns = ":".join(parts[:i])
+            parent_namespaces.append(parent_ns)
+        
+        # Busca em cada namespace pai
+        for parent_ns in parent_namespaces:
+            # Busca episódios no namespace pai que são SHARED ou LEARNED
+            episodes = self.graph.find_episodes(
+                query=query,
+                limit=limit,
+                context={
+                    "namespace": parent_ns,
+                    # Só busca memórias que foram marcadas como compartilháveis
+                    "include_shared": True,
+                },
+                min_score=0.2,  # Threshold mais baixo para memórias compartilhadas
+            )
+            
+            # Filtra apenas memórias que são SHARED/LEARNED ou consolidadas (is_summary=True)
+            for ep in episodes:
+                visibility = ep.metadata.get("visibility", "personal")
+                is_summary = ep.metadata.get("is_summary", False) or ep.is_consolidated
+                
+                # Inclui se é SHARED, LEARNED ou um resumo de consolidação
+                if visibility in ["shared", "learned"] or is_summary:
+                    # Marca como memória herdada para formatação diferenciada
+                    ep.metadata["inherited_from"] = parent_ns
+                    parent_episodes.append(ep)
+                    
+                    if len(parent_episodes) >= limit:
+                        break
+            
+            if len(parent_episodes) >= limit:
+                break
+        
+        return parent_episodes[:limit]
     
     def stats(self) -> StatsResponse:
         """Get statistics about the memory graph."""
@@ -444,9 +565,26 @@ class MemoryService:
         # Store in metadata for full W5H access
         episode.metadata["w5h"] = memory.to_w5h_dict()
         episode.metadata["where"] = memory.where
+        episode.metadata["namespace"] = memory.where
+        
+        # Store visibility and owner for shared memory management
+        episode.metadata["visibility"] = request.visibility
+        episode.metadata["owner_id"] = request.owner_id or (
+            request.who[0] if request.who else "anonymous"
+        )
         
         # 4. Add with consolidation check
         consolidated, consolidation_count = self.graph.add_episode_with_consolidation(episode)
+        
+        # 5. Register in SharedMemoryManager for visibility tracking
+        visibility_enum = MemoryVisibility(request.visibility)
+        self.shared_manager.register_memory(
+            memory_id=episode.id,
+            visibility=visibility_enum,
+            owner_id=episode.metadata["owner_id"],
+            namespace=request.where,
+            memory_type="episode",
+        )
         
         return RememberResponse(
             success=True,

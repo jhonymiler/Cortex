@@ -8,9 +8,16 @@ O MemoryGraph é o coração do Cortex:
 - Busca por relevância contextual
 - Consolida episódios repetidos
 - Detecta e resolve contradições
+
+OTIMIZAÇÕES v2 (Opção 5 Híbrida):
+- Índice invertido para busca O(log n) ao invés de O(n)
+- Threshold de relevância mínima (0.25) para filtrar ruído
+- Ranking por retrievability (frescor + acesso)
+- Limite hard de memórias para evitar crescimento ilimitado
 """
 
 import json
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -19,6 +26,8 @@ from typing import Any
 from cortex.core.entity import Entity
 from cortex.core.episode import Episode
 from cortex.core.relation import Relation
+from cortex.core.inverted_index import InvertedIndex
+from cortex.core.language import tokenize
 from cortex.core.contradiction import (
     ContradictionDetector,
     Contradiction,
@@ -26,6 +35,11 @@ from cortex.core.contradiction import (
     ResolutionResult,
     create_default_detector,
 )
+
+# Configurações de recall (podem ser sobrescritas via .env)
+RECALL_MIN_THRESHOLD = float(os.getenv("CORTEX_RECALL_THRESHOLD", "0.25"))
+RECALL_MAX_CANDIDATES = int(os.getenv("CORTEX_RECALL_MAX_CANDIDATES", "50"))
+RECALL_MAX_RESULTS = int(os.getenv("CORTEX_RECALL_MAX_RESULTS", "10"))
 
 
 @dataclass
@@ -37,12 +51,16 @@ class RecallResult:
     relations: list[Relation] = field(default_factory=list)
     context_summary: str = ""
     
+    # Métricas de recall (para debug/análise)
+    metrics: dict[str, Any] = field(default_factory=dict)
+    
     def to_dict(self) -> dict[str, Any]:
         return {
             "entities": [e.to_dict() for e in self.entities],
             "episodes": [e.to_dict() for e in self.episodes],
             "relations": [r.to_dict() for r in self.relations],
             "context_summary": self.context_summary,
+            "metrics": self.metrics,
         }
     
     def to_prompt_context(self, format: str = "yaml") -> str:
@@ -64,43 +82,134 @@ class RecallResult:
     
     def _to_yaml_context(self) -> str:
         """
-        Formato YAML ultra-compacto para LLMs.
+        Formato estruturado para LLMs.
         
-        OBJETIVO: Máxima densidade informacional, mínimo tokens.
-        - SEM headers desnecessários
-        - SEM tipos genéricos (participant, user, etc)
-        - APENAS fatos úteis para resposta
+        OBJETIVO: Contexto claro e utilizável para dar continuidade à conversa.
+        - Formato W5H legível
+        - Nomes de participantes claros
+        - Histórico formatado como lista
+        - Evita valores undefined/null
         """
         parts = []
         
         # Filtra entidades relevantes (ignora genéricos)
-        skip_names = {"user", "assistant", "participant", "none", ""}
+        skip_names = {"user", "assistant", "participant", "none", "", "undefined"}
         useful_entities = [
             e for e in self.entities[:5]
             if e.name.lower() not in skip_names 
             and e.type.lower() not in skip_names
+            and not e.name.startswith("[")  # Evita arrays serializados
         ]
         
         if useful_entities:
             names = [e.name for e in useful_entities]
-            parts.append(f"conhece: {', '.join(names)}")
+            parts.append(f"Usuário: {names[0]}" if len(names) == 1 else f"Conhece: {', '.join(names)}")
         
-        # Histórico ultra-compacto: só ação e resultado
-        if self.episodes:
-            history = []
-            for ep in self.episodes[:3]:  # Menos episódios = menos tokens
-                if ep.outcome:
-                    history.append(f"{ep.action}→{ep.outcome}")
-                else:
-                    history.append(ep.action)
-            if history:
-                parts.append(f"histórico: {'; '.join(history)}")
+        # Separa episódios pessoais de coletivos (herdados)
+        personal_episodes = []
+        collective_episodes = []
+        
+        for ep in self.episodes[:6]:  # Limita total a 6 episódios
+            visibility = ep.metadata.get("visibility", "personal")
+            inherited_from = ep.metadata.get("inherited_from")
+            
+            if visibility == "learned" or inherited_from:
+                collective_episodes.append(ep)
+            else:
+                personal_episodes.append(ep)
+        
+        # Histórico pessoal formatado como lista W5H
+        if personal_episodes:
+            parts.append("Memórias anteriores:")
+            for ep in personal_episodes[:3]:  # Limita a 3 episódios pessoais
+                line = self._format_episode_line(ep, skip_names)
+                if line:
+                    parts.append(line)
+        
+        # Conhecimento coletivo (LEARNED/herdado) - formatado diferente
+        if collective_episodes:
+            parts.append("Conhecimento útil:")  # Seção separada para coletivo
+            for ep in collective_episodes[:2]:  # Limita a 2 conhecimentos coletivos
+                line = self._format_collective_line(ep)
+                if line:
+                    parts.append(line)
         
         # Resumo se houver
         if self.context_summary:
-            parts.append(f"contexto: {self.context_summary}")
+            summary = self._sanitize_value(self.context_summary)
+            if summary and summary != "undefined":
+                parts.append(f"Contexto: {summary}")
         
         return "\n".join(parts) if parts else ""
+    
+    def _format_episode_line(self, ep: Episode, skip_names: set) -> str:
+        """Formata linha de episódio pessoal."""
+        # Extrai W5H do metadata se disponível
+        w5h = ep.metadata.get("w5h", {})
+        
+        # Sanitiza valores - evita undefined, null, arrays como string
+        action = self._sanitize_value(w5h.get("what") or ep.action)
+        outcome = self._sanitize_value(w5h.get("how") or ep.outcome)
+        why = self._sanitize_value(w5h.get("why") or ep.context)
+        who = w5h.get("who", [])
+        
+        # Formata quem participou
+        if isinstance(who, list) and who:
+            who_str = ", ".join(str(w) for w in who if w and str(w).lower() not in skip_names)
+        elif isinstance(who, str) and who:
+            who_str = who
+        else:
+            who_str = ""
+        
+        # Monta linha do episódio
+        if action and action != "undefined":
+            line = f"  - {action}"
+            if outcome and outcome != "undefined":
+                line += f": {outcome[:80]}"
+            if why and why != "undefined" and len(line) < 100:
+                line += f" ({why[:40]})"
+            return line
+        return ""
+    
+    def _format_collective_line(self, ep: Episode) -> str:
+        """Formata linha de conhecimento coletivo (LEARNED)."""
+        w5h = ep.metadata.get("w5h", {})
+        
+        # Para conhecimento coletivo, foca em problema -> solução
+        problema = self._sanitize_value(w5h.get("what") or ep.action)
+        solucao = self._sanitize_value(w5h.get("how") or ep.outcome)
+        
+        if problema and solucao:
+            return f"  💡 {problema}: {solucao[:100]}"
+        elif problema:
+            return f"  💡 {problema}"
+        return ""
+    
+    def _sanitize_value(self, value: Any) -> str:
+        """Sanitiza valor para evitar undefined, null, arrays como string."""
+        if value is None:
+            return ""
+        
+        # Converte para string
+        str_val = str(value).strip()
+        
+        # Remove valores inválidos
+        if str_val.lower() in {"undefined", "null", "none", ""}:
+            return ""
+        
+        # Detecta arrays serializados como string
+        if str_val.startswith("[") and str_val.endswith("]"):
+            try:
+                # Tenta parsear como lista
+                import ast
+                parsed = ast.literal_eval(str_val)
+                if isinstance(parsed, list):
+                    return ", ".join(str(item) for item in parsed[:3])
+            except Exception:
+                # Se não conseguir, retorna os primeiros 50 chars
+                return str_val[1:-1][:50]
+        
+        return str_val
     
     def _to_text_context(self) -> str:
         """Formato texto legível (mais tokens, mais claro)."""
@@ -158,6 +267,9 @@ class MemoryGraph:
         self._entity_by_type: dict[str, list[str]] = {}  # type -> [entity_ids]
         self._relations_by_from: dict[str, list[str]] = {}  # from_id -> [relation_ids]
         self._relations_by_to: dict[str, list[str]] = {}  # to_id -> [relation_ids]
+        
+        # NOVO: Índice invertido para busca O(log n)
+        self._inverted_index = InvertedIndex()
         
         # Detector de contradições
         self._contradiction_detector = create_default_detector()
@@ -282,23 +394,35 @@ class MemoryGraph:
             # Consolida todos + o novo
             consolidated = Episode.consolidate(similar + [episode])
             
-            # Remove os antigos
+            # Remove os antigos do índice invertido
             for old in similar:
+                self._inverted_index.remove_episode(old.id)
                 self._episodes.pop(old.id, None)
             
             # Adiciona consolidado
             self._episodes[consolidated.id] = consolidated
+            self._index_episode(consolidated)
             self._save()
             return consolidated
         
         # Adiciona normal
         self._episodes[episode.id] = episode
+        self._index_episode(episode)
         
         # Cria relações automáticas episódio ↔ participantes
         self._create_episode_relations(episode)
         
         self._save()
         return episode
+    
+    def _index_episode(self, episode: Episode) -> None:
+        """Adiciona episódio ao índice invertido."""
+        self._inverted_index.index_episode(
+            episode_id=episode.id,
+            action=episode.action,
+            context=episode.context,
+            outcome=episode.outcome,
+        )
     
     def get_episode(self, episode_id: str) -> Episode | None:
         """Busca episódio por ID."""
@@ -311,17 +435,86 @@ class MemoryGraph:
         action: str | None = None,
         limit: int = 10,
         context: dict[str, Any] | None = None,
+        min_score: float | None = None,
     ) -> list[Episode]:
         """
         Busca episódios por diversos critérios.
+        
+        OTIMIZADO v2:
+        - Usa índice invertido para pré-filtrar candidatos O(log n)
+        - Aplica threshold mínimo de relevância
+        - Limita candidatos para evitar explosão
+        - Filtra por namespace (metadata["where"]) se fornecido
+        
+        Args:
+            query: Texto de busca
+            participant_ids: Filtrar por participantes
+            action: Filtrar por ação específica
+            limit: Máximo de resultados
+            context: Contexto adicional para scoring, incluindo:
+                - namespace: Filtrar por namespace (metadata["where"])
+                - who: Lista de participantes para filtro por owner
+            min_score: Score mínimo de relevância (default: RECALL_MIN_THRESHOLD)
         """
-        candidates = list(self._episodes.values())
+        min_score = min_score if min_score is not None else RECALL_MIN_THRESHOLD
+        context = context or {}
+        
+        # Extrai filtros do contexto
+        namespace_filter = context.get("namespace")
+        who_filter = context.get("who")  # Lista de participantes/owners
+        
+        # OTIMIZAÇÃO: Usa índice invertido para pré-filtrar
+        if query and len(self._episodes) > 20:
+            # Busca candidatos via índice invertido
+            candidate_ids = self._inverted_index.get_candidates(
+                query, limit=RECALL_MAX_CANDIDATES
+            )
+            
+            if candidate_ids:
+                candidates = [
+                    self._episodes[eid] 
+                    for eid in candidate_ids 
+                    if eid in self._episodes
+                ]
+            else:
+                # Fallback: busca linear se índice vazio
+                candidates = list(self._episodes.values())
+        else:
+            candidates = list(self._episodes.values())
+        
+        # NOVO: Filtra por namespace (metadata["where"])
+        if namespace_filter and namespace_filter != "default":
+            candidates = [
+                e for e in candidates
+                if e.metadata.get("where") == namespace_filter
+                or e.metadata.get("namespace") == namespace_filter
+            ]
+        
+        # NOVO: Filtra por owner/participante (who)
+        # Se who é fornecido, prioriza episódios que envolvem esses participantes
+        if who_filter:
+            # Resolve nomes para IDs se necessário
+            who_ids = set()
+            for who_name in who_filter:
+                entity = self.find_entity_by_name(who_name)
+                if entity:
+                    who_ids.add(entity.id)
+                who_ids.add(who_name)  # Também busca pelo nome direto
+            
+            if who_ids:
+                # Filtra episódios que têm pelo menos um dos participantes
+                candidates = [
+                    e for e in candidates
+                    if (set(e.participants) & who_ids) or
+                       any(who in str(e.metadata.get("w5h", {}).get("who", [])) 
+                           for who in who_filter)
+                ]
         
         # Filtra por ação
         if action:
             candidates = [e for e in candidates if e.action.lower() == action.lower()]
         
-        # Filtra por participantes
+        # Filtra por participantes (IDs)
         if participant_ids:
             participant_set = set(participant_ids)
             candidates = [
@@ -329,13 +522,18 @@ class MemoryGraph:
                 if set(e.participants) & participant_set
             ]
         
-        # Pontua por query
+        # Pontua por query com threshold
         if query:
             scored = []
             for episode in candidates:
                 score = episode.similarity_score(query, context)
-                if score > 0:
-                    scored.append((episode, score))
+                
+                # OTIMIZAÇÃO: Aplica threshold mínimo
+                if score >= min_score:
+                    # Boost por retrievability (frescor + importância)
+                    retrievability_boost = self._calculate_retrievability(episode)
+                    final_score = score * (0.7 + retrievability_boost * 0.3)
+                    scored.append((episode, final_score))
             
             scored.sort(key=lambda x: x[1], reverse=True)
             candidates = [e for e, _ in scored[:limit]]
@@ -347,6 +545,41 @@ class MemoryGraph:
             )
         
         return candidates[:limit]
+    
+    def _calculate_retrievability(self, episode: Episode) -> float:
+        """
+        Calcula retrievability baseado em Ebbinghaus.
+        
+        R = e^(-t/S) onde:
+        - t = tempo desde último acesso
+        - S = estabilidade (baseada em acessos, consolidação, centralidade)
+        """
+        from datetime import timezone
+        import math
+        
+        now = datetime.now()
+        
+        # Tempo desde criação (em horas)
+        time_diff = (now - episode.timestamp).total_seconds() / 3600
+        
+        # Estabilidade base (1-10)
+        stability = 1.0
+        
+        # Boost por número de acessos (occurrence_count)
+        stability += min(5.0, episode.occurrence_count * 0.5)
+        
+        # Boost por importância
+        stability += episode.importance * 2
+        
+        # Boost por consolidação
+        if episode.is_consolidated:
+            stability += 2.0
+        
+        # Retrievability: e^(-t/S)
+        # Normalizado para 0-1
+        retrievability = math.exp(-time_diff / (stability * 24))  # 24h base
+        
+        return min(1.0, max(0.0, retrievability))
     
     def _find_similar_episodes(self, episode: Episode, threshold: float = 0.7) -> list[Episode]:
         """Encontra episódios similares para consolidação."""
@@ -575,10 +808,11 @@ class MemoryGraph:
         
         Este é o método principal para agentes obterem contexto.
         
-        MELHORIAS:
-        - Busca participantes frequentes do namespace
-        - Filtra por conversation_id se fornecido
-        - Prioriza episódios recentes da mesma conversa
+        OTIMIZAÇÕES v2:
+        - Índice invertido para busca O(log n)
+        - Threshold mínimo de relevância (0.25)
+        - Boost por retrievability
+        - Métricas de recall para debug
         
         Args:
             query: Texto da pergunta/contexto do usuário
@@ -590,12 +824,25 @@ class MemoryGraph:
             limit: Máximo de resultados por tipo
             
         Returns:
-            RecallResult com entidades, episódios e relações relevantes
+            RecallResult com entidades, episódios, relações e métricas
         """
+        import time
+        start_time = time.time()
+        
         context = context or {}
         conversation_id = context.get("conversation_id")
         session_id = context.get("session_id")
         namespace = context.get("namespace", "default")
+        
+        # Métricas
+        metrics = {
+            "query_terms": len(tokenize(query)),
+            "total_episodes": len(self._episodes),
+            "total_entities": len(self._entities),
+            "index_size": self._inverted_index._total_episodes,
+            "candidates_checked": 0,
+            "filtered_by_threshold": 0,
+        }
         
         # 1. Busca entidades diretamente mencionadas na query
         entities = self.find_entities(query=query, limit=limit)
@@ -621,24 +868,28 @@ class MemoryGraph:
         # Limita entidades ao máximo
         entities = entities[:limit * 2]  # 2x limit para entidades
         entity_ids = [e.id for e in entities]
+        metrics["entities_found"] = len(entities)
         
-        # 4. Busca episódios
+        # 4. Busca episódios com otimizações
         enriched_context = {**context, "entity_ids": entity_ids}
         episodes = self.find_episodes(
             query=query,
             participant_ids=entity_ids if entity_ids else None,
-            limit=limit * 2,  # Busca mais para compensar filtro
+            limit=RECALL_MAX_RESULTS,
             context=enriched_context,
+            min_score=RECALL_MIN_THRESHOLD,
         )
         
         # 4.1. FILTRA memórias que JÁ FORAM CONSOLIDADAS (filhas)
         # Só retorna resumos (consolidadas) e memórias frescas (não consolidadas)
         include_consolidated = context.get("include_consolidated", False)
         if not include_consolidated:
+            before_filter = len(episodes)
             episodes = [
                 ep for ep in episodes
                 if not ep.metadata.get("consolidated_into")
             ]
+            metrics["filtered_consolidated"] = before_filter - len(episodes)
         
         # 5. Se há conversa ativa, prioriza episódios dessa conversa
         if conversation_id:
@@ -653,13 +904,14 @@ class MemoryGraph:
                     episodes.append(ep)
                     episode_ids.add(ep.id)
         
-        # Limita episódios
-        episodes = episodes[:limit]
+        # Limita episódios ao máximo configurado
+        episodes = episodes[:RECALL_MAX_RESULTS]
+        metrics["episodes_found"] = len(episodes)
         
-        # 6. Busca relações entre os encontrados
+        # 6. Busca relações entre os encontrados (limite para evitar explosão)
         all_ids = entity_ids + [ep.id for ep in episodes]
         relations = []
-        for id_ in all_ids:
+        for id_ in all_ids[:20]:  # Limita IDs para busca de relações
             relations.extend(self.get_relations(from_id=id_))
             relations.extend(self.get_relations(to_id=id_))
         
@@ -670,6 +922,8 @@ class MemoryGraph:
             if rel.id not in seen_relation_ids:
                 seen_relation_ids.add(rel.id)
                 unique_relations.append(rel)
+        
+        metrics["relations_found"] = len(unique_relations)
         
         # Gera resumo
         summary = self._generate_context_summary(entities, episodes, unique_relations)
@@ -682,11 +936,16 @@ class MemoryGraph:
         
         self._save()
         
+        # Finaliza métricas
+        metrics["recall_time_ms"] = round((time.time() - start_time) * 1000, 2)
+        metrics["threshold_used"] = RECALL_MIN_THRESHOLD
+        
         return RecallResult(
             entities=entities,
             episodes=episodes,
             relations=unique_relations[:10],  # Limita relações
             context_summary=summary,
+            metrics=metrics,
         )
     
     def store(
@@ -829,6 +1088,7 @@ class MemoryGraph:
             "entities": {k: v.to_dict() for k, v in self._entities.items()},
             "episodes": {k: v.to_dict() for k, v in self._episodes.items()},
             "relations": {k: v.to_dict() for k, v in self._relations.items()},
+            "inverted_index": self._inverted_index.to_dict(),
             "saved_at": datetime.now().isoformat(),
         }
         
@@ -864,6 +1124,13 @@ class MemoryGraph:
             relation = Relation.from_dict(relation_data)
             self._relations[relation.id] = relation
             self._index_relation(relation)
+        
+        # Carrega índice invertido (ou reconstrói se não existir)
+        if "inverted_index" in data:
+            self._inverted_index = InvertedIndex.from_dict(data["inverted_index"])
+        else:
+            # Reconstrói índice para grafos antigos
+            self._rebuild_inverted_index()
     
     # ==================== ADDITIONAL METHODS ====================
     
@@ -925,11 +1192,25 @@ class MemoryGraph:
         self._entity_by_type.clear()
         self._relations_by_from.clear()
         self._relations_by_to.clear()
+        self._inverted_index.clear()
         
-        if self.storage_path:
-            graph_file = self.storage_path / "memory_graph.json"
-            if graph_file.exists():
-                graph_file.unlink()
+        # NÃO deleta o arquivo para preservar dados entre reinícios
+        # O arquivo será sobrescrito no próximo _save()
+        self._save()
+    
+    def _rebuild_inverted_index(self) -> None:
+        """
+        Reconstrói o índice invertido a partir dos episódios existentes.
+        
+        Útil para migrar grafos antigos que não têm índice.
+        """
+        self._inverted_index.clear()
+        
+        for episode in self._episodes.values():
+            self._index_episode(episode)
+        
+        # Salva o índice reconstruído
+        self._save()
     
     # ==================== STATS ====================
     
@@ -949,6 +1230,12 @@ class MemoryGraph:
             ),
             "entities_by_type": entities_by_type,
             "contradiction_stats": self._contradiction_detector.stats(),
+            "inverted_index_stats": self._inverted_index.stats(),
+            "recall_config": {
+                "min_threshold": RECALL_MIN_THRESHOLD,
+                "max_candidates": RECALL_MAX_CANDIDATES,
+                "max_results": RECALL_MAX_RESULTS,
+            },
         }
     
     # ==================== CONTRADICTION MANAGEMENT ====================

@@ -1,216 +1,160 @@
-# Cortex Python SDK
+# Cortex Memory SDK
 
-SDK Python para integração de memória cognitiva em agentes LLM.
-Modelo W5H (Who, What, Why, When, Where, How).
+SDK Python para integração com o serviço Cortex Memory.
 
-## 📁 Estrutura
-
-```
-sdk/python/
-├── cortex_sdk.py        # Cliente REST baixo-nível
-├── cortex_memory.py     # Core genérico (before/after)
-└── integrations/
-    ├── langchain.py     # Adaptador LangChain (BaseMemory)
-    └── crewai.py        # Adaptador CrewAI (long_term_memory)
-```
-
----
-
-## 🚀 Instalação
+## Instalação
 
 ```bash
-# Copiar para seu projeto
-cp -r sdk/python/ seu_projeto/cortex/
-
-# Ou adicionar ao PYTHONPATH
-export PYTHONPATH=/path/to/cortex/sdk/python:$PYTHONPATH
+pip install cortex-memory-sdk
 ```
 
----
-
-## 📖 Uso
-
-### 1. Core Genérico (qualquer framework)
-
-O método mais simples - funciona com qualquer LLM/framework:
+## Uso Básico
 
 ```python
-from cortex_memory import CortexMemory
+from cortex_memory_sdk import CortexMemorySDK
 
-cortex = CortexMemory(namespace="meu_agente:usuario_123")
+# Cria cliente
+sdk = CortexMemorySDK(
+    namespace="support:user_123",
+    api_url="http://localhost:8000",  # ou env CORTEX_API_URL
+)
 
-def meu_agente(user_msg):
-    # ANTES: Busca contexto de memória
-    context = cortex.before(user_msg)
-    
-    # Seu LLM aqui (OpenAI, Ollama, Anthropic, etc)
-    response = llm.generate(context + user_msg)
-    
-    # DEPOIS: Armazena (extração W5H automática no servidor)
-    cortex.after(user_msg, response)
-    
-    return response
+# Armazena memória estruturada
+sdk.remember({
+    "verb": "solicitou",
+    "subject": "carlos",
+    "object": "reembolso",
+    "modifiers": ["urgente"],
+})
+
+# Busca memórias relevantes
+result = sdk.recall("Carlos")
+print(result.to_prompt_context())
+# Output: who:carlos what:solicitou_reembolso how:urgente
 ```
 
-### 2. Decorator (mais limpo)
+## Integrações
+
+### LangChain
 
 ```python
-from cortex_memory import with_memory
-
-@with_memory(namespace="meu_agente")
-def meu_agente(user_msg: str, context: str = "") -> str:
-    # context já contém a memória injetada automaticamente
-    return llm.generate(context + user_msg)
-
-# Uso - recall/store automáticos!
-response = meu_agente("Olá, sou Maria")
-```
-
-### 3. LangChain (plug and play)
-
-```python
-from cortex.integrations import CortexLangChainMemory
+from cortex_memory_sdk import CortexMemorySDK
+from integrations import CortexLangChainMemory
 from langchain.chains import LLMChain
-from langchain_openai import ChatOpenAI
 
-# Cria memória Cortex
-memory = CortexLangChainMemory(namespace="meu_agente")
+sdk = CortexMemorySDK(namespace="agent:user_123")
+memory = CortexLangChainMemory(sdk=sdk)
 
-# Usa normalmente com LangChain
-llm = ChatOpenAI()
 chain = LLMChain(llm=llm, memory=memory, prompt=prompt)
-
-# Zero código extra - recall/store automáticos!
-response = chain.run("Olá, sou Maria")
+response = chain.run("Olá, sou Maria")  # Auto recall/store!
 ```
 
-### 4. CrewAI (plug and play)
+### CrewAI
 
 ```python
-from cortex.integrations import CortexCrewAIMemory
-from crewai import Crew, Agent, Task
+from cortex_memory_sdk import CortexMemorySDK
+from integrations import CortexCrewAIMemory
 
-# Cria memória Cortex
-memory = CortexCrewAIMemory(namespace="minha_crew")
+sdk = CortexMemorySDK(namespace="crew:mission_1")
+memory = CortexCrewAIMemory(sdk)
 
-# Usa com CrewAI
-crew = Crew(
-    agents=[...],
-    tasks=[...],
-    memory=True,
-    long_term_memory=memory,  # Plug and play!
-)
-```
-
-### 5. Cliente REST (baixo nível)
-
-Para controle total sobre recall/store:
-
-```python
-from cortex_sdk import CortexClient
-
-client = CortexClient(namespace="meu_agente")
-
-# ANTES de responder
-memories = client.recall(query="problema com pagamento")
-print(memories['prompt_context'])
-
-# DEPOIS de responder (W5H manual)
-client.remember(
-    who=["usuario_123", "sistema_pagamentos"],
-    what="reportou_erro_pagamento",
-    why="cartao_expirado",
-    how="orientado_atualizar_dados",
-)
-```
-
----
-
-## 🔧 API Reference
-
-### CortexMemory (Core)
-
-```python
-cortex = CortexMemory(
-    namespace="default",           # Isolamento de memórias
-    cortex_url="http://localhost:8000",
-    auto_inject=True,              # Formata contexto automaticamente
+# Enriquece task com contexto
+enriched = memory.enrich_task_description(
+    "Pesquisar tendências de mercado"
 )
 
-# Hooks principais
-context = cortex.before(user_message)      # Busca memória
-cortex.after(user_message, response)       # Armazena
-
-# Métodos diretos
-result = cortex.recall(query, limit=5)     # RecallResult
-result = cortex.store_interaction(msg, resp)  # StoreResult
-result = cortex.store_w5h(who, what, ...)  # StoreResult manual
+# Armazena resultado
+memory.remember_task("Pesquisa", "Encontradas 5 tendências", "Researcher")
 ```
 
-### CortexClient (REST)
+### Google ADK
 
 ```python
-client = CortexClient(
-    base_url="http://localhost:8000",
-    namespace="default"
-)
+from cortex_memory_sdk import CortexMemorySDK
+from integrations import CortexADKMemory
 
-# Métodos W5H
-client.remember(who, what, why="", how="", importance=0.5)
-client.recall(query, who=None, limit=10)
-client.forget(memory_id, reason="")
+sdk = CortexMemorySDK(namespace="agent:user_123")
+memory = CortexADKMemory(sdk)
 
-# Admin
-client.stats()       # Estatísticas
-client.health()      # Métricas de saúde
-client.clear()       # ⚠️ Limpa namespace!
+# Busca contexto
+context = memory.get_context("histórico do cliente")
+
+# Armazena após resposta
+memory.after_response(user_input, agent_response)
 ```
 
----
+## Arquitetura
 
-## 📊 Modelo W5H
+```
+┌─────────────────────────────────────────────────────┐
+│                   Seu Agente                        │
+│  (LangChain / CrewAI / Google ADK / Custom)         │
+└──────────────────────┬──────────────────────────────┘
+                       │ texto
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│              CortexMemorySDK                        │
+│                                                     │
+│   ┌────────────┐    ┌─────────────┐                │
+│   │  Extractor │ → │  Normalizer │   ← local       │
+│   └────────────┘    └─────────────┘                │
+│          │                                          │
+│          ▼                                          │
+│   ┌─────────────────────────────────┐              │
+│   │         HTTP Client             │──────────────┼──→ API Cortex
+│   └─────────────────────────────────┘              │
+└─────────────────────────────────────────────────────┘
+```
 
-| Campo | Descrição | Obrigatório |
-|-------|-----------|-------------|
-| **WHO** | Participantes (nomes, emails, sistemas) | ✅ |
-| **WHAT** | O que aconteceu (ação/fato) | ✅ |
-| **WHY** | Por quê (causa/razão) | ❌ |
-| **WHEN** | Quando (automático) | - |
-| **WHERE** | Namespace/contexto | ❌ |
-| **HOW** | Resultado/método | ❌ |
+## API
 
----
+### `CortexMemorySDK`
 
-## 🔌 Endpoint /memory/interact
+| Método | Descrição |
+|--------|-----------|
+| `remember(action)` | Armazena Action estruturada |
+| `observe(text)` | Armazena observação bruta |
+| `process(text)` | Extrai Action ou armazena como observação |
+| `recall(query)` | Busca memórias relevantes |
+| `clean_response(text)` | Remove marcadores [MEMORY] |
 
-O endpoint `/memory/interact` permite armazenar interações com **extração automática de W5H no servidor**. O cliente não precisa extrair nada:
+### Contratos
 
 ```python
-# POST /memory/interact
-{
-    "user_message": "Olá, meu nome é João e preciso de ajuda",
-    "assistant_response": "Olá João! Como posso ajudar?",
-    "user_name": "João"
-}
+@dataclass
+class Action:
+    verb: str           # Obrigatório
+    subject: str = ""   # Quem
+    object: str = ""    # O quê
+    modifiers: tuple = ()  # Contexto adicional
 
-# Response
-{
-    "success": true,
-    "memory_id": "abc123",
-    "extracted": {
-        "who": ["João"],
-        "what": "solicitou_ajuda",
-        "why": "primeiro_contato",
-        "how": "assistente_ofereceu_ajuda"
-    }
-}
+@dataclass
+class W5H:
+    who: str    # ← subject
+    what: str   # ← verb_object
+    when: str   # ← timestamp
+    where: str  # ← namespace
+    how: str    # ← modifiers
+    why: str    # ← explícito
 ```
 
----
+## Variáveis de Ambiente
 
-## 📚 Documentação
+| Variável | Descrição | Default |
+|----------|-----------|---------|
+| `CORTEX_API_URL` | URL da API Cortex | `http://localhost:8000` |
+| `CORTEX_API_KEY` | Chave de autenticação | _(vazio)_ |
 
-- [API Reference](../../docs/API.md)
-- [W5H Design](../../docs/W5H_DESIGN.md)
-- [Architecture](../../docs/ARCHITECTURE.md)
-- [MCP Integration](../../docs/MCP.md)
+## Desenvolvimento
+
+```bash
+# Instala dependências de dev
+pip install -e ".[dev]"
+
+# Roda testes
+pytest tests/ -v
+```
+
+## Licença
+
+MIT

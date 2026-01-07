@@ -68,6 +68,23 @@ class LightweightBenchmarkRunner:
         if self.verbose:
             print(message, end=end, flush=True)
     
+    def _print_wrapped(self, text: str, prefix: str = "", max_width: int = 70):
+        """Imprime texto quebrado em múltiplas linhas."""
+        import textwrap
+        
+        if not text:
+            print(f"{prefix}(vazio)")
+            return
+        
+        # Remove múltiplos espaços e quebras de linha excessivas
+        text = " ".join(text.split())
+        
+        # Quebra em linhas
+        lines = textwrap.wrap(text, width=max_width - len(prefix))
+        
+        for line in lines:
+            print(f"{prefix}{line}")
+    
     def verify_services(self) -> bool:
         """Verifica se Ollama e Cortex estão acessíveis."""
         self._log("\n🔍 Verificando serviços...")
@@ -99,8 +116,20 @@ class LightweightBenchmarkRunner:
         Executa UMA conversa em ambos agentes.
         
         Coleta apenas dados brutos, sem análises.
+        
+        IMPORTANTE: Cada conversa/usuário tem seu próprio namespace para evitar
+        cross-contamination de memória entre diferentes usuários.
         """
-        self._log(f"\n📋 Conversa: {conversation.domain} - {conversation.user_profile.get('name', 'user')}")
+        # Extrai identificador único do usuário
+        user_name = conversation.user_profile.get('name', 'user')
+        user_id = conversation.user_profile.get('id') or user_name.lower().replace(' ', '_')
+        
+        # Namespace hierárquico: {base}:{domain}:{user_id}
+        # Isso garante isolamento completo por usuário
+        user_namespace = f"{self.namespace}:{conversation.domain}:{user_id}"
+        self.cortex_agent.set_namespace(user_namespace)
+        
+        self._log(f"\n📋 Conversa: {conversation.domain} - {user_name} (ns: {user_namespace})")
         
         conv_result = {
             "conversation_id": conversation_id,
@@ -111,7 +140,14 @@ class LightweightBenchmarkRunner:
         
         # Processa cada sessão
         for session_idx, session in enumerate(conversation.sessions):
-            self._log(f"   📅 Sessão {session_idx + 1}/{len(conversation.sessions)}.")
+            is_returning = session_idx > 0
+            
+            if self.verbose:
+                print(f"\n   {'═' * 50}")
+                print(f"   📅 SESSÃO {session_idx + 1}/{len(conversation.sessions)}")
+                if is_returning:
+                    print(f"   🔄 USUÁRIO RETORNANDO (teste de memória)")
+                print(f"   {'═' * 50}")
             
             session_id = f"session_{session_idx}"
             session_result = {
@@ -191,8 +227,59 @@ class LightweightBenchmarkRunner:
                         winner = eval_result.get("winner", "TIE")
                         self._log(f"\n      🏆 Winner: {winner} | B:{eval_result.get('baseline_score', 0):.1f} vs C:{eval_result.get('cortex_score', 0):.1f}")
                 
-                # Logs detalhados
-                if self.detailed_logs:
+                # Logs detalhados (igual ao full)
+                if self.detailed_logs or self.verbose:
+                    print(f"\n   ┌{'─' * 70}┐")
+                    print(f"   │ 💬 MENSAGEM {msg_idx + 1}")
+                    print(f"   └{'─' * 70}┘")
+                    
+                    # Mensagem do usuário COMPLETA
+                    print(f"   │ 👤 USUÁRIO:")
+                    self._print_wrapped(user_message, prefix="   │    ", max_width=70)
+                    
+                    print(f"   │")
+                    print(f"   ├{'─' * 70}┤")
+                    
+                    # Baseline COMPLETO
+                    print(f"   │ ⚪ BASELINE  │ 🎟️ {baseline_response.total_tokens:4d} tokens │ ⏱️ {baseline_time_ms:.0f}ms")
+                    print(f"   │ 💭 Resposta:")
+                    self._print_wrapped(baseline_response.content, prefix="   │    ", max_width=70)
+                    
+                    print(f"   │")
+                    print(f"   ├{'─' * 70}┤")
+                    
+                    # Cortex COMPLETO
+                    mems = cortex_response.memory_entities + cortex_response.memory_episodes
+                    print(f"   │ 🟢 CORTEX    │ 🎟️ {cortex_response.total_tokens:4d} tokens │ ⏱️ {cortex_time_ms:.0f}ms │ 🧠 {mems} mems")
+                    
+                    # CONTEXTO DE MEMÓRIA RECUPERADO (COMPLETO)
+                    if cortex_response.context_from_memory:
+                        print(f"   │")
+                        print(f"   │ 📋 CONTEXTO DE MEMÓRIA RECUPERADO:")
+                        self._print_wrapped(cortex_response.context_from_memory, prefix="   │    ", max_width=70)
+                    else:
+                        print(f"   │ 📋 Contexto: (nenhuma memória recuperada)")
+                    
+                    print(f"   │")
+                    print(f"   │ 💭 Resposta:")
+                    self._print_wrapped(cortex_response.content, prefix="   │    ", max_width=70)
+                    
+                    # MEMÓRIA EXTRAÍDA E SALVA
+                    print(f"   │")
+                    if cortex_response.memory_extracted:
+                        mem = cortex_response.extracted_memory or {}
+                        print(f"   │ 💾 MEMÓRIA EXTRAÍDA E SALVA:")
+                        print(f"   │    who: {mem.get('who', '?')}")
+                        print(f"   │    what: {mem.get('what', '?')}")
+                        print(f"   │    why: {mem.get('why', '')}")
+                        print(f"   │    how: {mem.get('how', '')}")
+                    else:
+                        print(f"   │ 💾 Memória: (nenhuma memória extraída desta resposta)")
+                    
+                    print(f"   └{'─' * 70}┘")
+                
+                # Logs detalhados antigo (removido, agora usa o visual acima)
+                if False and self.detailed_logs:
                     self._log(f"\n      📝 User: {user_message[:60]}...")
                     self._log(f"      🅰️ Baseline ({baseline_response.total_tokens}t): {baseline_response.content[:80]}...")
                     self._log(f"      🅱️ Cortex ({cortex_response.total_tokens}t): {cortex_response.content[:80]}...")
@@ -202,6 +289,23 @@ class LightweightBenchmarkRunner:
                         self._log(f"      💾 Extracted: {cortex_response.extracted_memory}")
                 
                 session_result["messages"].append(message_result)
+            
+            # Sumário da sessão
+            if self.verbose:
+                total_baseline_tokens = sum(m.get("baseline_tokens", 0) for m in session_result["messages"])
+                total_cortex_tokens = sum(m.get("cortex_tokens", 0) for m in session_result["messages"])
+                total_baseline_time = sum(m.get("baseline_time_ms", 0) for m in session_result["messages"])
+                total_cortex_time = sum(m.get("cortex_time_ms", 0) for m in session_result["messages"])
+                
+                economy = ((total_baseline_tokens - total_cortex_tokens) / total_baseline_tokens * 100) if total_baseline_tokens > 0 else 0
+                
+                print(f"\n   ┌{'─' * 45}┐")
+                print(f"   │ 📊 SUMÁRIO SESSÃO {session_idx + 1}")
+                print(f"   ├{'─' * 45}┤")
+                print(f"   │ ⚪ Baseline: {total_baseline_tokens:5d} tokens │ {total_baseline_time:7.0f}ms")
+                print(f"   │ 🟢 Cortex:   {total_cortex_tokens:5d} tokens │ {total_cortex_time:7.0f}ms")
+                print(f"   │ 💰 Economia: {economy:+.1f}%")
+                print(f"   └{'─' * 45}┘")
             
             conv_result["sessions"].append(session_result)
         
@@ -262,10 +366,8 @@ class LightweightBenchmarkRunner:
             
             conversation_id = f"conv_{idx}_{conv.domain}"
             
-            # ISOLA cada conversa com namespace único por domínio
-            # Evita contaminação de memória entre domínios diferentes
-            domain_namespace = f"{self.namespace}_{conv.domain}"
-            self.cortex_agent.set_namespace(domain_namespace)
+            # NOTA: O namespace por usuário é definido em run_conversation()
+            # Cada usuário/conversa tem seu próprio namespace isolado
             
             try:
                 conv_result = self.run_conversation(conv, conversation_id)

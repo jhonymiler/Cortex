@@ -899,6 +899,161 @@ class FinancialGenerator:
         return session
 
 
+# ==================== COLLECTIVE SCENARIOS ====================
+
+
+class CollectiveScenarioGenerator:
+    """
+    Gerador de cenários coletivos para testar memória compartilhada.
+    
+    Cria múltiplos usuários com problemas similares no mesmo domínio,
+    permitindo testar:
+    1. Isolamento de memórias pessoais
+    2. Compartilhamento de conhecimento LEARNED
+    3. Extração de padrões procedurais
+    """
+    
+    def generate_support_collective(self, num_users: int = 3) -> list[Conversation]:
+        """
+        Gera conversas de suporte com problema similar para testar memória coletiva.
+        
+        Usuário 1: Reporta problema e resolve (cria conhecimento)
+        Usuário 2: Reporta mesmo problema (deve receber conhecimento LEARNED)
+        Usuário 3: Problema diferente (isolamento)
+        """
+        conversations = []
+        
+        # Problema comum: timeout de API
+        common_problem = "timeout na API"
+        common_solution = "aumentar timeout para 30s e verificar connection pooling"
+        
+        users = [
+            {"name": "Pedro Costa", "id": "pedro_costa", "role": "first_reporter"},
+            {"name": "Maria Silva", "id": "maria_silva", "role": "second_reporter"},
+            {"name": "João Santos", "id": "joao_santos", "role": "different_problem"},
+        ]
+        
+        for i, user in enumerate(users[:num_users]):
+            conv = Conversation(
+                domain="customer_support",
+                user_profile={
+                    "name": user["name"],
+                    "id": user["id"],
+                    "product": "Plano Enterprise",
+                    "role_in_test": user["role"],
+                }
+            )
+            
+            if user["role"] == "first_reporter":
+                # Primeiro a reportar e resolver
+                session1 = Session()
+                session1.messages = [
+                    Message("user", f"Olá, sou {user['name']}. Estou tendo {common_problem}!"),
+                    Message("assistant", f"Olá {user['name']}! Vou verificar. Pode descrever melhor o erro?"),
+                    Message("user", "A integração dá timeout depois de 10 segundos, mas as vezes demora mais."),
+                    Message("assistant", "Entendi. O timeout padrão é 10s. Sugiro aumentar para 30s nas configurações."),
+                ]
+                session1.key_facts = [f"usuário: {user['name']}", f"problema: {common_problem}"]
+                
+                session2 = Session()
+                session2.messages = [
+                    Message("user", f"Funcionou! Aumentei o timeout e também verifiquei o connection pooling."),
+                    Message("assistant", f"Ótimo, {user['name']}! Fico feliz que resolveu. Essa é uma dica importante."),
+                ]
+                session2.key_facts = [f"solução: {common_solution}"]
+                
+                conv.sessions = [session1, session2]
+                
+            elif user["role"] == "second_reporter":
+                # Segundo usuário - deve receber conhecimento do primeiro
+                session = Session()
+                session.messages = [
+                    Message("user", f"Olá, sou {user['name']}. Também estou com {common_problem}."),
+                    Message("assistant", f"Olá {user['name']}! Esse é um problema comum. Já tentou aumentar o timeout?"),
+                ]
+                session.expected_recalls = ["solução anterior", "timeout", "connection pooling"]
+                conv.sessions = [session]
+                
+            else:
+                # Problema diferente - isolamento
+                session = Session()
+                session.messages = [
+                    Message("user", f"Olá, sou {user['name']}. Quero fazer upgrade do meu plano."),
+                    Message("assistant", f"Olá {user['name']}! Claro, posso ajudar com o upgrade."),
+                ]
+                session.expected_recalls = []  # Não deve ver memórias de timeout
+                conv.sessions = [session]
+            
+            conversations.append(conv)
+        
+        return conversations
+    
+    def generate_education_collective(self, num_users: int = 3) -> list[Conversation]:
+        """
+        Gera conversas educacionais com dúvidas similares.
+        """
+        conversations = []
+        
+        common_topic = "derivadas"
+        common_approach = "pensar como velocidade instantânea, usar exemplos práticos"
+        
+        users = [
+            {"name": "Letícia", "id": "leticia", "role": "first_learner"},
+            {"name": "Rafael", "id": "rafael", "role": "second_learner"},
+            {"name": "Camila", "id": "camila", "role": "different_subject"},
+        ]
+        
+        for user in users[:num_users]:
+            conv = Conversation(
+                domain="education",
+                user_profile={
+                    "student_name": user["name"],
+                    "id": user["id"],
+                    "subject": "Cálculo" if user["role"] != "different_subject" else "História",
+                    "role_in_test": user["role"],
+                }
+            )
+            
+            if user["role"] == "first_learner":
+                session1 = Session()
+                session1.messages = [
+                    Message("user", f"Oi, sou {user['name']}. Não entendo {common_topic}!"),
+                    Message("assistant", f"Olá {user['name']}! Derivadas podem ser difíceis. Como você aprende melhor?"),
+                    Message("user", "Prefiro exemplos práticos."),
+                    Message("assistant", "Ótimo! Pense em velocidade: a derivada é a velocidade instantânea."),
+                ]
+                
+                session2 = Session()
+                session2.messages = [
+                    Message("user", "Entendi! Pensar como velocidade ajudou muito!"),
+                    Message("assistant", f"Que bom, {user['name']}! Essa analogia funciona muito bem."),
+                ]
+                session2.key_facts = [common_approach]
+                
+                conv.sessions = [session1, session2]
+                
+            elif user["role"] == "second_learner":
+                session = Session()
+                session.messages = [
+                    Message("user", f"Sou {user['name']}, também preciso de ajuda com {common_topic}."),
+                    Message("assistant", f"Olá {user['name']}! Uma dica que funciona: pense como velocidade."),
+                ]
+                session.expected_recalls = ["velocidade instantânea", "exemplos práticos"]
+                conv.sessions = [session]
+                
+            else:
+                session = Session()
+                session.messages = [
+                    Message("user", f"Sou {user['name']}, preciso estudar Revolução Francesa."),
+                    Message("assistant", f"Olá {user['name']}! Vamos estudar a Revolução Francesa."),
+                ]
+                conv.sessions = [session]
+            
+            conversations.append(conv)
+        
+        return conversations
+
+
 # ==================== MAIN GENERATOR ====================
 
 
@@ -915,6 +1070,9 @@ class ConversationGenerator:
         "healthcare": HealthcareGenerator,
         "financial": FinancialGenerator,
     }
+    
+    # Gerador de cenários coletivos
+    COLLECTIVE_GENERATOR = CollectiveScenarioGenerator
     
     def generate_all(self, conversations_per_domain: int = 3, sessions_per_conversation: int = 5) -> list[Conversation]:
         """
@@ -945,6 +1103,58 @@ class ConversationGenerator:
         
         generator = self.GENERATORS[domain]()
         return [generator.generate(num_sessions=sessions) for _ in range(count)]
+    
+    def generate_collective(self, scenario_type: str = "support", num_users: int = 3) -> list[Conversation]:
+        """
+        Gera cenário coletivo para testar memória compartilhada.
+        
+        Args:
+            scenario_type: "support" ou "education"
+            num_users: Número de usuários no cenário
+            
+        Returns:
+            Lista de conversas no mesmo domínio com problemas similares
+        """
+        collective_gen = self.COLLECTIVE_GENERATOR()
+        
+        if scenario_type == "support":
+            return collective_gen.generate_support_collective(num_users)
+        elif scenario_type == "education":
+            return collective_gen.generate_education_collective(num_users)
+        else:
+            raise ValueError(f"Tipo desconhecido: {scenario_type}. Opções: support, education")
+    
+    def generate_with_collective(
+        self, 
+        conversations_per_domain: int = 2, 
+        sessions_per_conversation: int = 3,
+        include_collective: bool = True,
+    ) -> list[Conversation]:
+        """
+        Gera conversas incluindo cenários coletivos para testar memória compartilhada.
+        
+        Args:
+            conversations_per_domain: Conversas por domínio
+            sessions_per_conversation: Sessões por conversa
+            include_collective: Se True, adiciona cenários coletivos
+            
+        Returns:
+            Lista de todas as conversas incluindo cenários coletivos
+        """
+        conversations = self.generate_all(
+            conversations_per_domain=conversations_per_domain,
+            sessions_per_conversation=sessions_per_conversation,
+        )
+        
+        if include_collective:
+            # Adiciona cenários coletivos
+            collective_support = self.generate_collective("support", num_users=3)
+            collective_education = self.generate_collective("education", num_users=3)
+            
+            conversations.extend(collective_support)
+            conversations.extend(collective_education)
+        
+        return conversations
     
     def save_to_file(self, conversations: list[Conversation], filepath: Path | str) -> None:
         """Salva conversas em arquivo JSON."""
