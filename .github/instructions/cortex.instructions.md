@@ -578,60 +578,59 @@ test: adicionar/modificar testes
 - MemoryService (store, recall, consolidation)
 - **DecayManager** (Ebbinghaus decay + hub protection)
 - **SharedMemoryManager** (isolamento personal/shared/learned)
-- API REST com endpoints W5H + /memory/interact
+- **SleepRefiner** (consolidação em background com LLM)
+- **Consolidação Hierárquica** (resumo → granulares, filhas decaem 3x mais rápido)
+- API REST com endpoints W5H + /memory/interact + PATCH /memory/episode/{id}
 - MCP Server (cortex_recall, cortex_remember, cortex_forget, cortex_stats)
-- SDK Python (Core + Adaptadores LangChain/CrewAI)
+- SDK Python (Core + Adaptadores LangChain/CrewAI) com extração [MEMORY]
+- CortexAgent otimizado (-50% chamadas LLM, extração inline)
 - Benchmark científico completo:
   - Métricas: Precision@K, Recall@K, MRR, Consistency
   - Baselines: RAG (TF-IDF), Mem0
   - Ablation Study (8 variantes)
   - Shared Memory Benchmark
+  - Resultado: **-12.5% tokens vs baseline**
 - Documentação completa
+- Variáveis de ambiente normalizadas (.env)
 
 ### Próximos Passos 🎯
 1. Adicionar adaptador Google ADK
 2. Adicionar adaptador FastAgent
 3. Dashboard com visualização de retrievability
-4. Background job para decaimento diário
+4. SleepRefiner com suporte multi-cliente (PERSONAL vs LEARNED)
 5. Paper científico com resultados do benchmark
 
 ---
 
 ## 🔑 CONCEITOS-CHAVE
 
-### Consolidação Hierárquica (SleepRefiner)
-
-O SleepRefiner consolida memórias em background, criando uma hierarquia:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  RESUMO (is_summary=True)                               │
-│  "Cliente resolveu problema com técnico"                │
-│  - Retornado no recall normal                           │
-│  - Decai lentamente (2x mais estável)                   │
-│                                                         │
-│  ┌─────────────────────────────────────────────────┐   │
-│  │  GRANULARES (consolidated_into=resumo_id)       │   │
-│  │  - "Carlos ligou com problema"                  │   │
-│  │  - "Técnico verificou luz vermelha"             │   │
-│  │  - Decaem 3x mais rápido (decay_multiplier=0.3) │   │
-│  │  - NÃO retornadas no recall normal              │   │
-│  │  - Disponíveis para drill-down                  │   │
-│  └─────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────┘
-```
-
+### Consolidação Hierárquica
 ```python
-# Campos de consolidação
+# SleepRefiner cria hierarquia pai/filho:
+
+# RESUMO (pai) - retornado no recall normal
 Memory(
-    consolidated_from=[],          # IDs consolidadas NESTA memória
-    consolidated_into="resumo_id", # ID da memória pai (se foi consolidada)
-    is_summary=False,              # True se for resumo
+    what="Cliente_resolveu_problemas_pagamento",
+    is_summary=True,
+    consolidated_from=["id1", "id2", "id3"],
+    occurrence_count=3
 )
 
-# Recall com filtro
-find_episodes(include_consolidated=False)  # Só resumos e frescas
-find_episodes(drill_down_from="resumo_id") # Granulares do resumo
+# GRANULARES (filhas) - só drill-down/rollback
+Memory(id="id1", what="erro_cartao", consolidated_into="resumo_id")
+Memory(id="id2", what="expirou_data", consolidated_into="resumo_id")
+Memory(id="id3", what="taxa_incorreta", consolidated_into="resumo_id")
+# Filhas decaem 3x mais rápido (consolidation_modifier=0.33)
+# Filhas são excluídas do recall normal
+```
+
+### SleepRefiner (Consolidação em Background)
+```python
+from cortex.workers import SleepRefiner
+
+refiner = SleepRefiner()
+result = refiner.refine(namespace="meu_agente")
+# Analisa memórias → extrai padrões → cria resumos → marca originais
 ```
 
 ### Busca sem Tokens
@@ -662,4 +661,4 @@ Episode(action="resolved_issue", outcome="ticket closed")
 
 ---
 
-*Última atualização: 06 de Janeiro de 2026*
+*Última atualização: 07 de Janeiro de 2026*

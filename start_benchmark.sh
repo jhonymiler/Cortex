@@ -86,8 +86,8 @@ if ! curl -s --connect-timeout 5 --max-time 10 "${OLLAMA_URL}/api/version" > /de
     echo "   \$env:OLLAMA_HOST='0.0.0.0'; ollama serve"
     echo ""
     echo "   Ou defina OLLAMA_URL no .env com o IP correto"
-    exit 1
-fi
+        exit 1
+    fi
 echo "   ✓ Ollama OK"
 
 # Modelo padrão
@@ -127,9 +127,9 @@ if ! curl -s http://localhost:8000/health > /dev/null; then
             break
         fi
         echo -n "."
-        sleep 1
-    done
-    
+    sleep 1
+done
+
     # Verifica se conseguiu iniciar
     if ! curl -s http://localhost:8000/health > /dev/null; then
         echo ""

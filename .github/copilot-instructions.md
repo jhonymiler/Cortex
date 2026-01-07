@@ -81,16 +81,28 @@ mypy src/         # Type checking
 
 ## Critical Patterns
 
-### 1. Consolidation (Auto-Merge Similar Episodes)
+### 1. Consolidation (Hierarchical Parent-Child)
 
 ```python
-# 5+ similar episodes → consolidated pattern
-Episode(action="password_reset", occurrence_count=1)  # 5 times
-# Becomes:
-Episode(action="password_reset_pattern", occurrence_count=5, is_consolidated=True)
+# SleepRefiner creates hierarchy:
+
+# PARENT (summary) - returned in normal recall
+Memory(
+    what="user_resolved_payment_issues",
+    is_summary=True,
+    consolidated_from=["id1", "id2", "id3"],
+)
+
+# CHILDREN (granular) - only for drill-down/rollback
+Memory(id="id1", what="card_error", consolidated_into="summary_id")  # 3x faster decay
+Memory(id="id2", what="expired_date", consolidated_into="summary_id")  # excluded from recall
+Memory(id="id3", what="wrong_fee", consolidated_into="summary_id")
 ```
 
-**Implementation:** `MemoryService._detect_consolidation()` checks for 5+ similar episodes before storing.
+**Implementation:** 
+- `SleepRefiner.refine()` - Background consolidation with LLM
+- `Memory.was_consolidated` → 3x faster decay (`consolidation_modifier=0.33`)
+- `MemoryGraph.recall()` filters out `consolidated_into` memories by default
 
 ### 2. Entity Resolution (Dedupe via Identifiers)
 
@@ -262,16 +274,21 @@ def recall(self, query: str, context: dict) -> RecallResult:
 - MemoryService (store, recall, consolidation)
 - **DecayManager** (`src/cortex/core/decay.py`) - Ebbinghaus decay + hub protection
 - **SharedMemoryManager** (`src/cortex/core/shared_memory.py`) - personal/shared/learned isolation
-- API REST (W5H + /interact)
+- **SleepRefiner** (`src/cortex/workers/sleep_refiner.py`) - Background LLM consolidation
+- **Hierarchical Consolidation** - parent/child with accelerated child decay (3x)
+- API REST (W5H + /interact + PATCH /memory/episode/{id})
 - MCP Server (cortex_recall, cortex_remember, cortex_forget, cortex_stats)
-- SDK Python (Core + LangChain/CrewAI adapters)
+- SDK Python (Core + LangChain/CrewAI adapters) with [MEMORY] extraction
+- CortexAgent optimized (-50% LLM calls via inline extraction)
 - Benchmark científico:
   - Métricas: Precision@K, Recall@K, MRR, Consistency
   - Baselines: RAG (TF-IDF), Mem0
   - Ablation Study (8 variantes)
   - Shared Memory Benchmark
+  - Result: **-12.5% tokens vs baseline**
+- Environment variables normalized (.env)
 
-⏳ **Pending:** Google ADK adapter, FastAgent adapter, Dashboard visualizations
+⏳ **Pending:** Google ADK adapter, FastAgent adapter, SleepRefiner multi-client support (PERSONAL vs LEARNED), Dashboard visualizations
 
 ---
 

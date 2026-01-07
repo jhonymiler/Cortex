@@ -222,21 +222,79 @@ namespaces = manager.get_recall_namespaces("user_123")
 2. **Dev Team**: Múltiplos devs compartilham conhecimento do projeto
 3. **Healthcare**: Dados de pacientes estritamente isolados
 
-## Consolidação
+## Consolidação Hierárquica ✅
 
-Quando episódios similares ocorrem 5+ vezes:
-1. Detecta padrão comum
-2. Cria episódio consolidado
-3. Arquiva episódios individuais
-4. Mantém contagem de ocorrências
+### SleepRefiner (`src/cortex/workers/sleep_refiner.py`)
+
+Consolida memórias em background, similar ao processo de consolidação durante o sono:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  CONSOLIDADA (recall normal)                            │
+│  "Cliente expressou gratidão após resolução"            │
+│  is_summary=True, occurrence_count=15                   │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  GRANULARES (só drill-down/rollback)            │   │
+│  │  ├── "Carlos ligou com problema de modem"       │   │
+│  │  ├── "Técnico verificou luz vermelha"           │   │
+│  │  ├── "Problema era cabo desconectado"           │   │
+│  │  └── "Carlos agradeceu"                         │   │
+│  │  (consolidated_into → ID do resumo acima)       │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Campos de Consolidação em Memory:
+
+| Campo | Descrição |
+|-------|-----------|
+| `consolidated_from` | IDs das memórias que originaram este resumo |
+| `consolidated_into` | ID do resumo pai (se esta foi consolidada) |
+| `is_summary` | True se é um resumo de consolidação |
+| `is_consolidated` | Property: True se é pai (tem consolidated_from) |
+| `was_consolidated` | Property: True se é filho (tem consolidated_into) |
+
+### Decaimento Acelerado para Filhas
+
+Memórias que JÁ FORAM consolidadas (`was_consolidated=True`) decaem **3x mais rápido**:
 
 ```python
-Episode(
-    action="analyzed_log",
-    outcome="pattern: 404 errors from missing routes",
-    occurrence_count=15,
-    is_consolidated=True
-)
+# Memory.retrievability
+if self.was_consolidated:
+    consolidation_modifier = 0.33  # 3x mais rápido
+```
+
+Isso permite que o grafo se "limpe" naturalmente, mantendo apenas resumos e memórias recentes.
+
+### Recall Inteligente
+
+Por padrão, `recall()` **exclui memórias filhas** (já consolidadas):
+
+```python
+# MemoryGraph.recall()
+if not include_consolidated:
+    episodes = [ep for ep in episodes if not ep.metadata.get("consolidated_into")]
+```
+
+Para drill-down (buscar detalhes), use:
+```python
+result = graph.recall(query, context={"include_consolidated": True})
+```
+
+### Uso do SleepRefiner
+
+```python
+from cortex.workers import SleepRefiner
+
+refiner = SleepRefiner()
+result = refiner.refine(namespace="meu_agente")
+
+print(f"Analisadas: {result.memories_analyzed}")
+print(f"Refinadas: {result.memories_refined}")
+print(f"Entidades: {result.entities_extracted}")
+print(f"Padrões: {result.patterns_found}")
+print(f"Resumo: {result.consolidated_summary}")
 ```
 
 ## Persistência

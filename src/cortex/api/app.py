@@ -444,6 +444,66 @@ def _extract_w5h_simple(user_msg: str, assistant_resp: str, user_name: str) -> d
     }
 
 
+# ==================== EPISODE UPDATE (FOR CONSOLIDATION) ====================
+
+
+class UpdateEpisodeRequest(BaseModel):
+    """Request para atualizar campos de um episódio."""
+    consolidated_into: str | None = Field(None, description="ID da memória pai")
+    is_summary: bool | None = Field(None, description="Se é um resumo de consolidação")
+    importance: float | None = Field(None, description="Importância (0.0-1.0)")
+
+
+@app.patch("/memory/episode/{episode_id}")
+async def update_episode(
+    episode_id: str,
+    request: UpdateEpisodeRequest,
+    namespace: str = Depends(get_namespace),
+    service: MemoryService = Depends(get_service),
+) -> dict[str, Any]:
+    """
+    Atualiza campos de um episódio.
+    
+    Usado principalmente pelo SleepRefiner para marcar memórias
+    como consolidadas (apontando para o resumo).
+    
+    Headers:
+        X-Cortex-Namespace: Namespace (opcional, default: "default")
+    
+    Body:
+        consolidated_into: ID da memória resumo (pai)
+        is_summary: Se esta memória é um resumo de consolidação
+        importance: Nova importância (0.0-1.0)
+    """
+    try:
+        episode = service.graph.get_episode(episode_id)
+        if not episode:
+            raise HTTPException(status_code=404, detail="Episode not found")
+        
+        # Atualiza campos se fornecidos
+        if request.consolidated_into is not None:
+            episode.metadata["consolidated_into"] = request.consolidated_into
+        
+        if request.is_summary is not None:
+            episode.metadata["is_summary"] = request.is_summary
+        
+        if request.importance is not None:
+            episode.importance = request.importance
+        
+        # Salva
+        service._save()
+        
+        return {
+            "success": True,
+            "episode_id": episode_id,
+            "updated": True,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/namespaces")
 async def list_namespaces(
     namespaced_service: NamespacedMemoryService = Depends(get_namespaced_service),
@@ -476,65 +536,6 @@ async def delete_namespace(
         "namespace": namespace,
         "message": f"Namespace '{namespace}' deleted" if deleted else "Namespace not found",
     }
-
-
-# ==================== EPISODE UPDATE ====================
-
-
-class EpisodeUpdateRequest(BaseModel):
-    """Request to update an episode."""
-    consolidated_into: str | None = None
-    is_summary: bool | None = None
-    importance: float | None = None
-    stability: float | None = None
-
-
-@app.patch("/memory/episodes/{episode_id}")
-async def update_episode(
-    episode_id: str,
-    request: EpisodeUpdateRequest,
-    namespace: str = Depends(get_namespace),
-    service: MemoryService = Depends(get_service),
-) -> dict[str, Any]:
-    """
-    Update an episode's consolidation status.
-    
-    Used by SleepRefiner to link granular memories to summaries.
-    
-    Args:
-        episode_id: ID of the episode to update
-        request: Fields to update
-    """
-    try:
-        graph = service.graph
-        episode = graph._episodes.get(episode_id)
-        
-        if not episode:
-            return {"success": False, "error": "Episode not found"}
-        
-        # Update fields if provided
-        if request.consolidated_into is not None:
-            episode.consolidated_into = request.consolidated_into
-        if request.is_summary is not None:
-            episode.is_summary = request.is_summary
-        if request.importance is not None:
-            episode.importance = request.importance
-        if request.stability is not None:
-            episode.stability = request.stability
-        
-        # Save changes
-        graph._save()
-        
-        return {
-            "success": True,
-            "episode_id": episode_id,
-            "updated_fields": {
-                k: v for k, v in request.model_dump().items() if v is not None
-            },
-        }
-        
-    except Exception as e:
-        return {"success": False, "error": str(e)}
 
 
 # ==================== ENTRY POINT ====================

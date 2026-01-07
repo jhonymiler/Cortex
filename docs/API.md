@@ -259,6 +259,48 @@ GET /namespaces
 
 ---
 
+### Update Episode (Consolidação) ⭐ NOVO
+
+Atualiza campos de um episódio. Usado pelo SleepRefiner para marcar memórias como consolidadas.
+
+```http
+PATCH /memory/episode/{episode_id}
+```
+
+**Request Body:**
+
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|-------------|-----------|
+| consolidated_into | string | ❌ | ID da memória resumo (pai) |
+| is_summary | boolean | ❌ | Se é resumo de consolidação |
+| importance | float | ❌ | Nova importância (0.0-1.0) |
+
+**Example:**
+
+```json
+{
+  "consolidated_into": "mem_summary_123",
+  "importance": 0.3
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "episode_id": "mem_abc123",
+  "updated": true
+}
+```
+
+**Efeitos:**
+- Memórias com `consolidated_into` decaem **3x mais rápido**
+- Memórias com `consolidated_into` são **excluídas do recall normal**
+- Para incluí-las, use `context.include_consolidated = true` no recall
+
+---
+
 ## Health Check
 
 ```http

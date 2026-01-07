@@ -117,9 +117,9 @@ class Memory:
     
     # Consolidação
     occurrence_count: int = 1
-    consolidated_from: list[str] = field(default_factory=list)  # IDs consolidadas NESTA memória
+    consolidated_from: list[str] = field(default_factory=list)
     consolidated_into: str | None = None  # ID da memória pai (se foi consolidada)
-    is_summary: bool = False  # True se for uma memória de consolidação/resumo
+    is_summary: bool = False  # True se esta memória é um resumo de consolidação
     
     # Metadados
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -127,34 +127,15 @@ class Memory:
     # Cache de centralidade (atualizado externamente)
     _centrality_score: float = field(default=0.0, repr=False)
     
-    # Constante de decaimento para memórias já consolidadas
-    CONSOLIDATED_DECAY_MULTIPLIER: float = field(default=0.3, repr=False)
-    
     @property
     def is_consolidated(self) -> bool:
-        """Retorna True se esta memória é resultado de consolidação (memória pai/resumo)."""
+        """Retorna True se esta memória é resultado de consolidação (é um resumo)."""
         return len(self.consolidated_from) > 0 or self.is_summary
     
     @property
     def was_consolidated(self) -> bool:
-        """Retorna True se esta memória FOI consolidada em outra (memória filha/granular)."""
+        """Retorna True se esta memória foi consolidada em outra (é filha)."""
         return self.consolidated_into is not None
-    
-    @property
-    def decay_multiplier(self) -> float:
-        """
-        Multiplicador de decaimento para memórias já consolidadas.
-        
-        Memórias que foram consolidadas em um resumo decaem 3x mais rápido,
-        pois seu conteúdo já está representado na memória pai.
-        
-        Returns:
-            0.3 se foi consolidada (decai rápido)
-            1.0 se ainda não foi consolidada (decai normal)
-        """
-        if self.was_consolidated:
-            return self.CONSOLIDATED_DECAY_MULTIPLIER  # 0.3
-        return 1.0
     
     @property
     def is_forgotten(self) -> bool:
@@ -176,8 +157,7 @@ class Memory:
         Modificadores de stability:
             - access_count: mais acessos = mais estável
             - centrality: hubs são mais estáveis
-            - is_consolidated (resumo): memórias resumo são mais estáveis
-            - was_consolidated (granular): memórias granulares já consolidadas decaem RÁPIDO
+            - consolidation: memórias consolidadas são mais estáveis
         
         Returns:
             float entre 0.0 (esquecida) e 1.0 (fresca na memória)
@@ -192,12 +172,13 @@ class Memory:
         # Base: stability * (1 + log(access_count + 1))
         access_modifier = 1 + math.log(self.access_count + 1)
         
-        # Bonus para memórias RESUMO (consolidação pai)
-        summary_modifier = 2.0 if self.is_consolidated else 1.0
+        # Bonus para memórias consolidadas (resumos) - decaem mais lentamente
+        consolidation_modifier = 2.0 if self.is_consolidated else 1.0
         
-        # PENALIDADE para memórias granulares JÁ consolidadas
-        # Elas decaem 3x mais rápido (decay_multiplier = 0.3)
-        granular_modifier = self.decay_multiplier
+        # Penalidade para memórias que JÁ FORAM consolidadas (filhas)
+        # Elas decaem 3x mais rápido para liberar espaço
+        if self.was_consolidated:
+            consolidation_modifier = 0.33  # 3x mais rápido
         
         # Bonus para hubs (centralidade)
         centrality_modifier = 1 + (self._centrality_score * 0.5)
@@ -205,8 +186,7 @@ class Memory:
         effective_stability = (
             self.stability 
             * access_modifier 
-            * summary_modifier 
-            * granular_modifier  # 0.3 se já consolidada
+            * consolidation_modifier 
             * centrality_modifier
         )
         

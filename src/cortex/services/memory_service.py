@@ -161,7 +161,6 @@ class RememberRequest(BaseModel):
     how: str = Field(default="", description="How it was resolved (outcome/result)")
     where: str = Field(default="default", description="Namespace/context")
     importance: float = Field(default=0.5, ge=0.0, le=1.0, description="Importance 0.0-1.0")
-    is_summary: bool = Field(default=False, description="True if this is a consolidation summary")
 
 
 class RememberResponse(BaseModel):
@@ -429,7 +428,6 @@ class MemoryService:
             how=request.how,
             where=request.where,
             importance=request.importance,
-            is_summary=request.is_summary,  # Mark if this is a consolidation summary
         )
         
         # 3. Store as Episode (compatibility layer)
@@ -441,13 +439,11 @@ class MemoryService:
             context=memory.why,  # WHY stored in context
             participants=who_resolved,
             importance=memory.importance,
-            is_summary=request.is_summary,  # Pass through summary flag
         )
         
         # Store in metadata for full W5H access
         episode.metadata["w5h"] = memory.to_w5h_dict()
         episode.metadata["where"] = memory.where
-        episode.metadata["is_summary"] = request.is_summary
         
         # 4. Add with consolidation check
         consolidated, consolidation_count = self.graph.add_episode_with_consolidation(episode)
