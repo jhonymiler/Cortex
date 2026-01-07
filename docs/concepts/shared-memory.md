@@ -311,11 +311,40 @@ if contains_pii(memory.what) or contains_pii(memory.how):
 
 ---
 
-## Relacionamento com Outros Conceitos
+## 🧭 Próximos Passos
 
-- **Modelo W5H**: Ver [Modelo de Memória](./memory-model.md)
-- **Decaimento**: Ver [Decaimento Cognitivo](./cognitive-decay.md)
-- **Consolidação**: Ver [Consolidação Hierárquica](./consolidation.md)
+Escolha seu caminho baseado no que você quer fazer agora:
+
+> **🚀 Quer configurar shared memory no seu agente?**
+> 
+> ```bash
+> # .env
+> CORTEX_MEMORY_MODE=hybrid  # individual | shared | hybrid
+> ```
+> 
+> ```bash
+> # Armazenar com nível específico
+> curl -X POST http://localhost:8000/memory/remember \
+>   -H "X-Cortex-Namespace: suporte" \
+>   -H "X-Cortex-User: user_123" \
+>   -d '{"who": ["João"], "what": "preferencia", "memory_level": "personal"}'
+> ```
+> → [API Reference](../architecture/api-reference.md)
+
+> **🔬 Quer entender como padrões são promovidos para LEARNED?**
+> 
+> O DreamAgent detecta padrões comuns entre usuários e promove para LEARNED (após anonimização).
+> → [Consolidação Hierárquica](./consolidation.md)
+
+> **💡 Quer ver a economia com shared memory?**
+> 
+> No benchmark de Dev Team, shared memory economizou **15.2%** vs memória individual.
+> → [Benchmarks: Shared Memory](../research/benchmarks.md#benchmark-de-shared-memory)
+
+> **🏥 Quer garantir compliance (LGPD, HIPAA)?**
+> 
+> PII/PCI é **automaticamente detectado** e forçado para namespace PERSONAL.
+> Ver seção [Proteção de PII/PCI](#proteção-de-piipci) acima.
 
 ---
 

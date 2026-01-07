@@ -25,6 +25,8 @@ import re
 import requests
 from dataclasses import dataclass, field
 
+from cortex.core.memory_normalizer import MemoryNormalizer
+
 
 @dataclass
 class DreamResult:
@@ -100,6 +102,9 @@ resumo_consolidado: |
         
         self._session = requests.Session()
         self._session.headers.update({"Content-Type": "application/json"})
+        
+        # Normalizador para compactar memórias
+        self._normalizer = MemoryNormalizer(max_nouns=3, use_lemma=False)
     
     def dream(self, namespace: str, query: str = "") -> DreamResult:
         """
@@ -164,28 +169,34 @@ resumo_consolidado: |
             entidades = re.findall(r'nome:\s*"([^"]+)"', yaml_content)
             result.entities_extracted = entidades
             
-            # Extrai padrões
-            padroes = re.findall(r'what:\s*"([^"]+)"', yaml_content)
+            # Extrai padrões e NORMALIZA com spaCy
+            padroes_raw = re.findall(r'what:\s*"([^"]+)"', yaml_content)
+            padroes = [self._normalizer.extract_core(p) for p in padroes_raw]
             result.patterns_found = padroes
             
-            # Extrai resumo consolidado
+            # Extrai resumo consolidado e NORMALIZA
             resumo_match = re.search(
                 r'resumo_consolidado:\s*\|?\s*\n(.+?)(?=\n\w|\Z)', 
                 yaml_content, 
                 re.DOTALL
             )
             if resumo_match:
-                result.consolidated_summary = resumo_match.group(1).strip()
+                resumo_raw = resumo_match.group(1).strip()
+                # Normaliza resumo para formato compacto
+                result.consolidated_summary = self._normalizer.extract_core(resumo_raw)
             
-            # 4. Salva memória consolidada
+            # 4. Salva memória consolidada (já normalizada)
             if result.consolidated_summary:
+                # Extrai o padrão principal dos patterns para usar como what
+                what_consolidated = padroes[0] if padroes else "consolidacao_memoria"
+                
                 store_resp = self._session.post(
                     f"{self.cortex_url}/memory/remember",
                     json={
                         "who": entidades[:3] if entidades else ["sistema"],
-                        "what": "consolidacao_memoria",
+                        "what": what_consolidated,  # Já normalizado
                         "why": "dream_consolidation",
-                        "how": result.consolidated_summary[:200],
+                        "how": result.consolidated_summary,  # Já normalizado
                         "where": namespace,
                         "importance": 0.9,
                         "is_summary": True,  # Marca como resumo de consolidação

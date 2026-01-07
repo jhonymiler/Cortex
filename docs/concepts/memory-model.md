@@ -165,11 +165,35 @@ Memory(
 
 ---
 
-## Relacionamento com Outros Conceitos
+## 🧭 Próximos Passos
 
-- **Decaimento**: Ver [Decaimento Cognitivo](./cognitive-decay.md)
-- **Consolidação**: Ver [Consolidação Hierárquica](./consolidation.md)
-- **Isolamento**: Ver [Memória Compartilhada](./shared-memory.md)
+Escolha seu caminho baseado no que você quer fazer agora:
+
+> **🚀 Quer usar o W5H na prática?**
+> 
+> Você já entendeu a estrutura. Agora veja como armazenar sua primeira memória:
+> ```bash
+> curl -X POST http://localhost:8000/memory/remember \
+>   -H "Content-Type: application/json" \
+>   -H "X-Cortex-Namespace: meu_agente" \
+>   -d '{"who": ["João"], "what": "testou_cortex", "how": "sucesso"}'
+> ```
+> → [Quick Start completo](../getting-started/quickstart.md)
+
+> **🔬 Quer entender como memórias são "esquecidas"?**
+> 
+> O W5H define a estrutura. O **decaimento de Ebbinghaus** define quanto tempo cada memória permanece ativa.
+> → [Decaimento Cognitivo](./cognitive-decay.md)
+
+> **💡 Quer ver quanto o W5H economiza vs texto livre?**
+> 
+> No ablation study, W5H completo economiza **7.4% mais tokens** que modelos simples (só action/outcome).
+> → [Benchmarks: Ablation Study](../research/benchmarks.md#ablation-study)
+
+> **🏗️ Quer ver a implementação completa?**
+> 
+> O dataclass `Memory` está em `src/cortex/core/memory.py` com todos os campos e propriedades.
+> → [Arquitetura: Overview](../architecture/overview.md)
 
 ---
 

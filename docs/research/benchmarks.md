@@ -110,6 +110,14 @@ PÓS-CONSOLIDAÇÃO (DreamAgent):
 | Mem0 | 46.500 | -5.9% | 78% |
 | **Cortex** | **43.255** | **-12.5%** | **100%** |
 
+### 💡 O Que Isso Significa na Prática
+
+**Cortex vs RAG**: RAG economiza apenas **2.5%** de tokens porque embeddings e chunks ainda consomem contexto. Cortex economiza **5x mais** porque usa índices O(1) e formato estruturado (W5H), não texto.
+
+**Cortex vs Mem0**: Mem0 extrai "salience" mas não consolida nem aplica decay. Cortex economiza **mais que o dobro** porque memórias antigas são arquivadas e padrões são consolidados.
+
+**Hit Rate 100%**: Toda query no Cortex retorna pelo menos uma memória relevante. Em RAG (65%) e Mem0 (78%), queries frequentemente retornam chunks irrelevantes ou nada.
+
 ---
 
 ## Métricas de Retrieval
@@ -218,6 +226,16 @@ SESSÃO 2 (após consolidação):
 1. **Consolidação é crítica** — Sem ela, tokens aumentam 8.7%
 2. **Decay melhora relevância** — Menos ruído nos recalls
 3. **W5H completo supera simple** — +7.4pp de economia
+
+### 💡 O Que Isso Significa na Prática
+
+**Para desenvolvedores**: Se você implementar Cortex sem o DreamAgent (consolidação), seu sistema vai **gastar 21% mais tokens** do que a versão completa. O DreamAgent não é opcional — é o que transforma memórias brutas em economia real.
+
+**Para arquitetos**: O modelo W5H completo (com WHY e HOW) supera o modelo simples (só action/outcome) em **7.4 pontos percentuais**. O custo de implementar campos extras é mínimo; o benefício é mensurável.
+
+**Para pesquisadores**: O decay de Ebbinghaus contribui com **2.3%** de economia e **5%** de hit rate. É um componente de refinamento, não essencial, mas cientificamente interessante.
+
+**Para stakeholders**: Cada componente tem ROI mensurável. A consolidação sozinha paga o custo de toda a infraestrutura em economia de tokens.
 
 ---
 

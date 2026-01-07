@@ -253,11 +253,41 @@ CORTEX_CONSOLIDATION_WINDOW_HOURS=1  # Janela temporal
 
 ---
 
-## Relacionamento com Outros Conceitos
+## 🧭 Próximos Passos
 
-- **Modelo W5H**: Ver [Modelo de Memória](./memory-model.md)
-- **Decaimento**: Ver [Decaimento Cognitivo](./cognitive-decay.md)
-- **Isolamento**: Ver [Memória Compartilhada](./shared-memory.md)
+Escolha seu caminho baseado no que você quer fazer agora:
+
+> **🚀 Quer executar o DreamAgent agora?**
+> 
+> ```python
+> from cortex.workers import DreamAgent
+> 
+> agent = DreamAgent(
+>     cortex_url="http://localhost:8000",
+>     llm_url="http://localhost:11434",
+>     llm_model="gemma3:4b"
+> )
+> result = agent.dream(namespace="meu_agente")
+> print(f"Consolidados: {result.summaries_created}")
+> ```
+> → [Integrações: Workers](../getting-started/integrations.md)
+
+> **🔬 Quer entender como memórias consolidadas decaem diferente?**
+> 
+> Memórias-resumo (pais) decaem **2x mais lento**. Memórias arquivadas (filhas) decaem **3x mais rápido**.
+> → [Decaimento Cognitivo](./cognitive-decay.md)
+
+> **💡 Quer ver o impacto da consolidação nos tokens?**
+> 
+> **Sem consolidação**: +8.7% tokens vs baseline (memórias brutas acumulam).
+> **Com consolidação**: -12.5% tokens vs baseline.
+> **Delta**: 21.2 pontos percentuais de melhoria.
+> → [Benchmarks: Impacto da Consolidação](../research/benchmarks.md#impacto-da-consolidação)
+
+> **🏢 Quer consolidar padrões entre múltiplos usuários?**
+> 
+> O DreamAgent pode promover padrões comuns de PERSONAL para LEARNED (anonimizado).
+> → [Memória Compartilhada](./shared-memory.md#promoção-personal--learned)
 
 ---
 

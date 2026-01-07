@@ -235,11 +235,41 @@ result = graph.recall(query, include_forgotten=True)
 
 ---
 
-## Relacionamento com Outros Conceitos
+## 🧭 Próximos Passos
 
-- **Modelo W5H**: Ver [Modelo de Memória](./memory-model.md)
-- **Consolidação**: Ver [Consolidação Hierárquica](./consolidation.md)
-- **Isolamento**: Ver [Memória Compartilhada](./shared-memory.md)
+Escolha seu caminho baseado no que você quer fazer agora:
+
+> **🚀 Quer aplicar decay manualmente?**
+> 
+> Use a API para forçar decay em um namespace:
+> ```bash
+> curl -X POST http://localhost:8000/memory/decay \
+>   -H "X-Cortex-Namespace: meu_agente"
+> 
+> # Resposta:
+> # {"success": true, "memories_decayed": 42, "memories_forgotten": 3}
+> ```
+> → [API Reference: Decay](../architecture/api-reference.md)
+
+> **🔬 Quer entender como consolidação afeta o decay?**
+> 
+> Memórias consolidadas decaem **2x mais lento**. Memórias já consolidadas (filhas) decaem **3x mais rápido**.
+> → [Consolidação Hierárquica](./consolidation.md)
+
+> **💡 Quer ver quanto o decay impacta nos resultados?**
+> 
+> No ablation study, remover decay reduz economia em **2.3%** e hit rate em **5%**.
+> → [Benchmarks: Ablation Study](../research/benchmarks.md#ablation-study)
+
+> **⚙️ Quer configurar os parâmetros de decay?**
+> 
+> Todas as variáveis são configuráveis via `.env`:
+> ```bash
+> CORTEX_DECAY_BASE_STABILITY=7.0
+> CORTEX_DECAY_CONSOLIDATION_BONUS=2.0
+> CORTEX_DECAY_HUB_BONUS=1.5
+> CORTEX_DECAY_FORGOTTEN_THRESHOLD=0.1
+> ```
 
 ---
 
