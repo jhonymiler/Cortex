@@ -6,86 +6,45 @@
 http://localhost:8000
 ```
 
-## Autenticação
+## Headers
 
-Atualmente sem autenticação. Em produção, adicione bearer token via middleware.
-
----
-
-## Endpoints
-
-### Health Check
-
-```http
-GET /health
-```
-
-**Response:**
-```json
-{
-  "status": "healthy",
-  "service": "cortex-memory"
-}
-```
+| Header | Descrição | Obrigatório |
+|--------|-----------|-------------|
+| `X-Cortex-Namespace` | Namespace para isolamento de memórias | ❌ (default: "default") |
+| `Content-Type` | application/json | ✅ (para POST) |
 
 ---
 
-### Store Memory
+## Endpoints W5H (Recomendados)
 
-Armazena uma memória após interação.
+### Remember (Armazenar memória W5H)
+
+Armazena memória usando modelo W5H. Use **APÓS** responder ao usuário.
 
 ```http
-POST /memory/store
-Content-Type: application/json
+POST /memory/remember
 ```
 
 **Request Body:**
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|-------------|-----------|
-| action | string | ✅ | Verbo do que foi feito |
-| outcome | string | ✅ | Resultado ou conclusão |
-| participants | array | ❌ | Entidades envolvidas |
-| context | string | ❌ | Situação ou cenário |
-| relations | array | ❌ | Conexões descobertas |
-
-**Participant Object:**
-
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| type | string | Tipo da entidade |
-| name | string | Nome da entidade |
-| identifiers | array | Identificadores únicos |
-
-**Relation Object:**
-
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| from | string | Nome da entidade origem |
-| type | string | Tipo da relação |
-| to | string | Nome da entidade destino |
+| who | array[string] | ✅ | Participantes (nomes, emails, sistemas) |
+| what | string | ✅ | O que aconteceu (ação/fato) |
+| why | string | ❌ | Por quê (causa/razão) |
+| how | string | ❌ | Como foi resolvido (resultado) |
+| where | string | ❌ | Namespace (default: "default") |
+| importance | float | ❌ | Importância 0.0-1.0 (default: 0.5) |
 
 **Example:**
 
 ```json
 {
-  "action": "analyzed_log",
-  "outcome": "found 3 errors, cause: missing route",
-  "participants": [
-    {
-      "type": "file",
-      "name": "apache.log",
-      "identifiers": ["sha256:abc123", "/var/log/apache.log"]
-    }
-  ],
-  "context": "debugging session",
-  "relations": [
-    {
-      "from": "error_404",
-      "type": "caused_by",
-      "to": "missing_route"
-    }
-  ]
+  "who": ["João", "sistema_pagamentos"],
+  "what": "reportou_erro_pagamento",
+  "why": "cartao_expirado",
+  "how": "orientado_atualizar_dados",
+  "importance": 0.7
 }
 ```
 
@@ -94,24 +53,21 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "episode_id": "ep_abc123",
-  "entities_created": 1,
-  "entities_updated": 0,
-  "relations_created": 1,
+  "memory_id": "mem_abc123",
+  "who_resolved": ["ent_123", "ent_456"],
   "consolidated": false,
-  "consolidation_count": 1
+  "retrievability": 0.95
 }
 ```
 
 ---
 
-### Recall Memories
+### Recall (Buscar memórias)
 
-Busca memórias relevantes antes de responder.
+Busca memórias relevantes. Use **ANTES** de responder ao usuário.
 
 ```http
 POST /memory/recall
-Content-Type: application/json
 ```
 
 **Request Body:**
@@ -119,18 +75,14 @@ Content-Type: application/json
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|-------------|-----------|
 | query | string | ✅ | Texto para buscar |
-| context | object | ❌ | Contexto adicional |
+| context | object | ❌ | Contexto adicional (who, where) |
 | limit | integer | ❌ | Máximo de resultados (default: 5) |
 
 **Example:**
 
 ```json
 {
-  "query": "análise de logs apache",
-  "context": {
-    "entity_types": ["file"],
-    "current_task": "debugging"
-  },
+  "query": "problema com pagamento João",
   "limit": 5
 }
 ```
@@ -142,29 +94,89 @@ Content-Type: application/json
   "entities_found": 2,
   "episodes_found": 3,
   "relations_found": 1,
-  "context_summary": "Você já analisou apache.log 5 vezes. Padrão: erros 404.",
-  "prompt_context": "[MEMORY CONTEXT]\nEntities known:\n  - apache.log (file)\n...",
-  "entities": [
-    {
-      "id": "ent_abc",
-      "type": "file",
-      "name": "apache.log",
-      "access_count": 5
-    }
-  ],
-  "episodes": [
-    {
-      "id": "ep_xyz",
-      "action": "analyzed_log",
-      "outcome": "found 3 errors",
-      "occurrence_count": 5,
-      "is_pattern": true
-    }
-  ]
+  "context_summary": "João é cliente VIP. Já teve 2 problemas de pagamento.",
+  "prompt_context": "conhece: João\nhistórico: reportou_erro→orientado_atualizar",
+  "entities": [...],
+  "episodes": [...]
 }
 ```
 
 ---
+
+### Interact (Armazenar com extração automática) ⭐ NOVO
+
+Armazena interação com **extração automática de W5H no servidor**.
+O cliente NÃO precisa extrair nada.
+
+```http
+POST /memory/interact
+```
+
+**Request Body:**
+
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|-------------|-----------|
+| user_message | string | ✅ | Mensagem do usuário |
+| assistant_response | string | ✅ | Resposta do assistente |
+| user_name | string | ❌ | Nome do usuário (default: "user") |
+
+**Example:**
+
+```json
+{
+  "user_message": "Olá, meu nome é Maria e preciso de ajuda com meu pedido",
+  "assistant_response": "Olá Maria! Vou verificar seu pedido. Qual o número?",
+  "user_name": "Maria"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "memory_id": "mem_xyz789",
+  "extracted": {
+    "who": ["Maria"],
+    "what": "solicitou_ajuda_pedido",
+    "why": "problema_com_pedido",
+    "how": "assistente_solicitou_numero"
+  },
+  "message": "Interação armazenada com sucesso"
+}
+```
+
+---
+
+### Forget (Esquecer memória)
+
+Marca memória como esquecida (excluída de recalls futuros).
+
+```http
+POST /memory/forget
+```
+
+**Request Body:**
+
+| Campo | Tipo | Obrigatório | Descrição |
+|-------|------|-------------|-----------|
+| memory_id | string | ✅ | ID da memória a esquecer |
+| reason | string | ❌ | Motivo (para auditoria) |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "memory_id": "mem_abc123",
+  "was_forgotten": false,
+  "message": "Memória marcada como esquecida"
+}
+```
+
+---
+
+## Endpoints Admin
 
 ### Get Statistics
 
@@ -179,13 +191,30 @@ GET /memory/stats
   "total_entities": 42,
   "total_episodes": 128,
   "total_relations": 67,
-  "entities_by_type": {
-    "file": 15,
-    "person": 10,
-    "concept": 17
-  },
+  "entities_by_type": {"person": 10, "system": 5},
   "consolidated_episodes": 12,
-  "storage_path": "/home/user/.cortex"
+  "storage_path": "/data/cortex"
+}
+```
+
+---
+
+### Memory Health
+
+```http
+GET /memory/health
+```
+
+**Response:**
+
+```json
+{
+  "orphan_entities": 3,
+  "lonely_episodes": 2,
+  "weak_relations": 5,
+  "avg_episode_importance": 0.65,
+  "avg_relation_strength": 0.72,
+  "health_score": 85
 }
 ```
 
@@ -193,10 +222,10 @@ GET /memory/stats
 
 ### Clear Memories
 
-⚠️ **Perigoso!** Remove todas as memórias.
+⚠️ **Perigoso!** Remove todas as memórias do namespace.
 
 ```http
-DELETE /memory/clear
+POST /memory/clear
 ```
 
 **Response:**
@@ -204,7 +233,44 @@ DELETE /memory/clear
 ```json
 {
   "success": true,
-  "message": "All memories cleared"
+  "entities_deleted": 42,
+  "episodes_deleted": 128,
+  "relations_deleted": 67
+}
+```
+
+---
+
+### List Namespaces
+
+```http
+GET /namespaces
+```
+
+**Response:**
+
+```json
+{
+  "active": ["default", "agente_a", "agente_b"],
+  "persisted": ["default", "agente_a"],
+  "stats": {"total_namespaces": 3}
+}
+```
+
+---
+
+## Health Check
+
+```http
+GET /health
+```
+
+**Response:**
+
+```json
+{
+  "status": "healthy",
+  "service": "cortex-memory"
 }
 ```
 
@@ -216,24 +282,45 @@ DELETE /memory/clear
 |--------|-----------|
 | 200 | Sucesso |
 | 400 | Request inválido |
+| 404 | Memória não encontrada |
 | 500 | Erro interno |
+
+---
 
 ## Exemplos cURL
 
 ```bash
-# Store
-curl -X POST http://localhost:8000/memory/store \
+# Remember (W5H)
+curl -X POST http://localhost:8000/memory/remember \
   -H "Content-Type: application/json" \
-  -d '{"action": "test", "outcome": "success"}'
+  -H "X-Cortex-Namespace: meu_agente" \
+  -d '{
+    "who": ["João", "suporte"],
+    "what": "resolveu_problema",
+    "why": "erro_de_login",
+    "how": "reset_de_senha"
+  }'
 
 # Recall
 curl -X POST http://localhost:8000/memory/recall \
   -H "Content-Type: application/json" \
-  -d '{"query": "test"}'
+  -H "X-Cortex-Namespace: meu_agente" \
+  -d '{"query": "João login"}'
+
+# Interact (extração automática)
+curl -X POST http://localhost:8000/memory/interact \
+  -H "Content-Type: application/json" \
+  -H "X-Cortex-Namespace: meu_agente" \
+  -d '{
+    "user_message": "Oi, sou Maria",
+    "assistant_response": "Olá Maria, como posso ajudar?"
+  }'
 
 # Stats
-curl http://localhost:8000/memory/stats
+curl http://localhost:8000/memory/stats \
+  -H "X-Cortex-Namespace: meu_agente"
 
-# Clear
-curl -X DELETE http://localhost:8000/memory/clear
+# Clear (cuidado!)
+curl -X POST http://localhost:8000/memory/clear \
+  -H "X-Cortex-Namespace: meu_agente"
 ```

@@ -1,7 +1,7 @@
 # 🧠 Cortex - Sistema de Memória Cognitiva
 
 > **Memória semântica para agentes LLM**  
-> Versão: 3.0 | Janeiro 2026
+> Versão: 3.1 | Janeiro 2026
 
 ---
 
@@ -326,29 +326,93 @@ Memória NÃO é opcional. Ela permite continuidade entre sessões.
 
 ## 🗺️ Roadmap
 
-### Fase 1: Core ← ATUAL
+### Fase 1: Core ✅
 - [x] Estrutura do projeto
-- [ ] Entity, Episode, Relation
-- [ ] MemoryGraph
-- [ ] Storage (JSON local)
+- [x] Entity, Episode, Relation
+- [x] MemoryGraph
+- [x] Storage (JSON local)
 
-### Fase 2: MCP
-- [ ] MCP Server
-- [ ] cortex_recall
-- [ ] cortex_store
-- [ ] Testes com Claude Desktop
+### Fase 2: MCP ✅
+- [x] MCP Server (FastMCP)
+- [x] cortex_recall
+- [x] cortex_remember (W5H)
+- [x] cortex_store (legacy)
+- [x] cortex_forget
 
-### Fase 3: Inteligência
-- [ ] EntityResolver (identificar entidades ambíguas)
-- [ ] Consolidator (compactar episódios repetidos)
-- [ ] RecallEngine (busca por relevância)
+### Fase 3: API + SDK ✅
+- [x] API REST (FastAPI) com /memory/interact
+- [x] SDK Python - Core genérico (cortex_memory.py)
+- [x] Adaptador LangChain (BaseMemory)
+- [x] Adaptador CrewAI (long_term_memory)
 
-### Fase 4: Produção
+### Fase 4: Inteligência ✅
+- [x] EntityResolver (identificar entidades)
+- [x] Consolidator (compactar episódios)
+- [x] Decaimento Ebbinghaus (`src/cortex/core/decay.py`)
+- [x] Hub centrality detection (`src/cortex/core/entity.py`)
+- [x] Shared Memory com isolamento (`src/cortex/core/shared_memory.py`)
+
+### Fase 5: Benchmark Científico ✅
+- [x] Métricas científicas (Precision@K, Recall@K, MRR)
+- [x] Consistency Metrics (`benchmark/consistency_metrics.py`)
+- [x] RAG Baseline (`benchmark/rag_agent.py`)
+- [x] Mem0 Baseline (`benchmark/mem0_agent.py`)
+- [x] Shared Memory Benchmark (`benchmark/shared_memory_benchmark.py`)
+- [x] Ablation Study (`benchmark/ablation_runner.py`)
+
+### Fase 6: Expansão 🔮
+- [ ] Adaptador Google ADK
+- [ ] Adaptador FastAgent
 - [ ] PostgreSQL storage
-- [ ] API REST (além de MCP)
-- [ ] SDKs (Python, TypeScript)
 - [ ] Docker
+- [ ] SDK TypeScript
 
 ---
 
-*Última atualização: 05 de Janeiro de 2026*
+## 🔌 SDK Python
+
+### Arquitetura Core + Adaptadores
+
+```
+CortexMemory (Core Genérico)
+    ├── before(user_message) → contexto
+    └── after(user_message, response) → store
+         │
+         ├── LangChain Adapter (BaseMemory)
+         ├── CrewAI Adapter (long_term_memory)
+         └── @with_memory decorator
+```
+
+### Uso Simples (Decorator)
+
+```python
+from cortex_memory import with_memory
+
+@with_memory(namespace="meu_agente")
+def meu_agente(msg: str, context: str = "") -> str:
+    return f"Resposta com contexto: {context}"
+```
+
+### LangChain
+
+```python
+from integrations.langchain import CortexLangChainMemory
+
+memory = CortexLangChainMemory(namespace="lc_agent")
+chain = ConversationChain(llm=llm, memory=memory)
+```
+
+### CrewAI
+
+```python
+from integrations.crewai import CortexCrewAIMemory
+
+crew = Crew(
+    agents=[...],
+    long_term_memory=CortexCrewAIMemory(namespace="crew")
+)
+```
+
+---
+
+*Última atualização: 06 de Janeiro de 2026*

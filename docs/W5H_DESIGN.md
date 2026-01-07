@@ -422,39 +422,42 @@ class GraphMetrics:
 
 ## 🚀 Plano de Implementação
 
-### Fase 1: Core Schema (Prioridade Alta)
-1. [ ] Criar `Memory` dataclass com campos W5H
-2. [ ] Adicionar `centrality_score` a Entity
-3. [ ] Migrar Episode → Memory
-4. [ ] Atualizar MemoryGraph para novo schema
+### Fase 1: Core Schema ✅
+1. [x] Criar `Memory` dataclass com campos W5H (`src/cortex/core/memory.py`)
+2. [x] Adicionar `centrality_score` a Entity (`src/cortex/core/entity.py`)
+3. [x] Migrar Episode → Memory (alias para retrocompatibilidade)
+4. [x] Atualizar MemoryGraph para novo schema
 
-### Fase 2: Decaimento (Prioridade Alta)
-1. [ ] Implementar `DecayManager`
-2. [ ] Adicionar `retrievability` calculation
-3. [ ] Implementar `apply_decay()` batch job
-4. [ ] Adicionar threshold para "forgotten"
+### Fase 2: Decaimento ✅
+1. [x] Implementar `DecayManager` (`src/cortex/core/decay.py`)
+2. [x] Adicionar `retrievability` calculation (propriedade em Memory)
+3. [x] Implementar `apply_decay()` com spaced repetition
+4. [x] Adicionar threshold para "forgotten"
+5. [x] Hub protection (memórias centrais decaem mais lentamente)
 
-### Fase 3: Centralidade (Prioridade Média)
-1. [ ] Implementar cálculo de degree centrality
-2. [ ] Atualizar centrality em cada store/recall
-3. [ ] Ajustar decaimento baseado em centrality
-4. [ ] Adicionar hub detection
+### Fase 3: Centralidade ✅
+1. [x] Implementar cálculo de degree centrality
+2. [x] Atualizar centrality em cada store/recall
+3. [x] Ajustar decaimento baseado em centrality
+4. [x] Adicionar hub detection (>5 referências)
 
-### Fase 4: MCP Tools (Prioridade Alta)
-1. [ ] Refatorar `cortex_store` → `cortex_remember` com W5H
-2. [ ] Atualizar `cortex_recall` com filtros W5H
-3. [ ] Implementar `cortex_forget`
-4. [ ] Testar com Claude Desktop
+### Fase 4: MCP Tools ✅
+1. [x] Refatorar `cortex_store` → `cortex_remember` com W5H
+2. [x] Atualizar `cortex_recall` com filtros W5H
+3. [x] Implementar `cortex_forget`
+4. [x] Testar com Claude Desktop
 
-### Fase 5: Persistência (Prioridade Média)
-1. [ ] Atualizar serialização JSON para novo schema
-2. [ ] Migração de dados existentes
-3. [ ] Background job para decaimento diário
+### Fase 5: Shared Memory ✅
+1. [x] Implementar `SharedMemoryManager` (`src/cortex/core/shared_memory.py`)
+2. [x] Três níveis: personal, shared, learned
+3. [x] Isolamento entre usuários
+4. [x] Benchmark de shared memory
 
 ### Fase 6: Dashboard (Prioridade Baixa)
-1. [ ] Visualizar retrievability
-2. [ ] Mostrar hubs
-3. [ ] Gráfico de decaimento ao longo do tempo
+1. [x] Visualizar grafo de memória (Streamlit)
+2. [ ] Visualizar retrievability
+3. [ ] Mostrar hubs
+4. [ ] Gráfico de decaimento ao longo do tempo
 
 ---
 

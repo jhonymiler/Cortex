@@ -44,7 +44,7 @@ GOOGLE_API_KEY=sua-api-key-aqui
 OLLAMA_URL=http://localhost:11434
 
 # Modelo padrão
-OLLAMA_MODEL=llama3.2:3b
+OLLAMA_MODEL=gemma3:4b
 ```
 
 ## Uso em Código

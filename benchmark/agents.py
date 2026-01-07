@@ -9,8 +9,10 @@ Ambos coletam métricas reais: tokens, tempo de resposta, etc.
 """
 
 import os
+import re
 import sys
 import time
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -18,6 +20,11 @@ from pathlib import Path
 from typing import Any
 
 import litellm
+import yaml
+
+# Configura logging para benchmark
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("cortex.benchmark")
 
 # Adiciona SDK ao path
 sdk_path = Path(__file__).parent.parent / "sdk" / "python"
@@ -84,6 +91,81 @@ def call_llm_with_retry(
     
     # Todas tentativas falharam
     raise last_error
+
+
+def evaluate_responses(
+    model: str,
+    api_base: str,
+    user_message: str,
+    baseline_response: str,
+    cortex_response: str,
+    memory_context: str = "",
+) -> dict:
+    """
+    Usa LLM para avaliar qual resposta é melhor.
+    
+    Retorna scores de 1-5 para cada aspecto.
+    Formato YAML para economizar tokens.
+    """
+    eval_prompt = f"""Compare these two AI responses. Score 1-5 each aspect.
+
+USER QUESTION: {user_message[:150]}
+
+RESPONSE A (without memory):
+{baseline_response[:300]}
+
+RESPONSE B (with memory context):
+{cortex_response[:300]}
+
+Memory context used by B: {memory_context[:100] if memory_context else "none"}
+
+Reply ONLY in YAML:
+relevance_a: 1-5
+relevance_b: 1-5
+coherence_a: 1-5
+coherence_b: 1-5
+personalization_a: 1-5
+personalization_b: 1-5
+winner: A or B or TIE
+reason: brief explanation"""
+
+    try:
+        response = call_llm_with_retry(
+            model=model,
+            messages=[{"role": "user", "content": eval_prompt}],
+            api_base=api_base,
+            max_retries=2,
+            initial_wait=5.0,
+        )
+        
+        content = response.choices[0].message.content
+        content = re.sub(r'```ya?ml\s*|\s*```', '', content).strip()
+        
+        try:
+            result = yaml.safe_load(content)
+            if isinstance(result, dict):
+                return {
+                    "baseline_score": (
+                        result.get("relevance_a", 3) + 
+                        result.get("coherence_a", 3) + 
+                        result.get("personalization_a", 3)
+                    ) / 3,
+                    "cortex_score": (
+                        result.get("relevance_b", 3) + 
+                        result.get("coherence_b", 3) + 
+                        result.get("personalization_b", 3)
+                    ) / 3,
+                    "winner": result.get("winner", "TIE"),
+                    "reason": result.get("reason", ""),
+                    "raw": result,
+                }
+        except Exception:
+            pass
+        
+        return {"baseline_score": 3, "cortex_score": 3, "winner": "TIE", "error": "parse_failed"}
+        
+    except Exception as e:
+        return {"baseline_score": 3, "cortex_score": 3, "winner": "TIE", "error": str(e)}
 
 
 @dataclass
@@ -321,15 +403,17 @@ class CortexAgent(BaseAgent):
     - Padrões consolidados
     """
     
-    SYSTEM_PROMPT_TEMPLATE = """Você é um assistente útil e amigável COM MEMÓRIA PERSISTENTE.
+    SYSTEM_PROMPT_TEMPLATE = """Você é um assistente útil com memória de conversas anteriores.
 
 {memory_section}
 
-INSTRUÇÕES:
-- Use as memórias para dar respostas mais contextualizadas e personalizadas
-- Se lembrar de algo sobre o usuário, mencione naturalmente
-- Se não tiver memórias relevantes, responda normalmente
-- Seja consistente com informações de sessões anteriores"""
+Use a memória para:
+- Reconhecer o usuário e seu contexto
+- Não pedir informações que já sabe
+- Dar continuidade natural à conversa
+- Ser mais preciso e relevante nas respostas
+
+Responda de forma natural e completa."""
     
     def __init__(
         self,
@@ -350,6 +434,7 @@ INSTRUÇÕES:
         
         # Cliente Cortex com namespace para isolamento
         self.cortex = CortexClient(base_url=cortex_url, namespace=namespace)
+        self._cortex_url = cortex_url  # Guarda para recriar cliente
         
         # Estado da sessão atual
         self._session_history: list[dict] = []
@@ -377,16 +462,12 @@ INSTRUÇÕES:
     def _recall_memory(
         self, 
         query: str,
-        conversation_id: str | None = None,
-        session_id: str | None = None,
     ) -> tuple[str, int, int, int, float]:
         """
         Busca memórias relevantes no Cortex.
         
         Args:
             query: Query de busca
-            conversation_id: ID da conversa ativa
-            session_id: ID da sessão atual
         
         Returns:
             (context_text, num_entities, num_episodes, num_relations, time_ms)
@@ -394,13 +475,11 @@ INSTRUÇÕES:
         start_time = time.time()
         
         try:
-            # Chama recall com conversation_id e session_id
+            # Chama recall
             result = self.cortex.recall(
                 query=query,
                 who=[self._current_user] if self._current_user else None,
                 where=self.namespace,
-                conversation_id=conversation_id,
-                session_id=session_id,
                 limit=10,
             )
             
@@ -443,69 +522,49 @@ INSTRUÇÕES:
             recall_time = (time.time() - start_time) * 1000
             return f"[Erro ao buscar memória: {e}]", 0, 0, 0, recall_time
     
-    def _store_memory(self, message: str, response: str) -> float:
+    def _store_memory(self, message: str, response: str, verbose: bool = False) -> tuple[float, dict]:
         """
-        Armazena a interação no Cortex extraindo SIGNIFICADO SEMÂNTICO COMPLETO.
+        Armazena a interação no Cortex usando prompt YAML otimizado.
         
-        Usa LLM para extrair:
-        - action: verbo + objeto (ex: "requested_password_reset")
-        - outcome: resultado conciso (ex: "reset link sent to email")
-        - context: situação relevante (ex: "support_ticket_#123")
-        - entities: entidades mencionadas na conversa
-        - relations: relações semânticas descobertas
+        Prompt simplificado para modelos pequenos:
+        - Formato YAML (30% menos tokens que JSON)
+        - Poucas regras, mais exemplos
+        - Foco no modelo W5H
         
         Returns:
-            time_ms
+            (time_ms, extracted_data)
         """
         start_time = time.time()
+        extracted_data = {}
         
         try:
-            # Usa LLM para extrair significado ENRIQUECIDO
-            extract_prompt = f"""Extraia o significado SEMÂNTICO COMPLETO desta interação em JSON:
+            # Prompt OTIMIZADO: curto, YAML, poucos exemplos
+            extract_prompt = f"""Extract memory from this conversation. Reply ONLY in YAML format.
 
-USER: {message}
-ASSISTANT: {response}
+USER: {message[:200]}
+ASSISTANT: {response[:200]}
 
-Retorne apenas JSON (sem markdown):
-{{
-  "action": "verbo_objeto",
-  "outcome": "resultado_conciso",
-  "context": "situação_relevante",
-  "entities": [
-    {{"type": "tipo", "name": "nome"}}
-  ],
-  "relations": [
-    {{"from": "origem", "type": "relação", "to": "destino"}}
-  ]
-}}
+Reply with this YAML structure (no markdown, no explanation):
+who:
+  - name_of_person_or_entity
+what: action_verb_object
+why: reason_or_context
+how: result_or_outcome
+topics:
+  - topic1
+  - topic2
 
-Regras:
-- action: verbo + objeto em snake_case (ex: "reported_login_issue")
-- outcome: resultado em ~10 palavras
-- context: contexto útil em ~5 palavras
-- entities: TODOS conceitos, produtos, tecnologias, tópicos mencionados
-  - types válidos: concept, product, technology, topic, feature, problem, solution
-- relations: conexões semânticas descobertas (use nomes das entidades)
-  - tipos de relação: interested_in, has_issue_with, requested, learned_about, 
-    prefers, dislikes, works_with, needs, solved, caused_by, related_to
-- Inclua o usuário nas relations quando relevante (use "{self._current_user}" como nome)
-- SEM texto literal, MÁXIMO valor informacional
-
-Exemplo extraído:
-{{
-  "action": "asked_about_fastapi",
-  "outcome": "explained async routing and dependency injection",
-  "context": "python_web_development",
-  "entities": [
-    {{"type": "technology", "name": "FastAPI"}},
-    {{"type": "concept", "name": "async_routing"}},
-    {{"type": "concept", "name": "dependency_injection"}}
-  ],
-  "relations": [
-    {{"from": "{self._current_user}", "type": "interested_in", "to": "FastAPI"}},
-    {{"from": "FastAPI", "type": "has_feature", "to": "async_routing"}}
-  ]
-}}"""
+Example:
+who:
+  - Maria
+  - FastAPI
+what: asked_about_authentication
+why: building_web_api
+how: explained_jwt_tokens
+topics:
+  - JWT
+  - security
+  - Python"""
 
             extract_response = call_llm_with_retry(
                 model=f"ollama_chat/{self.model}",
@@ -515,39 +574,101 @@ Exemplo extraído:
                 initial_wait=5.0,
             )
             
-            # Parse JSON
-            import json
-            import re
-            
             content = extract_response.choices[0].message.content
+            
             # Remove markdown se houver
-            content = re.sub(r'```json\s*|\s*```', '', content).strip()
+            content = re.sub(r'```ya?ml\s*|\s*```', '', content).strip()
             
-            extracted = json.loads(content)
+            # Parse YAML
+            try:
+                extracted = yaml.safe_load(content)
+                if not isinstance(extracted, dict):
+                    raise ValueError("YAML não retornou dict")
+            except Exception:
+                # Fallback: tenta extrair manualmente
+                extracted = self._parse_yaml_fallback(content)
             
-            # Extrai nomes das entidades para o campo 'who'
-            entity_names = [
-                e.get("name", "").strip() 
-                for e in extracted.get("entities", []) 
-                if e.get("name") and e.get("name", "").strip().lower() != self._current_user.lower()
-            ]
+            extracted_data = extracted or {}
             
+            # Extrai campos
+            who_list = extracted.get("who", [])
+            if isinstance(who_list, str):
+                who_list = [who_list]
+            who_list = [w for w in who_list if w and str(w).lower() not in ["user", "assistant", "none"]]
+            
+            what = extracted.get("what", "conversed")
+            why = extracted.get("why", "")
+            how = extracted.get("how", "")
+            topics = extracted.get("topics", [])
+            
+            # Adiciona tópicos como entidades "who"
+            if topics and isinstance(topics, list):
+                who_list.extend([t for t in topics if t and isinstance(t, str)])
+            
+            # Remove duplicatas e limpa
+            who_list = list(set([str(w).strip() for w in who_list if w]))[:5]
+            
+            # Adiciona usuário atual
+            if self._current_user and self._current_user not in who_list:
+                who_list.insert(0, self._current_user)
+            
+            # Salva no Cortex (com namespace isolado)
             self.cortex.remember(
-                who=[self._current_user] + entity_names,
-                what=extracted.get("action", "conversed"),
-                why=extracted.get("context", "session interaction"),
-                how=extracted.get("outcome", "interaction completed"),
+                who=who_list if who_list else [self._current_user],
+                what=str(what)[:100] if what else "conversed",
+                why=str(why)[:100] if why else "",
+                how=str(how)[:150] if how else "",
+                where=self.namespace,  # Isola por domínio
             )
             
+            if verbose:
+                print(f"\n   📝 Store: who={who_list}, what={what}")
+                print(f"      why={why}, how={how[:50]}...")
+            
         except Exception as e:
-            # Fallback: salva versão minimalista manual
+            if verbose:
+                print(f"\n   ⚠️ Store fallback: {e}")
+            # Fallback: salva versão minimalista
             self.cortex.remember(
                 who=[self._current_user],
                 what="interaction",
-                how="user engaged with assistant",
+                how=response[:100] if response else "completed",
+                where=self.namespace,  # Isola por domínio
             )
+            extracted_data = {"error": str(e)}
         
-        return (time.time() - start_time) * 1000
+        return (time.time() - start_time) * 1000, extracted_data
+    
+    def _parse_yaml_fallback(self, content: str) -> dict:
+        """Parse YAML manualmente quando yaml.safe_load falha."""
+        import re
+        
+        result = {"who": [], "what": "", "why": "", "how": "", "topics": []}
+        
+        # Extrai campos com regex
+        who_match = re.search(r'who:\s*\n((?:\s*-\s*.+\n?)+)', content)
+        if who_match:
+            items = re.findall(r'-\s*(.+)', who_match.group(1))
+            result["who"] = [i.strip() for i in items if i.strip()]
+        
+        what_match = re.search(r'what:\s*(.+)', content)
+        if what_match:
+            result["what"] = what_match.group(1).strip()
+        
+        why_match = re.search(r'why:\s*(.+)', content)
+        if why_match:
+            result["why"] = why_match.group(1).strip()
+        
+        how_match = re.search(r'how:\s*(.+)', content)
+        if how_match:
+            result["how"] = how_match.group(1).strip()
+        
+        topics_match = re.search(r'topics:\s*\n((?:\s*-\s*.+\n?)+)', content)
+        if topics_match:
+            items = re.findall(r'-\s*(.+)', topics_match.group(1))
+            result["topics"] = [i.strip() for i in items if i.strip()]
+        
+        return result
     
     def process_message(self, message: str, user_context: dict | None = None) -> AgentResponse:
         """
@@ -621,7 +742,7 @@ Exemplo extraído:
         })
         
         # 3. STORE - Armazena a interação
-        store_time = self._store_memory(message, answer)
+        store_time, extracted_data = self._store_memory(message, answer, verbose=False)
         
         total_time = (time.time() - total_start) * 1000
         
@@ -742,6 +863,13 @@ Exemplo extraído:
     ) -> dict:
         """Store público para lightweight benchmark."""
         return self._store_memory(user_message, assistant_response)
+    
+    def set_namespace(self, namespace: str) -> None:
+        """Atualiza o namespace e recria o cliente Cortex."""
+        if self.namespace != namespace:
+            self.namespace = namespace
+            # Recria cliente com novo namespace (header atualizado)
+            self.cortex = CortexClient(base_url=self._cortex_url, namespace=namespace)
     
     def clear_namespace(self) -> bool:
         """Limpa o namespace de benchmark no Cortex."""

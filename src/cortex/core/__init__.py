@@ -9,9 +9,18 @@ from cortex.core.namespace import NamespacedMemoryManager, get_memory_manager, r
 from cortex.core.decay import (
     DecayManager,
     DecayConfig,
+    create_decay_manager,
     create_default_decay_manager,
     create_aggressive_decay_manager,
     create_gentle_decay_manager,
+)
+from cortex.core.shared_memory import (
+    SharedMemoryManager,
+    MemoryVisibility,
+    SharedMemoryContext,
+    MemoryWithVisibility,
+    NamespaceConfig,
+    create_shared_memory_manager,
 )
 from cortex.core.identity import (
     IdentityKernel,
@@ -49,9 +58,17 @@ __all__ = [
     # Decay / Forgetting
     "DecayManager",
     "DecayConfig",
+    "create_decay_manager",
     "create_default_decay_manager",
     "create_aggressive_decay_manager",
     "create_gentle_decay_manager",
+    # Shared Memory
+    "SharedMemoryManager",
+    "MemoryVisibility",
+    "SharedMemoryContext",
+    "MemoryWithVisibility",
+    "NamespaceConfig",
+    "create_shared_memory_manager",
     # Identity / Anti-jailbreak
     "IdentityKernel",
     "JailbreakPattern",

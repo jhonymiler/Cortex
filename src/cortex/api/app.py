@@ -324,6 +324,126 @@ async def clear_memories(
     return service.clear()
 
 
+# ==================== INTERACT ENDPOINT (AUTO W5H) ====================
+
+
+from pydantic import BaseModel, Field
+
+
+class InteractRequest(BaseModel):
+    """Request para armazenar interação com extração automática W5H."""
+    user_message: str = Field(..., description="Mensagem do usuário")
+    assistant_response: str = Field(..., description="Resposta do assistente")
+    user_name: str = Field(default="user", description="Nome do usuário (opcional)")
+
+
+class InteractResponse(BaseModel):
+    """Response do endpoint interact."""
+    success: bool
+    memory_id: str | None = None
+    extracted: dict = Field(default_factory=dict)
+    message: str = ""
+
+
+@app.post("/memory/interact")
+async def store_interaction(
+    request: InteractRequest,
+    namespace: str = Depends(get_namespace),
+    service: MemoryService = Depends(get_service),
+) -> InteractResponse:
+    """
+    Armazena interação com extração automática de W5H.
+    
+    Use este endpoint para automatizar o armazenamento de memória
+    SEM que o cliente precise extrair W5H.
+    
+    O Cortex internamente:
+    1. Analisa a interação
+    2. Extrai W5H (who, what, why, how)
+    3. Armazena a memória
+    
+    Headers:
+        X-Cortex-Namespace: Namespace (opcional, default: "default")
+    
+    Body:
+        user_message: A mensagem que o usuário enviou
+        assistant_response: A resposta que o assistente deu
+        user_name: Nome do usuário (opcional, default: "user")
+    
+    Returns:
+        success: Se foi armazenado
+        memory_id: ID da memória criada
+        extracted: O W5H extraído
+        message: Mensagem de status
+    """
+    try:
+        # Extração simples de W5H (sem LLM - determinístico básico)
+        # TODO: Pode ser melhorado com LLM assíncrono no futuro
+        extracted = _extract_w5h_simple(
+            request.user_message, 
+            request.assistant_response,
+            request.user_name,
+        )
+        
+        # Armazena
+        remember_request = RememberRequest(
+            who=extracted["who"],
+            what=extracted["what"],
+            why=extracted["why"],
+            how=extracted["how"],
+            where=namespace,
+            importance=0.5,
+        )
+        
+        result = service.remember(remember_request)
+        
+        return InteractResponse(
+            success=True,
+            memory_id=result.memory_id,
+            extracted=extracted,
+            message="Interação armazenada com sucesso",
+        )
+    except Exception as e:
+        return InteractResponse(
+            success=False,
+            message=f"Erro ao armazenar: {str(e)}",
+        )
+
+
+def _extract_w5h_simple(user_msg: str, assistant_resp: str, user_name: str) -> dict:
+    """
+    Extração simples de W5H sem LLM.
+    
+    Usa heurísticas básicas para extrair informações.
+    Não é tão bom quanto LLM, mas é rápido e não onera o cliente.
+    """
+    # WHO: usuário + primeiras palavras capitalizadas (possíveis nomes)
+    who = [user_name]
+    words = user_msg.split()
+    for word in words[:10]:
+        clean = word.strip(".,!?")
+        if clean and clean[0].isupper() and len(clean) > 2 and clean.lower() not in ["olá", "oi", "bom", "boa"]:
+            if clean not in who:
+                who.append(clean)
+    
+    # WHAT: ação principal (primeira frase do assistente, resumida)
+    first_sentence = assistant_resp.split(".")[0][:100] if assistant_resp else "responded"
+    what = first_sentence.lower().replace(" ", "_")[:50] if first_sentence else "interaction"
+    
+    # WHY: contexto do usuário (primeiras palavras da mensagem)
+    why = user_msg[:80] if user_msg else ""
+    
+    # HOW: resumo da resposta
+    how = assistant_resp[:100] if assistant_resp else ""
+    
+    return {
+        "who": who[:5],  # Limita a 5 participantes
+        "what": what,
+        "why": why,
+        "how": how,
+    }
+
+
 @app.get("/namespaces")
 async def list_namespaces(
     namespaced_service: NamespacedMemoryService = Depends(get_namespaced_service),

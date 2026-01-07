@@ -1,137 +1,214 @@
 # Cortex Python SDK
 
-SDK Python para comunicação com a API REST do Cortex.
-Usa modelo W5H (Who, What, Why, When, Where, How).
+SDK Python para integração de memória cognitiva em agentes LLM.
+Modelo W5H (Who, What, Why, When, Where, How).
 
-## Instalação
+## 📁 Estrutura
+
+```
+sdk/python/
+├── cortex_sdk.py        # Cliente REST baixo-nível
+├── cortex_memory.py     # Core genérico (before/after)
+└── integrations/
+    ├── langchain.py     # Adaptador LangChain (BaseMemory)
+    └── crewai.py        # Adaptador CrewAI (long_term_memory)
+```
+
+---
+
+## 🚀 Instalação
 
 ```bash
 # Copiar para seu projeto
-cp cortex_sdk.py seu_projeto/
+cp -r sdk/python/ seu_projeto/cortex/
 
 # Ou adicionar ao PYTHONPATH
 export PYTHONPATH=/path/to/cortex/sdk/python:$PYTHONPATH
 ```
 
-## Uso Básico
+---
+
+## 📖 Uso
+
+### 1. Core Genérico (qualquer framework)
+
+O método mais simples - funciona com qualquer LLM/framework:
+
+```python
+from cortex_memory import CortexMemory
+
+cortex = CortexMemory(namespace="meu_agente:usuario_123")
+
+def meu_agente(user_msg):
+    # ANTES: Busca contexto de memória
+    context = cortex.before(user_msg)
+    
+    # Seu LLM aqui (OpenAI, Ollama, Anthropic, etc)
+    response = llm.generate(context + user_msg)
+    
+    # DEPOIS: Armazena (extração W5H automática no servidor)
+    cortex.after(user_msg, response)
+    
+    return response
+```
+
+### 2. Decorator (mais limpo)
+
+```python
+from cortex_memory import with_memory
+
+@with_memory(namespace="meu_agente")
+def meu_agente(user_msg: str, context: str = "") -> str:
+    # context já contém a memória injetada automaticamente
+    return llm.generate(context + user_msg)
+
+# Uso - recall/store automáticos!
+response = meu_agente("Olá, sou Maria")
+```
+
+### 3. LangChain (plug and play)
+
+```python
+from cortex.integrations import CortexLangChainMemory
+from langchain.chains import LLMChain
+from langchain_openai import ChatOpenAI
+
+# Cria memória Cortex
+memory = CortexLangChainMemory(namespace="meu_agente")
+
+# Usa normalmente com LangChain
+llm = ChatOpenAI()
+chain = LLMChain(llm=llm, memory=memory, prompt=prompt)
+
+# Zero código extra - recall/store automáticos!
+response = chain.run("Olá, sou Maria")
+```
+
+### 4. CrewAI (plug and play)
+
+```python
+from cortex.integrations import CortexCrewAIMemory
+from crewai import Crew, Agent, Task
+
+# Cria memória Cortex
+memory = CortexCrewAIMemory(namespace="minha_crew")
+
+# Usa com CrewAI
+crew = Crew(
+    agents=[...],
+    tasks=[...],
+    memory=True,
+    long_term_memory=memory,  # Plug and play!
+)
+```
+
+### 5. Cliente REST (baixo nível)
+
+Para controle total sobre recall/store:
 
 ```python
 from cortex_sdk import CortexClient
 
-# Conectar ao Cortex com namespace
-client = CortexClient(
-    base_url="http://localhost:8000",
-    namespace="meu_agente:usuario_123"
-)
+client = CortexClient(namespace="meu_agente")
 
-# Verificar conexão
-if client.health_check():
-    print("✅ Conectado!")
+# ANTES de responder
+memories = client.recall(query="problema com pagamento")
+print(memories['prompt_context'])
 
-# ANTES de responder - Recall
-memories = client.recall(
-    query="problema com pagamento",
-    who=["usuario_123"],  # Filtrar por participantes
-    limit=5
-)
-
-print(f"Encontradas {memories['episodes_found']} memórias")
-print(memories['prompt_context'])  # Injetar no prompt
-
-# APÓS responder - Remember (W5H)
-result = client.remember(
+# DEPOIS de responder (W5H manual)
+client.remember(
     who=["usuario_123", "sistema_pagamentos"],
-    what="reportou erro de pagamento",
-    why="cartão expirado",
-    how="orientado a atualizar dados do cartão",
-    importance=0.7
+    what="reportou_erro_pagamento",
+    why="cartao_expirado",
+    how="orientado_atualizar_dados",
 )
-
-print(f"Memória {result['memory_id']} criada")
-print(f"Retrievability: {result['retrievability']}")
-
-# Para esquecer
-client.forget(
-    memory_id=result['memory_id'],
-    reason="informação incorreta"
-)
-
-# Estatísticas
-stats = client.stats()
-print(f"Entidades: {stats['total_entities']}")
-print(f"Memórias: {stats['total_episodes']}")
 ```
 
-## API Reference
+---
 
-### CortexClient
+## 🔧 API Reference
+
+### CortexMemory (Core)
+
+```python
+cortex = CortexMemory(
+    namespace="default",           # Isolamento de memórias
+    cortex_url="http://localhost:8000",
+    auto_inject=True,              # Formata contexto automaticamente
+)
+
+# Hooks principais
+context = cortex.before(user_message)      # Busca memória
+cortex.after(user_message, response)       # Armazena
+
+# Métodos diretos
+result = cortex.recall(query, limit=5)     # RecallResult
+result = cortex.store_interaction(msg, resp)  # StoreResult
+result = cortex.store_w5h(who, what, ...)  # StoreResult manual
+```
+
+### CortexClient (REST)
 
 ```python
 client = CortexClient(
     base_url="http://localhost:8000",
     namespace="default"
 )
+
+# Métodos W5H
+client.remember(who, what, why="", how="", importance=0.5)
+client.recall(query, who=None, limit=10)
+client.forget(memory_id, reason="")
+
+# Admin
+client.stats()       # Estatísticas
+client.health()      # Métricas de saúde
+client.clear()       # ⚠️ Limpa namespace!
 ```
 
-**Métodos W5H (Core):**
+---
 
-- `remember(who, what, why="", how="", where="default", importance=0.5) -> dict`
-- `recall(query, who=None, where=None, min_importance=0.0, limit=10) -> dict`
-- `forget(memory_id, reason="") -> dict`
-
-**Métodos Admin:**
-
-- `stats() -> dict` - Estatísticas do grafo
-- `health() -> dict` - Métricas de saúde
-- `clear() -> dict` ⚠️ Limpa namespace!
-- `health_check() -> bool` - Verifica se API está online
-
-## Modelo W5H
-
-O Cortex usa o modelo W5H para memória semântica:
+## 📊 Modelo W5H
 
 | Campo | Descrição | Obrigatório |
 |-------|-----------|-------------|
-| **WHO** | Quem participou (nomes, emails, sistemas) | ✅ |
+| **WHO** | Participantes (nomes, emails, sistemas) | ✅ |
 | **WHAT** | O que aconteceu (ação/fato) | ✅ |
-| **WHY** | Por quê aconteceu (causa/razão) | ❌ |
+| **WHY** | Por quê (causa/razão) | ❌ |
 | **WHEN** | Quando (automático) | - |
 | **WHERE** | Namespace/contexto | ❌ |
-| **HOW** | Como foi resolvido (resultado) | ❌ |
+| **HOW** | Resultado/método | ❌ |
 
-## Workflow Típico
+---
 
-```python
-# 1. ANTES de responder ao usuário
-context = client.recall(user_message)
+## 🔌 Endpoint /memory/interact
 
-# 2. Usar context['prompt_context'] para informar resposta
-
-# 3. APÓS responder
-client.remember(
-    who=[user_id, ...entities],
-    what="ação realizada",
-    why="causa/razão",
-    how="resultado obtido"
-)
-```
-
-## Namespaces
-
-Use namespaces para isolar memórias:
+O endpoint `/memory/interact` permite armazenar interações com **extração automática de W5H no servidor**. O cliente não precisa extrair nada:
 
 ```python
-# Atendimento ao cliente
-client = CortexClient(namespace=f"suporte:{user_email}")
+# POST /memory/interact
+{
+    "user_message": "Olá, meu nome é João e preciso de ajuda",
+    "assistant_response": "Olá João! Como posso ajudar?",
+    "user_name": "João"
+}
 
-# Multi-agente
-client = CortexClient(namespace=f"agent:{agent_id}:user:{user_id}")
-
-# Projetos diferentes
-client = CortexClient(namespace=f"projeto:{project_name}")
+# Response
+{
+    "success": true,
+    "memory_id": "abc123",
+    "extracted": {
+        "who": ["João"],
+        "what": "solicitou_ajuda",
+        "why": "primeiro_contato",
+        "how": "assistente_ofereceu_ajuda"
+    }
+}
 ```
 
-## Documentação Completa
+---
+
+## 📚 Documentação
 
 - [API Reference](../../docs/API.md)
 - [W5H Design](../../docs/W5H_DESIGN.md)

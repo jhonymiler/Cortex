@@ -16,7 +16,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from benchmark.agents import BaselineAgent, CortexAgent
+from benchmark.agents import BaselineAgent, CortexAgent, evaluate_responses
+from benchmark.cortex_agent_v2 import CortexAgentV2
 from benchmark.conversation_generator import Conversation
 
 
@@ -24,6 +25,8 @@ class LightweightBenchmarkRunner:
     """
     Runner otimizado que apenas COLETA dados,
     sem fazer comparações ou análises que usem LLM.
+    
+    NOVO: Suporta CortexAgentV2 com extração [MEMORY] inline.
     """
     
     def __init__(
@@ -33,10 +36,17 @@ class LightweightBenchmarkRunner:
         cortex_url: str = "http://localhost:8000",
         namespace: str = "benchmark",
         verbose: bool = True,
+        evaluate_responses_llm: bool = False,
+        detailed_logs: bool = False,
+        use_v2: bool = True,  # NOVO: Usar CortexAgentV2 por padrão
     ):
         self.model = model
         self.namespace = namespace
         self.verbose = verbose
+        self.ollama_url = ollama_url
+        self.evaluate_responses_llm = evaluate_responses_llm
+        self.detailed_logs = detailed_logs
+        self.use_v2 = use_v2
         
         # Cria agentes
         self.baseline = BaselineAgent(
@@ -44,12 +54,21 @@ class LightweightBenchmarkRunner:
             ollama_url=ollama_url,
         )
         
-        self.cortex_agent = CortexAgent(
-            model=model,
-            ollama_url=ollama_url,
-            cortex_url=cortex_url,
-            namespace=namespace,
-        )
+        # Usa V2 com extração [MEMORY] inline (50% menos tokens)
+        if use_v2:
+            self.cortex_agent = CortexAgentV2(
+                model=model,
+                ollama_url=ollama_url,
+                cortex_url=cortex_url,
+                namespace=namespace,
+            )
+        else:
+            self.cortex_agent = CortexAgent(
+                model=model,
+                ollama_url=ollama_url,
+                cortex_url=cortex_url,
+                namespace=namespace,
+            )
     
     def _log(self, message: str, end: str = "\n"):
         """Log condicional."""
@@ -177,7 +196,34 @@ class LightweightBenchmarkRunner:
                     # Dados brutos de memória (para análise posterior)
                     "cortex_entities": recall_result.get("entities", []),
                     "cortex_episodes": recall_result.get("episodes", []),
+                    
+                    # Store result
+                    "cortex_store_result": store_result if isinstance(store_result, dict) else {},
                 }
+                
+                # Avaliação LLM (opcional)
+                if self.evaluate_responses_llm:
+                    eval_result = evaluate_responses(
+                        model=f"ollama_chat/{self.model}",
+                        api_base=self.ollama_url,
+                        user_message=user_message,
+                        baseline_response=baseline_response.content,
+                        cortex_response=cortex_response.content,
+                        memory_context=recall_result.get("prompt_context", ""),
+                    )
+                    message_result["evaluation"] = eval_result
+                    
+                    if self.detailed_logs:
+                        winner = eval_result.get("winner", "TIE")
+                        self._log(f"\n      🏆 Winner: {winner} | B:{eval_result.get('baseline_score', 0):.1f} vs C:{eval_result.get('cortex_score', 0):.1f}")
+                
+                # Logs detalhados
+                if self.detailed_logs:
+                    self._log(f"\n      📝 User: {user_message[:60]}...")
+                    self._log(f"      🅰️ Baseline ({baseline_response.total_tokens}t): {baseline_response.content[:80]}...")
+                    self._log(f"      🅱️ Cortex ({cortex_response.total_tokens}t): {cortex_response.content[:80]}...")
+                    if recall_result.get("prompt_context"):
+                        self._log(f"      🧠 Memory: {recall_result.get('prompt_context', '')[:100]}...")
                 
                 session_result["messages"].append(message_result)
             
@@ -240,8 +286,10 @@ class LightweightBenchmarkRunner:
             
             conversation_id = f"conv_{idx}_{conv.domain}"
             
-            # NÃO limpa entre conversas - memória acumula para análise posterior
-            # A limpeza só ocorre no início do benchmark (clear_before=True)
+            # ISOLA cada conversa com namespace único por domínio
+            # Evita contaminação de memória entre domínios diferentes
+            domain_namespace = f"{self.namespace}_{conv.domain}"
+            self.cortex_agent.set_namespace(domain_namespace)
             
             try:
                 conv_result = self.run_conversation(conv, conversation_id)

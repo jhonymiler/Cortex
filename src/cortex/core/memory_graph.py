@@ -63,40 +63,44 @@ class RecallResult:
         return self._to_text_context()
     
     def _to_yaml_context(self) -> str:
-        """Formato YAML ultra-compacto para LLMs."""
-        lines = ["# MEMÓRIA DO USUÁRIO"]
+        """
+        Formato YAML ultra-compacto para LLMs.
         
-        if self.entities:
-            lines.append("conhecidos:")
-            for e in self.entities[:5]:
-                # Formato: "- nome (tipo): atributos principais"
-                attrs = ", ".join(f"{k}={v}" for k, v in list(e.attributes.items())[:3])
-                if attrs:
-                    lines.append(f"  - {e.name} ({e.type}): {attrs}")
-                else:
-                    lines.append(f"  - {e.name} ({e.type})")
+        OBJETIVO: Máxima densidade informacional, mínimo tokens.
+        - SEM headers desnecessários
+        - SEM tipos genéricos (participant, user, etc)
+        - APENAS fatos úteis para resposta
+        """
+        parts = []
         
+        # Filtra entidades relevantes (ignora genéricos)
+        skip_names = {"user", "assistant", "participant", "none", ""}
+        useful_entities = [
+            e for e in self.entities[:5]
+            if e.name.lower() not in skip_names 
+            and e.type.lower() not in skip_names
+        ]
+        
+        if useful_entities:
+            names = [e.name for e in useful_entities]
+            parts.append(f"conhece: {', '.join(names)}")
+        
+        # Histórico ultra-compacto: só ação e resultado
         if self.episodes:
-            lines.append("histórico:")
-            for ep in self.episodes[:5]:
-                # Formato compacto: ação + resultado em uma linha
-                if ep.is_consolidated:
-                    lines.append(f"  - [{ep.occurrence_count}x] {ep.action}: {ep.outcome}")
+            history = []
+            for ep in self.episodes[:3]:  # Menos episódios = menos tokens
+                if ep.outcome:
+                    history.append(f"{ep.action}→{ep.outcome}")
                 else:
-                    lines.append(f"  - {ep.action}: {ep.outcome}")
+                    history.append(ep.action)
+            if history:
+                parts.append(f"histórico: {'; '.join(history)}")
         
-        if self.relations:
-            # Só mostra relações fortes e relevantes
-            strong_rels = [r for r in self.relations if r.strength > 0.5][:3]
-            if strong_rels:
-                lines.append("conexões:")
-                for r in strong_rels:
-                    lines.append(f"  - {r.relation_type}")
-        
+        # Resumo se houver
         if self.context_summary:
-            lines.append(f"resumo: {self.context_summary}")
+            parts.append(f"contexto: {self.context_summary}")
         
-        return "\n".join(lines)
+        return "\n".join(parts) if parts else ""
     
     def _to_text_context(self) -> str:
         """Formato texto legível (mais tokens, mais claro)."""
@@ -1344,17 +1348,29 @@ class MemoryGraph:
         else:
             avg_importance = 0.0
         
+        # Força média das relações
+        if self._relations:
+            avg_strength = sum(r.strength for r in self._relations.values()) / len(self._relations)
+        else:
+            avg_strength = 0.0
+        
         return {
-            "orphan_entities_count": len(orphan_entities),
+            # Nomes compatíveis com UI
+            "orphan_entities": len(orphan_entities),
             "orphan_entity_ids": orphan_entities[:10],  # Primeiros 10
-            "lonely_episodes_count": len(lonely_episodes),
-            "weak_relations_count": len(weak_relations),
+            "lonely_episodes": len(lonely_episodes),
+            "weak_relations": len(weak_relations),
             "avg_episode_importance": avg_importance,
+            "avg_relation_strength": avg_strength,
             "health_score": self._calculate_health_score(
                 len(orphan_entities),
                 len(lonely_episodes),
                 len(weak_relations),
             ),
+            # Aliases para compatibilidade
+            "orphan_entities_count": len(orphan_entities),
+            "lonely_episodes_count": len(lonely_episodes),
+            "weak_relations_count": len(weak_relations),
         }
     
     def _get_frequent_participants(self, namespace: str, top_n: int = 5) -> list[Entity]:
@@ -1418,16 +1434,16 @@ class MemoryGraph:
     
     def _calculate_health_score(
         self,
-        orphan_entities: list[str],
-        lonely_episodes: list[Episode],
-        weak_relations: list[Relation],
+        orphan_count: int,
+        lonely_count: int,
+        weak_count: int,
     ) -> float:
         """Calcula um score de saúde do grafo (0-100)."""
         total = len(self._entities) + len(self._episodes) + len(self._relations)
         if total == 0:
             return 100.0
         
-        problems = len(orphan_entities) + len(lonely_episodes) + len(weak_relations)
+        problems = orphan_count + lonely_count + weak_count
         health = max(0, 100 - (problems / total * 100))
         
         return round(health, 1)

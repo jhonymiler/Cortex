@@ -37,6 +37,22 @@ from scientific_metrics import (
     ScientificMetricsEvaluator,
     evaluate_benchmark_scientifically,
 )
+from consistency_metrics import ConsistencyEvaluator, calculate_consistency_score
+
+# Tenta importar os novos baselines
+try:
+    from rag_agent import RAGAgent
+    RAG_AVAILABLE = True
+except ImportError:
+    RAG_AVAILABLE = False
+    RAGAgent = None
+
+try:
+    from mem0_agent import Mem0Agent
+    MEM0_AVAILABLE = True
+except ImportError:
+    MEM0_AVAILABLE = False
+    Mem0Agent = None
 
 
 @dataclass
@@ -106,6 +122,20 @@ ABLATION_VARIANTS = {
             "is_baseline": True,
         },
     ),
+    "rag": AblationVariant(
+        name="rag",
+        description="RAG baseline (TF-IDF retrieval)",
+        config={
+            "is_rag": True,
+        },
+    ),
+    "mem0": AblationVariant(
+        name="mem0",
+        description="Mem0 baseline (salience extraction)",
+        config={
+            "is_mem0": True,
+        },
+    ),
 }
 
 
@@ -171,6 +201,41 @@ class AblationRunner:
             
             return result.to_dict()
         
+        elif variant.config.get("is_rag"):
+            # RAG baseline
+            if not RAG_AVAILABLE:
+                self._log("⚠️ RAGAgent não disponível, pulando...")
+                return {"error": "rag_not_available", "message": "pip install scikit-learn"}
+            
+            return self._run_with_custom_agent(
+                agent_class=RAGAgent,
+                agent_kwargs={
+                    "model": self.model,
+                    "ollama_url": self.ollama_url,
+                },
+                conversations=conversations,
+                namespace=namespace,
+                variant_name="rag",
+            )
+        
+        elif variant.config.get("is_mem0"):
+            # Mem0 baseline
+            if not MEM0_AVAILABLE:
+                self._log("⚠️ Mem0Agent não disponível, pulando...")
+                return {"error": "mem0_not_available", "message": "pip install mem0ai"}
+            
+            return self._run_with_custom_agent(
+                agent_class=Mem0Agent,
+                agent_kwargs={
+                    "model": self.model,
+                    "ollama_url": self.ollama_url,
+                    "use_real_mem0": False,  # Usa implementação simples
+                },
+                conversations=conversations,
+                namespace=namespace,
+                variant_name="mem0",
+            )
+        
         else:
             # Para variantes do Cortex, precisamos passar configuração
             # TODO: Implementar flags no CortexAgent para cada componente
@@ -202,6 +267,102 @@ class AblationRunner:
             )
             
             return result.to_dict()
+    
+    def _run_with_custom_agent(
+        self,
+        agent_class: type,
+        agent_kwargs: dict,
+        conversations: list,
+        namespace: str,
+        variant_name: str,
+    ) -> dict:
+        """
+        Executa benchmark com um agente customizado (RAG, Mem0, etc).
+        
+        Adapta o agente para a interface esperada pelo benchmark.
+        """
+        import time
+        from datetime import datetime
+        
+        self._log(f"\n   Executando {variant_name} baseline...")
+        
+        result = {
+            "variant": variant_name,
+            "model": self.model,
+            "conversations": [],
+            "total_tokens": 0,
+            "total_messages": 0,
+            "total_time_ms": 0,
+        }
+        
+        for conv in conversations:
+            conv_result = {
+                "domain": conv.get("domain", "unknown"),
+                "sessions": [],
+            }
+            
+            # Cria agente
+            agent = agent_class(**agent_kwargs)
+            
+            for session_idx, session in enumerate(conv.get("sessions", [])):
+                session_result = {
+                    "session_idx": session_idx,
+                    "messages": [],
+                }
+                
+                # Inicia sessão
+                user_id = f"{namespace}_{conv.get('domain')}_{session_idx}"
+                if hasattr(agent, "new_session"):
+                    agent.new_session(user_id=user_id)
+                if hasattr(agent, "set_namespace"):
+                    agent.set_namespace(namespace)
+                
+                for msg in session.get("messages", []):
+                    try:
+                        start = time.time()
+                        
+                        # Diferentes agentes têm diferentes métodos
+                        if hasattr(agent, "process_message"):
+                            response = agent.process_message(msg)
+                        elif hasattr(agent, "get_response"):
+                            response = agent.get_response(msg)
+                        else:
+                            response = AgentResponse(content="N/A", total_tokens=0)
+                        
+                        elapsed = (time.time() - start) * 1000
+                        
+                        session_result["messages"].append({
+                            "user": msg,
+                            "response": response.content[:200] if hasattr(response, "content") else str(response)[:200],
+                            "tokens": response.total_tokens if hasattr(response, "total_tokens") else 0,
+                            "time_ms": elapsed,
+                        })
+                        
+                        result["total_tokens"] += response.total_tokens if hasattr(response, "total_tokens") else 0
+                        result["total_messages"] += 1
+                        result["total_time_ms"] += elapsed
+                        
+                    except Exception as e:
+                        self._log(f"   ⚠️ Erro: {e}")
+                        session_result["messages"].append({
+                            "user": msg,
+                            "error": str(e),
+                        })
+                
+                conv_result["sessions"].append(session_result)
+            
+            result["conversations"].append(conv_result)
+            self._log(f"   ✓ {conv.get('domain', 'unknown')}: {len(conv.get('sessions', []))} sessões")
+        
+        # Calcula métricas resumidas
+        result["avg_tokens_per_message"] = (
+            result["total_tokens"] / max(1, result["total_messages"])
+        )
+        result["avg_time_per_message_ms"] = (
+            result["total_time_ms"] / max(1, result["total_messages"])
+        )
+        
+        return result
     
     def run_ablation_study(
         self,

@@ -257,3 +257,42 @@ O servidor MCP escreve logs para stderr. Para debug:
 ```bash
 cortex-mcp 2>&1 | tee cortex.log
 ```
+
+---
+
+## 🔌 Alternativa: SDK Python
+
+Se você está desenvolvendo um agente programaticamente (não via Claude Desktop), considere usar o **SDK Python** que oferece integração automática:
+
+### Decorator Simples
+
+```python
+from cortex_memory import with_memory
+
+@with_memory(namespace="meu_agente")
+def meu_agente(msg: str, context: str = "") -> str:
+    # context já contém memórias relevantes
+    return f"Resposta: {msg}"
+```
+
+### LangChain
+
+```python
+from integrations.langchain import CortexLangChainMemory
+
+memory = CortexLangChainMemory(namespace="langchain_agent")
+chain = ConversationChain(llm=llm, memory=memory)
+```
+
+### CrewAI
+
+```python
+from integrations.crewai import CortexCrewAIMemory
+
+crew = Crew(
+    agents=[...],
+    long_term_memory=CortexCrewAIMemory(namespace="crewai_agent")
+)
+```
+
+Veja `sdk/python/README.md` para documentação completa.

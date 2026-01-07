@@ -12,6 +12,7 @@ MCP/API Layer (entry points) → Services (business logic) → Core (domain mode
 - **Core** (`src/cortex/core/`): Pure domain models (Entity, Episode, Relation, MemoryGraph) — NO I/O operations
 - **Services** (`src/cortex/services/`): `MemoryService` orchestrates all logic — single source of truth for both MCP and API
 - **Interfaces**: FastMCP (`src/cortex/mcp/server.py`) + FastAPI (`src/cortex/api/app.py`) — both delegate to `MemoryService`
+- **SDK** (`sdk/python/`): Client libraries with generic core (`cortex_memory.py`) + framework adapters (`integrations/`)
 
 **Critical rule:** NEVER mix layers. Models don't do I/O, services don't handle HTTP/MCP directly.
 
@@ -192,13 +193,35 @@ entity = graph.resolve_entity(name="João Silva", identifiers=["joao@email.com"]
 ## File Organization Rules
 
 ### SDK Location
-- `sdk/python/cortex_sdk.py` — REST client for external use (NOT for internal code)
+- `sdk/python/cortex_sdk.py` — Low-level REST client
+- `sdk/python/cortex_memory.py` — Generic core with before/after hooks
+- `sdk/python/integrations/` — Framework adapters (LangChain, CrewAI)
 - `teste-llm/` — Integration tests using SDK (Ollama examples)
+
+### SDK Architecture (Core + Adapters)
+
+```python
+# Generic Core - works with any framework
+from cortex_memory import CortexMemory, with_memory
+
+# Decorator for simple functions
+@with_memory(namespace="my_agent")
+def my_agent(user_message: str, context: str = "") -> str:
+    return f"Response with memory context: {context}"
+
+# LangChain Adapter
+from integrations.langchain import CortexLangChainMemory
+memory = CortexLangChainMemory(namespace="langchain")
+
+# CrewAI Adapter
+from integrations.crewai import CortexCrewAIMemory
+crew = Crew(long_term_memory=CortexCrewAIMemory(namespace="crewai"))
+```
 
 ### Documentation Reference
 - `docs/VISION.md` — Philosophy, core concepts
 - `docs/ARCHITECTURE.md` — Layer structure, data flows
-- `docs/API.md` — REST endpoint specs
+- `docs/API.md` — REST endpoint specs (including `/memory/interact`)
 - `docs/MCP.md` — MCP tool specs + Claude Desktop config
 - `.github/instructions/cortex.instructions.md` — Detailed development rules (this supersedes on conflicts)
 
@@ -234,8 +257,21 @@ def recall(self, query: str, context: dict) -> RecallResult:
 
 ## Current Status (Jan 2026)
 
-✅ **Complete:** Core models, MemoryService, test suite, documentation, pyproject.toml  
-⏳ **Pending:** Full MCP/API implementation, Claude Desktop integration, persistence layer, benchmarks
+✅ **Complete:**
+- Core models (Entity, Memory/Episode, Relation, MemoryGraph)
+- MemoryService (store, recall, consolidation)
+- **DecayManager** (`src/cortex/core/decay.py`) - Ebbinghaus decay + hub protection
+- **SharedMemoryManager** (`src/cortex/core/shared_memory.py`) - personal/shared/learned isolation
+- API REST (W5H + /interact)
+- MCP Server (cortex_recall, cortex_remember, cortex_forget, cortex_stats)
+- SDK Python (Core + LangChain/CrewAI adapters)
+- Benchmark científico:
+  - Métricas: Precision@K, Recall@K, MRR, Consistency
+  - Baselines: RAG (TF-IDF), Mem0
+  - Ablation Study (8 variantes)
+  - Shared Memory Benchmark
+
+⏳ **Pending:** Google ADK adapter, FastAgent adapter, Dashboard visualizations
 
 ---
 

@@ -1,294 +1,478 @@
 """
 DecayManager - Gerencia decaimento de memórias baseado em Ebbinghaus.
 
-O decaimento simula o esquecimento natural:
-- Memórias não acessadas perdem importância ao longo do tempo
-- Memórias acessadas frequentemente são reforçadas
-- Hubs (memórias muito referenciadas) decaem mais lentamente
-- Memórias consolidadas são mais duráveis
+Implementa:
+- Curva de esquecimento exponencial: R = e^(-t/S)
+- Spaced repetition: acessos aumentam stability
+- Hub protection: memórias centrais decaem mais lentamente
+- Consolidation bonus: memórias consolidadas são mais estáveis
 
-Baseado na Curva de Esquecimento de Ebbinghaus (1885):
-    R = e^(-t/S)
-
-Onde:
-    R = retrievability (facilidade de recuperação)
-    t = tempo desde último acesso
-    S = stability (durabilidade da memória)
+Baseado em:
+- Ebbinghaus (1885) - Forgetting Curve
+- CoALA - Cognitive Architectures for Language Agents
+- Generative Agents (Stanford)
 """
 
 import math
 from dataclasses import dataclass
-from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Any
+from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cortex.core.memory import Memory
     from cortex.core.memory_graph import MemoryGraph
+    from cortex.core.episode import Episode
+    from cortex.core.entity import Entity
 
 
 @dataclass
 class DecayConfig:
     """Configuração do sistema de decaimento."""
     
-    # Taxa de decaimento diário base (5% por dia)
-    daily_decay_rate: float = 0.95
+    # Taxa base de decaimento (dias para reduzir 63% sem reforço)
+    base_stability_days: float = 7.0
     
-    # Multiplicadores
+    # Multiplicadores de proteção
     consolidation_bonus: float = 2.0  # Memórias consolidadas decaem 2x mais lento
     hub_bonus: float = 1.5  # Hubs decaem 1.5x mais lento
-    high_importance_bonus: float = 1.3  # importance > 0.7 decai 1.3x mais lento
+    high_importance_bonus: float = 1.3  # Importância > 0.7 decai mais lento
     
     # Thresholds
-    forgotten_threshold: float = 0.1  # Abaixo disso = esquecida
-    hub_min_references: int = 5  # Mínimo de referências para ser hub
+    forgotten_threshold: float = 0.1  # Abaixo disso = esquecido
+    weak_threshold: float = 0.3  # Abaixo disso = fraco
+    hub_reference_threshold: int = 5  # 5+ referências = hub
     
     # Limites
-    min_importance: float = 0.01  # Nunca vai abaixo disso
-    max_stability: float = 10.0  # Limite de stability
+    min_stability: float = 0.1  # Estabilidade mínima
+    max_stability: float = 100.0  # Estabilidade máxima
     
-    # Spaced repetition
-    touch_stability_increase: float = 1.2  # Cada acesso aumenta stability em 20%
+    # Spaced repetition multiplier (cada acesso aumenta stability)
+    access_stability_multiplier: float = 1.2
 
 
 class DecayManager:
     """
-    Gerencia decaimento de memórias.
+    Gerencia o decaimento de memórias baseado na curva de Ebbinghaus.
     
-    Responsabilidades:
-    - Aplicar decaimento periódico a todas as memórias
-    - Calcular retrievability
-    - Marcar memórias como "esquecidas"
-    - Reforçar memórias acessadas
+    Formula: R = e^(-t/S)
+    Onde:
+        R = retrievability (0.0 - 1.0)
+        t = tempo desde último acesso (dias)
+        S = stability (durabilidade da memória)
     
-    Example:
-        decay_manager = DecayManager()
-        
-        # Aplicar decaimento diário
-        decay_manager.apply_decay_batch(graph)
-        
-        # Quando memória é acessada
-        decay_manager.touch(memory)
+    Stability é afetada por:
+        - access_count (spaced repetition)
+        - centrality (hubs são mais estáveis)
+        - consolidation (memórias consolidadas são mais estáveis)
+        - importance declarada
     """
     
-    def __init__(self, config: Optional[DecayConfig] = None):
-        """
-        Inicializa o gerenciador de decaimento.
-        
-        Args:
-            config: Configuração customizada (usa defaults se None)
-        """
+    def __init__(self, config: DecayConfig | None = None):
         self.config = config or DecayConfig()
+        self._centrality_cache: dict[str, float] = {}
     
-    def apply_decay(self, memory: "Memory", graph: Optional["MemoryGraph"] = None) -> None:
+    def calculate_retrievability(
+        self,
+        last_accessed: datetime,
+        stability: float,
+        now: datetime | None = None,
+    ) -> float:
         """
-        Aplica decaimento a uma memória individual.
+        Calcula a facilidade de recuperação de uma memória.
         
         Args:
-            memory: Memória a processar
-            graph: Grafo para calcular centralidade (opcional)
+            last_accessed: Quando foi acessada pela última vez
+            stability: Estabilidade atual da memória
+            now: Momento atual (default: agora)
+            
+        Returns:
+            Retrievability entre 0.0 e 1.0
         """
-        # Calcula dias desde último acesso
-        reference_time = memory.last_accessed or memory.when
-        days_since = (datetime.now() - reference_time).total_seconds() / 86400
+        now = now or datetime.now()
+        days_since = (now - last_accessed).total_seconds() / 86400  # Converte para dias
         
-        if days_since < 1:
-            return  # Menos de 1 dia, sem decaimento
+        if days_since <= 0:
+            return 1.0
         
-        # Calcula multiplicadores
-        total_multiplier = 1.0
+        # R = e^(-t/S)
+        effective_stability = max(self.config.min_stability, stability)
+        retrievability = math.exp(-days_since / effective_stability)
         
-        # Bonus para memórias consolidadas
-        if memory.is_consolidated:
-            total_multiplier *= self.config.consolidation_bonus
+        return max(0.0, min(1.0, retrievability))
+    
+    def calculate_stability(
+        self,
+        access_count: int,
+        centrality: float = 0.0,
+        is_consolidated: bool = False,
+        importance: float = 0.5,
+    ) -> float:
+        """
+        Calcula a estabilidade de uma memória.
         
-        # Bonus para hubs
-        if graph and self._is_hub(memory, graph):
-            total_multiplier *= self.config.hub_bonus
+        Stability = base × (1 + log(access + 1)) × bonuses
         
-        # Bonus para alta importância
-        if memory.importance > 0.7:
-            total_multiplier *= self.config.high_importance_bonus
+        Args:
+            access_count: Quantas vezes foi acessada
+            centrality: Score de centralidade (0.0 - 1.0)
+            is_consolidated: Se é uma memória consolidada
+            importance: Importância declarada (0.0 - 1.0)
+            
+        Returns:
+            Estabilidade (dias)
+        """
+        base = self.config.base_stability_days
         
-        # Aplica decaimento
-        # importance_new = importance_old * (decay_rate ^ days) * multiplier_adjustment
-        effective_days = days_since / total_multiplier
-        decay_factor = self.config.daily_decay_rate ** effective_days
+        # Spaced repetition: cada acesso aumenta estabilidade logaritmicamente
+        access_factor = 1 + math.log(access_count + 1)
         
-        memory.importance = max(
-            self.config.min_importance,
-            memory.importance * decay_factor
+        # Bônus por centralidade
+        centrality_factor = 1 + (centrality * (self.config.hub_bonus - 1))
+        
+        # Bônus por consolidação
+        consolidation_factor = self.config.consolidation_bonus if is_consolidated else 1.0
+        
+        # Bônus por alta importância
+        importance_factor = self.config.high_importance_bonus if importance > 0.7 else 1.0
+        
+        stability = base * access_factor * centrality_factor * consolidation_factor * importance_factor
+        
+        return min(self.config.max_stability, stability)
+    
+    def calculate_entity_centrality(
+        self,
+        entity_id: str,
+        graph: "MemoryGraph",
+    ) -> float:
+        """
+        Calcula a centralidade de uma entidade no grafo.
+        
+        Centrality = log(1 + incoming_relations + episodes_referencing)
+        
+        Normalizado para 0.0 - 1.0
+        """
+        # Conta relações de entrada
+        incoming = len(graph.get_relations(to_id=entity_id))
+        
+        # Conta episódios que referenciam esta entidade
+        referencing_episodes = sum(
+            1 for ep in graph._episodes.values()
+            if entity_id in ep.participants
         )
         
-        # Marca como esquecida se abaixo do threshold
-        if memory.importance < self.config.forgotten_threshold:
-            memory.metadata["forgotten"] = True
-    
-    def apply_decay_batch(
-        self, 
-        graph: "MemoryGraph",
-        only_active: bool = True
-    ) -> dict[str, int]:
-        """
-        Aplica decaimento a todas as memórias do grafo.
+        total_references = incoming + referencing_episodes
         
-        Args:
-            graph: Grafo de memória
-            only_active: Se True, pula memórias já esquecidas
+        # Log para suavizar
+        raw_centrality = math.log(1 + total_references)
+        
+        # Normaliza baseado no threshold de hub
+        normalized = min(1.0, raw_centrality / math.log(1 + self.config.hub_reference_threshold * 2))
+        
+        return normalized
+    
+    def calculate_episode_centrality(
+        self,
+        episode_id: str,
+        graph: "MemoryGraph",
+    ) -> float:
+        """
+        Calcula a centralidade de um episódio no grafo.
+        
+        Episódios são centrais se:
+        - Conectam entidades importantes
+        - São referenciados por outras relações
+        - Têm muitos participantes
+        """
+        episode = graph.get_episode(episode_id)
+        if not episode:
+            return 0.0
+        
+        # Fator 1: Número de participantes
+        participant_factor = math.log(1 + len(episode.participants)) / 3  # Normalizado
+        
+        # Fator 2: Centralidade média dos participantes
+        participant_centralities = []
+        for pid in episode.participants:
+            if pid in self._centrality_cache:
+                participant_centralities.append(self._centrality_cache[pid])
+            else:
+                centrality = self.calculate_entity_centrality(pid, graph)
+                self._centrality_cache[pid] = centrality
+                participant_centralities.append(centrality)
+        
+        avg_participant_centrality = (
+            sum(participant_centralities) / len(participant_centralities)
+            if participant_centralities else 0.0
+        )
+        
+        # Fator 3: Relações de entrada
+        incoming = len(graph.get_relations(to_id=episode_id))
+        relation_factor = min(1.0, incoming / self.config.hub_reference_threshold)
+        
+        # Combina fatores
+        centrality = (participant_factor * 0.3) + (avg_participant_centrality * 0.5) + (relation_factor * 0.2)
+        
+        return min(1.0, centrality)
+    
+    def is_hub(self, entity_or_episode_id: str, graph: "MemoryGraph") -> bool:
+        """Verifica se uma memória é um hub (altamente conectada)."""
+        incoming = len(graph.get_relations(to_id=entity_or_episode_id))
+        outgoing = len(graph.get_relations(from_id=entity_or_episode_id))
+        return (incoming + outgoing) >= self.config.hub_reference_threshold
+    
+    def apply_decay_to_episode(
+        self,
+        episode: "Episode",
+        graph: "MemoryGraph",
+        now: datetime | None = None,
+    ) -> tuple[float, float]:
+        """
+        Aplica decaimento a um episódio e retorna (retrievability, new_stability).
+        
+        Não modifica o episódio diretamente - retorna valores calculados.
+        """
+        now = now or datetime.now()
+        
+        # Último acesso (usa timestamp se nunca foi acessado)
+        last_accessed = getattr(episode, 'last_accessed', None) or episode.timestamp
+        
+        # Calcula centralidade
+        centrality = self.calculate_episode_centrality(episode.id, graph)
+        
+        # Calcula estabilidade
+        access_count = getattr(episode, 'access_count', 0)
+        stability = self.calculate_stability(
+            access_count=access_count,
+            centrality=centrality,
+            is_consolidated=episode.is_consolidated,
+            importance=episode.importance,
+        )
+        
+        # Calcula retrievability
+        retrievability = self.calculate_retrievability(last_accessed, stability, now)
+        
+        return retrievability, stability
+    
+    def apply_decay_to_entity(
+        self,
+        entity: "Entity",
+        graph: "MemoryGraph",
+        now: datetime | None = None,
+    ) -> tuple[float, float]:
+        """
+        Aplica decaimento a uma entidade e retorna (retrievability, new_stability).
+        """
+        now = now or datetime.now()
+        
+        last_accessed = entity.last_accessed or entity.created_at
+        centrality = self.calculate_entity_centrality(entity.id, graph)
+        
+        # Entidades consolidadas implicitamente (se referenciadas em muitos episódios)
+        episode_count = sum(
+            1 for ep in graph._episodes.values()
+            if entity.id in ep.participants
+        )
+        is_consolidated = episode_count >= 5
+        
+        stability = self.calculate_stability(
+            access_count=entity.access_count,
+            centrality=centrality,
+            is_consolidated=is_consolidated,
+            importance=0.5,  # Entidades têm importância base
+        )
+        
+        retrievability = self.calculate_retrievability(last_accessed, stability, now)
+        
+        return retrievability, stability
+    
+    def get_memory_status(self, retrievability: float) -> str:
+        """
+        Retorna o status de uma memória baseado na retrievability.
         
         Returns:
-            Estatísticas do processamento
+            "active" | "fading" | "weak" | "forgotten"
         """
+        if retrievability >= 0.7:
+            return "active"
+        elif retrievability >= self.config.weak_threshold:
+            return "fading"
+        elif retrievability >= self.config.forgotten_threshold:
+            return "weak"
+        else:
+            return "forgotten"
+    
+    def touch_memory(
+        self,
+        entity_or_episode: "Entity | Episode",
+        graph: "MemoryGraph",
+    ) -> float:
+        """
+        Marca uma memória como acessada, aumentando sua estabilidade.
+        
+        Implementa spaced repetition - cada acesso fortalece a memória.
+        
+        Returns:
+            Nova estabilidade após o touch
+        """
+        # Aumenta access_count
+        if hasattr(entity_or_episode, 'touch'):
+            entity_or_episode.touch()
+        else:
+            # Fallback para episódios (não tem touch nativo)
+            if hasattr(entity_or_episode, 'access_count'):
+                entity_or_episode.access_count = getattr(entity_or_episode, 'access_count', 0) + 1
+            entity_or_episode.last_accessed = datetime.now()
+        
+        # Recalcula estabilidade
+        if hasattr(entity_or_episode, 'participants'):  # É Episode
+            _, stability = self.apply_decay_to_episode(entity_or_episode, graph)
+        else:  # É Entity
+            _, stability = self.apply_decay_to_entity(entity_or_episode, graph)
+        
+        return stability
+    
+    def run_decay_cycle(
+        self,
+        graph: "MemoryGraph",
+        now: datetime | None = None,
+    ) -> dict[str, int]:
+        """
+        Executa um ciclo de decaimento em todo o grafo.
+        
+        Este método deve ser chamado periodicamente (ex: diariamente).
+        
+        Returns:
+            Estatísticas do ciclo
+        """
+        now = now or datetime.now()
         stats = {
-            "processed": 0,
-            "decayed": 0,
-            "forgotten": 0,
-            "skipped": 0,
+            "episodes_active": 0,
+            "episodes_fading": 0,
+            "episodes_weak": 0,
+            "episodes_forgotten": 0,
+            "entities_active": 0,
+            "entities_fading": 0,
+            "entities_weak": 0,
+            "entities_forgotten": 0,
+            "hubs_protected": 0,
         }
         
-        for memory in graph.get_all_memories():
-            # Pula já esquecidas se only_active
-            if only_active and memory.is_forgotten:
-                stats["skipped"] += 1
-                continue
+        # Limpa cache de centralidade
+        self._centrality_cache.clear()
+        
+        # Processa episódios
+        for episode in list(graph._episodes.values()):
+            retrievability, stability = self.apply_decay_to_episode(episode, graph, now)
+            status = self.get_memory_status(retrievability)
             
-            old_importance = memory.importance
-            self.apply_decay(memory, graph)
-            stats["processed"] += 1
+            # Atualiza metadata do episódio
+            episode.metadata["retrievability"] = retrievability
+            episode.metadata["stability"] = stability
+            episode.metadata["decay_status"] = status
             
-            if memory.importance < old_importance:
-                stats["decayed"] += 1
+            stats[f"episodes_{status}"] += 1
             
-            if memory.is_forgotten and old_importance >= self.config.forgotten_threshold:
-                stats["forgotten"] += 1
+            if self.is_hub(episode.id, graph):
+                stats["hubs_protected"] += 1
+        
+        # Processa entidades
+        for entity in list(graph._entities.values()):
+            retrievability, stability = self.apply_decay_to_entity(entity, graph, now)
+            status = self.get_memory_status(retrievability)
+            
+            # Atualiza attributes da entidade
+            entity.attributes["retrievability"] = retrievability
+            entity.attributes["stability"] = stability
+            entity.attributes["decay_status"] = status
+            
+            stats[f"entities_{status}"] += 1
+            
+            if self.is_hub(entity.id, graph):
+                stats["hubs_protected"] += 1
         
         return stats
     
-    def touch(self, memory: "Memory") -> None:
+    def get_decay_report(self, graph: "MemoryGraph") -> dict:
         """
-        Marca memória como acessada, reforçando-a.
-        
-        Efeitos:
-        - Incrementa access_count
-        - Atualiza last_accessed
-        - Aumenta stability (spaced repetition)
-        - Aumenta importance levemente
-        - Remove flag "forgotten" se existir
-        
-        Args:
-            memory: Memória acessada
+        Gera relatório detalhado do estado de decaimento.
         """
-        memory.access_count += 1
-        memory.last_accessed = datetime.now()
+        now = datetime.now()
         
-        # Spaced repetition: cada acesso aumenta stability
-        memory.stability = min(
-            self.config.max_stability,
-            memory.stability * self.config.touch_stability_increase
-        )
+        episodes_by_status: dict[str, list] = {
+            "active": [], "fading": [], "weak": [], "forgotten": []
+        }
+        entities_by_status: dict[str, list] = {
+            "active": [], "fading": [], "weak": [], "forgotten": []
+        }
         
-        # Leve boost de importância
-        memory.importance = min(1.0, memory.importance * 1.05)
+        for episode in graph._episodes.values():
+            retrievability, _ = self.apply_decay_to_episode(episode, graph, now)
+            status = self.get_memory_status(retrievability)
+            episodes_by_status[status].append({
+                "id": episode.id,
+                "action": episode.action,
+                "retrievability": round(retrievability, 3),
+                "is_hub": self.is_hub(episode.id, graph),
+            })
         
-        # Revive se esquecida
-        if memory.metadata.get("forgotten"):
-            del memory.metadata["forgotten"]
-            memory.importance = max(memory.importance, 0.3)  # Volta com importância mínima
-    
-    def calculate_retrievability(self, memory: "Memory") -> float:
-        """
-        Calcula retrievability (facilidade de recuperação).
-        
-        Usa a fórmula de Ebbinghaus: R = e^(-t/S)
-        
-        Args:
-            memory: Memória para calcular
-        
-        Returns:
-            float entre 0.0 (impossível) e 1.0 (fácil)
-        """
-        return memory.retrievability
-    
-    def _is_hub(self, memory: "Memory", graph: "MemoryGraph") -> bool:
-        """
-        Verifica se a memória é um hub (muito referenciada).
-        
-        Args:
-            memory: Memória a verificar
-            graph: Grafo para contar referências
-        
-        Returns:
-            True se for hub
-        """
-        incoming = graph.count_relations_to(memory.id)
-        return incoming >= self.config.hub_min_references
-    
-    def get_memory_health(self, memory: "Memory") -> dict[str, Any]:
-        """
-        Retorna status de "saúde" de uma memória.
-        
-        Args:
-            memory: Memória a analisar
-        
-        Returns:
-            Dict com métricas de saúde
-        """
-        retrievability = self.calculate_retrievability(memory)
-        
-        # Classifica estado
-        if memory.is_forgotten:
-            status = "forgotten"
-        elif retrievability > 0.7:
-            status = "fresh"
-        elif retrievability > 0.4:
-            status = "stable"
-        elif retrievability > 0.1:
-            status = "fading"
-        else:
-            status = "near_forgotten"
-        
-        # Estima dias até esquecimento
-        if retrievability > self.config.forgotten_threshold:
-            # Resolve para t: forgotten_threshold = e^(-t/S)
-            # ln(threshold) = -t/S
-            # t = -S * ln(threshold)
-            effective_stability = memory.stability * (1 + math.log(memory.access_count + 1))
-            if memory.is_consolidated:
-                effective_stability *= self.config.consolidation_bonus
-            
-            days_until_forgotten = -effective_stability * math.log(self.config.forgotten_threshold / max(retrievability, 0.01))
-            days_until_forgotten = max(0, days_until_forgotten)
-        else:
-            days_until_forgotten = 0
+        for entity in graph._entities.values():
+            retrievability, _ = self.apply_decay_to_entity(entity, graph, now)
+            status = self.get_memory_status(retrievability)
+            entities_by_status[status].append({
+                "id": entity.id,
+                "name": entity.name,
+                "retrievability": round(retrievability, 3),
+                "is_hub": self.is_hub(entity.id, graph),
+            })
         
         return {
-            "status": status,
-            "retrievability": round(retrievability, 3),
-            "importance": round(memory.importance, 3),
-            "stability": round(memory.stability, 3),
-            "access_count": memory.access_count,
-            "days_until_forgotten": round(days_until_forgotten, 1),
-            "is_hub": memory._centrality_score > 0.5,
-            "is_consolidated": memory.is_consolidated,
+            "timestamp": now.isoformat(),
+            "episodes": {
+                status: len(items) for status, items in episodes_by_status.items()
+            },
+            "entities": {
+                status: len(items) for status, items in entities_by_status.items()
+            },
+            "top_active_episodes": sorted(
+                episodes_by_status["active"],
+                key=lambda x: x["retrievability"],
+                reverse=True,
+            )[:10],
+            "top_active_entities": sorted(
+                entities_by_status["active"],
+                key=lambda x: x["retrievability"],
+                reverse=True,
+            )[:10],
+            "forgotten_episodes": episodes_by_status["forgotten"][:10],
+            "forgotten_entities": entities_by_status["forgotten"][:10],
         }
 
 
+# Factory functions
+def create_decay_manager(config: DecayConfig | None = None) -> DecayManager:
+    """Cria um DecayManager com configuração padrão ou customizada."""
+    return DecayManager(config)
+
+
 def create_default_decay_manager() -> DecayManager:
-    """Cria DecayManager com configuração padrão."""
-    return DecayManager()
+    """Cria DecayManager com configuração padrão (7 dias base stability)."""
+    return DecayManager(DecayConfig())
 
 
 def create_aggressive_decay_manager() -> DecayManager:
-    """Cria DecayManager com decaimento mais agressivo (para testes)."""
+    """Cria DecayManager agressivo (3 dias base stability, esquece rápido)."""
     return DecayManager(DecayConfig(
-        daily_decay_rate=0.80,  # 20% por dia
-        forgotten_threshold=0.2,
+        base_stability_days=3.0,
+        forgotten_threshold=0.15,
+        weak_threshold=0.4,
     ))
 
 
 def create_gentle_decay_manager() -> DecayManager:
-    """Cria DecayManager com decaimento mais suave (para memórias importantes)."""
+    """Cria DecayManager gentil (14 dias base stability, esquece devagar)."""
     return DecayManager(DecayConfig(
-        daily_decay_rate=0.98,  # 2% por dia
+        base_stability_days=14.0,
         forgotten_threshold=0.05,
+        weak_threshold=0.2,
+        hub_bonus=2.0,
         consolidation_bonus=3.0,
     ))

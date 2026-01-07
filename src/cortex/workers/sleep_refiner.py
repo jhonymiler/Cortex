@@ -1,0 +1,222 @@
+"""
+Sleep Refiner - Consolida e refina memórias em background.
+
+Inspirado no processo de consolidação de memória durante o sono:
+1. Analisa memórias brutas
+2. Extrai entidades e relações
+3. Cria resumos consolidados
+4. Salva memórias refinadas
+
+Uso:
+    from cortex.workers import SleepRefiner
+    
+    refiner = SleepRefiner(
+        cortex_url="http://localhost:8000",
+        llm_url="http://localhost:11434",  # Ollama
+        llm_model="gemma3:4b",
+    )
+    
+    result = refiner.refine(namespace="meu_agente")
+    print(f"Refinadas: {result.memories_refined}")
+"""
+
+import re
+import requests
+from dataclasses import dataclass, field
+from typing import Any
+
+
+@dataclass
+class RefineResult:
+    """Resultado do refinamento."""
+    success: bool = False
+    memories_analyzed: int = 0
+    memories_refined: int = 0
+    entities_extracted: list[str] = field(default_factory=list)
+    patterns_found: list[str] = field(default_factory=list)
+    consolidated_summary: str = ""
+    error: str = ""
+
+
+class SleepRefiner:
+    """
+    Refina e consolida memórias usando LLM.
+    
+    Este worker simula o processo de consolidação de memória
+    que ocorre durante o sono no cérebro humano.
+    
+    Attributes:
+        cortex_url: URL da API Cortex
+        llm_url: URL do servidor LLM (Ollama)
+        llm_model: Modelo LLM a usar
+    """
+    
+    REFINEMENT_PROMPT = """Você é um sistema de consolidação de memória.
+
+Analise estas memórias brutas de um atendimento:
+
+{context}
+
+Sua tarefa:
+1. Identifique PADRÕES e agrupe memórias similares
+2. Extraia ENTIDADES importantes (pessoas, produtos, problemas)
+3. Crie RELAÇÕES entre entidades
+4. Gere um RESUMO consolidado
+
+Responda EXATAMENTE neste formato YAML:
+
+```yaml
+entidades:
+  - nome: "Nome da Entidade"
+    tipo: "cliente|equipamento|problema|local"
+    atributos:
+      chave: "valor"
+
+padroes:
+  - what: "verbo_acao_padrao"
+    ocorrencias: 1
+    resumo: "Descrição do padrão"
+
+relacoes:
+  - de: "Entidade1"
+    tipo: "possui|reportou|resolveu"
+    para: "Entidade2"
+
+resumo_consolidado: |
+  Resumo em 2-3 frases do que aconteceu.
+```
+"""
+    
+    def __init__(
+        self,
+        cortex_url: str = "http://localhost:8000",
+        llm_url: str = "http://localhost:11434",
+        llm_model: str = "gemma3:4b",
+    ):
+        self.cortex_url = cortex_url.rstrip("/")
+        self.llm_url = llm_url.rstrip("/")
+        self.llm_model = llm_model
+        
+        self._session = requests.Session()
+        self._session.headers.update({"Content-Type": "application/json"})
+    
+    def refine(self, namespace: str, query: str = "") -> RefineResult:
+        """
+        Executa refinamento de memórias para um namespace.
+        
+        Args:
+            namespace: Namespace a refinar
+            query: Query opcional para filtrar memórias (default: busca ampla)
+        
+        Returns:
+            RefineResult com detalhes do refinamento
+        """
+        result = RefineResult()
+        
+        try:
+            # 1. Busca memórias brutas
+            self._session.headers["X-Cortex-Namespace"] = namespace
+            
+            recall_query = query or "cliente problema solução atendimento"
+            recall_resp = self._session.post(
+                f"{self.cortex_url}/memory/recall",
+                json={"query": recall_query, "context": {}, "limit": 50},
+            )
+            
+            recall_data = recall_resp.json()
+            context = recall_data.get("prompt_context", "")
+            result.memories_analyzed = recall_data.get("episodes_found", 0)
+            
+            if not context or len(context) < 50:
+                result.error = "Poucas memórias para refinar"
+                return result
+            
+            # 2. Envia para LLM refinar
+            prompt = self.REFINEMENT_PROMPT.format(context=context)
+            
+            llm_resp = requests.post(
+                f"{self.llm_url}/api/chat",
+                json={
+                    "model": self.llm_model,
+                    "messages": [
+                        {"role": "system", "content": "Responda apenas em YAML."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    "stream": False,
+                },
+                timeout=120,
+            )
+            
+            llm_content = llm_resp.json().get("message", {}).get("content", "")
+            
+            # 3. Parseia resultado
+            yaml_match = re.search(r'```yaml\s*\n(.+?)```', llm_content, re.DOTALL)
+            if not yaml_match:
+                result.error = "LLM não retornou YAML válido"
+                return result
+            
+            yaml_content = yaml_match.group(1)
+            
+            # Extrai entidades
+            entidades = re.findall(r'nome:\s*"([^"]+)"', yaml_content)
+            result.entities_extracted = entidades
+            
+            # Extrai padrões
+            padroes = re.findall(r'what:\s*"([^"]+)"', yaml_content)
+            result.patterns_found = padroes
+            
+            # Extrai resumo consolidado
+            resumo_match = re.search(
+                r'resumo_consolidado:\s*\|?\s*\n(.+?)(?=\n\w|\Z)', 
+                yaml_content, 
+                re.DOTALL
+            )
+            if resumo_match:
+                result.consolidated_summary = resumo_match.group(1).strip()
+            
+            # 4. Salva memória consolidada
+            if result.consolidated_summary:
+                store_resp = self._session.post(
+                    f"{self.cortex_url}/memory/remember",
+                    json={
+                        "who": entidades[:3] if entidades else ["sistema"],
+                        "what": "consolidacao_memoria",
+                        "why": "refinamento_sono",
+                        "how": result.consolidated_summary[:200],
+                        "where": namespace,
+                        "importance": 0.9,
+                    },
+                )
+                
+                if store_resp.json().get("success"):
+                    result.memories_refined = 1
+            
+            result.success = True
+            
+        except Exception as e:
+            result.error = str(e)
+        
+        return result
+    
+    def refine_all_namespaces(self) -> dict[str, RefineResult]:
+        """
+        Executa refinamento em todos os namespaces.
+        
+        Returns:
+            Dict de namespace -> RefineResult
+        """
+        results = {}
+        
+        try:
+            # Lista namespaces
+            resp = self._session.get(f"{self.cortex_url}/namespaces")
+            namespaces = resp.json().get("namespaces", [])
+            
+            for ns in namespaces:
+                results[ns] = self.refine(ns)
+                
+        except Exception as e:
+            results["_error"] = RefineResult(error=str(e))
+        
+        return results
+

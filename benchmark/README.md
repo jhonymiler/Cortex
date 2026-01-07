@@ -42,7 +42,7 @@ benchmark/
 1. **Ollama rodando**:
 ```bash
 ollama serve
-ollama pull llama3.2:3b  # ou outro modelo
+ollama pull gemma3:4b  # ou outro modelo
 ```
 
 2. **Cortex API rodando**:
@@ -115,7 +115,7 @@ python benchmark/run_benchmark.py --model llama3.1:8b
 ======================================================================
 
 🔧 Configuração:
-   Modelo: llama3.2:3b
+   Modelo: gemma3:4b
    Duração: 342.5s
    Conversas: 8
    Sessões: 24
@@ -177,9 +177,9 @@ python benchmark/run_benchmark.py --model llama3.1:8b
 
 ## 🔮 Próximos Passos
 
-- [ ] Adicionar avaliação qualitativa automática (LLM-as-judge)
-- [ ] Métricas de consistência (comparar informações entre sessões)
-- [ ] Gráficos e visualizações
+- [x] Adicionar avaliação qualitativa automática (LLM-as-judge) ✅
+- [x] Métricas de consistência (comparar informações entre sessões) ✅
+- [x] Gráficos e visualizações (Streamlit Dashboard) ✅
 - [ ] Benchmark com múltiplos modelos
 - [ ] Teste de carga (muitos usuários simultâneos)
 
@@ -226,6 +226,42 @@ python benchmark/ablation_runner.py --full
 - `no_consolidation`: Sem consolidação de episódios
 - `simple_episodic`: Apenas action/outcome (sem W5H)
 - `baseline`: Sem memória (controle)
+- `rag`: RAG baseline (TF-IDF retrieval)
+- `mem0`: Mem0 baseline (salience extraction)
+
+### Consistency Metrics (`consistency_metrics.py`)
+
+Avalia coerência factual entre sessões:
+
+```python
+from benchmark.consistency_metrics import calculate_consistency_score
+
+result = calculate_consistency_score(
+    sessions=[
+        {"messages": [{"role": "user", "content": "Meu nome é Carlos"}]},
+        {"messages": [{"role": "user", "content": "Você lembra meu nome?"}]},
+    ],
+    use_llm=False,  # Regras heurísticas (rápido)
+)
+print(f"Consistency: {result.overall_score:.1%}")
+```
+
+### Shared Memory Benchmark (`shared_memory_benchmark.py`)
+
+Testa memória compartilhada com isolamento pessoal:
+
+```bash
+# Executar cenário específico
+python benchmark/shared_memory_benchmark.py --scenario customer_support_shared
+
+# Todos os cenários
+python benchmark/shared_memory_benchmark.py --all
+```
+
+**Cenários:**
+- `customer_support_shared`: Múltiplos clientes, padrões aprendidos
+- `dev_team_shared`: Múltiplos devs, conhecimento do projeto
+- `healthcare_shared`: Dados de pacientes isolados
 
 ### LLM-as-Judge
 

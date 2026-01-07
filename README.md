@@ -95,47 +95,73 @@ cp .env.example .env
 - `cortex_health` — Saúde da memória
 - `cortex_decay` — Aplicar decay manual
 
-### Opção 2: SDK Python (API REST)
+### Opção 2: SDK Python (Core Genérico)
+
+Funciona com **qualquer LLM/framework** (OpenAI, Ollama, Anthropic, etc):
 
 ```python
-from cortex_sdk import CortexClient
+from cortex_memory import CortexMemory
 
-client = CortexClient("http://localhost:8000")
+cortex = CortexMemory(namespace="meu_agente:usuario_123")
 
-# Recall antes de responder
-context = client.recall("ajuda com login", user="joao@email.com")
-# Retorna YAML compacto:
-# conhecidos:
-#   - João Silva (customer): vip=True
-# histórico:
-#   - [4x] login_issue: VPN bloqueando acesso
-
-# Store após responder
-client.store(
-    action="resolved_login",
-    outcome="Desconectar VPN resolveu",
-    participants=[{"type": "customer", "name": "João Silva"}]
-)
+def meu_agente(user_msg):
+    context = cortex.before(user_msg)      # ← Busca memória
+    response = llm.generate(context + user_msg)
+    cortex.after(user_msg, response)       # ← Armazena (W5H automático)
+    return response
 ```
 
-### Opção 3: API REST Direta
+### Opção 3: LangChain (Plug and Play)
+
+```python
+from cortex.integrations import CortexLangChainMemory
+
+memory = CortexLangChainMemory(namespace="meu_agente")
+chain = LLMChain(llm=llm, memory=memory)
+
+response = chain.run("Olá!")  # ← Zero código extra!
+```
+
+### Opção 4: CrewAI (Plug and Play)
+
+```python
+from cortex.integrations import CortexCrewAIMemory
+
+memory = CortexCrewAIMemory(namespace="minha_crew")
+crew = Crew(agents=[...], long_term_memory=memory)
+```
+
+### Opção 5: API REST Direta
 
 ```bash
 # Iniciar servidor
 cortex-api
 
-# Recall
+# Recall (busca memória)
 curl -X POST http://localhost:8000/memory/recall \
   -H "Content-Type: application/json" \
+  -H "X-Cortex-Namespace: meu_agente" \
   -d '{"query": "login João"}'
 
-# Store
-curl -X POST http://localhost:8000/memory/store \
+# Interact (armazena com extração W5H automática)
+curl -X POST http://localhost:8000/memory/interact \
   -H "Content-Type: application/json" \
+  -H "X-Cortex-Namespace: meu_agente" \
   -d '{
-    "action": "resolved_login",
-    "outcome": "VPN desconectada",
-    "participants": [{"type": "customer", "name": "João"}]
+    "user_message": "Meu login não funciona",
+    "assistant_response": "Vou verificar sua conta",
+    "user_name": "João"
+  }'
+
+# Remember (W5H manual)
+curl -X POST http://localhost:8000/memory/remember \
+  -H "Content-Type: application/json" \
+  -H "X-Cortex-Namespace: meu_agente" \
+  -d '{
+    "who": ["João", "sistema_auth"],
+    "what": "resolveu_problema_login",
+    "why": "vpn_bloqueando",
+    "how": "desconectou_vpn"
   }'
 ```
 
@@ -181,18 +207,40 @@ conexões:
 resumo: Cliente VIP, fã de Nike Pegasus, tamanho 42
 ```
 
-### Decay por Acesso (não temporal!)
+### Decaimento Cognitivo (Ebbinghaus)
+
+Baseado na ciência de memória humana:
 
 ```
-Recall("Python")  →  Python ⬆️ fortalece
-                     Java ⬇️ enfraquece (não acessado)
-                     
-Resultado após 10 recalls de Python:
-  Python: importance=1.000 ✅
-  Java:   importance=0.409 (decaiu naturalmente)
+R = e^(-t/S)   # Curva de esquecimento
+
+Stability aumenta com:
+├── Acessos frequentes (spaced repetition)
+├── Consolidação (5+ ocorrências similares)
+├── Hub Centrality (muitas referências)
+└── Importância declarada
 ```
 
-**Por que não temporal?** Um agente pode ficar meses sem uso. Quando voltar, as memórias devem estar lá!
+### Shared Memory com Isolamento
+
+Para agentes que atendem múltiplos usuários:
+
+```
+┌─────────────────────────────────────────────┐
+│  NAMESPACE: agente_suporte                   │
+├─────────────────────────────────────────────┤
+│  personal:user_123 │ personal:user_456      │
+│  "João pediu #123" │ "Maria mora em SP"     │
+├─────────────────────────────────────────────┤
+│  shared:                                     │
+│  "Política de devolução: 30 dias"           │
+├─────────────────────────────────────────────┤
+│  learned:                                    │
+│  "Padrão: clientes perguntam sobre prazos"  │
+└─────────────────────────────────────────────┘
+```
+
+**Resultado:** Agente aprende com todos, mas não confunde dados pessoais!
 
 ---
 
@@ -225,13 +273,38 @@ python test_integration_mcp.py
 ```
 cortex/
 ├── src/cortex/
-│   ├── core/           # Modelos: Entity, Episode, Relation, MemoryGraph
+│   ├── core/           # Modelos puros (sem I/O)
+│   │   ├── entity.py       # Entidade + centrality
+│   │   ├── memory.py       # Memory W5H (ex-Episode)
+│   │   ├── relation.py     # Relações entre nós
+│   │   ├── memory_graph.py # Grafo + índices
+│   │   ├── decay.py        # DecayManager (Ebbinghaus)
+│   │   └── shared_memory.py # SharedMemoryManager
 │   ├── services/       # MemoryService (lógica de negócio)
 │   ├── api/            # FastAPI REST endpoints
 │   ├── mcp/            # FastMCP server
 │   └── ui/             # Streamlit dashboard
+│
 ├── sdk/python/         # SDK para clientes
-├── teste-llm/          # Agentes de teste (Ollama, MCP)
+│   ├── cortex_sdk.py       # Cliente REST baixo-nível
+│   ├── cortex_memory.py    # Core genérico (before/after)
+│   └── integrations/       # Adaptadores
+│       ├── langchain.py    # LangChain BaseMemory
+│       └── crewai.py       # CrewAI long_term_memory
+│
+├── benchmark/          # Sistema de benchmark científico
+│   ├── agents.py           # BaselineAgent, CortexAgent V1
+│   ├── cortex_agent_v2.py  # CortexAgent V2 (extração inline)
+│   ├── rag_agent.py        # RAG baseline (TF-IDF)
+│   ├── mem0_agent.py       # Mem0 baseline
+│   ├── scientific_metrics.py    # Precision, Recall, MRR
+│   ├── consistency_metrics.py   # Coerência entre sessões
+│   ├── ablation_runner.py      # Ablation study
+│   └── shared_memory_benchmark.py  # Shared memory tests
+│
+├── src/cortex/workers/ # Processos em background
+│   └── sleep_refiner.py    # Consolidação de memórias (sono)
+│
 ├── tests/              # Testes unitários e de comparação
 └── docs/               # Documentação detalhada
 ```
@@ -243,10 +316,13 @@ cortex/
 | Documento | Descrição |
 |-----------|-----------|
 | [VISION.md](docs/VISION.md) | Filosofia, conceitos, princípios |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Camadas, fluxo de dados, consolidação |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Camadas, fluxo de dados, decay, shared memory |
+| [W5H_DESIGN.md](docs/W5H_DESIGN.md) | Design do modelo W5H, Ebbinghaus, centralidade |
 | [API.md](docs/API.md) | Endpoints REST, payloads, exemplos |
 | [MCP.md](docs/MCP.md) | Integração MCP, Claude Desktop |
-| [ENVIRONMENT.md](docs/ENVIRONMENT.md) | Variáveis de ambiente |
+| [PAPER_TEMPLATE.md](docs/PAPER_TEMPLATE.md) | Template do paper científico |
+| [benchmark/README.md](benchmark/README.md) | Sistema de benchmark, métricas científicas |
+| [sdk/python/README.md](sdk/python/README.md) | SDK Python, integrações |
 
 ---
 
@@ -274,6 +350,40 @@ cortex/
 ```
 ❌ "Tem alergias? Medicamentos?" (tudo no prontuário)
 ✅ "Carlos, vejo sua gastrite crônica. Sintomas iguais ou diferentes?"
+```
+
+---
+
+## 📊 Benchmark
+
+Execute benchmarks para validar performance:
+
+```bash
+# Benchmark rápido (1 conv/domínio, ~10 min)
+./start_benchmark.sh --quick
+
+# Benchmark completo (3 conv/domínio, ~1 hora)
+./start_benchmark.sh --full
+
+# Análise de resultados
+./analyze_results.sh
+```
+
+### Cortex V2 - Extração [MEMORY] Inline
+
+O V2 reduz chamadas LLM em 50%:
+
+| Métrica | V1 | V2 | Economia |
+|---------|----|----|----------|
+| **Chamadas LLM/msg** | 2 | 1 | **-50%** |
+| **Tokens/msg** | ~600 | ~350 | **-42%** |
+| **Latência** | Alta | Baixa | **-40%** |
+
+```python
+# V2: Extração automática no output do LLM
+response = agent.process("Olá Carlos!")
+# LLM responde: "Olá! Como posso ajudar? [MEMORY]who:Carlos what:saudacao[/MEMORY]"
+# SDK extrai memória e retorna resposta limpa ao usuário
 ```
 
 ---

@@ -117,11 +117,19 @@ cortex/
 │   │   └── memory_service.py  # Orquestrador principal
 │   │
 │   ├── api/               # API REST (FastAPI)
-│   │   └── app.py         # Aplicação FastAPI
+│   │   └── app.py         # Endpoints + /memory/interact
 │   │
 │   └── mcp/               # MCP Server (FastMCP)
 │       └── server.py      # Servidor MCP
 │
+├── sdk/python/            # SDK Python para clientes
+│   ├── cortex_sdk.py      # Cliente REST baixo-nível
+│   ├── cortex_memory.py   # Core genérico (before/after hooks)
+│   └── integrations/      # Adaptadores para frameworks
+│       ├── langchain.py   # LangChain BaseMemory
+│       └── crewai.py      # CrewAI long_term_memory
+│
+├── benchmark/             # Sistema de benchmark
 ├── tests/                 # Testes
 ├── docs/                  # Documentação
 └── pyproject.toml         # Configuração do projeto
@@ -363,11 +371,24 @@ Episode(action="analyzed", ...)  # action é livre
 
 ## 📋 API ENDPOINTS
 
-### POST /memory/store
-Armazena um episódio após interação.
+### POST /memory/remember (W5H)
+Armazena memória usando modelo W5H.
+
+```python
+{
+    "who": ["user", "FastAPI"],
+    "what": "asked_about_routing",
+    "why": "building_web_app",
+    "how": "explained_decorators",
+    "where": "namespace"
+}
+```
 
 ### POST /memory/recall
 Busca memórias relevantes antes de responder.
+
+### POST /memory/interact
+Endpoint completo: recall + store em uma chamada (para SDK).
 
 ### GET /memory/stats
 Estatísticas do grafo.
@@ -382,11 +403,68 @@ Limpa todas as memórias (com cuidado!).
 ### cortex_recall
 **OBRIGATÓRIO antes de responder ao usuário.**
 
-### cortex_store
+### cortex_remember (W5H)
 **OBRIGATÓRIO após responder ao usuário.**
+
+```python
+cortex_remember(
+    who=["user", "FastAPI"],
+    what="asked_about_routing",
+    why="building_web_app",
+    how="explained_decorators",
+    where="namespace"
+)
+```
 
 ### cortex_stats
 Estatísticas do grafo.
+
+---
+
+## 🔌 SDK PYTHON
+
+### Arquitetura Core + Adaptadores
+
+```
+CortexMemory (Core Genérico)
+    ├── before(user_message) → contexto
+    └── after(user_message, response) → store
+         │
+         ├── LangChain Adapter (BaseMemory)
+         ├── CrewAI Adapter (long_term_memory)
+         └── @with_memory decorator (qualquer função)
+```
+
+### Uso Direto (Decorator)
+
+```python
+from cortex_memory import with_memory
+
+@with_memory(namespace="meu_agente")
+def meu_agente(user_message: str, context: str = "") -> str:
+    # context já contém memórias relevantes
+    return f"Resposta para: {user_message}"
+```
+
+### LangChain
+
+```python
+from integrations.langchain import CortexLangChainMemory
+
+memory = CortexLangChainMemory(namespace="langchain_agent")
+chain = ConversationChain(llm=llm, memory=memory)
+```
+
+### CrewAI
+
+```python
+from integrations.crewai import CortexCrewAIMemory
+
+crew = Crew(
+    agents=[...],
+    long_term_memory=CortexCrewAIMemory(namespace="crewai_agent")
+)
+```
 
 ---
 
@@ -496,31 +574,26 @@ test: adicionar/modificar testes
 ## 📊 STATUS DO PROJETO
 
 ### Completo ✅
-- Estrutura de arquivos (23 arquivos criados)
-- Core models (Entity, Episode, Relation, MemoryGraph)
+- Core models (Entity, Memory/Episode, Relation, MemoryGraph)
 - MemoryService (store, recall, consolidation)
-- Testes unitários e integração
-- Documentação completa (ARCHITECTURE.md, API.md, MCP.md, VISION.md)
-- Git inicializado (commit inicial)
-- pyproject.toml configurado
-
-### Pendente ⏳
-- Validação de instalação (`pip install -e ".[all,dev]"`)
-- Execução de testes (`pytest tests/ -v`)
-- Implementação completa MCP Server
-- Implementação completa API REST
-- Testes end-to-end
-- Integração Claude Desktop
-- Persistência (salvar/carregar grafo)
+- **DecayManager** (Ebbinghaus decay + hub protection)
+- **SharedMemoryManager** (isolamento personal/shared/learned)
+- API REST com endpoints W5H + /memory/interact
+- MCP Server (cortex_recall, cortex_remember, cortex_forget, cortex_stats)
+- SDK Python (Core + Adaptadores LangChain/CrewAI)
+- Benchmark científico completo:
+  - Métricas: Precision@K, Recall@K, MRR, Consistency
+  - Baselines: RAG (TF-IDF), Mem0
+  - Ablation Study (8 variantes)
+  - Shared Memory Benchmark
+- Documentação completa
 
 ### Próximos Passos 🎯
-1. Validar instalação e dependências
-2. Rodar suite de testes completa
-3. Completar endpoints API REST
-4. Implementar MCP tools (cortex_recall, cortex_store, cortex_stats)
-5. Adicionar persistência JSON/SQLite
-6. Configurar Claude Desktop integration
-7. Benchmark comparativo (se aplicável)
+1. Adicionar adaptador Google ADK
+2. Adicionar adaptador FastAgent
+3. Dashboard com visualização de retrievability
+4. Background job para decaimento diário
+5. Paper científico com resultados do benchmark
 
 ---
 
@@ -571,4 +644,4 @@ Episode(action="resolved_issue", outcome="ticket closed")
 
 ---
 
-*Última atualização: 05 de Janeiro de 2026*
+*Última atualização: 06 de Janeiro de 2026*

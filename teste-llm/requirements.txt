@@ -1,2 +1,0 @@
-# Dependências para teste Cortex + Ollama
-google-adk>=1.0.0

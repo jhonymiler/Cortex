@@ -13,11 +13,33 @@ Uso:
 
 import argparse
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 
 from benchmark.lightweight_runner import LightweightBenchmarkRunner
 from benchmark.conversation_generator import ConversationGenerator
+
+
+def get_ollama_url() -> str:
+    """Obtém URL do Ollama, detectando WSL automaticamente."""
+    if os.environ.get("OLLAMA_URL"):
+        return os.environ["OLLAMA_URL"]
+    
+    # Detecta WSL
+    try:
+        with open("/proc/version", "r") as f:
+            if "microsoft" in f.read().lower():
+                # Está no WSL - pega IP do Windows
+                with open("/etc/resolv.conf", "r") as resolv:
+                    for line in resolv:
+                        if "nameserver" in line:
+                            windows_ip = line.split()[1]
+                            return f"http://{windows_ip}:11434"
+    except Exception:
+        pass
+    
+    return "http://localhost:11434"
 
 
 def main():
@@ -78,20 +100,20 @@ Exemplos:
     parser.add_argument(
         "--model",
         type=str,
-        default="ministral-3:3b",
-        help="Modelo Ollama",
+        default=os.environ.get("OLLAMA_MODEL", "ministral-3:3b"),
+        help="Modelo Ollama (env: OLLAMA_MODEL)",
     )
     parser.add_argument(
         "--ollama-url",
         type=str,
-        default="http://localhost:11434",
-        help="URL do Ollama",
+        default=None,  # Será detectado automaticamente
+        help="URL do Ollama (env: OLLAMA_URL, auto-detecta WSL)",
     )
     parser.add_argument(
         "--cortex-url",
         type=str,
-        default="http://localhost:8000",
-        help="URL da API Cortex",
+        default=os.environ.get("CORTEX_API_URL", "http://localhost:8000"),
+        help="URL da API Cortex (env: CORTEX_API_URL)",
     )
     parser.add_argument(
         "--namespace",
@@ -125,8 +147,32 @@ Exemplos:
         action="store_true",
         help="Modo silencioso",
     )
+    parser.add_argument(
+        "-y", "--yes",
+        action="store_true",
+        help="Pular confirmação (não-interativo)",
+    )
+    parser.add_argument(
+        "--evaluate",
+        action="store_true",
+        help="Usar LLM para avaliar qual resposta é melhor",
+    )
+    parser.add_argument(
+        "--detailed-logs",
+        action="store_true",
+        help="Mostrar logs detalhados (inputs, outputs, memória)",
+    )
+    parser.add_argument(
+        "--use-v1",
+        action="store_true",
+        help="Usar CortexAgent V1 (com chamada LLM extra para extração)",
+    )
     
     args = parser.parse_args()
+    
+    # Detecta URL do Ollama se não fornecida
+    if args.ollama_url is None:
+        args.ollama_url = get_ollama_url()
     
     # Determina config
     if args.full:
@@ -139,14 +185,23 @@ Exemplos:
         conv_per_domain = args.conversations or 1
         sessions = args.sessions or 3
     
+    use_v2 = not args.use_v1
+    
     print("\n" + "=" * 80)
-    print("🚀 BENCHMARK LEVE - SEM COMPARAÇÕES LLM")
+    print("🚀 BENCHMARK CORTEX V2 - [MEMORY] INLINE")
     print("=" * 80)
+    print(f"   Ollama: {args.ollama_url}")
     print(f"   Modelo: {args.model}")
+    print(f"   Cortex: {args.cortex_url}")
+    print(f"   Agente: {'CortexAgentV2 (50% menos tokens)' if use_v2 else 'CortexAgent V1 (legado)'}")
     print(f"   Conversas/domínio: {conv_per_domain}")
     print(f"   Sessões/conversa: {sessions}")
     if args.domain:
         print(f"   Domínio: {args.domain}")
+    if args.evaluate:
+        print("   ⚖️  Avaliação LLM: ATIVADA")
+    if args.detailed_logs:
+        print("   📋 Logs detalhados: ATIVADOS")
     print("=" * 80)
     
     # Gera conversas
@@ -181,11 +236,12 @@ Exemplos:
     est_total_time = total_messages * est_time_per_msg * 2  # baseline + cortex
     print(f"\n⏱️  Tempo estimado: {est_total_time // 60} min")
     
-    try:
-        input("\n⏸️  Pressione ENTER para iniciar (Ctrl+C para cancelar)...")
-    except KeyboardInterrupt:
-        print("\n\n❌ Cancelado.")
-        return
+    if not args.yes:
+        try:
+            input("\n⏸️  Pressione ENTER para iniciar (Ctrl+C para cancelar)...")
+        except (KeyboardInterrupt, EOFError):
+            print("\n\n❌ Cancelado.")
+            return
     
     # Cria runner
     runner = LightweightBenchmarkRunner(
@@ -194,6 +250,9 @@ Exemplos:
         cortex_url=args.cortex_url,
         namespace=args.namespace,
         verbose=not args.quiet,
+        evaluate_responses_llm=args.evaluate,
+        detailed_logs=args.detailed_logs,
+        use_v2=use_v2,
     )
     
     # Verifica serviços
@@ -204,19 +263,6 @@ Exemplos:
         print(f"   2. Modelo: ollama pull {args.model}")
         print("   3. Cortex: cortex-api")
         return
-    
-    # Executa
-    try:
-        result = runner.run_benchmark(
-            conversations=conversations,
-            clear_before=not args.no_clear,
-        )
-    except KeyboardInterrupt:
-        print("\n\n⚠️  Interrompido.")
-        return
-    except Exception as e:
-        print(f"\n❌ Erro: {e}")
-        raise
     
     # Salva
     if args.output:

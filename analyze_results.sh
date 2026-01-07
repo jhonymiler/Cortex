@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script para análise completa dos resultados do Cortex Benchmark
-# Usage: ./analyze_results.sh
+# Usage: ./analyze_results.sh [checkpoint_file]
 
 set -e
 
@@ -18,40 +18,49 @@ if [ ! -d "$RESULTS_DIR" ]; then
     exit 1
 fi
 
-# Encontra o resultado mais recente
-LATEST_SUMMARY=$(ls -t $RESULTS_DIR/benchmark_*.summary.json 2>/dev/null | head -1)
+# Ativa ambiente virtual
+if [ -z "$VIRTUAL_ENV" ]; then
+    echo "⚠️  Ativando ambiente virtual..."
+    source venv/bin/activate
+fi
 
-if [ -z "$LATEST_SUMMARY" ]; then
+# Encontra o resultado mais recente
+if [ -n "$1" ]; then
+    LATEST_RESULT="$1"
+else
+    # Procura por checkpoint ou summary
+    LATEST_RESULT=$(ls -t $RESULTS_DIR/lightweight_*.checkpoint.json $RESULTS_DIR/lightweight_*.json $RESULTS_DIR/benchmark_*.summary.json 2>/dev/null | head -1)
+fi
+
+if [ -z "$LATEST_RESULT" ] || [ ! -f "$LATEST_RESULT" ]; then
     echo "❌ Nenhum resultado de benchmark encontrado em $RESULTS_DIR"
+    echo "   Procurando por: lightweight_*.json, *.checkpoint.json ou benchmark_*.summary.json"
     exit 1
 fi
 
-echo "📊 Resultado mais recente: $(basename $LATEST_SUMMARY)"
+echo "📊 Analisando: $(basename $LATEST_RESULT)"
 echo ""
 
-# Executa análises
+# Executa análise do grafo
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "1️⃣  Análise Geral do Grafo"
+echo "1️⃣  Análise Completa do Benchmark"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 python $SCRIPT_DIR/analyze_graph.py
 
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "2️⃣  Análise de Hubs (Nós Centrais)"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-python $SCRIPT_DIR/analyze_hubs.py
+# Verifica se analyze_hubs.py existe
+if [ -f "$SCRIPT_DIR/analyze_hubs.py" ]; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "2️⃣  Análise de Hubs (Entidades Centrais)"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    python $SCRIPT_DIR/analyze_hubs.py 2>/dev/null || echo "   ⚠️  Análise de hubs não disponível"
+fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "✅ Análise concluída!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "📁 Relatórios disponíveis:"
-echo "   - $RESULTS_DIR/PRELIMINARY_REPORT.md (análise detalhada)"
-echo "   - $RESULTS_DIR/VISUAL_SUMMARY.md (resumo visual)"
-echo ""
-echo "💡 Próximos passos:"
-echo "   1. Aguardar rate limit resetar"
-echo "   2. Executar: ./start_benchmark.sh --resume"
-echo "   3. Completar os 7 domínios restantes"
+echo "📁 Arquivos disponíveis:"
+ls -la $RESULTS_DIR/*.json 2>/dev/null | tail -5 || echo "   (nenhum arquivo JSON)"
 echo ""

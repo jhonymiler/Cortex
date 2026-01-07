@@ -339,31 +339,40 @@ def render_graph_visual(graph: MemoryGraph):
         return
     
     # Controles principais
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
     with col1:
         show_entities = st.checkbox("🎯 Entidades", value=True)
     with col2:
         show_episodes = st.checkbox("📝 Episódios", value=True)
     with col3:
-        physics_enabled = st.checkbox("🌀 Física", value=True)
-    with col4:
         min_weight = st.slider("Peso mín", 0.0, 1.0, 0.0, 0.1)
     
-    # Controles de espaçamento (expansível)
-    with st.expander("⚙️ Ajustar Espaçamento"):
-        col1, col2, col3 = st.columns(3)
+    # Controles de espaçamento
+    with st.expander("⚙️ Ajustar Layout", expanded=True):
+        col1, col2, col3, col4 = st.columns(4)
         with col1:
-            node_distance = st.slider("Distância entre nós", 100, 800, 500, 50)
+            layout_type = st.selectbox("🕸️ Tipo de Layout", [
+                "spring",      # Força-direcionado (padrão)
+                "kamada_kawai",  # Minimiza energia
+                "shell",       # Anéis concêntricos
+                "radial",      # Radial a partir do hub
+                "circular",    # Círculo
+            ], index=0)
         with col2:
-            spring_length = st.slider("Comprimento mola", 100, 600, 400, 50)
+            layout_scale = st.slider("📐 Escala", 1, 30, 15, 1)
         with col3:
-            repulsion = st.slider("Repulsão", 500, 5000, 2000, 500)
+            layout_k = st.slider("🔄 Espaçamento", 1.0, 15.0, 5.0, 0.5)
+        with col4:
+            layout_seed = st.number_input("🎲 Seed", 0, 9999, 42)
     
-    # Prepara nós e arestas
-    nodes = []
-    edges = []
+    # Prepara nós e arestas - COM POSIÇÕES PRÉ-CALCULADAS
+    import networkx as nx
+    import math
     
+    # Cria grafo NetworkX para calcular layout
+    G = nx.Graph()
     visible_ids = set()
+    node_data = {}
     
     for node in graph_data["nodes"]:
         if node["weight"] < min_weight:
@@ -372,16 +381,90 @@ def render_graph_visual(graph: MemoryGraph):
             continue
         if node["type"] == "episode" and not show_episodes:
             continue
-        
         visible_ids.add(node["id"])
+        node_data[node["id"]] = node
+        G.add_node(node["id"])
+    
+    for edge in graph_data["edges"]:
+        if edge["from"] in visible_ids and edge["to"] in visible_ids:
+            G.add_edge(edge["from"], edge["to"])
+    
+    # Calcula posições baseado no layout escolhido
+    if len(G.nodes()) > 0:
+        scale = layout_scale * 50
+        
+        if layout_type == "spring":
+            # Força-direcionado clássico
+            pos = nx.spring_layout(
+                G, 
+                k=layout_k / math.sqrt(len(G.nodes())),
+                iterations=100,
+                seed=int(layout_seed),
+                scale=scale,
+            )
+        elif layout_type == "kamada_kawai":
+            # Minimiza energia - bom para ver estrutura
+            try:
+                pos = nx.kamada_kawai_layout(G, scale=scale)
+            except ImportError:
+                st.warning("⚠️ Layout kamada_kawai requer scipy. Usando spring.")
+                pos = nx.spring_layout(G, scale=scale, seed=int(layout_seed))
+        elif layout_type == "shell":
+            # Anéis concêntricos - hubs no centro
+            # Ordena nós por grau (mais conectados primeiro)
+            degrees = dict(G.degree())
+            sorted_nodes = sorted(degrees.keys(), key=lambda x: degrees[x], reverse=True)
+            # Divide em shells (camadas)
+            n_shells = min(5, len(sorted_nodes) // 3 + 1)
+            shell_size = len(sorted_nodes) // n_shells
+            shells = [sorted_nodes[i*shell_size:(i+1)*shell_size] for i in range(n_shells)]
+            if len(sorted_nodes) % n_shells:
+                shells[-1].extend(sorted_nodes[n_shells*shell_size:])
+            pos = nx.shell_layout(G, nlist=shells, scale=scale)
+        elif layout_type == "radial":
+            # Radial a partir do nó mais conectado (hub)
+            degrees = dict(G.degree())
+            if degrees:
+                center = max(degrees.keys(), key=lambda x: degrees[x])
+                # Usa BFS para calcular distâncias
+                try:
+                    lengths = nx.single_source_shortest_path_length(G, center)
+                    max_dist = max(lengths.values()) if lengths else 1
+                    # Agrupa por distância
+                    shells = [[] for _ in range(max_dist + 1)]
+                    for node, dist in lengths.items():
+                        shells[dist].append(node)
+                    # Remove shells vazios
+                    shells = [s for s in shells if s]
+                    pos = nx.shell_layout(G, nlist=shells, scale=scale)
+                except:
+                    pos = nx.spring_layout(G, scale=scale, seed=int(layout_seed))
+            else:
+                pos = nx.spring_layout(G, scale=scale, seed=int(layout_seed))
+        elif layout_type == "circular":
+            # Todos em círculo
+            pos = nx.circular_layout(G, scale=scale)
+        else:
+            pos = nx.spring_layout(G, scale=scale, seed=int(layout_seed))
+    else:
+        pos = {}
+    
+    # Cria nós COM posições fixas (x, y)
+    nodes = []
+    for node_id in visible_ids:
+        node = node_data[node_id]
+        x, y = pos.get(node_id, (0, 0))
         nodes.append(Node(
             id=node["id"],
             label=node["label"],
             size=node["size"],
             color=node["color"],
             title=f"{node['type']}: {node['label']}\nPeso: {node['weight']:.2f}",
+            x=x * 10,  # Escala para pixels
+            y=y * 10,
         ))
     
+    edges = []
     for edge in graph_data["edges"]:
         if edge["from"] in visible_ids and edge["to"] in visible_ids:
             edges.append(Edge(
@@ -392,25 +475,18 @@ def render_graph_visual(graph: MemoryGraph):
                 color=edge["color"],
             ))
     
-    # Configuração do grafo com parâmetros ajustáveis
+    # Configuração do grafo - ESTÁTICO com posições pré-calculadas
     config = Config(
-        width=1400,
-        height=800,
+        width=1600,
+        height=1000,
         directed=True,
-        physics=physics_enabled,
+        physics=False,  # SEM física - posições já calculadas
         hierarchical=False,
+        staticGraph=True,  # Grafo estático
+        staticGraphWithDragAndDrop=True,  # Permite arrastar nós
         nodeHighlightBehavior=True,
         highlightColor="#F7A7A6",
         collapsible=False,
-        # Parâmetros de física para maior separação
-        nodeDistance=node_distance,
-        springLength=spring_length,
-        springStrength=0.01,
-        centralGravity=0.001,
-        avoidOverlap=1.0,
-        # Parâmetros adicionais de repulsão
-        damping=0.09,
-        minVelocity=0.75,
     )
     
     # Renderiza
