@@ -153,7 +153,24 @@ echo ""
 BENCHMARK_ARGS="--ollama-url $OLLAMA_URL --model $OLLAMA_MODEL -y"
 BENCHMARK_SUCCESS=0
 
-if [ "$1" == "--full" ]; then
+if [ "$1" == "--compare" ]; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🔬 BENCHMARK DE COMPARAÇÃO COMPLETA"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "   Agentes: Baseline, RAG, Mem0, Cortex"
+    echo "   Inclui: Multi-sessão, volta de usuário, consolidação"
+    echo ""
+    
+    if [ "$2" == "--full" ]; then
+        echo "🚀 Executando comparação COMPLETA..."
+        python benchmark/full_comparison_benchmark.py --full -y && BENCHMARK_SUCCESS=1
+    else
+        echo "🚀 Executando comparação RÁPIDA..."
+        python benchmark/full_comparison_benchmark.py --quick -y && BENCHMARK_SUCCESS=1
+    fi
+    
+elif [ "$1" == "--full" ]; then
     echo "🚀 Executando benchmark COMPLETO com CortexAgent..."
     python run_lightweight_benchmark.py --full $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
 elif [ "$1" == "--quick" ]; then
