@@ -28,24 +28,39 @@ fi
 if [ -n "$1" ]; then
     LATEST_RESULT="$1"
 else
-    # Procura por checkpoint ou summary
-    LATEST_RESULT=$(ls -t $RESULTS_DIR/lightweight_*.checkpoint.json $RESULTS_DIR/lightweight_*.json $RESULTS_DIR/benchmark_*.summary.json 2>/dev/null | head -1)
+    # Procura por todos os tipos de resultado (ordem de prioridade)
+    LATEST_RESULT=$(ls -t \
+        $RESULTS_DIR/full_comparison_*.json \
+        $RESULTS_DIR/lightweight_*.json \
+        $RESULTS_DIR/lightweight_*.checkpoint.json \
+        $RESULTS_DIR/benchmark_*.summary.json \
+        2>/dev/null | head -1)
 fi
 
 if [ -z "$LATEST_RESULT" ] || [ ! -f "$LATEST_RESULT" ]; then
     echo "❌ Nenhum resultado de benchmark encontrado em $RESULTS_DIR"
-    echo "   Procurando por: lightweight_*.json, *.checkpoint.json ou benchmark_*.summary.json"
+    echo "   Procurando por: full_comparison_*.json, lightweight_*.json, *.checkpoint.json"
+    echo ""
+    echo "📁 Arquivos disponíveis:"
+    ls -la $RESULTS_DIR/*.json 2>/dev/null || echo "   (nenhum)"
     exit 1
 fi
 
 echo "📊 Analisando: $(basename $LATEST_RESULT)"
 echo ""
 
-# Executa análise do grafo
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "1️⃣  Análise Completa do Benchmark"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-python $SCRIPT_DIR/analyze_graph.py
+# Detecta tipo de resultado e executa análise apropriada
+if [[ "$(basename $LATEST_RESULT)" == full_comparison_* ]]; then
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "1️⃣  Análise de Comparação (Cortex vs RAG vs Mem0)"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    python $SCRIPT_DIR/analyze_comparison.py
+else
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "1️⃣  Análise Completa do Benchmark"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    python $SCRIPT_DIR/analyze_graph.py
+fi
 
 # Verifica se analyze_hubs.py existe
 if [ -f "$SCRIPT_DIR/analyze_hubs.py" ]; then

@@ -29,6 +29,7 @@ A documentação segue o princípio **D.R.Y.** — conceitos são definidos uma 
 - **NUNCA** criar arquivos duplicados
 - **SEMPRE** responder em português
 - **SEMPRE** realizar testes unitários
+- **SEMPRE** atualizar documentações
 
 ### Arquitetura
 - Cortex **NÃO é RAG** nem VectorDB
