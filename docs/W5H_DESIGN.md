@@ -461,6 +461,103 @@ class GraphMetrics:
 
 ---
 
+## 🛏️ Consolidação Hierárquica (SleepRefiner)
+
+### Conceito
+
+O SleepRefiner simula o processo de consolidação de memória durante o sono:
+
+1. **Memórias brutas** são analisadas em batch
+2. **Resumos** são criados agrupando memórias similares
+3. **Memórias granulares** são ligadas ao resumo via `consolidated_into`
+4. **Decaimento acelerado** para granulares já consolidadas
+
+### Hierarquia de Memórias
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  RESUMO (is_summary=True)                               │
+│  "Cliente resolveu problema com técnico"                │
+│  - Decai lentamente (summary_modifier = 2.0)            │
+│  - Retornado no recall normal                           │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  GRANULARES (consolidated_into=resumo_id)       │   │
+│  │  - "Carlos ligou com problema de modem"         │   │
+│  │  - "Técnico verificou luz vermelha"             │   │
+│  │  - "Problema era cabo desconectado"             │   │
+│  │  - Decaem 3x mais rápido (decay_multiplier=0.3) │   │
+│  │  - NÃO retornadas no recall normal              │   │
+│  │  - Disponíveis para drill-down                  │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Campos Novos
+
+```python
+class Memory/Episode:
+    # ... campos existentes ...
+    
+    # Consolidação
+    consolidated_from: list[str] = []  # IDs consolidadas NESTA memória
+    consolidated_into: str | None = None  # ID da memória pai
+    is_summary: bool = False  # True se for resumo de consolidação
+    
+    @property
+    def was_consolidated(self) -> bool:
+        """True se foi consolidada em outra."""
+        return self.consolidated_into is not None
+    
+    @property
+    def decay_multiplier(self) -> float:
+        """0.3 se já consolidada, 1.0 se não."""
+        if self.was_consolidated:
+            return 0.3
+        return 1.0
+```
+
+### Decaimento com Consolidação
+
+```python
+# Fórmula atualizada
+effective_stability = (
+    base_stability
+    * access_modifier       # 1 + log(access_count)
+    * summary_modifier      # 2.0 se is_summary
+    * granular_modifier     # 0.3 se was_consolidated (decai RÁPIDO)
+    * centrality_modifier   # 1 + centrality * 0.5
+)
+
+retrievability = exp(-days_since / effective_stability)
+```
+
+### Recall com Filtro
+
+```python
+def find_episodes(..., include_consolidated=False, drill_down_from=None):
+    """
+    Por padrão (include_consolidated=False):
+    - Retorna resumos (is_summary=True)
+    - Retorna memórias frescas (consolidated_into=None)
+    - EXCLUI granulares já consolidadas
+    
+    Com drill_down_from=<id>:
+    - Retorna apenas granulares ligadas ao resumo
+    """
+```
+
+### Fluxo do SleepRefiner
+
+1. **Busca memórias brutas** do namespace
+2. **Envia para LLM** extrair entidades, padrões, resumo
+3. **Cria memória resumo** com `is_summary=True`
+4. **Liga granulares** ao resumo via `consolidated_into`
+5. **Granulares decaem rápido** (3x mais rápido)
+6. **Recall normal** retorna apenas resumos
+
+---
+
 ## 🔑 Decisões de Design
 
 ### Por que unificar Episode → Memory?

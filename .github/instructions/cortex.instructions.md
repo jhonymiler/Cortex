@@ -599,21 +599,39 @@ test: adicionar/modificar testes
 
 ## 🔑 CONCEITOS-CHAVE
 
-### Consolidação Automática
-```python
-# 5+ episódios similares → padrão consolidado
-# Antes:
-Episode("user forgot password") # occurrence_count=1
-Episode("user forgot password") # occurrence_count=1
-Episode("user forgot password") # occurrence_count=1
-# ... (5x)
+### Consolidação Hierárquica (SleepRefiner)
 
-# Depois (consolidado):
-Episode(
-    action="password_reset_pattern",
-    occurrence_count=5,
-    is_consolidated=True
+O SleepRefiner consolida memórias em background, criando uma hierarquia:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  RESUMO (is_summary=True)                               │
+│  "Cliente resolveu problema com técnico"                │
+│  - Retornado no recall normal                           │
+│  - Decai lentamente (2x mais estável)                   │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  GRANULARES (consolidated_into=resumo_id)       │   │
+│  │  - "Carlos ligou com problema"                  │   │
+│  │  - "Técnico verificou luz vermelha"             │   │
+│  │  - Decaem 3x mais rápido (decay_multiplier=0.3) │   │
+│  │  - NÃO retornadas no recall normal              │   │
+│  │  - Disponíveis para drill-down                  │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
+```
+
+```python
+# Campos de consolidação
+Memory(
+    consolidated_from=[],          # IDs consolidadas NESTA memória
+    consolidated_into="resumo_id", # ID da memória pai (se foi consolidada)
+    is_summary=False,              # True se for resumo
 )
+
+# Recall com filtro
+find_episodes(include_consolidated=False)  # Só resumos e frescas
+find_episodes(drill_down_from="resumo_id") # Granulares do resumo
 ```
 
 ### Busca sem Tokens

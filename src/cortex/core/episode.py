@@ -67,7 +67,9 @@ class Episode:
     id: str = field(default_factory=lambda: str(uuid4()))
     timestamp: datetime = field(default_factory=datetime.now)
     occurrence_count: int = 1
-    consolidated_from: list[str] = field(default_factory=list)
+    consolidated_from: list[str] = field(default_factory=list)  # IDs consolidadas NESTA memória
+    consolidated_into: str | None = None  # ID da memória pai (se foi consolidada)
+    is_summary: bool = False  # True se for uma memória de consolidação/resumo
     importance: float = 0.5
     metadata: dict[str, Any] = field(default_factory=dict)
     
@@ -75,10 +77,34 @@ class Episode:
     conversation_id: str | None = None
     session_id: str | None = None
     
+    # Constante de decaimento para memórias já consolidadas
+    CONSOLIDATED_DECAY_MULTIPLIER: float = field(default=0.3, repr=False)
+    
     @property
     def is_consolidated(self) -> bool:
-        """Retorna True se este episódio é resultado de consolidação."""
-        return len(self.consolidated_from) > 0
+        """Retorna True se este episódio é resultado de consolidação (memória resumo)."""
+        return len(self.consolidated_from) > 0 or self.is_summary
+    
+    @property
+    def was_consolidated(self) -> bool:
+        """Retorna True se este episódio FOI consolidado em outro (memória granular)."""
+        return self.consolidated_into is not None
+    
+    @property
+    def decay_multiplier(self) -> float:
+        """
+        Multiplicador de decaimento para memórias já consolidadas.
+        
+        Memórias que foram consolidadas em um resumo decaem 3x mais rápido,
+        pois seu conteúdo já está representado na memória pai.
+        
+        Returns:
+            0.3 se foi consolidada (decai rápido)
+            1.0 se ainda não foi consolidada (decai normal)
+        """
+        if self.was_consolidated:
+            return self.CONSOLIDATED_DECAY_MULTIPLIER  # 0.3
+        return 1.0
     
     @property
     def consolidation_level(self) -> int:
@@ -199,6 +225,8 @@ class Episode:
             "outcome": self.outcome,
             "occurrence_count": self.occurrence_count,
             "consolidated_from": self.consolidated_from,
+            "consolidated_into": self.consolidated_into,
+            "is_summary": self.is_summary,
             "importance": self.importance,
             "metadata": self.metadata,
         }
@@ -215,6 +243,8 @@ class Episode:
             outcome=data.get("outcome", ""),
             occurrence_count=data.get("occurrence_count", 1),
             consolidated_from=data.get("consolidated_from", []),
+            consolidated_into=data.get("consolidated_into"),
+            is_summary=data.get("is_summary", False),
             importance=data.get("importance", 0.5),
             metadata=data.get("metadata", {}),
         )

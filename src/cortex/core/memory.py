@@ -117,7 +117,9 @@ class Memory:
     
     # Consolidação
     occurrence_count: int = 1
-    consolidated_from: list[str] = field(default_factory=list)
+    consolidated_from: list[str] = field(default_factory=list)  # IDs consolidadas NESTA memória
+    consolidated_into: str | None = None  # ID da memória pai (se foi consolidada)
+    is_summary: bool = False  # True se for uma memória de consolidação/resumo
     
     # Metadados
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -125,10 +127,34 @@ class Memory:
     # Cache de centralidade (atualizado externamente)
     _centrality_score: float = field(default=0.0, repr=False)
     
+    # Constante de decaimento para memórias já consolidadas
+    CONSOLIDATED_DECAY_MULTIPLIER: float = field(default=0.3, repr=False)
+    
     @property
     def is_consolidated(self) -> bool:
-        """Retorna True se esta memória é resultado de consolidação."""
-        return len(self.consolidated_from) > 0
+        """Retorna True se esta memória é resultado de consolidação (memória pai/resumo)."""
+        return len(self.consolidated_from) > 0 or self.is_summary
+    
+    @property
+    def was_consolidated(self) -> bool:
+        """Retorna True se esta memória FOI consolidada em outra (memória filha/granular)."""
+        return self.consolidated_into is not None
+    
+    @property
+    def decay_multiplier(self) -> float:
+        """
+        Multiplicador de decaimento para memórias já consolidadas.
+        
+        Memórias que foram consolidadas em um resumo decaem 3x mais rápido,
+        pois seu conteúdo já está representado na memória pai.
+        
+        Returns:
+            0.3 se foi consolidada (decai rápido)
+            1.0 se ainda não foi consolidada (decai normal)
+        """
+        if self.was_consolidated:
+            return self.CONSOLIDATED_DECAY_MULTIPLIER  # 0.3
+        return 1.0
     
     @property
     def is_forgotten(self) -> bool:
@@ -150,7 +176,8 @@ class Memory:
         Modificadores de stability:
             - access_count: mais acessos = mais estável
             - centrality: hubs são mais estáveis
-            - consolidation: memórias consolidadas são mais estáveis
+            - is_consolidated (resumo): memórias resumo são mais estáveis
+            - was_consolidated (granular): memórias granulares já consolidadas decaem RÁPIDO
         
         Returns:
             float entre 0.0 (esquecida) e 1.0 (fresca na memória)
@@ -165,8 +192,12 @@ class Memory:
         # Base: stability * (1 + log(access_count + 1))
         access_modifier = 1 + math.log(self.access_count + 1)
         
-        # Bonus para memórias consolidadas
-        consolidation_modifier = 2.0 if self.is_consolidated else 1.0
+        # Bonus para memórias RESUMO (consolidação pai)
+        summary_modifier = 2.0 if self.is_consolidated else 1.0
+        
+        # PENALIDADE para memórias granulares JÁ consolidadas
+        # Elas decaem 3x mais rápido (decay_multiplier = 0.3)
+        granular_modifier = self.decay_multiplier
         
         # Bonus para hubs (centralidade)
         centrality_modifier = 1 + (self._centrality_score * 0.5)
@@ -174,7 +205,8 @@ class Memory:
         effective_stability = (
             self.stability 
             * access_modifier 
-            * consolidation_modifier 
+            * summary_modifier 
+            * granular_modifier  # 0.3 se já consolidada
             * centrality_modifier
         )
         
@@ -299,6 +331,8 @@ class Memory:
             "created_at": self.created_at.isoformat(),
             "occurrence_count": self.occurrence_count,
             "consolidated_from": self.consolidated_from,
+            "consolidated_into": self.consolidated_into,
+            "is_summary": self.is_summary,
             "metadata": self.metadata,
             "centrality_score": self._centrality_score,
         }
@@ -320,6 +354,8 @@ class Memory:
             access_count=data.get("access_count", 0),
             occurrence_count=data.get("occurrence_count", 1),
             consolidated_from=data.get("consolidated_from", []),
+            consolidated_into=data.get("consolidated_into"),
+            is_summary=data.get("is_summary", False),
             metadata=data.get("metadata", {}),
         )
         

@@ -478,6 +478,65 @@ async def delete_namespace(
     }
 
 
+# ==================== EPISODE UPDATE ====================
+
+
+class EpisodeUpdateRequest(BaseModel):
+    """Request to update an episode."""
+    consolidated_into: str | None = None
+    is_summary: bool | None = None
+    importance: float | None = None
+    stability: float | None = None
+
+
+@app.patch("/memory/episodes/{episode_id}")
+async def update_episode(
+    episode_id: str,
+    request: EpisodeUpdateRequest,
+    namespace: str = Depends(get_namespace),
+    service: MemoryService = Depends(get_service),
+) -> dict[str, Any]:
+    """
+    Update an episode's consolidation status.
+    
+    Used by SleepRefiner to link granular memories to summaries.
+    
+    Args:
+        episode_id: ID of the episode to update
+        request: Fields to update
+    """
+    try:
+        graph = service.graph
+        episode = graph._episodes.get(episode_id)
+        
+        if not episode:
+            return {"success": False, "error": "Episode not found"}
+        
+        # Update fields if provided
+        if request.consolidated_into is not None:
+            episode.consolidated_into = request.consolidated_into
+        if request.is_summary is not None:
+            episode.is_summary = request.is_summary
+        if request.importance is not None:
+            episode.importance = request.importance
+        if request.stability is not None:
+            episode.stability = request.stability
+        
+        # Save changes
+        graph._save()
+        
+        return {
+            "success": True,
+            "episode_id": episode_id,
+            "updated_fields": {
+                k: v for k, v in request.model_dump().items() if v is not None
+            },
+        }
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 # ==================== ENTRY POINT ====================
 
 

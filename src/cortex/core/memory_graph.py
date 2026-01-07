@@ -311,11 +311,39 @@ class MemoryGraph:
         action: str | None = None,
         limit: int = 10,
         context: dict[str, Any] | None = None,
+        include_consolidated: bool = False,
+        drill_down_from: str | None = None,
     ) -> list[Episode]:
         """
         Busca episódios por diversos critérios.
+        
+        Args:
+            query: Texto para busca semântica
+            participant_ids: IDs de entidades participantes
+            action: Ação específica a buscar
+            limit: Máximo de resultados
+            context: Contexto adicional (namespace, etc.)
+            include_consolidated: Se True, inclui memórias que já foram consolidadas
+                                  Por padrão (False), retorna apenas memórias frescas e resumos
+            drill_down_from: ID de memória resumo para buscar suas granulares
         """
         candidates = list(self._episodes.values())
+        
+        # DRILL-DOWN: busca memórias granulares ligadas a um resumo
+        if drill_down_from:
+            candidates = [
+                e for e in candidates
+                if getattr(e, 'consolidated_into', None) == drill_down_from
+            ]
+            return candidates[:limit]
+        
+        # FILTRO DE CONSOLIDAÇÃO: por padrão, exclui memórias que JÁ foram consolidadas
+        # Isso mantém apenas: resumos (is_summary=True) e memórias frescas (consolidated_into=None)
+        if not include_consolidated:
+            candidates = [
+                e for e in candidates
+                if not getattr(e, 'consolidated_into', None)  # Não foi consolidada em outra
+            ]
         
         # Filtra por ação
         if action:

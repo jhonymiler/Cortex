@@ -4,8 +4,23 @@ Sleep Refiner - Consolida e refina memórias em background.
 Inspirado no processo de consolidação de memória durante o sono:
 1. Analisa memórias brutas
 2. Extrai entidades e relações
-3. Cria resumos consolidados
-4. Salva memórias refinadas
+3. Cria resumos consolidados (is_summary=True)
+4. Liga memórias granulares ao resumo (consolidated_into)
+5. Memórias granulares decaem mais rápido (decay_multiplier=0.3)
+
+Fluxo de Consolidação:
+    ANTES:
+        [mem_1] [mem_2] [mem_3] [mem_4] [mem_5]  (5 memórias similares)
+    
+    DEPOIS:
+        [mem_resumo] (is_summary=True, consolidated_from=[mem_1..5])
+            ├── [mem_1] (consolidated_into=mem_resumo, decai rápido)
+            ├── [mem_2] (consolidated_into=mem_resumo, decai rápido)
+            └── ...
+    
+    RECALL:
+        - Por padrão retorna apenas mem_resumo
+        - drill_down=True retorna mem_1..5 para detalhes
 
 Uso:
     from cortex.workers import SleepRefiner
@@ -33,9 +48,11 @@ class RefineResult:
     success: bool = False
     memories_analyzed: int = 0
     memories_refined: int = 0
+    memories_linked: int = 0  # Quantas memórias granulares foram ligadas ao resumo
     entities_extracted: list[str] = field(default_factory=list)
     patterns_found: list[str] = field(default_factory=list)
     consolidated_summary: str = ""
+    summary_id: str = ""  # ID da memória resumo criada
     error: str = ""
 
 
@@ -176,7 +193,7 @@ resumo_consolidado: |
             if resumo_match:
                 result.consolidated_summary = resumo_match.group(1).strip()
             
-            # 4. Salva memória consolidada
+            # 4. Salva memória consolidada (resumo)
             if result.consolidated_summary:
                 store_resp = self._session.post(
                     f"{self.cortex_url}/memory/remember",
@@ -187,11 +204,24 @@ resumo_consolidado: |
                         "how": result.consolidated_summary[:200],
                         "where": namespace,
                         "importance": 0.9,
+                        "is_summary": True,  # Marca como resumo
                     },
                 )
                 
-                if store_resp.json().get("success"):
+                store_data = store_resp.json()
+                if store_data.get("success"):
                     result.memories_refined = 1
+                    result.summary_id = store_data.get("episode_id", "")
+                    
+                    # 5. Liga memórias granulares ao resumo
+                    # Isso faz com que decaiam mais rápido (decay_multiplier=0.3)
+                    if result.summary_id:
+                        linked = self._link_granular_memories(
+                            namespace=namespace,
+                            summary_id=result.summary_id,
+                            patterns=padroes,
+                        )
+                        result.memories_linked = linked
             
             result.success = True
             
@@ -199,6 +229,68 @@ resumo_consolidado: |
             result.error = str(e)
         
         return result
+    
+    def _link_granular_memories(
+        self,
+        namespace: str,
+        summary_id: str,
+        patterns: list[str],
+    ) -> int:
+        """
+        Liga memórias granulares ao resumo.
+        
+        Isso marca as memórias originais com consolidated_into=summary_id,
+        fazendo com que decaiam mais rápido e não apareçam no recall normal.
+        
+        Args:
+            namespace: Namespace das memórias
+            summary_id: ID da memória resumo
+            patterns: Padrões identificados (para filtrar quais ligar)
+        
+        Returns:
+            Número de memórias ligadas
+        """
+        linked = 0
+        
+        try:
+            # Busca memórias que ainda não foram consolidadas
+            # (excluindo a própria consolidação)
+            recall_resp = self._session.post(
+                f"{self.cortex_url}/memory/recall",
+                json={
+                    "query": " ".join(patterns) if patterns else "atendimento",
+                    "context": {"namespace": namespace},
+                    "limit": 50,
+                },
+            )
+            
+            episodes = recall_resp.json().get("episodes", [])
+            
+            for ep in episodes:
+                ep_id = ep.get("id", "")
+                # Não liga a memória de consolidação a si mesma
+                if ep_id == summary_id:
+                    continue
+                # Não liga memórias que já são resumos
+                if ep.get("is_summary") or ep.get("action") == "consolidacao_memoria":
+                    continue
+                # Não re-liga memórias já consolidadas
+                if ep.get("consolidated_into"):
+                    continue
+                
+                # Atualiza a memória para marcar como consolidada
+                update_resp = self._session.patch(
+                    f"{self.cortex_url}/memory/episodes/{ep_id}",
+                    json={"consolidated_into": summary_id},
+                )
+                
+                if update_resp.status_code == 200:
+                    linked += 1
+                    
+        except Exception:
+            pass  # Silenciosamente ignora erros de linking
+        
+        return linked
     
     def refine_all_namespaces(self) -> dict[str, RefineResult]:
         """
