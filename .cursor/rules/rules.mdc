@@ -1,238 +1,140 @@
----
-alwaysApply: true
----
-
 # 🧠 Cortex - Cursor Rules
 
 > **Sistema de Memória Cognitiva para Agentes LLM**  
-> Versão: 3.0 | Janeiro 2026 | Modelo W5H
+> Versão: 3.1 | Janeiro 2026 | Modelo W5H
+
+---
+
+## 📚 DOCUMENTAÇÃO MODULAR
+
+A documentação segue o princípio **D.R.Y.** — conceitos são definidos uma única vez:
+
+| Categoria | Local | Conteúdo |
+|-----------|-------|----------|
+| **Conceitos** | `docs/concepts/` | W5H, Ebbinghaus, Consolidação, Shared Memory |
+| **Início Rápido** | `docs/getting-started/` | Quickstart, Integrações |
+| **Arquitetura** | `docs/architecture/` | Overview, API Reference |
+| **Pesquisa** | `docs/research/` | Base científica, Benchmarks |
+| **Negócio** | `docs/business/` | Value prop, Roadmap |
+
+**Regra**: Ao documentar, **referencie** os conceitos centrais. Não duplique.
+
+---
 
 ## 📋 REGRAS GERAIS
 
 ### Ambiente
-- **SEMPRE** ativar venv antes de qualquer comando: `source venv/bin/activate`
-- **SEMPRE** comitar após confirmar funcionamento de feature
-- **NUNCA** criar arquivos duplicados ou lixo
+- **SEMPRE** ativar venv: `source venv/bin/activate`
+- **SEMPRE** comitar após confirmar funcionamento
+- **NUNCA** criar arquivos duplicados
 - **SEMPRE** responder em português
-- **SEMPRE** ATUALIZAR AS DOCUMENTAÇÕES
+- **SEMPRE** realizar testes unitários
 
 ### Arquitetura
 - Cortex **NÃO é RAG** nem VectorDB
-- Memória baseada em **grafo semântico** (Entity-Episode-Relation)
+- Memória baseada em **grafo semântico** (Entity-Memory-Relation)
 - Busca por **índice O(1)** - ZERO tokens, sem embeddings
-- Usar apenas **FastMCP** (decorator-based) - NUNCA old MCP
+- Usar apenas **FastMCP** (decorator-based)
 
 ---
 
-## 🚀 BENCHMARK - COMANDOS
+## 🚀 COMANDOS
 
-### Executar Benchmark (RECOMENDADO)
+### Desenvolvimento
+
 ```bash
-# Setup automático + execução
-./start_benchmark.sh
-
-# Variantes
-./start_benchmark.sh --quick   # Rápido (1 conv/domínio, 2 sessões)
-./start_benchmark.sh --full    # Completo (3 conv/domínio, 5 sessões)
-./start_benchmark.sh education # Apenas um domínio
+pip install -e ".[all,dev]"   # Instalar
+cortex-api                    # API REST
+cortex-mcp                    # MCP Server
+pytest tests/ -v              # Testes
+ruff check src/               # Lint
 ```
 
-### Ablation Study
+### Benchmark
+
 ```bash
-# Teste rápido de ablation (6 variantes)
-python benchmark/ablation_runner.py --quick
-
-# Completo com todas as variantes
-python benchmark/ablation_runner.py --full
-
-# Variantes específicas
-python benchmark/ablation_runner.py --variants full no_decay rag mem0
+./start_benchmark.sh --quick   # Rápido (~10 min)
+./start_benchmark.sh --full    # Completo (~1 hora)
+./analyze_results.sh           # Análise
 ```
-
-### Shared Memory Benchmark
-```bash
-# Testa cenários de memória compartilhada
-python benchmark/shared_memory_benchmark.py --all
-
-# Cenário específico
-python benchmark/shared_memory_benchmark.py --scenario customer_support_shared
-```
-
-### Análise de Resultados
-```bash
-# Análise completa do grafo
-./analyze_results.sh
-
-# Scripts individuais
-python benchmark/analyze_graph.py
-python benchmark/analyze_hubs.py
-```
-
-### Variantes de Ablation Disponíveis
-| Variante | Descrição |
-|----------|-----------|
-| `full` | Cortex completo (W5H + Decay + Hub + Consolidation) |
-| `no_decay` | Sem decaimento Ebbinghaus |
-| `no_centrality` | Sem hub detection |
-| `no_consolidation` | Sem consolidação |
-| `simple_episodic` | Apenas action/outcome (sem W5H) |
-| `baseline` | Sem memória (controle) |
-| `rag` | RAG baseline (TF-IDF) |
-| `mem0` | Mem0 baseline (salience extraction) |
 
 ---
 
-## 📁 ESTRUTURA DE ARQUIVOS
+## 📁 ESTRUTURA
 
 ```
 cortex/
 ├── src/cortex/
-│   ├── core/              # Modelos puros (sem I/O)
-│   │   ├── entity.py      # Entidade + centrality_score
-│   │   ├── memory.py      # Memory W5H (Episode = alias)
-│   │   ├── relation.py    # Relação (conexão)
+│   ├── core/              # Modelos puros
+│   │   ├── entity.py
+│   │   ├── memory.py      # Memory W5H
+│   │   ├── relation.py
 │   │   ├── memory_graph.py
-│   │   ├── decay.py       # ✅ DecayManager (Ebbinghaus)
-│   │   └── shared_memory.py # ✅ SharedMemoryManager
-│   ├── services/          # Lógica de negócio
-│   │   └── memory_service.py
-│   ├── api/               # FastAPI REST
-│   │   └── app.py         # Endpoints incluindo /memory/interact
-│   └── mcp/               # FastMCP Server
+│   │   ├── decay.py       # DecayManager
+│   │   └── shared_memory.py
+│   ├── services/          # MemoryService
+│   ├── api/               # FastAPI
+│   ├── mcp/               # FastMCP
+│   └── workers/           # DreamAgent
 │
-├── sdk/python/            # SDK Python (Core + Adaptadores)
-│   ├── cortex_sdk.py      # Cliente REST baixo-nível
-│   ├── cortex_memory.py   # Core genérico (before/after hooks)
-│   ├── README.md          # Documentação do SDK
-│   └── integrations/      # Adaptadores para frameworks
-│       ├── __init__.py    # Imports lazy
-│       ├── langchain.py   # LangChain BaseMemory
-│       └── crewai.py      # CrewAI long_term_memory
+├── sdk/python/            # SDK
+│   ├── cortex_memory.py   # Core genérico
+│   └── integrations/      # LangChain, CrewAI
 │
-├── benchmark/             # Sistema de benchmark
-│   ├── lightweight_runner.py   # Runner otimizado (usa V2 por padrão)
-│   ├── agents.py               # BaselineAgent + CortexAgent V1
-│   ├── cortex_agent_v2.py      # ✅ CortexAgent V2 (extração inline)
-│   ├── rag_agent.py            # ✅ RAG Baseline (TF-IDF)
-│   ├── mem0_agent.py           # ✅ Mem0 Baseline
-│   ├── scientific_metrics.py   # Precision@K, Recall@K, MRR
-│   ├── consistency_metrics.py  # ✅ Coerência entre sessões
-│   ├── ablation_runner.py      # Ablation study (8 variantes)
-│   ├── shared_memory_benchmark.py # ✅ Shared memory tests
-│   └── scenarios/              # Cenários de teste
-│       └── shared_memory_scenarios.py
+├── benchmark/             # Benchmark científico
 │
-├── src/cortex/workers/    # Processos em background
-│   └── sleep_refiner.py       # ✅ Consolidação de memórias (sono)
+├── docs/                  # Documentação modular
+│   ├── concepts/          # Fonte única de conceitos
+│   ├── getting-started/
+│   ├── architecture/
+│   ├── research/
+│   └── business/
 │
-├── run_lightweight_benchmark.py  # ✅ Script principal
-├── start_benchmark.sh            # ✅ Wrapper com setup
-├── analyze_results.sh            # Análise pós-benchmark
-│
-├── docs/
-│   ├── W5H_DESIGN.md       # Design do modelo W5H
-│   ├── PAPER_TEMPLATE.md   # Template do paper científico
-│   ├── ARCHITECTURE.md     # Arquitetura + Decay + SharedMemory
-│   └── VISION.md
-│
-└── tests/                  # Testes unitários
+└── tests/
 ```
 
 ---
 
-## 🔬 MODELO W5H (NOVO DESIGN)
+## 🔬 MODELO W5H
 
-### Campos
-| W5H | Campo | Descrição |
-|-----|-------|-----------|
-| WHO | `who: list[str]` | Participantes (entidades) |
-| WHAT | `what: str` | O que aconteceu (ação/fato) |
-| WHY | `why: str` | Por quê (causa, motivação) |
-| WHEN | `when: datetime` | Quando (timestamp + contexto) |
-| WHERE | `where: str` | Onde (namespace/contexto espacial) |
-| HOW | `how: str` | Como (resultado/método) |
+> Ver: `docs/concepts/memory-model.md`
 
-### Decaimento (Ebbinghaus)
-```python
-R = e^(-t/S)  # Retrievability
-S = base_stability * (1 + log(access_count)) * (1 + centrality)
+| Campo | Descrição |
+|-------|-----------|
+| WHO | Participantes |
+| WHAT | Ação |
+| WHY | Causa |
+| WHEN | Timestamp |
+| WHERE | Namespace |
+| HOW | Resultado |
+
+---
+
+## 📉 DECAIMENTO
+
+> Ver: `docs/concepts/cognitive-decay.md`
+
 ```
+R = e^(-t/S)
 
-### Hub Centrality
-- Memórias muito referenciadas = **hubs**
-- Hubs decaem mais lentamente
-- Emergente, não declarado
-
----
-
-## 📊 MÉTRICAS DO BENCHMARK
-
-### Científicas
-- **Precision@K**: Relevantes / K recuperados
-- **Recall@K**: Recuperados relevantes / Total relevantes
-- **MRR**: Mean Reciprocal Rank
-- **Hit Rate**: % mensagens com recall útil
-- **Consistency**: Coerência entre sessões
-
-### Operacionais
-- Tokens (baseline vs cortex)
-- Tempo de resposta
-- Overhead de memória (recall + store)
-- Entidades/episódios recuperados
-
----
-
-## 🔧 COMANDOS ÚTEIS
-
-```bash
-# Setup
-pip install -e ".[all,dev]"
-
-# Serviços
-cortex-api                    # API REST
-cortex-mcp                    # MCP Server
-uvicorn cortex.api.app:app --reload
-
-# Testes
-pytest tests/ -v
-pytest tests/test_memory_service.py -v
-
-# Lint
-ruff check src/
-ruff format src/
+Stability aumenta com:
+├── Acessos frequentes
+├── Consolidação
+└── Hub centrality
 ```
 
 ---
 
-## 🚨 O QUE NÃO FAZER
+## 🔄 CONSOLIDAÇÃO
 
-### Código
-```python
-# ❌ Armazenar texto bruto grande
-Episode(context="10.000 linhas de log...")
+> Ver: `docs/concepts/consolidation.md`
 
-# ❌ Usar embeddings/vectors
-results = vector_db.similarity_search(embedding)
-
-# ❌ Duplicar entidades
-Entity(name="João")
-Entity(name="João Silva")  # Duplicado!
-
-# ❌ Misturar camadas
-class Entity:
-    def save_to_database(self): ...  # Modelo não faz I/O!
-
-# ❌ Old MCP
-from mcp import Server  # NUNCA!
 ```
-
-### Benchmark
-```bash
-# ❌ Benchmark pesado (gasta muitos tokens)
-python benchmark/run_benchmark.py
-
-# ❌ Script desatualizado
-./start_benchmark.sh
+DreamAgent:
+├── Agrupa memórias similares
+├── Cria resumo (is_summary=True)
+├── Marca originais (consolidated_into)
+└── Originais decaem 3x mais rápido
 ```
 
 ---
@@ -250,103 +152,20 @@ bench: benchmark
 
 ---
 
-## 🎯 STATUS DO PROJETO
+## 🎯 STATUS
 
 ### ✅ Completo
-- Core models (Entity, Memory/Episode, Relation, MemoryGraph)
-- MemoryService (store, recall, consolidation)
-- DecayManager (Ebbinghaus decay + hub protection)
-- SharedMemoryManager (isolamento personal/shared/learned)
-- Benchmark lightweight (sem comparações LLM)
-- Métricas científicas (Precision, Recall, MRR, Consistency)
-- RAG Baseline + Mem0 Baseline
-- Shared Memory Benchmark
-- Ablation Study (8 variantes)
-- SDK Python (Core + LangChain + CrewAI)
-- **CortexAgentV2** (extração [MEMORY] inline, -50% tokens)
-- **SleepRefiner** (consolidação em background)
-- Documentação completa
+- Core (Entity, Memory, Relation, MemoryGraph)
+- DecayManager, SharedMemoryManager, DreamAgent
+- SDK (Core, LangChain, CrewAI)
+- Benchmark científico
+- Documentação modular
 
-### 🆕 Cortex V2 - Otimizações
-| Métrica | V1 | V2 | Economia |
-|---------|----|----|----------|
-| Chamadas LLM/msg | 2 | 1 | **-50%** |
-| Tokens/msg | ~600 | ~350 | **-42%** |
-| Latência | Alta | Baixa | **-40%** |
-
-### 🔮 Próximo
-- Dashboard com visualização de retrievability
-- Background job para decaimento diário
-- Paper científico com resultados
-- Adaptador Google ADK
-- Adaptador FastAgent
+### 🔜 Próximo
+- Google ADK Adapter
+- FastAgent Adapter
+- PostgreSQL backend
 
 ---
 
-## 📚 DOCUMENTAÇÃO DE REFERÊNCIA
-
-1. `docs/W5H_DESIGN.md` - Design do modelo W5H (PRINCIPAL)
-2. `docs/PAPER_TEMPLATE.md` - Template do paper
-3. `docs/ARCHITECTURE.md` - Estrutura de camadas
-4. `docs/API.md` - Endpoints REST
-5. `docs/MCP.md` - Integração MCP
-6. `benchmark/README.md` - Sistema de benchmark
-
----
-
-## 🔄 FLUXO DO AGENTE
-
-### Via MCP (Claude Desktop)
-```
-1. USUÁRIO envia mensagem
-        ↓
-2. AGENTE chama cortex_recall(query)
-        ↓
-3. CORTEX retorna contexto relevante (W5H)
-        ↓
-4. AGENTE processa (com contexto)
-        ↓
-5. AGENTE responde ao usuário
-        ↓
-6. AGENTE chama cortex_remember(who, what, why, how, where)
-        ↓
-7. CORTEX armazena e consolida
-```
-
-### Via SDK V2 (LangChain, CrewAI, etc.)
-```
-1. USUÁRIO envia mensagem
-        ↓
-2. CortexMemory.before(msg) → contexto + instrução [MEMORY]
-        ↓
-3. AGENTE processa (contexto injetado)
-        ↓
-4. LLM gera: "resposta... [MEMORY]who:X what:Y[/MEMORY]"
-        ↓
-5. SDK extrai [MEMORY] via regex (O(1), sem LLM extra)
-        ↓
-6. SDK retorna resposta LIMPA ao usuário
-        ↓
-7. CortexMemory armazena memória extraída
-```
-
-### Uso do SDK
-
-```python
-# Decorator simples
-@with_memory(namespace="meu_agente")
-def meu_agente(msg: str, context: str = "") -> str:
-    return resposta
-
-# LangChain
-memory = CortexLangChainMemory(namespace="lc")
-chain = ConversationChain(llm=llm, memory=memory)
-
-# CrewAI
-crew = Crew(long_term_memory=CortexCrewAIMemory(namespace="crew"))
-```
-
----
-
-*Última atualização: 06 de Janeiro de 2026*
-
+*Última atualização: Janeiro 2026*

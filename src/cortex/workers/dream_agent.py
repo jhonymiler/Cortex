@@ -1,5 +1,5 @@
 """
-Sleep Refiner - Consolida e refina memórias em background.
+Dream Agent - Consolida e refina memórias em background.
 
 Inspirado no processo de consolidação de memória durante o sono:
 1. Analisa memórias brutas
@@ -8,15 +8,15 @@ Inspirado no processo de consolidação de memória durante o sono:
 4. Salva memórias refinadas
 
 Uso:
-    from cortex.workers import SleepRefiner
+    from cortex.workers import DreamAgent
     
-    refiner = SleepRefiner(
+    agent = DreamAgent(
         cortex_url="http://localhost:8000",
         llm_url="http://localhost:11434",  # Ollama
         llm_model="gemma3:4b",
     )
     
-    result = refiner.refine(namespace="meu_agente")
+    result = agent.dream(namespace="meu_agente")
     print(f"Refinadas: {result.memories_refined}")
 """
 
@@ -24,12 +24,11 @@ import os
 import re
 import requests
 from dataclasses import dataclass, field
-from typing import Any
 
 
 @dataclass
-class RefineResult:
-    """Resultado do refinamento."""
+class DreamResult:
+    """Resultado do sonho/consolidação."""
     success: bool = False
     memories_analyzed: int = 0
     memories_refined: int = 0
@@ -39,7 +38,7 @@ class RefineResult:
     error: str = ""
 
 
-class SleepRefiner:
+class DreamAgent:
     """
     Refina e consolida memórias usando LLM.
     
@@ -102,18 +101,20 @@ resumo_consolidado: |
         self._session = requests.Session()
         self._session.headers.update({"Content-Type": "application/json"})
     
-    def refine(self, namespace: str, query: str = "") -> RefineResult:
+    def dream(self, namespace: str, query: str = "") -> DreamResult:
         """
-        Executa refinamento de memórias para um namespace.
+        Executa consolidação de memórias para um namespace.
+        
+        Similar ao processo de sonho que consolida memórias no cérebro.
         
         Args:
-            namespace: Namespace a refinar
+            namespace: Namespace a processar
             query: Query opcional para filtrar memórias (default: busca ampla)
         
         Returns:
-            RefineResult com detalhes do refinamento
+            DreamResult com detalhes do refinamento
         """
-        result = RefineResult()
+        result = DreamResult()
         
         try:
             # 1. Busca memórias brutas
@@ -183,7 +184,7 @@ resumo_consolidado: |
                     json={
                         "who": entidades[:3] if entidades else ["sistema"],
                         "what": "consolidacao_memoria",
-                        "why": "refinamento_sono",
+                        "why": "dream_consolidation",
                         "how": result.consolidated_summary[:200],
                         "where": namespace,
                         "importance": 0.9,
@@ -254,12 +255,12 @@ resumo_consolidado: |
         
         return marked
     
-    def refine_all_namespaces(self) -> dict[str, RefineResult]:
+    def dream_all_namespaces(self) -> dict[str, DreamResult]:
         """
-        Executa refinamento em todos os namespaces.
+        Executa consolidação em todos os namespaces.
         
         Returns:
-            Dict de namespace -> RefineResult
+            Dict de namespace -> DreamResult
         """
         results = {}
         
@@ -269,10 +270,9 @@ resumo_consolidado: |
             namespaces = resp.json().get("namespaces", [])
             
             for ns in namespaces:
-                results[ns] = self.refine(ns)
+                results[ns] = self.dream(ns)
                 
         except Exception as e:
-            results["_error"] = RefineResult(error=str(e))
+            results["_error"] = DreamResult(error=str(e))
         
         return results
-

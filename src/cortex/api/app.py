@@ -464,7 +464,7 @@ async def update_episode(
     """
     Atualiza campos de um episódio.
     
-    Usado principalmente pelo SleepRefiner para marcar memórias
+    Usado principalmente pelo DreamAgent para marcar memórias
     como consolidadas (apontando para o resumo).
     
     Headers:

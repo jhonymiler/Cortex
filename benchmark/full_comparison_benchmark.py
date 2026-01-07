@@ -10,7 +10,7 @@ Executa benchmark completo comparando:
 Inclui:
 - Múltiplas sessões por domínio
 - Volta de usuários (test returning users)
-- SleepRefiner entre sessões (consolidação)
+- DreamAgent entre sessões (consolidação)
 - Métricas científicas (Precision@K, Recall@K, MRR)
 
 Uso:
@@ -53,12 +53,12 @@ from rag_agent import RAGAgent
 from mem0_agent import Mem0Agent
 from conversation_generator import ConversationGenerator
 
-# Import SleepRefiner
+# Import DreamAgent
 try:
-    from src.cortex.workers.sleep_refiner import SleepRefiner
-    SLEEP_REFINER_AVAILABLE = True
+    from src.cortex.workers.dream_agent import DreamAgent
+    DREAM_AGENT_AVAILABLE = True
 except ImportError:
-    SLEEP_REFINER_AVAILABLE = False
+    DREAM_AGENT_AVAILABLE = False
 
 
 @dataclass
@@ -211,18 +211,18 @@ class FullComparisonBenchmark:
         self._agents["mem0"].set_namespace(namespace)
         self._agents["cortex"].set_namespace(namespace)
     
-    def _run_sleep_refiner(self, namespace: str) -> dict:
-        """Executa SleepRefiner para consolidar memórias."""
-        if not SLEEP_REFINER_AVAILABLE:
-            return {"success": False, "error": "SleepRefiner not available"}
+    def _run_dream_agent(self, namespace: str) -> dict:
+        """Executa DreamAgent para consolidar memórias."""
+        if not DREAM_AGENT_AVAILABLE:
+            return {"success": False, "error": "DreamAgent not available"}
         
         try:
-            refiner = SleepRefiner(
+            agent = DreamAgent(
                 cortex_url=self.cortex_url,
                 llm_url=self.ollama_url,
                 llm_model=self.model,
             )
-            result = refiner.refine(namespace=namespace)
+            result = agent.dream(namespace=namespace)
             return {
                 "success": result.success,
                 "analyzed": result.memories_analyzed,
@@ -292,7 +292,7 @@ class FullComparisonBenchmark:
         Args:
             domain: Domínio do cenário
             num_sessions: Número de sessões (2+ para testar volta de usuário)
-            consolidate_between_sessions: Se deve rodar SleepRefiner entre sessões
+            consolidate_between_sessions: Se deve rodar DreamAgent entre sessões
         """
         namespace = f"bench_{domain}_{datetime.now().strftime('%H%M%S')}"
         user_id = f"user_{domain}"
@@ -320,7 +320,11 @@ class FullComparisonBenchmark:
             is_returning = session_idx > 0
             
             if self.verbose:
-                print(f"\n📍 {domain} - Sessão {session_idx + 1}/{num_sessions} {'(volta)' if is_returning else ''}")
+                print(f"\n{'═' * 60}")
+                print(f"📍 {domain.upper()} - SESSÃO {session_idx + 1}/{num_sessions}")
+                if is_returning:
+                    print(f"   🔄 USUÁRIO RETORNANDO (teste de memória)")
+                print(f"{'═' * 60}")
             
             # Nova sessão para cada agente
             for agent_name, agent in self._agents.items():
@@ -346,11 +350,17 @@ class FullComparisonBenchmark:
                     *session_messages[:2],
                 ]
             
-            for msg in session_messages:
+            for msg_idx, msg in enumerate(session_messages):
                 user_message = msg.get("content", msg) if isinstance(msg, dict) else msg
                 
                 if self.verbose:
-                    print(f"   💬 {user_message[:50]}...")
+                    print(f"\n   ┌{'─' * 56}┐")
+                    print(f"   │ 💬 MENSAGEM {msg_idx + 1}/{len(session_messages)}")
+                    print(f"   └{'─' * 56}┘")
+                    # Mostra mensagem completa (quebra em linhas se muito longa)
+                    for i in range(0, len(user_message), 70):
+                        prefix = "   │ 👤 " if i == 0 else "   │    "
+                        print(f"{prefix}{user_message[i:i+70]}")
                 
                 msg_result = {"user_message": user_message}
                 
@@ -365,25 +375,62 @@ class FullComparisonBenchmark:
                         session.total_tokens[agent_name] = session.total_tokens.get(agent_name, 0) + result.tokens
                         session.total_latency[agent_name] = session.total_latency.get(agent_name, 0) + result.latency_ms
                         
+                        if self.verbose:
+                            # Emoji por agente
+                            agent_emoji = {"baseline": "⚪", "rag": "🔵", "mem0": "🟣", "cortex": "🟢"}.get(agent_name, "⚫")
+                            print(f"   │")
+                            print(f"   │ {agent_emoji} {agent_name.upper():10s} │ 🎟️ {result.tokens:4d} tokens │ ⏱️ {result.latency_ms:.0f}ms │ 🧠 {result.memories_retrieved} mems")
+                            
+                            # Contexto usado (se houver)
+                            if result.context_used and agent_name != "baseline":
+                                ctx_preview = result.context_used[:100].replace('\n', ' ')
+                                print(f"   │   📋 Contexto: {ctx_preview}...")
+                            
+                            # Resposta (primeiras linhas)
+                            response_preview = result.response[:150].replace('\n', ' ')
+                            print(f"   │   💭 {response_preview}...")
+                        
                     except Exception as e:
                         msg_result[f"{agent_name}_error"] = str(e)
-                        print(f"      ❌ {agent_name}: {e}")
+                        print(f"   │ ❌ {agent_name}: {e}")
                 
                 session.messages.append(msg_result)
+                
+                if self.verbose:
+                    print(f"   └{'─' * 56}┘")
+            
+            # Sumário da sessão
+            if self.verbose:
+                print(f"\n   ┌{'─' * 50}┐")
+                print(f"   │ 📊 SUMÁRIO SESSÃO {session_idx + 1}")
+                print(f"   ├{'─' * 50}┤")
+                for agent in self.AGENTS:
+                    tokens = session.total_tokens.get(agent, 0)
+                    latency = session.total_latency.get(agent, 0)
+                    agent_emoji = {"baseline": "⚪", "rag": "🔵", "mem0": "🟣", "cortex": "🟢"}.get(agent, "⚫")
+                    print(f"   │ {agent_emoji} {agent:10s}: {tokens:5d} tokens │ {latency:7.0f}ms")
+                print(f"   └{'─' * 50}┘")
             
             conversation.sessions.append(session)
             
             # Consolidação entre sessões
             if consolidate_between_sessions and session_idx < num_sessions - 1:
                 if self.verbose:
-                    print(f"   🛏️ Executando SleepRefiner...")
+                    print(f"\n   ┌{'─' * 40}┐")
+                    print(f"   │ 💭 CONSOLIDAÇÃO (DreamAgent)         │")
+                    print(f"   └{'─' * 40}┘")
                 
-                refine_result = self._run_sleep_refiner(namespace)
+                refine_result = self._run_dream_agent(namespace)
                 
                 if refine_result.get("success"):
                     if self.verbose:
-                        print(f"      ✅ Refinadas: {refine_result.get('refined', 0)} memórias")
+                        print(f"   │ ✅ Analisadas: {refine_result.get('analyzed', 0)}")
+                        print(f"   │ ✅ Refinadas: {refine_result.get('refined', 0)}")
+                        print(f"   │ ✅ Entidades: {refine_result.get('entities', 0)}")
                     conversation.consolidated = True
+                else:
+                    if self.verbose:
+                        print(f"   │ ⚠️ Erro: {refine_result.get('error', 'Unknown')}")
         
         return conversation
     

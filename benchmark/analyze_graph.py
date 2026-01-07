@@ -480,7 +480,7 @@ def main():
     if consol_rate > 5:
         insights.append(f"✅ Consolidação ativa: {consol_rate:.1f}% dos episódios consolidados")
     elif consol_rate == 0:
-        insights.append("⚠️  Nenhum episódio consolidado - use SleepRefiner para consolidar")
+        insights.append("⚠️  Nenhum episódio consolidado - use DreamAgent para consolidar")
     
     # Graph density
     if quality["density_pct"] > 0.1:

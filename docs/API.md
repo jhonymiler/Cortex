@@ -1,5 +1,9 @@
 # API Reference
 
+> **Veja também**: [Referência completa](./architecture/api-reference.md) | [Integrações](./getting-started/integrations.md)
+
+---
+
 ## Base URL
 
 ```
@@ -261,7 +265,7 @@ GET /namespaces
 
 ### Update Episode (Consolidação) ⭐ NOVO
 
-Atualiza campos de um episódio. Usado pelo SleepRefiner para marcar memórias como consolidadas.
+Atualiza campos de um episódio. Usado pelo DreamAgent para marcar memórias como consolidadas.
 
 ```http
 PATCH /memory/episode/{episode_id}

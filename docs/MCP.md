@@ -1,5 +1,9 @@
 # Integração MCP
 
+> **Veja também**: [Integrações](./getting-started/integrations.md) | [Modelo W5H](./concepts/memory-model.md)
+
+---
+
 ## O que é MCP?
 
 Model Context Protocol (MCP) é um protocolo para ferramentas que LLMs podem chamar. O Cortex implementa um servidor MCP que expõe funções de memória.

@@ -52,14 +52,19 @@ echo "   ✓ Processos limpos"
 if [ "$IS_RESUME" = false ]; then
     echo "🧹 Limpando TODOS os dados de benchmark anteriores..."
     
-    # Limpa grafos de memória de todos os namespaces
-    rm -rf "$CORTEX_DATA_DIR"/benchmark*/memory_graph.json 2>/dev/null || true
+    # Limpa TODAS as pastas bench_* (criadas por benchmarks anteriores)
+    rm -rf "$CORTEX_DATA_DIR"/bench_*/ 2>/dev/null || true
     rm -rf "$CORTEX_DATA_DIR"/benchmark*/ 2>/dev/null || true
     rm -f "$CORTEX_DATA_DIR/default/memory_graph.json" 2>/dev/null || true
+    rm -rf "$CORTEX_DATA_DIR/test_*/" 2>/dev/null || true
     
     # Limpa resultados anteriores (JSON, não os reports MD)
     rm -f benchmark/results/lightweight_*.json 2>/dev/null || true
     rm -f benchmark/results/*.checkpoint.json 2>/dev/null || true
+    rm -f benchmark/results/comparison_*.json 2>/dev/null || true
+    
+    # Remove pastas vazias restantes
+    find "$CORTEX_DATA_DIR" -maxdepth 1 -type d -empty -delete 2>/dev/null || true
     
     echo "   ✓ Dados resetados"
 else

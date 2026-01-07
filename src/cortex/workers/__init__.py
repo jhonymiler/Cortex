@@ -2,20 +2,19 @@
 Cortex Workers - Processos em background.
 
 Workers disponíveis:
-- SleepRefiner: Consolida e refina memórias periodicamente
+- DreamAgent: Consolida e refina memórias periodicamente (como sonhos)
 
 Uso:
-    from cortex.workers import SleepRefiner
+    from cortex.workers import DreamAgent
     
     # Usa variáveis de ambiente: CORTEX_API_URL, OLLAMA_URL, OLLAMA_MODEL
-    refiner = SleepRefiner()
-    refiner.refine(namespace="meu_agente")
+    agent = DreamAgent()
+    agent.dream(namespace="meu_agente")
 """
 
-from .sleep_refiner import SleepRefiner, RefineResult
+from .dream_agent import DreamAgent, DreamResult
 
 __all__ = [
-    "SleepRefiner",
-    "RefineResult",
+    "DreamAgent",
+    "DreamResult",
 ]
-
