@@ -26,9 +26,18 @@ from pathlib import Path
 from typing import Any
 from dataclasses import dataclass, field
 
-from benchmark.agents import BaselineAgent
-from benchmark.cortex_agent import CortexAgent
-from benchmark.conversation_generator import Conversation, Session, Message
+import sys
+from pathlib import Path
+
+# Adiciona paths
+benchmark_path = Path(__file__).parent
+project_root = benchmark_path.parent
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(benchmark_path))
+
+from agents import BaselineAgent
+from cortex_agent import CortexAgent
+from conversation_generator import Conversation, Session, Message
 
 
 # ==================== CENÁRIOS DE TESTE ====================
@@ -198,10 +207,10 @@ class CollectiveMemoryBenchmark:
         """
         Executa um cenário com múltiplos usuários.
         
-        Fluxo:
+        Fluxo CORRIGIDO:
         1. Primeiro usuário reporta problema → resolve
-        2. DreamAgent consolida (simulated)
-        3. Segundo usuário reporta problema similar → deve lembrar
+        2. DreamAgent consolida (cria LEARNED)
+        3. Segundo usuário reporta problema similar → DEVE lembrar da solução
         4. Terceiro usuário com problema diferente → isolado
         """
         self._log(f"\n{'='*60}")
@@ -220,96 +229,139 @@ class CollectiveMemoryBenchmark:
             "isolation_test": {},
         }
         
-        # Processa cada usuário em sequência
-        for user_idx, user in enumerate(scenario.users):
-            user_id = user["id"]
-            user_name = user["name"]
+        # Categoriza usuários por tipo
+        users_with_resolution = [u for u in scenario.users if u.get("resolution")]
+        users_should_recall = [u for u in scenario.users if u.get("should_recall_learned")]
+        users_isolation_test = [u for u in scenario.users if u.get("should_not_see_personal")]
+        
+        # ═══════════════════════════════════════════════════════════
+        # FASE 1: Usuários que CRIAM conhecimento (resolvem problemas)
+        # ═══════════════════════════════════════════════════════════
+        self._log(f"\n📌 FASE 1: Criando conhecimento...")
+        
+        for user_idx, user in enumerate(users_with_resolution):
+            user_result = self._process_user(user, scenario, user_idx + 1)
+            results["users"].append(user_result)
+            time.sleep(0.5)
+        
+        # ═══════════════════════════════════════════════════════════
+        # FASE 2: DreamAgent consolida → cria memória LEARNED
+        # ═══════════════════════════════════════════════════════════
+        self._log(f"\n{'─'*50}")
+        self._log("🌙 FASE 2: DreamAgent consolidando memórias...")
+        dream_result = self._simulate_dream_consolidation(scenario)
+        results["dream_consolidation"] = dream_result
+        
+        # ═══════════════════════════════════════════════════════════
+        # FASE 3: Usuários que DEVEM LEMBRAR (testam memória coletiva)
+        # ═══════════════════════════════════════════════════════════
+        if users_should_recall:
+            self._log(f"\n📌 FASE 3: Testando memória coletiva (LEARNED)...")
             
-            # Define namespace hierárquico para o usuário
-            user_namespace = f"{self.namespace}:{scenario.domain}:{user_id}"
-            self.cortex.set_namespace(user_namespace)
-            self.cortex.new_session(user_id=user_id)
-            
-            self._log(f"\n{'─'*50}")
-            self._log(f"👤 USUÁRIO {user_idx + 1}: {user_name} ({user_id})")
-            self._log(f"   Namespace: {user_namespace}")
-            
-            user_result = {
-                "user_id": user_id,
-                "user_name": user_name,
-                "namespace": user_namespace,
-                "interactions": [],
-            }
-            
-            # INTERAÇÃO 1: Usuário reporta problema
-            problem_msg = f"Olá, meu nome é {user_name}. {user['problem']}"
-            if user.get("details"):
-                problem_msg += f" {user['details']}"
-            
-            self._log(f"\n   💬 Problema: {user['problem'][:60]}...")
-            
-            response = self.cortex.process_message(problem_msg)
-            
-            user_result["interactions"].append({
-                "type": "problem_report",
-                "message": problem_msg,
-                "response": response.content,
-                "memory_context": response.context_from_memory,
-                "entities": response.memory_entities,
-                "episodes": response.memory_episodes,
-            })
-            
-            # Verifica se lembrou de memória coletiva (para usuários que deveriam)
-            if user.get("should_recall_learned"):
-                has_learned = self._check_learned_memory(response.context_from_memory, scenario.common_solution)
+            for user_idx, user in enumerate(users_should_recall):
+                user_result = self._process_user(user, scenario, len(users_with_resolution) + user_idx + 1)
+                
+                # Verifica se lembrou de memória coletiva
+                last_interaction = user_result["interactions"][-1] if user_result["interactions"] else {}
+                context = last_interaction.get("memory_context", "")
+                
+                has_learned = self._check_learned_memory(context, scenario.common_solution)
                 user_result["recalled_learned"] = has_learned
-                results["collective_memory_test"][user_id] = has_learned
+                results["collective_memory_test"][user["id"]] = has_learned
                 
                 if has_learned:
                     self._log(f"   ✅ LEMBROU conhecimento coletivo!")
                 else:
-                    self._log(f"   ❌ NÃO lembrou conhecimento coletivo (esperado após DreamAgent)")
+                    self._log(f"   ❌ NÃO lembrou conhecimento coletivo")
+                    self._log(f"      Contexto: {context[:100] if context else '(vazio)'}...")
+                
+                results["users"].append(user_result)
+                time.sleep(0.5)
+        
+        # ═══════════════════════════════════════════════════════════
+        # FASE 4: Usuários de ISOLAMENTO (não devem ver memórias pessoais)
+        # ═══════════════════════════════════════════════════════════
+        if users_isolation_test:
+            self._log(f"\n📌 FASE 4: Testando isolamento...")
             
-            # Verifica isolamento (para usuários que NÃO devem ver memórias pessoais de outros)
-            if user.get("should_not_see_personal"):
+            for user_idx, user in enumerate(users_isolation_test):
+                user_result = self._process_user(user, scenario, len(users_with_resolution) + len(users_should_recall) + user_idx + 1)
+                
+                # Verifica isolamento
+                last_interaction = user_result["interactions"][-1] if user_result["interactions"] else {}
+                context = last_interaction.get("memory_context", "")
+                
                 has_personal_leak = self._check_personal_leak(
-                    response.context_from_memory, 
-                    [u["name"] for u in scenario.users if u["id"] != user_id]
+                    context, 
+                    [u["name"] for u in scenario.users if u["id"] != user["id"]]
                 )
                 user_result["personal_leak"] = has_personal_leak
-                results["isolation_test"][user_id] = not has_personal_leak
+                results["isolation_test"][user["id"]] = not has_personal_leak
                 
                 if has_personal_leak:
                     self._log(f"   ❌ VAZAMENTO de memória pessoal!")
                 else:
                     self._log(f"   ✅ Isolamento OK - não viu memórias pessoais de outros")
-            
-            # Se o usuário tem resolução, simula a resolução
-            if user.get("resolution"):
-                self._log(f"   💡 Resolução: {user['resolution'][:50]}...")
                 
-                resolution_msg = user["resolution"]
-                response2 = self.cortex.process_message(resolution_msg)
-                
-                user_result["interactions"].append({
-                    "type": "resolution",
-                    "message": resolution_msg,
-                    "response": response2.content,
-                    "memory_extracted": response2.memory_extracted,
-                })
-            
-            results["users"].append(user_result)
-            
-            # Pausa entre usuários (simula tempo passando)
-            time.sleep(0.5)
-        
-        # Simula DreamAgent consolidando conhecimento
-        self._log(f"\n{'─'*50}")
-        self._log("🌙 Simulando DreamAgent consolidando memórias...")
-        dream_result = self._simulate_dream_consolidation(scenario)
-        results["dream_consolidation"] = dream_result
+                results["users"].append(user_result)
+                time.sleep(0.5)
         
         return results
+    
+    def _process_user(self, user: dict, scenario: CollectiveScenario, user_num: int) -> dict:
+        """Processa um usuário individual."""
+        user_id = user["id"]
+        user_name = user["name"]
+        
+        # Define namespace hierárquico para o usuário
+        user_namespace = f"{self.namespace}:{scenario.domain}:{user_id}"
+        self.cortex.set_namespace(user_namespace)
+        self.cortex.new_session(user_id=user_id)
+        
+        self._log(f"\n{'─'*50}")
+        self._log(f"👤 USUÁRIO {user_num}: {user_name} ({user_id})")
+        self._log(f"   Namespace: {user_namespace}")
+        
+        user_result = {
+            "user_id": user_id,
+            "user_name": user_name,
+            "namespace": user_namespace,
+            "interactions": [],
+        }
+        
+        # INTERAÇÃO 1: Usuário reporta problema
+        problem_msg = f"Olá, meu nome é {user_name}. {user['problem']}"
+        if user.get("details"):
+            problem_msg += f" {user['details']}"
+        
+        self._log(f"\n   💬 Problema: {user['problem'][:60]}...")
+        
+        response = self.cortex.process_message(problem_msg)
+        
+        user_result["interactions"].append({
+            "type": "problem_report",
+            "message": problem_msg,
+            "response": response.content,
+            "memory_context": response.context_from_memory,
+            "entities": response.memory_entities,
+            "episodes": response.memory_episodes,
+        })
+        
+        # Se o usuário tem resolução, simula a resolução
+        if user.get("resolution"):
+            self._log(f"   💡 Resolução: {user['resolution'][:50]}...")
+            
+            resolution_msg = user["resolution"]
+            response2 = self.cortex.process_message(resolution_msg)
+            
+            user_result["interactions"].append({
+                "type": "resolution",
+                "message": resolution_msg,
+                "response": response2.content,
+                "memory_extracted": response2.memory_extracted,
+            })
+        
+        return user_result
     
     def _check_learned_memory(self, context: str | None, expected_pattern: str) -> bool:
         """Verifica se o contexto contém conhecimento aprendido."""
