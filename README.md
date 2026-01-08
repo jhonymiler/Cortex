@@ -37,13 +37,21 @@ def agent(msg, context=""):
 
 ---
 
-## 📊 Resultados
+## 📊 Resultados (Paper Benchmark)
 
-| Métrica | Economia |
-|---------|----------|
-| **Tokens** | **-12.5%** |
-| **Latência** | **-21%** |
-| **Hit Rate** | **100%** |
+| Métrica | Resultado |
+|---------|-----------|
+| **Acurácia Semântica** | **100%** |
+| **Recall Contextual** | **100%** |
+| **Memória Coletiva** | **75%** |
+| **Relevância** | **67%** |
+| **Latência Média** | **42ms** |
+| **GERAL** | **91.7%** |
+
+```bash
+# Rodar benchmark
+./start_benchmark.sh --paper
+```
 
 [→ Ver benchmark completo](docs/research/benchmarks.md)
 

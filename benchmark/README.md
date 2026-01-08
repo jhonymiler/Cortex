@@ -1,278 +1,98 @@
 # Cortex Benchmark
 
-Benchmark comparativo entre agente **baseline** (sem memória) e agente **Cortex** (com memória semântica), usando **LLM real via Ollama**.
+Benchmark focado em **VALOR**, não apenas métricas brutas.
 
-## 🎯 Objetivo
+## Filosofia
 
-Medir quantitativamente a diferença entre:
-- **Baseline**: Agente LLM padrão, cada sessão é isolada
-- **Cortex**: Agente LLM com memória persistente via Cortex
+Este benchmark avalia a **qualidade da informação recuperada**, não apenas velocidade ou tokens.
+O Cortex não compete em quantidade, compete em **inteligência da memória**.
 
-## 📊 Métricas Coletadas
+## Métricas de VALOR (foco principal)
 
-### Métricas Tangíveis
-- **Tokens**: Total de tokens usados (prompt + completion)
-- **Tempo**: Tempo de resposta, overhead de memória
-- **Taxa de Hit**: % de mensagens que recuperaram memórias
+| Métrica | O que mede |
+|---------|------------|
+| **Acurácia Semântica** | Encontra memória certa com termos diferentes |
+| **Recall Contextual** | Lembra de fluxos anteriores |
+| **Memória Coletiva** | Compartilha conhecimento útil entre usuários |
+| **Relevância** | Retorna informação útil, não ruído |
 
-### Métricas Qualitativas
-- **Contexto Recuperado**: Quais memórias foram usadas
-- **Consistência**: Se informações de sessões anteriores foram lembradas
-- **Personalização**: Se o agente usou informações do usuário
+## Métricas de Eficiência (secundárias)
 
-## 🏗️ Estrutura
+| Métrica | Descrição |
+|---------|-----------|
+| Latência | Tempo de resposta (ms) |
+| Tokens | Tamanho do contexto injetado |
+
+## Benchmarks Disponíveis
+
+### 1. Paper Benchmark (padrão)
+Avalia o Cortex isoladamente com métricas completas para publicação.
+
+```bash
+./start_benchmark.sh
+# ou
+./start_benchmark.sh --paper
+```
+
+### 2. Comparison Benchmark
+Compara Cortex vs Baseline vs RAG vs Mem0.
+
+```bash
+./start_benchmark.sh --compare
+```
+
+## Estrutura
 
 ```
 benchmark/
-├── __init__.py
-├── agents.py              # BaselineAgent e CortexAgent (LLM real)
-├── benchmark.py           # BenchmarkRunner e MetricsEvaluator
-├── conversation_generator.py  # Gerador de conversas por domínio
-├── run_benchmark.py       # Script principal
-├── data/                  # Dados gerados
-│   └── benchmark_conversations.json
-└── results/               # Resultados dos benchmarks
-    └── benchmark_YYYYMMDD_HHMMSS.json
+├── paper_benchmark.py       # Benchmark para paper acadêmico
+├── comparison_benchmark.py  # Comparativo Cortex vs RAG vs Mem0
+├── agents.py                # Implementação dos agentes base
+├── cortex_agent.py          # Agente Cortex
+├── rag_agent.py             # Agente RAG (TF-IDF)
+├── mem0_agent.py            # Agente Mem0 (salience)
+├── conversation_generator.py # Gerador de cenários
+└── _old/                    # Arquivos obsoletos
 ```
 
-## 🚀 Uso
+## Resultados
 
-### Pré-requisitos
+Os resultados são salvos em `benchmark_results/`:
 
-1. **Ollama rodando**:
-```bash
-ollama serve
-ollama pull gemma3:4b  # ou outro modelo
+```
+benchmark_results/
+├── paper_benchmark_YYYYMMDD_HHMMSS.json
+└── comparison_YYYYMMDD_HHMMSS.json
 ```
 
-2. **Cortex API rodando**:
-```bash
-cd /path/to/cortex
-source venv/bin/activate
-cortex-api
-```
+## Análise
 
-### Executar Benchmark
+Para analisar resultados existentes:
 
 ```bash
-# Ativar ambiente
-source venv/bin/activate
-
-# Benchmark rápido (teste)
-python benchmark/run_benchmark.py --quick
-
-# Benchmark padrão (1 conv/domínio, 3 sessões)
-python benchmark/run_benchmark.py
-
-# Benchmark completo (3 conv/domínio, 5 sessões)
-python benchmark/run_benchmark.py --full
-
-# Apenas um domínio
-python benchmark/run_benchmark.py --domain education
-
-# Configuração customizada
-python benchmark/run_benchmark.py --conversations 5 --sessions 7
-
-# Modelo diferente
-python benchmark/run_benchmark.py --model llama3.1:8b
+bash ./analyze_results.sh
 ```
 
-### Opções
+## Diferenciais do Cortex
 
+1. **Busca Semântica**: 100% de acurácia com embeddings
+2. **Memória Contextual**: Lembra de fluxos completos
+3. **Conhecimento Coletivo**: Compartilha entre usuários do mesmo tenant
+4. **Isolamento**: Separação automática entre tenants (PII/PCI)
+5. **Consolidação**: Compacta memórias similares automaticamente
+
+## Requisitos
+
+- Python 3.11+
+- Ollama com modelo qwen3-embedding:0.6b
+- API Cortex rodando
+
+## Configuração
+
+Variáveis de ambiente (`.env`):
+
+```ini
+OLLAMA_URL=http://localhost:11434
+CORTEX_API_URL=http://localhost:8000
+CORTEX_EMBEDDING_MODEL=qwen3-embedding:0.6b
 ```
---full              Benchmark completo (3 conv/domínio, 5 sessões)
---quick             Benchmark rápido (1 conv/domínio, 2 sessões)
---conversations N   N conversas por domínio
---sessions N        N sessões por conversa
---domain DOMAIN     Apenas um domínio específico
---model MODEL       Modelo Ollama a usar
---ollama-url URL    URL do Ollama
---cortex-url URL    URL da API Cortex
---output FILE       Arquivo de saída
---no-clear          Não limpar memória antes
---quiet             Menos output
-```
-
-## 🏛️ Domínios de Teste
-
-8 domínios cobrindo diferentes casos de uso:
-
-| Domínio | Descrição | Foco de Memória |
-|---------|-----------|-----------------|
-| customer_support | Suporte ao cliente | Nome, histórico de tickets |
-| code_assistant | Assistente de código | Projeto, linguagem, decisões técnicas |
-| roleplay | RPG/narrativa | Personagem, história, mundo |
-| education | Tutoria/educação | Aluno, progresso, dificuldades |
-| personal_assistant | Assistente pessoal | Agenda, preferências, família |
-| sales_crm | Vendas/CRM | Cliente, negociação, histórico |
-| healthcare | Saúde/medicação | Paciente, medicamentos, consultas |
-| financial | Finanças pessoais | Investimentos, metas, perfil |
-
-## 📈 Exemplo de Resultado
-
-```
-📊 RESUMO DO BENCHMARK
-======================================================================
-
-🔧 Configuração:
-   Modelo: gemma3:4b
-   Duração: 342.5s
-   Conversas: 8
-   Sessões: 24
-   Mensagens: 48
-
-📝 Tokens:
-   Baseline: 12,450 total (259.4 avg)
-   Cortex:   14,230 total (296.5 avg)
-   Overhead: +1,780 tokens (+14.3%)
-
-⏱️ Tempo:
-   Baseline: 120.3s total (2506ms avg)
-   Cortex:   145.8s total (3037ms avg)
-   Overhead memória: 2,340ms (recall: 1,890ms, store: 450ms)
-
-🧠 Memória Cortex:
-   Entidades recuperadas: 42
-   Episódios recuperados: 67
-   Taxa de hit: 78.5%
-```
-
-## 🔬 Como Funciona
-
-### Fluxo de uma Conversa
-
-```
-1. Gera conversas simuladas por domínio
-   ↓
-2. Para cada conversa:
-   ↓
-3. Para cada sessão:
-   ├─ Baseline: nova sessão (limpa histórico)
-   └─ Cortex: nova sessão (mantém memória)
-   ↓
-4. Para cada mensagem do usuário:
-   ├─ Baseline: processa com contexto da sessão
-   └─ Cortex: RECALL → processa → STORE
-   ↓
-5. Coleta métricas de ambos
-   ↓
-6. Gera relatório comparativo
-```
-
-### O que o Benchmark Testa
-
-1. **Reconhecimento de Usuário**: O Cortex lembra do nome?
-2. **Continuidade**: O Cortex lembra do contexto de sessões anteriores?
-3. **Preferências**: O Cortex lembra de preferências do usuário?
-4. **Histórico**: O Cortex lembra de eventos passados?
-5. **Consistência**: O Cortex mantém consistência entre sessões?
-
-## 📝 Notas
-
-- Todas as métricas são **reais** (LLM real, não simulado)
-- Tokens são contados pelo Ollama via LiteLLM
-- Tempos incluem latência de rede (localhost)
-- O overhead do Cortex é esperado (recall + store)
-- O valor está na **qualidade** das respostas, não só nos números
-
-## 🔮 Próximos Passos
-
-- [x] Adicionar avaliação qualitativa automática (LLM-as-judge) ✅
-- [x] Métricas de consistência (comparar informações entre sessões) ✅
-- [x] Gráficos e visualizações (Streamlit Dashboard) ✅
-- [ ] Benchmark com múltiplos modelos
-- [ ] Teste de carga (muitos usuários simultâneos)
-
----
-
-## 🔬 Avaliação Científica
-
-O benchmark agora inclui ferramentas para avaliação científica padronizada.
-
-### Métricas Científicas (`scientific_metrics.py`)
-
-```python
-from benchmark.scientific_metrics import ScientificMetricsEvaluator
-
-evaluator = ScientificMetricsEvaluator()
-
-# Métricas de retrieval
-metrics = evaluator.calculate_retrieval_metrics(
-    retrieved=["memória 1", "memória 2"],
-    relevant=["memória 1", "memória 3"],  # ground truth
-)
-print(f"Precision@3: {metrics.precision_at_k[3]}")
-print(f"Recall@5: {metrics.recall_at_k[5]}")
-print(f"MRR: {metrics.mrr}")
-```
-
-### Ablation Study (`ablation_runner.py`)
-
-```bash
-# Teste rápido de ablation
-python benchmark/ablation_runner.py --quick
-
-# Variantes específicas
-python benchmark/ablation_runner.py --variants full no_decay baseline
-
-# Completo
-python benchmark/ablation_runner.py --full
-```
-
-**Variantes disponíveis:**
-- `full`: Cortex completo (W5H + Decay + Centrality + Consolidation)
-- `no_decay`: Sem decaimento Ebbinghaus
-- `no_centrality`: Sem hub detection
-- `no_consolidation`: Sem consolidação de episódios
-- `simple_episodic`: Apenas action/outcome (sem W5H)
-- `baseline`: Sem memória (controle)
-- `rag`: RAG baseline (TF-IDF retrieval)
-- `mem0`: Mem0 baseline (salience extraction)
-
-### Consistency Metrics (`consistency_metrics.py`)
-
-Avalia coerência factual entre sessões:
-
-```python
-from benchmark.consistency_metrics import calculate_consistency_score
-
-result = calculate_consistency_score(
-    sessions=[
-        {"messages": [{"role": "user", "content": "Meu nome é Carlos"}]},
-        {"messages": [{"role": "user", "content": "Você lembra meu nome?"}]},
-    ],
-    use_llm=False,  # Regras heurísticas (rápido)
-)
-print(f"Consistency: {result.overall_score:.1%}")
-```
-
-### Shared Memory Benchmark (`shared_memory_benchmark.py`)
-
-Testa memória compartilhada com isolamento pessoal:
-
-```bash
-# Executar cenário específico
-python benchmark/shared_memory_benchmark.py --scenario customer_support_shared
-
-# Todos os cenários
-python benchmark/shared_memory_benchmark.py --all
-```
-
-**Cenários:**
-- `customer_support_shared`: Múltiplos clientes, padrões aprendidos
-- `dev_team_shared`: Múltiplos devs, conhecimento do projeto
-- `healthcare_shared`: Dados de pacientes isolados
-
-### LLM-as-Judge
-
-Usa DeepSeek via Ollama para avaliação qualitativa automática:
-
-```bash
-# Certifique-se que Ollama está rodando
-ollama serve
-
-# Execute o ablation study
-python benchmark/ablation_runner.py --quick
-```
-
-

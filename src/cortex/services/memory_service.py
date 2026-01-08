@@ -28,6 +28,7 @@ from cortex.core.memory import Memory
 from cortex.core.memory_graph import RecallResult
 from cortex.core.decay import DecayManager, create_default_decay_manager
 from cortex.core.namespace import NamespacedMemoryManager
+from cortex.core.embedding import get_embedding_service, cosine_similarity
 from cortex.core.shared_memory import (
     SharedMemoryManager, 
     SharedMemoryContext, 
@@ -253,6 +254,11 @@ class MemoryService:
         """
         self.graph = MemoryGraph(storage_path=storage_path)
         self.shared_manager = shared_memory_manager or SharedMemoryManager()
+        
+        # Cache de recall por sessão (evita recálculos)
+        # Chave: (session_id, query_hash) -> RecallResponse
+        self._recall_cache: dict[tuple[str, int], "RecallResponse"] = {}
+        self._cache_max_size = 100  # Limita tamanho do cache
     
     def store(self, request: StoreRequest) -> StoreResponse:
         """
@@ -301,6 +307,9 @@ class MemoryService:
         if request.namespace and request.namespace != "default":
             episode.metadata["namespace"] = request.namespace
         
+        # 2.5 Gera embedding para busca semântica (não-bloqueante)
+        self._generate_episode_embedding(episode)
+        
         # 3. Check for consolidation (similar episodes)
         consolidated, consolidation_count = self.graph.add_episode_with_consolidation(episode)
         
@@ -330,6 +339,80 @@ class MemoryService:
             consolidation_count=consolidation_count,
         )
     
+    def _generate_episode_embedding(self, episode: Episode) -> None:
+        """
+        Gera embedding para um episódio (para busca semântica).
+        
+        Usa o EmbeddingService singleton. Falha silenciosamente se
+        o serviço de embedding não estiver disponível.
+        """
+        try:
+            embedding_service = get_embedding_service()
+            text = episode.get_text_for_embedding()
+            if text:
+                result = embedding_service.embed(text)
+                if result:
+                    episode.embedding = result.vector
+        except Exception:
+            # Falha silenciosa - embedding é opcional
+            pass
+    
+    def _recall_by_embedding(
+        self,
+        query: str,
+        limit: int = 5,
+        exclude_ids: set[str] | None = None,
+        min_similarity: float = 0.6,
+    ) -> list[Episode]:
+        """
+        Busca episódios por similaridade de embedding.
+        
+        Usado como fallback quando a busca por tokens não encontra
+        episódios suficientes.
+        
+        Args:
+            query: Query de busca
+            limit: Máximo de episódios a retornar
+            exclude_ids: IDs de episódios para excluir
+            min_similarity: Similaridade mínima (0.0 a 1.0)
+            
+        Returns:
+            Lista de episódios ordenados por similaridade
+        """
+        exclude_ids = exclude_ids or set()
+        
+        try:
+            embedding_service = get_embedding_service()
+            
+            # Gera embedding da query
+            query_result = embedding_service.embed(query)
+            if not query_result:
+                return []
+            
+            # Busca episódios com embedding
+            candidates: list[tuple[Episode, float]] = []
+            
+            for ep_id, ep in self.graph._episodes.items():
+                if ep_id in exclude_ids:
+                    continue
+                
+                if not ep.embedding:
+                    continue
+                
+                # Calcula similaridade
+                sim = cosine_similarity(query_result.vector, ep.embedding)
+                if sim >= min_similarity:
+                    candidates.append((ep, sim))
+            
+            # Ordena por similaridade
+            candidates.sort(key=lambda x: x[1], reverse=True)
+            
+            return [ep for ep, _ in candidates[:limit]]
+            
+        except Exception:
+            # Falha silenciosa - embedding é opcional
+            return []
+    
     def recall(self, request: RecallRequest) -> RecallResponse:
         """
         Recall relevant memories for a query.
@@ -342,10 +425,20 @@ class MemoryService:
         - Avalia relevância do match antes de incluir no contexto
         - Threshold adaptativo baseado na qualidade
         
+        OTIMIZAÇÃO v3: Cache por sessão para evitar recálculos.
+        
         Supports hierarchical namespace inheritance:
         - First searches in current namespace (PERSONAL memories)
         - Then searches in parent namespace for SHARED/LEARNED memories
         """
+        # Cache check: evita recálculo para mesma query na mesma sessão
+        session_id = request.session_id or "default"
+        query_hash = hash(request.query.lower().strip())
+        cache_key = (session_id, query_hash)
+        
+        if cache_key in self._recall_cache:
+            return self._recall_cache[cache_key]
+        
         # Enriquece context com conversation_id, session_id e namespace
         enriched_context = {
             **request.context,
@@ -354,23 +447,23 @@ class MemoryService:
             "namespace": request.namespace,
         }
         
-        # 1. Busca memórias do namespace atual (PERSONAL)
+        # 1. BUSCA POR EMBEDDING (principal - alta acurácia)
+        # Usa embeddings para busca semântica de alta qualidade
+        episodes = self._recall_by_embedding(
+            query=request.query,
+            limit=request.limit,
+            min_similarity=0.6,  # Threshold mais alto para evitar ruído
+        )
+        
+        # 2. Busca entidades por nome (para context "Você lembra de mim?")
         result = self.graph.recall(
             query=request.query,
             context=enriched_context,
             limit=request.limit,
         )
         
-        # 1.5 Se encontrou entidades mas não episódios, busca episódios das entidades
-        # Isso ajuda em queries conversacionais como "Você lembra de mim?"
-        if result.entities and not result.episodes:
-            entity_ids = {e.id for e in result.entities}
-            for ep_id, ep in self.graph._episodes.items():
-                # Busca episódios que têm participantes nas entidades encontradas
-                if any(p_id in entity_ids for p_id in ep.participants):
-                    result.episodes.append(ep)
-                    if len(result.episodes) >= request.limit:
-                        break
+        # Usa entidades do recall por tokens, mas episódios do embedding
+        result.episodes = episodes
         
         # 2. Busca memórias do namespace pai (SHARED/LEARNED)
         parent_episodes = self._recall_from_parent_namespaces(
@@ -409,7 +502,7 @@ class MemoryService:
         if should_return_context:
             prompt_context = result.to_prompt_context()
         
-        return RecallResponse(
+        response = RecallResponse(
             entities_found=len(result.entities),
             episodes_found=len(result.episodes),
             relations_found=len(result.relations),
@@ -435,6 +528,15 @@ class MemoryService:
                 for ep in result.episodes
             ] if should_return_context else [],
         )
+        
+        # Cache: salva resultado para reutilização na mesma sessão
+        if len(self._recall_cache) >= self._cache_max_size:
+            # Remove entradas antigas (FIFO simples)
+            oldest_key = next(iter(self._recall_cache))
+            del self._recall_cache[oldest_key]
+        self._recall_cache[cache_key] = response
+        
+        return response
     
     def _evaluate_recall_relevance(
         self,
@@ -569,13 +671,12 @@ class MemoryService:
             for parent_ns in parent_namespaces:
                 try:
                     parent_service = self.namespaced_service.get_service(parent_ns)
-                    parent_graph = parent_service.graph
                     
-                    # Busca episódios no namespace pai
-                    episodes = parent_graph.find_episodes(
+                    # Usa busca por embedding no namespace pai
+                    episodes = parent_service._recall_by_embedding(
                         query=query,
                         limit=limit,
-                        min_score=0.15,  # Threshold baixo para coletivas
+                        min_similarity=0.55,  # Threshold para coletivas
                     )
                     
                     self._filter_and_add_parent_episodes(
@@ -587,7 +688,7 @@ class MemoryService:
                 except Exception:
                     continue
         
-        # Método 2: Fallback para busca por storage_path
+        # Método 2: Fallback para busca por storage_path usando embedding
         elif self.graph.storage_path:
             base_dir = self.graph.storage_path.parent
             
@@ -600,10 +701,15 @@ class MemoryService:
                 try:
                     parent_graph = MemoryGraph(storage_path=parent_path)
                     
-                    episodes = parent_graph.find_episodes(
+                    # Cria serviço temporário para usar embedding
+                    temp_service = MemoryService.__new__(MemoryService)
+                    temp_service.graph = parent_graph
+                    temp_service._recall_cache = {}
+                    
+                    episodes = temp_service._recall_by_embedding(
                         query=query,
                         limit=limit,
-                        min_score=0.15,
+                        min_similarity=0.55,
                     )
                     
                     self._filter_and_add_parent_episodes(
@@ -738,6 +844,9 @@ class MemoryService:
             request.who[0] if request.who else "anonymous"
         )
         
+        # 3.5 Gera embedding para busca semântica
+        self._generate_episode_embedding(episode)
+        
         # 4. Add with consolidation check
         consolidated, consolidation_count = self.graph.add_episode_with_consolidation(episode)
         
@@ -853,6 +962,8 @@ class NamespacedMemoryService:
             service.shared_manager = SharedMemoryManager()
             service.namespaced_service = self  # Referência para buscar grafos pai
             service._current_namespace = namespace  # Namespace atual
+            service._recall_cache = {}  # Cache de recall por sessão
+            service._cache_max_size = 100  # Limite do cache
             self._services[namespace] = service
         
         return self._services[namespace]

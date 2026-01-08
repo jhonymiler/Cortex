@@ -4,14 +4,32 @@
 
 ---
 
-## Resumo Executivo
+## Resumo Executivo - Paper Benchmark
 
-| Métrica | Baseline | Cortex | Diferença |
-|---------|----------|--------|-----------|
-| **Tokens** | 49.438 | 43.255 | **-12.5%** |
-| **Latência** | 239s | 189s | **-21%** |
-| **Hit Rate** | 0% | **100%** | ∞ |
-| **Custo estimado** | $1.00 | **$0.87** | **-13%** |
+O Cortex é avaliado em **5 categorias de valor**, não apenas eficiência operacional:
+
+| Categoria | Resultado | Descrição |
+|-----------|-----------|-----------|
+| **Acurácia Semântica** | **100%** | Encontra memória certa com termos diferentes |
+| **Recall Contextual** | **100%** | Lembra de fluxos/conversas anteriores |
+| **Memória Coletiva** | **75%** | Compartilha conhecimento entre usuários |
+| **Relevância** | **67%** | Retorna só informação útil (não ruído) |
+| **Eficiência** | **100%** | Latência <500ms, contexto compacto |
+
+**Resultado Geral: 91.7%** (22/24 testes)
+
+### Eficiência Operacional
+
+| Métrica | Valor |
+|---------|-------|
+| **Latência média** | 42ms |
+| **Tokens no contexto** | Compacto |
+| **Modelo de embedding** | qwen3-embedding:0.6b |
+
+```bash
+# Rodar benchmark
+./start_benchmark.sh --paper
+```
 
 ---
 

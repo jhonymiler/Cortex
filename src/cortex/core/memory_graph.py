@@ -80,110 +80,104 @@ class RecallResult:
             return self._to_yaml_context()
         return self._to_text_context()
     
-    def _to_yaml_context(self) -> str:
+    def _to_yaml_context(self, max_tokens: int = 150) -> str:
         """
-        Formato estruturado para LLMs.
+        Formato ULTRA-COMPACTO para LLMs.
         
-        OBJETIVO: Contexto claro e utilizável para dar continuidade à conversa.
-        - Formato W5H legível
-        - Nomes de participantes claros
-        - Histórico formatado como lista
-        - Evita valores undefined/null
+        OTIMIZAÇÃO v3: Máximo ~150 tokens (~40 palavras)
+        - 1 linha para entidade principal
+        - 2 episódios máximo (mais recentes/relevantes)
+        - 1 conhecimento coletivo máximo
+        - Cada linha <= 60 chars
         """
         parts = []
+        token_estimate = 0
         
         # Filtra entidades relevantes (ignora genéricos)
-        skip_names = {"user", "assistant", "participant", "none", "", "undefined"}
+        skip_names = {"user", "assistant", "participant", "none", "", "undefined", "cliente", "sistema"}
         useful_entities = [
-            e for e in self.entities[:5]
+            e for e in self.entities[:3]  # Reduzido de 5 para 3
             if e.name.lower() not in skip_names 
             and e.type.lower() not in skip_names
-            and not e.name.startswith("[")  # Evita arrays serializados
+            and not e.name.startswith("[")
+            and len(e.name) > 2  # Ignora nomes muito curtos
         ]
         
         if useful_entities:
-            names = [e.name for e in useful_entities]
-            parts.append(f"Usuário: {names[0]}" if len(names) == 1 else f"Conhece: {', '.join(names)}")
+            # Apenas o nome principal, sem prefixo verboso
+            parts.append(f"Cliente: {useful_entities[0].name}")
+            token_estimate += 5
         
-        # Separa episódios pessoais de coletivos (herdados)
+        # Separa episódios por relevância (mais recente + maior importância)
+        sorted_episodes = sorted(
+            self.episodes[:10],  # Considera até 10
+            key=lambda ep: (ep.importance, ep.timestamp.timestamp() if ep.timestamp else 0),
+            reverse=True
+        )
+        
         personal_episodes = []
         collective_episodes = []
         
-        for ep in self.episodes[:6]:  # Limita total a 6 episódios
+        for ep in sorted_episodes[:4]:  # Reduzido de 6 para 4
             visibility = ep.metadata.get("visibility", "personal")
-            inherited_from = ep.metadata.get("inherited_from")
-            
-            if visibility == "learned" or inherited_from:
+            if visibility == "learned" or ep.metadata.get("inherited_from"):
                 collective_episodes.append(ep)
             else:
                 personal_episodes.append(ep)
         
-        # Histórico pessoal formatado como lista W5H
-        if personal_episodes:
-            parts.append("Memórias anteriores:")
-            for ep in personal_episodes[:3]:  # Limita a 3 episódios pessoais
-                line = self._format_episode_line(ep, skip_names)
-                if line:
+        # Histórico pessoal - APENAS 2 episódios mais relevantes
+        if personal_episodes and token_estimate < max_tokens:
+            parts.append("Histórico:")
+            for ep in personal_episodes[:2]:  # Reduzido de 3 para 2
+                line = self._format_episode_compact(ep)
+                if line and token_estimate < max_tokens:
                     parts.append(line)
+                    token_estimate += len(line.split()) + 2
         
-        # Conhecimento coletivo (LEARNED/herdado) - formatado diferente
-        if collective_episodes:
-            parts.append("Conhecimento útil:")  # Seção separada para coletivo
-            for ep in collective_episodes[:2]:  # Limita a 2 conhecimentos coletivos
-                line = self._format_collective_line(ep)
-                if line:
-                    parts.append(line)
-        
-        # Resumo se houver
-        if self.context_summary:
-            summary = self._sanitize_value(self.context_summary)
-            if summary and summary != "undefined":
-                parts.append(f"Contexto: {summary}")
+        # Conhecimento coletivo - APENAS 1 se sobrar espaço
+        if collective_episodes and token_estimate < max_tokens - 20:
+            line = self._format_collective_compact(collective_episodes[0])
+            if line:
+                parts.append(f"💡 {line}")
+                token_estimate += len(line.split()) + 2
         
         return "\n".join(parts) if parts else ""
     
-    def _format_episode_line(self, ep: Episode, skip_names: set) -> str:
-        """Formata linha de episódio pessoal."""
-        # Extrai W5H do metadata se disponível
+    def _format_episode_compact(self, ep: Episode) -> str:
+        """Formato ultra-compacto: ação: resultado (max 60 chars)."""
         w5h = ep.metadata.get("w5h", {})
-        
-        # Sanitiza valores - evita undefined, null, arrays como string
         action = self._sanitize_value(w5h.get("what") or ep.action)
         outcome = self._sanitize_value(w5h.get("how") or ep.outcome)
-        why = self._sanitize_value(w5h.get("why") or ep.context)
-        who = w5h.get("who", [])
         
-        # Formata quem participou
-        if isinstance(who, list) and who:
-            who_str = ", ".join(str(w) for w in who if w and str(w).lower() not in skip_names)
-        elif isinstance(who, str) and who:
-            who_str = who
+        if not action or action == "undefined":
+            return ""
+        
+        # Formato compacto: "- ação: resultado"
+        if outcome and outcome != "undefined":
+            line = f"  - {action[:25]}: {outcome[:30]}"
         else:
-            who_str = ""
+            line = f"  - {action[:50]}"
         
-        # Monta linha do episódio
-        if action and action != "undefined":
-            line = f"  - {action}"
-            if outcome and outcome != "undefined":
-                line += f": {outcome[:80]}"
-            if why and why != "undefined" and len(line) < 100:
-                line += f" ({why[:40]})"
-            return line
-        return ""
+        return line[:60]  # Hard limit
     
-    def _format_collective_line(self, ep: Episode) -> str:
-        """Formata linha de conhecimento coletivo (LEARNED)."""
+    def _format_collective_compact(self, ep: Episode) -> str:
+        """Formato compacto para conhecimento coletivo (max 50 chars)."""
         w5h = ep.metadata.get("w5h", {})
-        
-        # Para conhecimento coletivo, foca em problema -> solução
         problema = self._sanitize_value(w5h.get("what") or ep.action)
         solucao = self._sanitize_value(w5h.get("how") or ep.outcome)
         
         if problema and solucao:
-            return f"  💡 {problema}: {solucao[:100]}"
-        elif problema:
-            return f"  💡 {problema}"
-        return ""
+            return f"{problema[:20]}→{solucao[:25]}"
+        return problema[:45] if problema else ""
+    
+    def _format_episode_line(self, ep: Episode, skip_names: set) -> str:
+        """Formata linha de episódio pessoal (legacy, usa compact)."""
+        return self._format_episode_compact(ep)
+    
+    def _format_collective_line(self, ep: Episode) -> str:
+        """Formata linha de conhecimento coletivo (legacy, usa compact)."""
+        line = self._format_collective_compact(ep)
+        return f"  💡 {line}" if line else ""
     
     def _sanitize_value(self, value: Any) -> str:
         """Sanitiza valor para evitar undefined, null, arrays como string."""

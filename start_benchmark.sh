@@ -1,238 +1,193 @@
 #!/bin/bash
-# Script para executar benchmark leve facilmente
+# Script para executar benchmark do Cortex
+# Foco em VALOR (qualidade) não apenas velocidade/tokens
 
 set -e
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 CORTEX LIGHTWEIGHT BENCHMARK"
+echo "🎯 CORTEX BENCHMARK"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
 
-# Configura data dir
+# === CONFIGURAÇÃO ===
 export CORTEX_DATA_DIR="$(pwd)/data"
+export CORTEX_PORT=8000
 
 # Carrega .env se existir
 if [ -f .env ]; then
-    echo "📂 Carregando variáveis de .env..."
-    set -a
-    source .env
-    set +a
+    echo "📂 Carregando .env..."
+    set -a && source .env && set +a
 fi
 
-# Detecta IP do Windows para WSL (se OLLAMA_URL não definida)
-if [ -z "$OLLAMA_URL" ]; then
-    # Tenta detectar se está no WSL
+# Usa OLLAMA_URL do .env ou detecta automaticamente
+if [ -n "$OLLAMA_URL" ]; then
+    export OLLAMA_BASE_URL="$OLLAMA_URL"
+    echo "📌 OLLAMA_BASE_URL=$OLLAMA_BASE_URL (do .env)"
+elif [ -z "$OLLAMA_BASE_URL" ]; then
     if grep -qi microsoft /proc/version 2>/dev/null; then
         WINDOWS_IP=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2}')
-        export OLLAMA_URL="http://${WINDOWS_IP}:11434"
-        echo "🪟 WSL detectado - Usando IP do Windows: $OLLAMA_URL"
+        export OLLAMA_BASE_URL="http://${WINDOWS_IP}:11434"
+        echo "🪟 WSL: OLLAMA_BASE_URL=$OLLAMA_BASE_URL"
     else
-        export OLLAMA_URL="http://localhost:11434"
+        export OLLAMA_BASE_URL="http://localhost:11434"
     fi
 fi
 
-echo "📌 OLLAMA_URL=$OLLAMA_URL"
+# === FUNÇÕES ===
 
-# Verifica se é resume (se primeiro argumento começar com --resume ou tiver --resume)
-IS_RESUME=false
-for arg in "$@"; do
-    if [[ "$arg" == --resume* ]] || [[ "$arg" == --checkpoint* ]]; then
-        IS_RESUME=true
-        break
+check_ollama() {
+    echo "🔍 Verificando Ollama..."
+    if curl -s "$OLLAMA_BASE_URL/api/tags" > /dev/null 2>&1; then
+        echo "   ✅ Ollama disponível"
+        return 0
+    else
+        echo "   ❌ Ollama não disponível em $OLLAMA_BASE_URL"
+        return 1
     fi
-done
+}
 
-# Limpa processos anteriores
-echo "🧹 Limpando processos anteriores..."
-pkill -f "cortex-api" 2>/dev/null || true
-sleep 1
-echo "   ✓ Processos limpos"
+check_embedding_model() {
+    echo "🔍 Verificando modelo de embedding..."
+    MODEL=${CORTEX_EMBEDDING_MODEL:-"qwen3-embedding:0.6b"}
+    MODELS=$(curl -s "$OLLAMA_BASE_URL/api/tags" | python3 -c "import json,sys; print(' '.join(m['name'] for m in json.load(sys.stdin).get('models',[])))" 2>/dev/null)
+    
+    if echo "$MODELS" | grep -q "$MODEL"; then
+        echo "   ✅ Modelo $MODEL disponível"
+        return 0
+    else
+        echo "   ⚠️ Modelo $MODEL não encontrado. Instalando..."
+        curl -s -X POST "$OLLAMA_BASE_URL/api/pull" -d "{\"name\":\"$MODEL\"}" > /dev/null
+        return 0
+    fi
+}
 
-# Limpa dados APENAS se NÃO for resume
-if [ "$IS_RESUME" = false ]; then
-    echo "🧹 Limpando TODOS os dados de benchmark anteriores..."
+start_api() {
+    echo "🚀 Iniciando API Cortex..."
     
-    # Limpa TODAS as pastas bench_* (criadas por benchmarks anteriores)
-    rm -rf "$CORTEX_DATA_DIR"/bench_*/ 2>/dev/null || true
-    rm -rf "$CORTEX_DATA_DIR"/benchmark*/ 2>/dev/null || true
-    rm -f "$CORTEX_DATA_DIR/default/memory_graph.json" 2>/dev/null || true
-    rm -rf "$CORTEX_DATA_DIR/test_*/" 2>/dev/null || true
+    # Para processos anteriores
+    pkill -f "uvicorn cortex" 2>/dev/null || true
+    sleep 2
     
-    # Limpa resultados anteriores (JSON, não os reports MD)
-    rm -f benchmark/results/lightweight_*.json 2>/dev/null || true
-    rm -f benchmark/results/*.checkpoint.json 2>/dev/null || true
-    rm -f benchmark/results/comparison_*.json 2>/dev/null || true
+    # Inicia em background
+    CORTEX_DATA_DIR="$CORTEX_DATA_DIR" python -m uvicorn cortex.api.app:app \
+        --host 0.0.0.0 --port $CORTEX_PORT > /tmp/cortex_api.log 2>&1 &
     
-    # Remove pastas vazias restantes
-    find "$CORTEX_DATA_DIR" -maxdepth 1 -type d -empty -delete 2>/dev/null || true
+    # Aguarda startup
+    for i in {1..10}; do
+        if curl -s "http://localhost:$CORTEX_PORT/health" | grep -q "healthy"; then
+            echo "   ✅ API rodando em http://localhost:$CORTEX_PORT"
+            return 0
+        fi
+        sleep 1
+    done
     
-    echo "   ✓ Dados resetados"
-else
-    echo "⏩ Modo RESUME - mantendo dados existentes"
-fi
+    echo "   ❌ Falha ao iniciar API"
+    cat /tmp/cortex_api.log
+    return 1
+}
 
-# Verifica se está no ambiente virtual
-if [ -z "$VIRTUAL_ENV" ]; then
-    echo "⚠️  Ativando ambiente virtual..."
+stop_api() {
+    echo "🛑 Parando API..."
+    pkill -f "uvicorn cortex" 2>/dev/null || true
+}
+
+clean_benchmark_data() {
+    echo "🧹 Limpando dados de benchmark anteriores..."
+    rm -rf "$CORTEX_DATA_DIR/comparison_*" 2>/dev/null || true
+    rm -rf "$CORTEX_DATA_DIR/paper_bench*" 2>/dev/null || true
+}
+
+run_paper_benchmark() {
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📊 BENCHMARK PARA PAPER (Cortex isolado)"
+    echo "   Métricas completas para publicação acadêmica"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    python benchmark/paper_benchmark.py --save
+    
+    # Executa análise automática
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📊 ANÁLISE DE RESULTADOS"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    bash ./analyze_results.sh
+}
+
+run_comparison_benchmark() {
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📊 BENCHMARK COMPARATIVO"
+    echo "   Cortex vs Baseline vs RAG vs Mem0"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    python benchmark/comparison_benchmark.py --save
+}
+
+show_help() {
+    echo "Uso: ./start_benchmark.sh [COMANDO]"
+    echo ""
+    echo "Comandos:"
+    echo "  (sem args)       Benchmark para paper (padrão)"
+    echo "  --paper          Benchmark completo para paper acadêmico"
+    echo "  --compare        Benchmark comparativo (Cortex vs RAG vs Mem0)"
+    echo "  --api-only       Apenas inicia a API"
+    echo "  --stop           Para a API"
+    echo ""
+    echo "Exemplos:"
+    echo "  ./start_benchmark.sh              # Benchmark para paper"
+    echo "  ./start_benchmark.sh --compare    # Compara com RAG/Mem0"
+    echo "  ./start_benchmark.sh --api-only   # Só inicia API"
+}
+
+# === MAIN ===
+
+# Ativa venv
+if [ -d "venv" ]; then
     source venv/bin/activate
 fi
 
-# Verifica Ollama (timeout de 5 segundos)
-echo "🔍 Verificando Ollama em $OLLAMA_URL..."
-if ! curl -s --connect-timeout 5 --max-time 10 "${OLLAMA_URL}/api/version" > /dev/null 2>&1; then
-    echo "❌ Ollama não está acessível em $OLLAMA_URL!"
-    echo ""
-    echo "   Possíveis causas:"
-    echo "   1. Ollama não está rodando → No Windows: ollama serve"
-    echo "   2. WSL não consegue acessar Windows → Configure OLLAMA_HOST=0.0.0.0 no Windows"
-    echo "   3. Firewall bloqueando porta 11434"
-    echo ""
-    echo "   Para configurar Ollama no Windows (PowerShell Admin):"
-    echo "   \$env:OLLAMA_HOST='0.0.0.0'; ollama serve"
-    echo ""
-    echo "   Ou defina OLLAMA_URL no .env com o IP correto"
-        exit 1
-    fi
-echo "   ✓ Ollama OK"
-
-# Modelo padrão
-OLLAMA_MODEL="${OLLAMA_MODEL:-ministral-3:3b}"
-
-# Verifica modelo
-echo "🔍 Verificando modelo $OLLAMA_MODEL..."
-if ! curl -s --connect-timeout 5 --max-time 10 "${OLLAMA_URL}/api/tags" | grep -q "$OLLAMA_MODEL"; then
-    echo "⚠️  Modelo $OLLAMA_MODEL não encontrado."
-    # No WSL, precisamos chamar ollama no Windows
-    if grep -qi microsoft /proc/version 2>/dev/null; then
-        echo "   Baixe o modelo no Windows: ollama pull $OLLAMA_MODEL"
-        echo "   Pressione ENTER após baixar..."
-        read -r
-    else
-        echo "   Baixando..."
-        ollama pull "$OLLAMA_MODEL"
-    fi
-fi
-echo "   ✓ Modelo OK"
-
-# Verifica/Inicia Cortex API
-echo "🔍 Verificando Cortex API..."
-if ! curl -s http://localhost:8000/health > /dev/null; then
-    echo "⚠️  API não está rodando. Iniciando..."
-    
-    # Inicia API em background com data dir do projeto
-    CORTEX_DATA_DIR="$(pwd)/data" nohup cortex-api > /tmp/cortex-api.log 2>&1 &
-    API_PID=$!
-    echo "   PID da API: $API_PID"
-    
-    # Aguarda API estar pronta (max 30s)
-    echo -n "   Aguardando API iniciar"
-    for i in {1..30}; do
-        if curl -s http://localhost:8000/health > /dev/null; then
-            echo " ✓"
-            break
-        fi
-        echo -n "."
-    sleep 1
-done
-
-    # Verifica se conseguiu iniciar
-    if ! curl -s http://localhost:8000/health > /dev/null; then
+# Processa argumentos
+case "${1:-}" in
+    --help|-h)
+        show_help
+        exit 0
+        ;;
+    --stop)
+        stop_api
+        exit 0
+        ;;
+    --api-only)
+        check_ollama || exit 1
+        check_embedding_model
+        start_api
         echo ""
-        echo "❌ Falha ao iniciar API. Verifique logs:"
-        echo "   tail -f /tmp/cortex-api.log"
+        echo "API rodando. Use './start_benchmark.sh --stop' para parar."
+        exit 0
+        ;;
+    --compare)
+        check_ollama || exit 1
+        check_embedding_model
+        start_api || exit 1
+        clean_benchmark_data
+        run_comparison_benchmark
+        stop_api
+        ;;
+    --paper|"")
+        check_ollama || exit 1
+        check_embedding_model
+        start_api || exit 1
+        clean_benchmark_data
+        run_paper_benchmark
+        stop_api
+        ;;
+    *)
+        echo "Comando desconhecido: $1"
+        show_help
         exit 1
-    fi
-    
-    echo "   ✓ API iniciada com sucesso!"
-    CORTEX_API_STARTED=1
-else
-    echo "   ✓ Cortex API OK"
-    CORTEX_API_STARTED=0
-fi
+        ;;
+esac
 
 echo ""
-echo "✅ Todos os serviços estão prontos!"
-echo ""
-
-# Executa benchmark (passa todos os argumentos)
-BENCHMARK_ARGS="--ollama-url $OLLAMA_URL --model $OLLAMA_MODEL -y"
-BENCHMARK_SUCCESS=0
-
-if [ "$1" == "--collective" ]; then
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🧠 BENCHMARK DE MEMÓRIA COLETIVA E DECAIMENTO"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "   Testa: Isolamento, LEARNED sharing, Decaimento"
-    echo ""
-    python benchmark/collective_memory_benchmark.py && BENCHMARK_SUCCESS=1
-
-elif [ "$1" == "--compare" ]; then
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🔬 BENCHMARK DE COMPARAÇÃO COMPLETA"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "   Agentes: Baseline, RAG, Mem0, Cortex"
-    echo "   Inclui: Multi-sessão, volta de usuário, consolidação"
-    echo ""
-    
-    if [ "$2" == "--full" ]; then
-        echo "🚀 Executando comparação COMPLETA..."
-        python benchmark/full_comparison_benchmark.py --full -y && BENCHMARK_SUCCESS=1
-    else
-        echo "🚀 Executando comparação RÁPIDA..."
-        python benchmark/full_comparison_benchmark.py --quick -y && BENCHMARK_SUCCESS=1
-    fi
-    
-elif [ "$1" == "--full" ]; then
-    if [ -n "$2" ]; then
-        echo "🚀 Executando benchmark FULL COMPARISON para domínio: $2"
-        echo "   Inclui: Baseline, RAG, Mem0, Cortex + DreamAgent"
-        python benchmark/full_comparison_benchmark.py --full --domains "$2" -y && BENCHMARK_SUCCESS=1
-    else
-        echo "🚀 Executando benchmark COMPLETO com CortexAgent..."
-        python run_lightweight_benchmark.py --full $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
-    fi
-elif [ "$1" == "--quick" ]; then
-    if [ -n "$2" ]; then
-        echo "🚀 Executando benchmark QUICK para domínio: $2"
-        echo "   Inclui: Baseline vs Cortex"
-        python run_lightweight_benchmark.py --domain "$2" --conversations 1 $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
-    else
-        echo "🚀 Executando benchmark RÁPIDO com CortexAgent..."
-        python run_lightweight_benchmark.py --quick $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
-    fi
-elif [ "$IS_RESUME" = true ]; then
-    echo "🚀 Continuando benchmark..."
-    python run_lightweight_benchmark.py "$@" $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
-elif [ -n "$1" ]; then
-    echo "🚀 Executando com domínio: $1"
-    python run_lightweight_benchmark.py --domain "$1" --conversations 2 $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
-else
-    echo "🚀 Executando benchmark PADRÃO (1 conv/domínio, 3 sessões)..."
-    python run_lightweight_benchmark.py $BENCHMARK_ARGS && BENCHMARK_SUCCESS=1
-fi
-
-# Executa análise se benchmark completou com sucesso
-if [ "$BENCHMARK_SUCCESS" == "1" ]; then
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📊 EXECUTANDO ANÁLISE AUTOMÁTICA"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo ""
-    ./analyze_results.sh
-fi
-
-# Cleanup - para API se foi iniciada por este script
-if [ "$CORTEX_API_STARTED" == "1" ]; then
-    echo ""
-    echo "🛑 Parando Cortex API..."
-    # Encontra e mata o processo da API
-    pkill -f "cortex-api" || true
-    echo "   ✓ API encerrada"
-fi
-
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🎉 BENCHMARK CORTEX V2 CONCLUÍDO!"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ Benchmark concluído!"

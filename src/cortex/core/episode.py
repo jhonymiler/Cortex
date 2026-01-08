@@ -75,6 +75,9 @@ class Episode:
     conversation_id: str | None = None
     session_id: str | None = None
     
+    # Embedding para busca semântica (vetor de 1024 dimensões)
+    embedding: list[float] | None = None
+    
     @property
     def is_consolidated(self) -> bool:
         """Retorna True se este episódio é resultado de consolidação."""
@@ -205,7 +208,7 @@ class Episode:
     
     def to_dict(self) -> dict[str, Any]:
         """Serializa para dicionário."""
-        return {
+        result = {
             "id": self.id,
             "timestamp": self.timestamp.isoformat(),
             "action": self.action,
@@ -217,6 +220,19 @@ class Episode:
             "importance": self.importance,
             "metadata": self.metadata,
         }
+        # Só inclui embedding se existir (economiza espaço)
+        if self.embedding:
+            result["embedding"] = self.embedding
+        return result
+    
+    def get_text_for_embedding(self) -> str:
+        """Gera texto representativo do episódio para embedding."""
+        parts = [self.action]
+        if self.context:
+            parts.append(self.context)
+        if self.outcome:
+            parts.append(self.outcome)
+        return " ".join(parts)
     
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Episode":
@@ -232,6 +248,7 @@ class Episode:
             consolidated_from=data.get("consolidated_from", []),
             importance=data.get("importance", 0.5),
             metadata=data.get("metadata", {}),
+            embedding=data.get("embedding"),  # Pode ser None
         )
     
     @classmethod
