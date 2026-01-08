@@ -191,6 +191,8 @@ async def recall_memories(
     - A YAML context summary for your prompt (minimal tokens)
     """
     try:
+        # Define o namespace do header no request
+        request.namespace = namespace
         return service.recall(request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

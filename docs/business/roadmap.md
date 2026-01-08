@@ -45,13 +45,32 @@ O Cortex não é apenas um sistema de memória. É a fundação para a próxima 
 | LangChain adapter | Maior ecossistema de agentes | ✅ |
 | CrewAI adapter | Multi-agente com memória compartilhada | ✅ |
 | MCP Server | Claude Desktop, Cursor, etc. | ✅ |
+| **Memória Coletiva (LEARNED)** | Conhecimento compartilhado entre usuários | 🚧 |
 | Google ADK adapter | Ecossistema Google AI | 🔜 |
 | FastAgent adapter | Agentes rápidos | 🔜 |
 | Documentação modular | Onboarding em 2 minutos | 🚧 |
 
+### Memória Coletiva — Detalhes
+
+**Definição**: Conhecimento que emerge de padrões repetidos entre múltiplos usuários.
+
+| Componente | Status | Descrição |
+|------------|--------|-----------|
+| Isolamento PERSONAL | ✅ | Memórias pessoais nunca vazam |
+| Herança hierárquica | ✅ | Namespaces pai/filho |
+| Visibility (PERSONAL/SHARED/LEARNED) | ✅ | Três níveis de visibilidade |
+| Recall de LEARNED em namespaces filhos | 🚧 | Buscar memórias do namespace pai |
+| Seleção de candidatos por acesso/conexões | 🔜 | Top N memórias por tenant |
+| Marcação de procedimentos na consolidação | 🔜 | Identificar sequências de passos |
+| Promoção baseada em contagem (não IA) | 🔜 | 3+ usuários = LEARNED |
+| Decaimento de LEARNED (relatórios) | 📋 | Futuro: review de conhecimentos desatualizados |
+
+→ Detalhes técnicos: [Shared Memory](../concepts/shared-memory.md#promoção-personal--learned)
+
 ### Marco Esperado
 🎯 1.000 desenvolvedores usando em produção.
 🎯 pip install cortex-memory funcionando.
+🎯 Memória coletiva funcionando em produção.
 
 ---
 

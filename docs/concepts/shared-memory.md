@@ -156,14 +156,92 @@ recall(user="user_123", namespaces=[
 
 ## Promoção: Personal → Learned
 
-Quando um padrão se repete em múltiplos usuários:
+### Princípio Fundamental
+
+> **Conhecimento coletivo NÃO é o que a IA "acha" que é útil.**
+> **Conhecimento coletivo É padrões que se repetem entre usuários diferentes.**
+
+### Definição de Conhecimento Coletivo
+
+| Tipo | Critério | Exemplo |
+|------|----------|---------|
+| **Dúvidas Comuns** | N usuários → mesma dúvida → mesma resolução | "Como resetar senha?" → "/forgot-password" |
+| **Procedimentos** | N usuários → passos similares → mesma resolução | Deploy → build → test → push |
+
+### Arquitetura de Promoção (Duas Etapas)
+
+O DreamAgent **não processa todas as memórias de uma vez** — com milhões de lembranças, isso seria inviável.
+
+**Etapa 1: Seleção de Candidatos** (Batch/Scheduled)
+
+Por tenant, seleciona memórias baseado em:
 
 ```python
-# DreamAgent detecta padrão comum
+candidatos = selecionar_por_tenant(
+    # Critério 1: Memórias mais acessadas
+    ordem_por=["access_count DESC"],
+    
+    # Critério 2: Memórias com mais conexões (hub centrality)
+    minimo_conexoes=3,
+    
+    # Critério 3: Memórias marcadas como procedimento
+    tipo=["procedimento", "resolucao"],
+    
+    limite=100  # Top 100 candidatos por tenant
+)
+```
+
+**Etapa 2: Análise e Promoção** (DreamAgent)
+
+```python
+for candidato in candidatos:
+    # Verifica se é padrão repetido entre usuários
+    usuarios_similares = contar_usuarios_com_padrao_similar(candidato)
+    
+    if usuarios_similares >= 3:  # Threshold configurável
+        # Anonimiza e promove
+        promover_para_learned(candidato)
+```
+
+### Marcação de Procedimentos
+
+Durante a consolidação normal, o DreamAgent marca memórias que são **procedimentos**:
+
+```python
+# Na consolidação:
+if detectar_sequencia_de_passos(memoria):
+    memoria.metadata["tipo"] = "procedimento"
+    memoria.metadata["passos"] = extrair_passos(memoria)
+```
+
+Isso facilita a seleção posterior:
+
+```python
+# Na seleção de candidatos:
+procedimentos = buscar(tipo="procedimento", importancia__gte=0.7)
+```
+
+### Evolução por Consolidação
+
+Procedimentos podem **evoluir** quando múltiplos usuários executam passos similares:
+
+```
+User A: Deploy → build → test → push → notify
+User B: Deploy → build → push → notify (sem test)
+User C: Deploy → build → test → push → notify
+
+→ Consolida: Deploy → build → test → push → notify (melhor prática)
+→ Promove para LEARNED: "Procedimento de Deploy"
+```
+
+### Exemplo Completo
+
+```python
+# DreamAgent detecta padrão comum entre 3+ usuários
 pattern = consolidate([
-    "user:123 → problema com modem X",
-    "user:456 → problema com modem X",
-    "user:789 → problema com modem X",
+    "user:123 → problema com modem X → atualizar firmware",
+    "user:456 → problema com modem X → atualizar firmware",
+    "user:789 → problema com modem X → atualizar firmware",
 ])
 
 # Anonimiza e promove para LEARNED
@@ -179,6 +257,15 @@ promoted = Memory(
 assert "João" not in str(promoted)
 assert "@email.com" not in str(promoted)
 ```
+
+### Decaimento de LEARNED
+
+| Tipo | Decaimento |
+|------|------------|
+| **PERSONAL** | Curva de Ebbinghaus normal |
+| **LEARNED** | **Fixo** (sem decay por enquanto) |
+
+**Futuro**: LEARNED pode ter decay baseado em uso agregado, gerando relatórios de "conhecimentos que podem estar desatualizados" para review do cliente.
 
 ---
 

@@ -25,6 +25,7 @@ from pydantic import BaseModel, Field
 
 from cortex.core import Entity, Episode, MemoryGraph, Relation
 from cortex.core.memory import Memory
+from cortex.core.memory_graph import RecallResult
 from cortex.core.decay import DecayManager, create_default_decay_manager
 from cortex.core.namespace import NamespacedMemoryManager
 from cortex.core.shared_memory import (
@@ -336,14 +337,14 @@ class MemoryService:
         This is called BEFORE responding to the user to get context.
         Memories that are recalled get reinforced (use = strength).
         
+        IMPORTANTE: Só retorna contexto se for RELEVANTE para a query.
+        - Não força memória quando não há nada útil
+        - Avalia relevância do match antes de incluir no contexto
+        - Threshold adaptativo baseado na qualidade
+        
         Supports hierarchical namespace inheritance:
         - First searches in current namespace (PERSONAL memories)
         - Then searches in parent namespace for SHARED/LEARNED memories
-        
-        Example: namespace "support:customer_support:user_123"
-        - Searches in "support:customer_support:user_123" (personal)
-        - Then in "support:customer_support" (domain shared/learned)
-        - Then in "support" (global shared/learned)
         """
         # Enriquece context com conversation_id, session_id e namespace
         enriched_context = {
@@ -360,35 +361,60 @@ class MemoryService:
             limit=request.limit,
         )
         
+        # 1.5 Se encontrou entidades mas não episódios, busca episódios das entidades
+        # Isso ajuda em queries conversacionais como "Você lembra de mim?"
+        if result.entities and not result.episodes:
+            entity_ids = {e.id for e in result.entities}
+            for ep_id, ep in self.graph._episodes.items():
+                # Busca episódios que têm participantes nas entidades encontradas
+                if any(p_id in entity_ids for p_id in ep.participants):
+                    result.episodes.append(ep)
+                    if len(result.episodes) >= request.limit:
+                        break
+        
         # 2. Busca memórias do namespace pai (SHARED/LEARNED)
         parent_episodes = self._recall_from_parent_namespaces(
             query=request.query,
             namespace=request.namespace,
-            limit=max(3, request.limit // 2),  # Menos memórias do pai
+            limit=max(3, request.limit // 2),
         )
         
         # 3. Combina resultados (pai tem prioridade menor)
         if parent_episodes:
-            # Adiciona episódios do pai que não estão duplicados
             existing_ids = {ep.id for ep in result.episodes}
             for ep in parent_episodes:
                 if ep.id not in existing_ids:
                     result.episodes.append(ep)
                     existing_ids.add(ep.id)
         
-        # Reforça memórias que foram lembradas (uso real = fortalecimento)
-        if result.entities or result.episodes:
+        # 4. NOVA LÓGICA: Avalia relevância antes de retornar contexto
+        relevance_info = self._evaluate_recall_relevance(
+            query=request.query,
+            result=result,
+        )
+        
+        # Se relevância for muito baixa, retorna contexto vazio
+        # mas ainda retorna os metadados para debug
+        should_return_context = relevance_info["should_include"]
+        
+        # Reforça APENAS se for relevante (não reforça ruído)
+        if should_return_context and (result.entities or result.episodes):
             self.graph.reinforce_on_recall(
                 entity_ids=[e.id for e in result.entities],
                 episode_ids=[ep.id for ep in result.episodes],
             )
         
+        # Gera prompt_context apenas se relevante
+        prompt_context = ""
+        if should_return_context:
+            prompt_context = result.to_prompt_context()
+        
         return RecallResponse(
             entities_found=len(result.entities),
             episodes_found=len(result.episodes),
             relations_found=len(result.relations),
-            context_summary=result.context_summary,
-            prompt_context=result.to_prompt_context(),
+            context_summary=result.context_summary if should_return_context else "",
+            prompt_context=prompt_context,
             entities=[
                 EntitySummary(
                     id=e.id,
@@ -397,7 +423,7 @@ class MemoryService:
                     access_count=e.access_count,
                 )
                 for e in result.entities
-            ],
+            ] if should_return_context else [],
             episodes=[
                 EpisodeSummary(
                     id=ep.id,
@@ -407,8 +433,103 @@ class MemoryService:
                     is_pattern=ep.is_consolidated,
                 )
                 for ep in result.episodes
-            ],
+            ] if should_return_context else [],
         )
+    
+    def _evaluate_recall_relevance(
+        self,
+        query: str,
+        result: "RecallResult",
+        min_relevance: float = 0.15,  # Threshold baixo para evitar falsos negativos
+    ) -> dict:
+        """
+        Avalia se o resultado do recall é relevante o suficiente para retornar.
+        
+        Critérios:
+        1. Se não há episódios nem entidades úteis → não relevante
+        2. Se a query não tem overlap significativo com as memórias → não relevante
+        3. Se só há memórias genéricas/noise → não relevante
+        
+        Args:
+            query: Query original
+            result: Resultado do recall
+            min_relevance: Threshold mínimo de relevância (default: 0.35)
+            
+        Returns:
+            Dict com should_include (bool) e score (float)
+        """
+        from cortex.core.language import tokenize_to_set
+        
+        # Caso trivial: sem resultados
+        if not result.episodes and not result.entities:
+            return {"should_include": False, "score": 0.0, "reason": "no_results"}
+        
+        query_tokens = tokenize_to_set(query.lower())
+        if not query_tokens:
+            # Query vazia ou só stopwords → retorna tudo que tiver
+            return {"should_include": True, "score": 0.5, "reason": "empty_query"}
+        
+        scores = []
+        
+        # Avalia relevância dos episódios
+        for ep in result.episodes:
+            ep_text = f"{ep.action} {ep.outcome} {ep.context}".lower()
+            ep_tokens = tokenize_to_set(ep_text)
+            
+            if ep_tokens:
+                overlap = len(query_tokens & ep_tokens) / len(query_tokens)
+                
+                # Boost para memórias consolidadas/importantes
+                if ep.is_consolidated or ep.importance > 0.7:
+                    overlap *= 1.3
+                
+                # Boost para memórias LEARNED (coletivas)
+                if ep.metadata.get("visibility") == "learned":
+                    overlap *= 1.2
+                
+                scores.append(min(overlap, 1.0))
+        
+        # Avalia relevância das entidades (participantes)
+        has_known_entities = False
+        for entity in result.entities:
+            entity_text = f"{entity.name} {entity.type}".lower()
+            entity_tokens = tokenize_to_set(entity_text)
+            
+            if entity_tokens:
+                overlap = len(query_tokens & entity_tokens) / len(query_tokens)
+                scores.append(min(overlap * 0.5, 0.5))
+            
+            # IMPORTANTE: Entidades com access_count > 0 indicam contexto relevante
+            # mesmo que a query seja conversacional ("Você lembra de mim?")
+            if hasattr(entity, 'access_count') and entity.access_count > 0:
+                has_known_entities = True
+        
+        # Se há entidades conhecidas, garantir retorno mesmo sem overlap
+        if has_known_entities:
+            # Score mínimo garantido para entidades conhecidas
+            scores.append(0.25)
+        
+        if not scores:
+            return {"should_include": False, "score": 0.0, "reason": "no_scorable_items"}
+        
+        # Usa o melhor score (não média, pois uma boa memória é suficiente)
+        best_score = max(scores)
+        avg_score = sum(scores) / len(scores)
+        
+        # Combinação: 70% melhor, 30% média
+        final_score = (best_score * 0.7) + (avg_score * 0.3)
+        
+        should_include = final_score >= min_relevance
+        
+        return {
+            "should_include": should_include,
+            "score": round(final_score, 3),
+            "best_score": round(best_score, 3),
+            "avg_score": round(avg_score, 3),
+            "items_evaluated": len(scores),
+            "threshold": min_relevance,
+            "reason": "relevant" if should_include else "below_threshold",
+        }
     
     def _recall_from_parent_namespaces(
         self,
@@ -435,43 +556,87 @@ class MemoryService:
         # Extrai namespaces pai da hierarquia
         # "support:customer_support:user_123" -> ["support:customer_support", "support"]
         parts = namespace.split(":")
+        if len(parts) <= 1:
+            return parent_episodes  # Já está no nível raiz
+        
         parent_namespaces = []
         for i in range(len(parts) - 1, 0, -1):
             parent_ns = ":".join(parts[:i])
             parent_namespaces.append(parent_ns)
         
-        # Busca em cada namespace pai
-        for parent_ns in parent_namespaces:
-            # Busca episódios no namespace pai que são SHARED ou LEARNED
-            episodes = self.graph.find_episodes(
-                query=query,
-                limit=limit,
-                context={
-                    "namespace": parent_ns,
-                    # Só busca memórias que foram marcadas como compartilháveis
-                    "include_shared": True,
-                },
-                min_score=0.2,  # Threshold mais baixo para memórias compartilhadas
-            )
-            
-            # Filtra apenas memórias que são SHARED/LEARNED ou consolidadas (is_summary=True)
-            for ep in episodes:
-                visibility = ep.metadata.get("visibility", "personal")
-                is_summary = ep.metadata.get("is_summary", False) or ep.is_consolidated
-                
-                # Inclui se é SHARED, LEARNED ou um resumo de consolidação
-                if visibility in ["shared", "learned"] or is_summary:
-                    # Marca como memória herdada para formatação diferenciada
-                    ep.metadata["inherited_from"] = parent_ns
-                    parent_episodes.append(ep)
+        # Método 1: Usa namespaced_service se disponível (mais eficiente)
+        if hasattr(self, 'namespaced_service') and self.namespaced_service:
+            for parent_ns in parent_namespaces:
+                try:
+                    parent_service = self.namespaced_service.get_service(parent_ns)
+                    parent_graph = parent_service.graph
+                    
+                    # Busca episódios no namespace pai
+                    episodes = parent_graph.find_episodes(
+                        query=query,
+                        limit=limit,
+                        min_score=0.15,  # Threshold baixo para coletivas
+                    )
+                    
+                    self._filter_and_add_parent_episodes(
+                        episodes, parent_ns, parent_episodes, limit
+                    )
                     
                     if len(parent_episodes) >= limit:
                         break
+                except Exception:
+                    continue
+        
+        # Método 2: Fallback para busca por storage_path
+        elif self.graph.storage_path:
+            base_dir = self.graph.storage_path.parent
             
-            if len(parent_episodes) >= limit:
-                break
+            for parent_ns in parent_namespaces:
+                parent_path = base_dir / parent_ns.replace(":", "__")
+                
+                if not parent_path.exists():
+                    continue
+                
+                try:
+                    parent_graph = MemoryGraph(storage_path=parent_path)
+                    
+                    episodes = parent_graph.find_episodes(
+                        query=query,
+                        limit=limit,
+                        min_score=0.15,
+                    )
+                    
+                    self._filter_and_add_parent_episodes(
+                        episodes, parent_ns, parent_episodes, limit
+                    )
+                    
+                    if len(parent_episodes) >= limit:
+                        break
+                except Exception:
+                    continue
         
         return parent_episodes[:limit]
+    
+    def _filter_and_add_parent_episodes(
+        self,
+        episodes: list[Episode],
+        parent_ns: str,
+        parent_episodes: list[Episode],
+        limit: int,
+    ) -> None:
+        """Filtra e adiciona episódios SHARED/LEARNED do namespace pai."""
+        for ep in episodes:
+            visibility = ep.metadata.get("visibility", "personal")
+            is_summary = ep.metadata.get("is_summary", False) or ep.is_consolidated
+            
+            # Inclui se é SHARED, LEARNED ou um resumo de consolidação
+            if visibility in ["shared", "learned"] or is_summary:
+                # Marca como memória herdada para formatação diferenciada
+                ep.metadata["inherited_from"] = parent_ns
+                parent_episodes.append(ep)
+                
+                if len(parent_episodes) >= limit:
+                    break
     
     def stats(self) -> StatsResponse:
         """Get statistics about the memory graph."""
@@ -580,10 +745,11 @@ class MemoryService:
         visibility_enum = MemoryVisibility(request.visibility)
         self.shared_manager.register_memory(
             memory_id=episode.id,
-            visibility=visibility_enum,
+            memory_type="episode",
+            content=episode.to_dict(),  # Conteúdo serializado do episódio
             owner_id=episode.metadata["owner_id"],
             namespace=request.where,
-            memory_type="episode",
+            visibility=visibility_enum,
         )
         
         return RememberResponse(
@@ -681,8 +847,12 @@ class NamespacedMemoryService:
         """
         if namespace not in self._services:
             graph = self.manager.get_graph(namespace)
+            # Usa __new__ para evitar duplicação de grafo, mas inicializa corretamente
             service = MemoryService.__new__(MemoryService)
             service.graph = graph
+            service.shared_manager = SharedMemoryManager()
+            service.namespaced_service = self  # Referência para buscar grafos pai
+            service._current_namespace = namespace  # Namespace atual
             self._services[namespace] = service
         
         return self._services[namespace]

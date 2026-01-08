@@ -24,8 +24,10 @@ import os
 import re
 import requests
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from cortex.core.memory_normalizer import MemoryNormalizer
+from cortex.core.collective_memory import CollectiveMemoryCollector
 
 
 @dataclass
@@ -466,3 +468,144 @@ quantidade_validos: 0
             results["_error"] = DreamResult(error=str(e))
         
         return results
+    
+    # ==================== MEMÓRIA COLETIVA (NOVA ABORDAGEM) ====================
+    
+    def promote_collective_knowledge(
+        self,
+        tenant: str,
+        data_path: Path | str | None = None,
+        dry_run: bool = False,
+    ) -> dict:
+        """
+        Promove memória coletiva baseada em CONTAGEM de padrões repetidos.
+        
+        NOVA ABORDAGEM: Não depende de "intuição da IA".
+        Conhecimento coletivo = padrões que se repetem em 3+ usuários diferentes.
+        
+        Fluxo:
+        1. Escaneia todos os namespaces do tenant
+        2. Coleta candidatos (memórias com alto acesso, conexões, procedimentos)
+        3. Agrupa por padrão similar (hash de what+outcome normalizado)
+        4. Promove para LEARNED se 3+ usuários têm o mesmo padrão
+        
+        Args:
+            tenant: Identificador do tenant (ex: "minha_empresa")
+            data_path: Diretório base dos dados (default: ./data)
+            dry_run: Se True, não salva (apenas mostra o que faria)
+            
+        Returns:
+            Resultado da operação com detalhes de promoção
+        """
+        # Define path dos dados
+        if data_path is None:
+            data_path = Path(os.getenv("CORTEX_DATA_DIR", "./data"))
+        else:
+            data_path = Path(data_path)
+        
+        # Usa o collector para encontrar candidatos
+        collector = CollectiveMemoryCollector(
+            base_path=data_path,
+            promotion_threshold=3,  # Mínimo 3 usuários
+        )
+        
+        # Encontra padrões que devem ser promovidos
+        to_promote = collector.get_promotion_candidates(tenant)
+        
+        result = {
+            "tenant": tenant,
+            "candidates_analyzed": len(collector._candidates.get(tenant, [])),
+            "patterns_found": len(collector._clusters),
+            "patterns_to_promote": len(to_promote),
+            "promoted": [],
+            "dry_run": dry_run,
+        }
+        
+        if dry_run:
+            result["would_promote"] = [
+                {
+                    "pattern": c.what,
+                    "outcome": c.outcome[:50] + "..." if len(c.outcome) > 50 else c.outcome,
+                    "users": c.user_count,
+                    "is_procedure": c.is_procedure,
+                }
+                for c in to_promote
+            ]
+            return result
+        
+        # Determina namespace de destino (raiz do tenant)
+        target_namespace = tenant
+        
+        # Promove cada cluster
+        for cluster in to_promote:
+            payload = collector.generate_learned_memory(cluster, target_namespace)
+            
+            try:
+                resp = self._session.post(
+                    f"{self.cortex_url}/memory/remember",
+                    json=payload,
+                    headers={"X-Cortex-Namespace": target_namespace},
+                )
+                
+                if resp.status_code == 200:
+                    data = resp.json()
+                    if data.get("success"):
+                        result["promoted"].append({
+                            "pattern": cluster.what,
+                            "memory_id": data.get("memory_id"),
+                            "users": cluster.user_count,
+                            "is_procedure": cluster.is_procedure,
+                        })
+            except Exception as e:
+                if "errors" not in result:
+                    result["errors"] = []
+                result["errors"].append(str(e))
+        
+        return result
+    
+    def scan_tenant_for_collective(
+        self,
+        tenant: str,
+        data_path: Path | str | None = None,
+    ) -> dict:
+        """
+        Escaneia um tenant e retorna candidatos a memória coletiva.
+        
+        Útil para debug e relatórios.
+        
+        Returns:
+            Dict com candidatos, clusters e padrões comuns
+        """
+        if data_path is None:
+            data_path = Path(os.getenv("CORTEX_DATA_DIR", "./data"))
+        else:
+            data_path = Path(data_path)
+        
+        collector = CollectiveMemoryCollector(base_path=data_path)
+        
+        candidates = collector.collect_candidates_from_tenant(tenant)
+        clusters = collector.cluster_by_pattern(candidates)
+        
+        return {
+            "tenant": tenant,
+            "total_candidates": len(candidates),
+            "total_clusters": len(clusters),
+            "candidates_summary": [
+                {
+                    "namespace": c.namespace,
+                    "pattern": c.what_normalized[:30],
+                    "score": round(c.candidate_score, 2),
+                    "is_procedure": c.is_procedure,
+                }
+                for c in candidates[:20]  # Top 20
+            ],
+            "clusters_summary": [
+                {
+                    "pattern": c.what[:30],
+                    "users": c.user_count,
+                    "should_promote": c.should_promote,
+                    "is_procedure": c.is_procedure,
+                }
+                for c in sorted(clusters.values(), key=lambda x: x.user_count, reverse=True)[:10]
+            ],
+        }
