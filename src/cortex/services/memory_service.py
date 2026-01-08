@@ -256,8 +256,9 @@ class MemoryService:
         self.shared_manager = shared_memory_manager or SharedMemoryManager()
         
         # Cache de recall por sessão (evita recálculos)
-        # Chave: (session_id, query_hash) -> RecallResponse
-        self._recall_cache: dict[tuple[str, int], "RecallResponse"] = {}
+        # Chave: (session_id, namespace, owner_id, query_hash) -> RecallResponse
+        # CORREÇÃO: Inclui namespace e owner_id para evitar vazamento entre usuários
+        self._recall_cache: dict[tuple[str, str, str, int], "RecallResponse"] = {}
         self._cache_max_size = 100  # Limita tamanho do cache
     
     def store(self, request: StoreRequest) -> StoreResponse:
@@ -363,18 +364,22 @@ class MemoryService:
         limit: int = 5,
         exclude_ids: set[str] | None = None,
         min_similarity: float = 0.6,
+        namespace: str | None = None,
+        owner_id: str | None = None,
     ) -> list[Episode]:
         """
-        Busca episódios por similaridade de embedding.
+        Busca episódios por similaridade de embedding COM ISOLAMENTO.
         
-        Usado como fallback quando a busca por tokens não encontra
-        episódios suficientes.
+        IMPORTANTE: Filtra por namespace e owner_id para evitar vazamento
+        de memórias entre usuários/contextos diferentes.
         
         Args:
             query: Query de busca
             limit: Máximo de episódios a retornar
             exclude_ids: IDs de episódios para excluir
             min_similarity: Similaridade mínima (0.0 a 1.0)
+            namespace: Namespace para filtrar (metadata["namespace"] ou metadata["where"])
+            owner_id: Owner/user_id para filtrar (metadata["owner_id"] ou participants)
             
         Returns:
             Lista de episódios ordenados por similaridade
@@ -389,7 +394,7 @@ class MemoryService:
             if not query_result:
                 return []
             
-            # Busca episódios com embedding
+            # Busca episódios com embedding E FILTROS DE ISOLAMENTO
             candidates: list[tuple[Episode, float]] = []
             
             for ep_id, ep in self.graph._episodes.items():
@@ -398,6 +403,31 @@ class MemoryService:
                 
                 if not ep.embedding:
                     continue
+                
+                # FILTRO 1: Namespace - episódio deve pertencer ao mesmo namespace
+                if namespace:
+                    ep_namespace = ep.metadata.get("namespace") or ep.metadata.get("where")
+                    if ep_namespace and ep_namespace != namespace:
+                        continue
+                
+                # FILTRO 2: Owner/User - episódio deve pertencer ao mesmo owner
+                # Verifica metadata["owner_id"] ou participants
+                if owner_id:
+                    ep_owner = ep.metadata.get("owner_id", "")
+                    ep_who = ep.metadata.get("w5h", {}).get("who", [])
+                    
+                    # Permite se:
+                    # - owner_id está em participants (IDs de entidades)
+                    # - owner_id está em metadata["owner_id"]
+                    # - owner_id está em w5h["who"] (nomes)
+                    owner_match = (
+                        owner_id in ep.participants or
+                        owner_id == ep_owner or
+                        owner_id in str(ep_who)
+                    )
+                    
+                    if not owner_match:
+                        continue
                 
                 # Calcula similaridade
                 sim = cosine_similarity(query_result.vector, ep.embedding)
@@ -432,9 +462,12 @@ class MemoryService:
         - Then searches in parent namespace for SHARED/LEARNED memories
         """
         # Cache check: evita recálculo para mesma query na mesma sessão
+        # CORREÇÃO: Inclui namespace e owner_id na chave do cache para evitar
+        # retornar resultados de outro usuário
         session_id = request.session_id or "default"
-        query_hash = hash(request.query.lower().strip())
-        cache_key = (session_id, query_hash)
+        who_filter = request.context.get("who", [])
+        owner_for_cache = who_filter[0] if who_filter else request.context.get("user_id", "")
+        cache_key = (session_id, request.namespace, owner_for_cache, hash(request.query.lower().strip()))
         
         if cache_key in self._recall_cache:
             return self._recall_cache[cache_key]
@@ -447,12 +480,20 @@ class MemoryService:
             "namespace": request.namespace,
         }
         
+        # Extrai owner_id do context (pode vir como who[0] ou user_id)
+        who_filter = request.context.get("who", [])
+        owner_id = who_filter[0] if who_filter else request.context.get("user_id")
+        
         # 1. BUSCA POR EMBEDDING (principal - alta acurácia)
         # Usa embeddings para busca semântica de alta qualidade
+        # CORREÇÃO: Passa namespace e owner_id para filtrar corretamente
+        # Threshold de 0.35 equilibra recall e precisão (testado com qwen3-embedding)
         episodes = self._recall_by_embedding(
             query=request.query,
             limit=request.limit,
-            min_similarity=0.6,  # Threshold mais alto para evitar ruído
+            min_similarity=0.35,  # Threshold balanceado para recall
+            namespace=request.namespace,
+            owner_id=owner_id,
         )
         
         # 2. Busca entidades por nome (para context "Você lembra de mim?")

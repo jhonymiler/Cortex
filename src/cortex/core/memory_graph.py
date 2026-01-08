@@ -476,12 +476,18 @@ class MemoryGraph:
         else:
             candidates = list(self._episodes.values())
         
-        # NOVO: Filtra por namespace (metadata["where"])
-        if namespace_filter and namespace_filter != "default":
+        # CORREÇÃO: Filtra por namespace (metadata["where"] ou metadata["namespace"])
+        # Inclui episódios do namespace solicitado OU sem namespace definido
+        if namespace_filter:
             candidates = [
                 e for e in candidates
-                if e.metadata.get("where") == namespace_filter
-                or e.metadata.get("namespace") == namespace_filter
+                if (
+                    # Episódio pertence ao namespace solicitado
+                    e.metadata.get("where") == namespace_filter or
+                    e.metadata.get("namespace") == namespace_filter or
+                    # Episódio não tem namespace (compatibilidade com dados antigos)
+                    (not e.metadata.get("where") and not e.metadata.get("namespace"))
+                )
             ]
         
         # NOVO: Filtra por owner/participante (who)

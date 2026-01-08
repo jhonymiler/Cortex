@@ -253,7 +253,8 @@ class ComparisonBenchmark:
         """Armazena memória diretamente na API Cortex (bypass LLM extraction)."""
         try:
             # Usa mesmo namespace que o CortexAgent
-            # Isolamento é feito pelo campo 'who' (user_id)
+            # CORREÇÃO: Passa 'where' explicitamente para garantir isolamento
+            namespace = f"{self.namespace_base}:cortex"
             requests.post(
                 f"{self.cortex_url}/memory/remember",
                 json={
@@ -261,10 +262,11 @@ class ComparisonBenchmark:
                     "what": message,  # Mensagem completa como ação
                     "why": "user_stated",
                     "how": message,  # Conteúdo completo
+                    "where": namespace,  # CORREÇÃO: Campo where explícito
                     "importance": 0.9,
-                    "context": {"user_id": user_id},  # Contexto adicional
+                    "owner_id": user_id,  # CORREÇÃO: Owner explícito para isolamento
                 },
-                headers={"X-Cortex-Namespace": f"{self.namespace_base}:cortex"},
+                headers={"X-Cortex-Namespace": namespace},
                 timeout=5,
             )
         except Exception:

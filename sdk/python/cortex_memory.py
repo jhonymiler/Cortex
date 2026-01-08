@@ -252,7 +252,7 @@ Use a memória para dar continuidade natural à conversa."""
         self._session = requests.Session()
         self._session.headers.update({
             "Content-Type": "application/json",
-            "X-Cortex-Namespace": namespace,
+            "X-Cortex-Namespace": self.namespace,  # CORREÇÃO: Usa self.namespace (já processado)
         })
         
         # Estatísticas
@@ -337,12 +337,17 @@ Use a memória para dar continuidade natural à conversa."""
     
     # ==================== API METHODS ====================
     
-    def recall(self, query: str, limit: int = 5) -> RecallResult:
+    def recall(self, query: str, limit: int = 5, user_id: str | None = None) -> RecallResult:
         """Busca memórias relevantes."""
         try:
+            # CORREÇÃO: Passa who e namespace no context para filtrar corretamente
+            context = {"namespace": self.namespace}
+            if user_id:
+                context["who"] = [user_id]
+            
             response = self._session.post(
                 f"{self.cortex_url}/memory/recall",
-                json={"query": query, "context": {}, "limit": limit},
+                json={"query": query, "context": context, "limit": limit},
             )
             self._recall_count += 1
             

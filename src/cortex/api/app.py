@@ -257,6 +257,9 @@ async def remember_w5h(
         ```
     """
     try:
+        # CORREÇÃO: Define o namespace do header no request.where
+        # Isso garante que a memória seja armazenada no namespace correto
+        request.where = namespace
         return service.remember(request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
