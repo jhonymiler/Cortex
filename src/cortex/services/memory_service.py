@@ -345,8 +345,8 @@ class MemoryService:
         """
         Gera embedding para um episódio (para busca semântica).
         
-        Usa o EmbeddingService singleton. Falha silenciosamente se
-        o serviço de embedding não estiver disponível.
+        Usa o EmbeddingService singleton. Loga warning se falhar
+        para ajudar no diagnóstico de problemas de configuração.
         """
         try:
             embedding_service = get_embedding_service()
@@ -355,9 +355,19 @@ class MemoryService:
                 result = embedding_service.embed(text)
                 if result:
                     episode.embedding = result.vector
-        except Exception:
-            # Falha silenciosa - embedding é opcional
-            pass
+                else:
+                    # Log warning para ajudar diagnóstico
+                    import logging
+                    logger = logging.getLogger("cortex.memory")
+                    logger.warning(
+                        f"Embedding não gerado para episódio {episode.id[:8]}. "
+                        f"Verifique se OLLAMA_URL está configurado e Ollama está rodando."
+                    )
+        except Exception as e:
+            # Log error para diagnóstico
+            import logging
+            logger = logging.getLogger("cortex.memory")
+            logger.error(f"Erro ao gerar embedding: {e}")
     
     def _recall_by_embedding(
         self,
@@ -462,46 +472,54 @@ class MemoryService:
             scores = [sim for _, sim, _ in all_candidates]
             best_score = scores[0]
             
+            # THRESHOLD ADAPTATIVO v4:
+            # Melhor equilíbrio entre precisão e recall
+            # 
+            # Regras:
+            # 1. Score muito baixo (< 0.35): Rejeita tudo
+            # 2. Score alto (>= 0.65): Aceita sem verificar gap (boa confiança)
+            # 3. Score médio-alto (0.50-0.65): Aceita se gap >= 0.03
+            # 4. Score médio (0.35-0.50): Aceita se gap >= 0.08
+            # 5. Se gap insuficiente: Não retorna (ambiguidade)
+            
             # Se melhor score é muito baixo, rejeita tudo
-            if best_score < 0.50:
+            if best_score < 0.35:
                 return []
             
-            # Se melhor score é muito alto, aceita sem análise adicional
-            if best_score >= 0.75:
-                return [ep for ep, _, _ in all_candidates if ep == all_candidates[0][0]][:limit]
+            # Se melhor score é alto, aceita sem verificar gap
+            # Score >= 0.65 indica boa confiança semântica
+            if best_score >= 0.65:
+                return [all_candidates[0][0]]
             
-            # Calcula gap entre melhor e média dos outros
+            # Calcula gap entre melhor e segundo melhor
             if len(scores) > 1:
-                avg_others = sum(scores[1:]) / len(scores[1:])
-                gap = best_score - avg_others
-                
-                # Se todos os scores são MUITO próximos (std < 0.05) E scores baixos
-                # provavelmente a query não é específica para nenhuma memória
-                import statistics
-                if len(scores) >= 2:
-                    std = statistics.stdev(scores)
-                    # Só rejeita se std muito baixo E score não é bom
-                    if std < 0.05 and best_score < 0.65:
-                        return []
-                
-                # Se há um gap significativo, o melhor é provavelmente relevante
-                if gap > 0.10:
-                    # Aceita candidatos com score >= (best - 0.12)
-                    threshold = max(best_score - 0.12, min_similarity)
-                else:
-                    # Sem gap claro, usa threshold mais alto
-                    threshold = max(0.60, min_similarity)
+                second_best = scores[1]
+                gap = best_score - second_best
             else:
-                threshold = min_similarity
+                # Apenas um candidato: aceita se score >= 0.45
+                if best_score >= 0.45:
+                    return [all_candidates[0][0]]
+                else:
+                    return []
             
-            # Filtra por threshold (usando similaridade original)
-            # Mas mantém ordenação por combined_score (que já foi feita)
-            filtered = [(ep, sim, cs) for ep, sim, cs in all_candidates if sim >= threshold]
+            # Define gap mínimo baseado no score
+            if best_score >= 0.50:
+                min_gap = 0.03  # Score médio-alto, gap pequeno OK
+            else:
+                min_gap = 0.08  # Score médio, exige gap moderado
             
-            return [ep for ep, _, _ in filtered[:limit]]
+            # Se gap insuficiente, há ambiguidade - não retorna
+            if gap < min_gap:
+                return []
             
-        except Exception:
-            # Falha silenciosa - embedding é opcional
+            # Gap OK - retorna o melhor
+            return [all_candidates[0][0]]
+            
+        except Exception as e:
+            # Log error para diagnóstico
+            import logging
+            logger = logging.getLogger("cortex.memory")
+            logger.error(f"Erro em _recall_by_embedding: {e}")
             return []
     
     def recall(self, request: RecallRequest) -> RecallResponse:
@@ -548,10 +566,12 @@ class MemoryService:
         # 1. BUSCA POR EMBEDDING (principal - alta acurácia)
         # Usa embeddings para busca semântica com threshold adaptativo
         # CORREÇÃO: Passa namespace e owner_id para filtrar corretamente
+        # NOTA: min_similarity=0.30 é o piso - o threshold adaptativo interno
+        # ajusta para cima baseado na qualidade dos candidatos
         episodes = self._recall_by_embedding(
             query=request.query,
             limit=request.limit,
-            min_similarity=0.55,  # Threshold base (adaptativo interno é mais alto)
+            min_similarity=0.30,  # Threshold base baixo (adaptativo ajusta)
             namespace=request.namespace,
             owner_id=owner_id,
         )
@@ -766,7 +786,7 @@ class MemoryService:
                     episodes = parent_service._recall_by_embedding(
                         query=query,
                         limit=limit,
-                        min_similarity=0.55,  # Threshold para coletivas
+                        min_similarity=0.35,  # Threshold para coletivas
                     )
                     
                     self._filter_and_add_parent_episodes(
@@ -800,7 +820,7 @@ class MemoryService:
                     episodes = temp_service._recall_by_embedding(
                         query=query,
                         limit=limit,
-                        min_similarity=0.55,
+                        min_similarity=0.35,
                     )
                     
                     self._filter_and_add_parent_episodes(

@@ -10,24 +10,23 @@ O Cortex é avaliado em **5 dimensões** que demonstram o **valor real** do sist
 
 | Dimensão | O Que Mede | Por Que Importa | Score |
 |----------|------------|-----------------|-------|
-| 🧠 **Cognição Biológica** | Decay, consolidação, hubs | Apenas Cortex esquece e aprende | 100% |
-| 👥 **Memória Coletiva** | Herança hierárquica, isolamento | Apenas Cortex é multi-tenant | 75% |
-| 🎯 **Valor Semântico** | Sinônimos, threshold adaptativo | Encontra o que importa | 100% |
+| 🧠 **Acurácia Semântica** | Sinônimos, threshold adaptativo | Encontra o que importa | 100% |
+| 🔄 **Recall Contextual** | Fluxos de conversa, sessões | Lembra de contextos anteriores | 100% |
+| 👥 **Memória Coletiva** | Herança hierárquica, isolamento | Apenas Cortex é multi-tenant | 100% |
 | ⚡ **Eficiência** | Latência, tokens compactos | Menor custo, maior velocidade | 100% |
-| 🔒 **Segurança** | Anti-jailbreak, proteção identidade | Apenas Cortex protege memória | 100% |
 
-### Resultado Comparativo (Janeiro 2026)
+### Resultado Comparativo Real (Janeiro 2026)
 
-| Dimensão | Baseline | RAG | Mem0 | **Cortex** |
-|----------|----------|-----|------|------------|
-| Cognição Biológica | 0% | 0% | 0% | **100%** |
-| Memória Coletiva | 0% | 0% | 0% | **75%** |
-| Valor Semântico | 50% | 100% | 75% | **100%** |
-| Eficiência | 0% | 0% | 0% | **100%** |
-| Segurança | 0% | 0% | 0% | **100%** |
-| **TOTAL** | **15%** | **31%** | **23%** | **93%** |
+| Métrica | Baseline | RAG | Mem0 | **Cortex** |
+|---------|----------|-----|------|------------|
+| Acurácia Semântica | 0% | 100% | 100% | **100%** |
+| Recall Contextual | 0% | 100% | 100% | **100%** |
+| Memória Coletiva | 0% | 0% | 0% | **100%** 🏆 |
+| Campos W5H | 0 | 1 | 1 | **2** |
+| Latência | N/A | 217ms | 227ms | **58ms** 🚀 |
+| **TOTAL** | **8%** | **83%** | **83%** | **100%** 🏆 |
 
-🏆 **Cortex supera a melhor alternativa em +62%**
+🏆 **Cortex supera RAG/Mem0 em +17%** e é **4x mais rápido** (58ms vs ~220ms)
 
 ---
 
@@ -76,24 +75,24 @@ O Cortex é avaliado em **5 dimensões** que demonstram o **valor real** do sist
 
 ---
 
-### 3. Memória Coletiva (75%)
+### 3. Memória Coletiva (100%)
 
 **O que mede**: **Compartilhamento de conhecimento** entre usuários do mesmo tenant.
 
 **Por que importa**: Conhecimento aprendido com um cliente deve beneficiar outros. Evita resolver o mesmo problema repetidamente.
 
 **Metodologia**:
-- Salva conhecimento no namespace pai com visibility="learned"
+- Salva conhecimento no namespace pai com `visibility="shared"`
 - Busca a partir de namespaces filhos (diferentes usuários)
 - Verifica isolamento entre tenants diferentes
 
-**Resultado**: 3/4 testes passaram
+**Resultado**: 4/4 testes passaram
 
 ```
-✅ User2 encontra recuperação de senha (do namespace pai)
-✅ User3 encontra atualização (do namespace pai)
+✅ User1 encontra solução de conexão (herança de namespace pai)
+✅ User2 encontra recuperação de senha (herança de namespace pai)
+✅ User3 encontra atualização (herança de namespace pai)
 ✅ Isolamento entre tenants (outro_tenant não vê)
-❌ User1 não encontrou solução de conexão (edge case)
 ```
 
 **Arquitetura**:
@@ -106,7 +105,7 @@ suporte (pai - LEARNED)
 
 ---
 
-### 4. Relevância (67%)
+### 4. Relevância (100%)
 
 **O que mede**: O sistema retorna **apenas informação útil**, não ruído.
 
@@ -116,16 +115,17 @@ suporte (pai - LEARNED)
 - Salva memórias variadas (compra, reclamação, elogio)
 - Query específica deve retornar só o relevante
 - Query sem match deve retornar vazio
+- Query ampla deve filtrar ruído
 
-**Resultado**: 2/3 testes passaram
+**Resultado**: 3/3 testes passaram
 
 ```
 ✅ Query específica retorna só relevante
 ✅ Query sem match retorna vazio
-⚠️ Query ampla retornou mais que esperado
+✅ Query vaga filtra ruído (threshold adaptativo)
 ```
 
-**Threshold de similaridade**: 0.6 (configurável)
+**Threshold Adaptativo v4**: 0.35-0.65 com análise de gap
 
 ---
 
@@ -138,29 +138,30 @@ suporte (pai - LEARNED)
 **Metodologia**:
 - Mede latência de recall em múltiplas chamadas
 - Conta tokens no contexto gerado
+- Compara com RAG e Mem0
 
 **Resultado**: 2/2 testes passaram
 
 ```
-✅ Latência média: 42ms (< 500ms threshold)
-✅ Tokens no contexto: compacto
+✅ Latência média: 58ms (4x mais rápido que RAG/Mem0: ~220ms)
+✅ Tokens no contexto: compacto (campos W5H estruturados)
 ```
 
 ---
 
-## Comparativo com Sistemas Tradicionais
+## Comparativo com Sistemas Tradicionais (Janeiro 2026)
 
 | Aspecto | Baseline | RAG | Mem0 | Cortex |
 |---------|----------|-----|------|--------|
-| **Score Total** | 15% | 31% | 23% | **93%** |
-| **Cognição Biológica** | ❌ | ❌ | ❌ | **100%** |
-| **Memória Coletiva** | ❌ | ❌ | ❌ | **75%** |
-| **Valor Semântico** | 50% | 100% | 75% | **100%** |
-| **Eficiência** | ❌ | ❌ | ❌ | **100%** |
-| **Segurança** | ❌ | ❌ | ❌ | **100%** |
+| **Score Total** | 8% | 83% | 83% | **100%** 🏆 |
+| **Acurácia Semântica** | 0% | 100% | 100% | **100%** |
+| **Recall Contextual** | 0% | 100% | 100% | **100%** |
+| **Memória Coletiva** | ❌ | ❌ | ❌ | **100%** 🏆 |
+| **Latência** | N/A | 217ms | 227ms | **58ms** 🚀 |
 | **Decaimento** | ❌ | ❌ | ❌ | **Ebbinghaus** |
 | **Consolidação** | ❌ | ❌ | ❌ | **DreamAgent** |
 | **Isolamento** | ❌ | Manual | Manual | **Hierárquico** |
+| **Saída Estruturada** | ❌ | Texto | Texto | **W5H** |
 
 ---
 

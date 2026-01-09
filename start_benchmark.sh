@@ -74,8 +74,11 @@ start_api() {
     pkill -f "uvicorn cortex" 2>/dev/null || true
     sleep 2
     
-    # Inicia em background
-    CORTEX_DATA_DIR="$CORTEX_DATA_DIR" python -m uvicorn cortex.api.app:app \
+    # Inicia em background (passa todas as variáveis de ambiente necessárias)
+    CORTEX_DATA_DIR="$CORTEX_DATA_DIR" \
+    OLLAMA_URL="$OLLAMA_BASE_URL" \
+    OLLAMA_BASE_URL="$OLLAMA_BASE_URL" \
+    python -m uvicorn cortex.api.app:app \
         --host 0.0.0.0 --port $CORTEX_PORT > /tmp/cortex_api.log 2>&1 &
     
     # Aguarda startup
@@ -134,16 +137,108 @@ run_paper_benchmark() {
     fi
 }
 
+run_locomo_benchmark() {
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📊 BENCHMARK LoCoMo (Long-term Conversational Memory)"
+    echo "   Padrão da indústria para avaliação de memória LLM"
+    echo "   Métricas: F1, BLEU-1, Exact Match, Recall@K"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    python -m benchmark.locomo_benchmark
+}
+
+run_real_comparison() {
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📊 COMPARATIVO REAL (Cortex vs RAG vs Mem0)"
+    echo "   RAG com embeddings reais (não TF-IDF)"
+    echo "   Mem0 real quando disponível"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    python -m benchmark.real_comparison_benchmark --save
+}
+
+run_ablation_study() {
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🔬 ABLATION STUDY"
+    echo "   Análise de contribuição de cada componente"
+    echo "   W5H, Decay, Hub, Namespace, Threshold"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    python -m benchmark.ablation_study --save --chart
+}
+
+generate_charts() {
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📊 GERAÇÃO DE GRÁFICOS PARA PAPER"
+    echo "   Comparativo, Radar, Latência, Ebbinghaus, Arquitetura"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    # Verifica se matplotlib está instalado
+    if ! python -c "import matplotlib" 2>/dev/null; then
+        echo "⚠️ matplotlib não instalado. Instalando..."
+        pip install matplotlib numpy
+    fi
+    
+    python -m benchmark.generate_paper_charts
+}
+
+run_full_paper_suite() {
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📚 SUITE COMPLETA PARA PAPER ACADÊMICO"
+    echo "   1. Paper Benchmark (métricas Cortex)"
+    echo "   2. Comparativo Real (vs RAG/Mem0)"
+    echo "   3. Ablation Study"
+    echo "   4. Geração de Gráficos"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    # 1. Paper Benchmark
+    run_paper_benchmark
+    
+    # 2. Comparativo Real
+    run_real_comparison
+    
+    # 3. Ablation Study
+    run_ablation_study
+    
+    # 4. Gráficos
+    generate_charts
+    
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "✅ SUITE COMPLETA FINALIZADA!"
+    echo "   Resultados em: ./benchmark_results/"
+    echo "   Gráficos em: ./benchmark_results/charts/"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+}
+
 show_help() {
     echo "Uso: ./start_benchmark.sh [COMANDO]"
     echo ""
     echo "🧠 Cortex Benchmark - Mede o valor real do sistema de memória cognitiva"
     echo ""
-    echo "Comandos:"
+    echo "Comandos principais:"
     echo "  (sem args)       Benchmark unificado (padrão) - 4 dimensões de valor"
-    echo "  --unified        Benchmark unificado (Cortex vs RAG vs Mem0 vs Baseline)"
     echo "  --paper          Benchmark para paper acadêmico (Cortex isolado)"
-    echo "  --compare        Alias para --unified"
+    echo "  --full-paper     Suite completa para paper (benchmark + comparativo + ablation + gráficos)"
+    echo ""
+    echo "Comandos avançados:"
+    echo "  --unified        Benchmark unificado (Cortex vs RAG vs Mem0 vs Baseline)"
+    echo "  --real-compare   Comparativo real (RAG com embeddings, Mem0 real)"
+    echo "  --ablation       Ablation Study (contribuição de cada componente)"
+    echo "  --charts         Gera gráficos para publicação"
+    echo "  --locomo         Benchmark LoCoMo (padrão da indústria)"
+    echo ""
+    echo "Utilitários:"
     echo "  --api-only       Apenas inicia a API"
     echo "  --stop           Para a API"
     echo ""
@@ -155,8 +250,9 @@ show_help() {
     echo ""
     echo "Exemplos:"
     echo "  ./start_benchmark.sh              # Benchmark unificado completo"
-    echo "  ./start_benchmark.sh --paper      # Só métricas do Cortex"
-    echo "  ./start_benchmark.sh --api-only   # Só inicia API"
+    echo "  ./start_benchmark.sh --paper      # Métricas para paper (Cortex)"
+    echo "  ./start_benchmark.sh --full-paper # Suite completa para publicação"
+    echo "  ./start_benchmark.sh --charts     # Gera gráficos PNG/PDF"
 }
 
 # === MAIN ===
@@ -198,6 +294,39 @@ case "${1:-}" in
         start_api || exit 1
         clean_benchmark_data
         run_paper_benchmark
+        stop_api
+        ;;
+    --locomo)
+        check_ollama || exit 1
+        check_embedding_model
+        clean_benchmark_data
+        run_locomo_benchmark
+        ;;
+    --real-compare|--real-comparison)
+        check_ollama || exit 1
+        check_embedding_model
+        start_api || exit 1
+        clean_benchmark_data
+        run_real_comparison
+        stop_api
+        ;;
+    --ablation)
+        check_ollama || exit 1
+        check_embedding_model
+        start_api || exit 1
+        clean_benchmark_data
+        run_ablation_study
+        stop_api
+        ;;
+    --charts)
+        generate_charts
+        ;;
+    --full-paper)
+        check_ollama || exit 1
+        check_embedding_model
+        start_api || exit 1
+        clean_benchmark_data
+        run_full_paper_suite
         stop_api
         ;;
     "")

@@ -226,12 +226,41 @@ class Episode:
         return result
     
     def get_text_for_embedding(self) -> str:
-        """Gera texto representativo do episódio para embedding."""
-        parts = [self.action]
+        """
+        Gera texto representativo do episódio para embedding.
+        
+        Converte formato técnico (underscores) para linguagem natural
+        para melhorar matching semântico com queries em linguagem natural.
+        
+        Exemplo:
+            action="problema_login_sistema", context="senha_expirada"
+            → "problema login sistema senha expirada"
+        """
+        def expand_underscores(text: str) -> str:
+            """Converte underscores para espaços."""
+            return text.replace("_", " ") if text else ""
+        
+        parts = []
+        
+        # Adiciona ação (what) expandida
+        if self.action:
+            parts.append(expand_underscores(self.action))
+        
+        # Adiciona contexto/razão (why) expandido
         if self.context:
-            parts.append(self.context)
+            parts.append(expand_underscores(self.context))
+        
+        # Adiciona outcome (how) expandido
         if self.outcome:
-            parts.append(self.outcome)
+            parts.append(expand_underscores(self.outcome))
+        
+        # Adiciona participantes (who) se disponíveis
+        # Isso ajuda queries como "cliente João" a encontrar memórias
+        if self.participants:
+            for p in self.participants[:3]:  # Limita a 3 participantes
+                if p and len(p) > 2:  # Ignora IDs curtos
+                    parts.append(expand_underscores(p))
+        
         return " ".join(parts)
     
     @classmethod
