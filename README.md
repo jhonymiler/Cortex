@@ -66,21 +66,49 @@ curl http://localhost:8000/health
 1. **Instale o servidor MCP:**
 ```bash
 pip install -e ".[mcp]"
+# ou: cd mcp && pip install -e .
 ```
 
-2. **Configure no Claude Desktop** (`~/.config/claude/config.json`):
+2. **Configure no Claude Desktop:**
+
+| OS | Arquivo de Configuração |
+|----|------------------------|
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
+
 ```json
 {
   "mcpServers": {
     "cortex": {
       "command": "cortex-mcp",
-      "args": []
+      "env": {
+        "CORTEX_API_URL": "http://localhost:8000",
+        "CORTEX_TEAM": "meu_time",
+        "CORTEX_USER": "meu_usuario",
+        "CORTEX_IDENTITY_ENABLED": "true",
+        "CORTEX_IDENTITY_MODE": "pattern"
+      }
     }
   }
 }
 ```
 
 3. **Reinicie o Claude Desktop** — O Cortex aparecerá como ferramenta disponível.
+
+**Variáveis de Ambiente do MCP:**
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `CORTEX_API_URL` | `http://localhost:8000` | URL da API Cortex |
+| `CORTEX_TEAM` | `default_team` | Time/organização (fixo) |
+| `CORTEX_USER` | `$USER` | Usuário atual |
+| `CORTEX_PROJECT` | (auto) | Projeto (detectado automaticamente) |
+| `CORTEX_IDENTITY_ENABLED` | `true` | Habilita Memory Firewall |
+| `CORTEX_IDENTITY_MODE` | `pattern` | Modo: `pattern`, `semantic`, `hybrid` |
+| `CORTEX_IDENTITY_STRICT` | `false` | Bloqueia ou apenas alerta |
+
+[→ Documentação completa do MCP](docs/MCP.md)
 
 ### SDK Python
 

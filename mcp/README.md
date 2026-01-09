@@ -68,12 +68,22 @@ pip install -e .
 
 ## Variáveis de Ambiente
 
+### Conexão e Namespace
+
 | Variável | Default | Descrição |
 |----------|---------|-----------|
 | `CORTEX_API_URL` | `http://localhost:8000` | URL da API Cortex |
 | `CORTEX_TEAM` | `default_team` | Time/organização (fixo) |
 | `CORTEX_USER` | `$USER` | Usuário atual (fixo) |
 | `CORTEX_PROJECT` | (auto) | Override do projeto |
+
+### Memory Firewall (Identity Kernel)
+
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `CORTEX_IDENTITY_ENABLED` | `true` | Habilita proteção anti-jailbreak |
+| `CORTEX_IDENTITY_MODE` | `pattern` | Modo de detecção: `pattern`, `semantic`, `hybrid` |
+| `CORTEX_IDENTITY_STRICT` | `false` | `true` = bloqueia, `false` = apenas alerta |
 
 ## Tools Disponíveis
 
