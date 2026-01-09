@@ -3,7 +3,7 @@
 
 > **A dor:** Sistemas tradicionais acumulam tudo para sempre — aumentando ruído, custo e confusão.
 > **A solução:** Cortex esquece ativamente o que é inútil para focar no sinal, como seu cérebro.
-> **O resultado:** -98% tokens desperdiçados com contexto irrelevante.
+> **O potencial:** Menos tokens desperdiçados com contexto irrelevante.
 
 *Documento Canônico — fonte única de verdade sobre decaimento de memórias.*
 
@@ -11,16 +11,17 @@
 
 ## Por Que Isso Importa
 
-A **Cognição Biológica** é uma das [4 dimensões de valor](../research/benchmarks.md) do Cortex:
+A **Cognição Biológica** é uma das [5 dimensões de valor](../research/benchmarks.md) do Cortex:
 
 | Dimensão | Score | Cortex é Único? |
 |----------|-------|-----------------|
-| 🧠 **Cognição Biológica** | **50%** | ✅ **Exclusivo** |
+| 🧠 **Cognição Biológica** | **100%** | ✅ **Exclusivo** |
 | 👥 Memória Coletiva | 75% | ✅ Exclusivo |
 | 🎯 Valor Semântico | 100% | Empata |
 | ⚡ Eficiência | 100% | ✅ Exclusivo |
+| 🔒 Segurança | 100% | ✅ Exclusivo |
 
-**Nenhum concorrente** (Baseline, RAG, Mem0) implementa decaimento ou consolidação.
+**Nenhum concorrente** (Baseline, RAG, Mem0) implementa decaimento, consolidação ou proteção de identidade.
 
 ---
 

@@ -2,7 +2,9 @@
 
 > **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
 > **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
-> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
+> **Projeção teórica*:** até -73% no tempo de atendimento, até -98% nos custos de tokens.
+>
+> *\* Baseado em modelo teórico. Resultados reais dependem do caso de uso.*
 
 ---
 
@@ -69,10 +71,10 @@ HOJE:
 | Componente | Dor que Resolve | Resultado |
 |------------|-----------------|-----------|
 | **Modelo W5H** | "Agente não lembra o que falei" | Contexto estruturado em ~36 tokens |
-| **Gerenciamento de Relevância** *(Decay Ebbinghaus)* | "Contexto poluído com lixo" | -98% tokens desperdiçados |
-| **Detecção de Temas Centrais** *(Hub Centrality)* | "Perdeu o mais importante" | Contexto crítico nunca é esquecido |
+| **Gerenciamento de Relevância** *(Decay Ebbinghaus)* | "Contexto poluído com lixo" | Menos tokens desperdiçados |
+| **Detecção de Temas Centrais** *(Hub Centrality)* | "Perdeu o mais importante" | Contexto crítico preservado |
 | **Síntese de Padrões** *(DreamAgent)* | "100 casos, nenhum insight" | Conhecimento evolui automaticamente |
-| **Benchmark Científico** | "Funciona mesmo?" | +43.3% vs alternativas |
+| **Benchmark Científico** | "Funciona mesmo?" | +62% vs alternativas (testado) |
 
 ### O Marco
 

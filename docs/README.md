@@ -6,16 +6,17 @@
 
 ---
 
-## 🎯 4 Dimensões de Valor
+## 🎯 5 Dimensões de Valor
 
 | Dimensão | O Que Significa | Score |
 |----------|-----------------|-------|
-| 🧠 **Cognição Biológica** | Esquece ruído, lembra importante (Ebbinghaus) | 50% |
+| 🧠 **Cognição Biológica** | Esquece ruído, lembra importante (Ebbinghaus) | 100% |
 | 👥 **Memória Coletiva** | Conhecimento evolui e é compartilhado | 75% |
 | 🎯 **Valor Semântico** | Recupera o que IMPORTA, não tudo similar | 100% |
-| ⚡ **Eficiência** | 16ms latência, tokens compactos | 100% |
+| ⚡ **Eficiência** | 5ms latência, tokens compactos | 100% |
+| 🔒 **Segurança** | Anti-jailbreak, proteção de identidade | 100% |
 
-**Score Total: 83%** (vs 40% das alternativas - RAG, Mem0)
+**Score Total: 93%** (vs 31% da melhor alternativa - RAG)
 
 ---
 

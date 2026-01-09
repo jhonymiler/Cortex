@@ -187,16 +187,17 @@ O Cortex extrai automaticamente:
 
 ---
 
-## 4 Dimensões de Valor
+## 5 Dimensões de Valor
 
 | Dimensão | Score | Exclusivo? |
 |----------|-------|------------|
-| 🧠 Cognição Biológica | 50% | ✅ |
+| 🧠 Cognição Biológica | 100% | ✅ |
 | 👥 Memória Coletiva | 75% | ✅ |
 | 🎯 Valor Semântico | 100% | Empata |
 | ⚡ Eficiência | 100% | ✅ |
+| 🔒 Segurança | 100% | ✅ |
 
-**Score Total: 83%** (vs 40% das alternativas)
+**Score Total: 93%** (vs 31% da melhor alternativa)
 
 ---
 

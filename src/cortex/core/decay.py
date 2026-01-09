@@ -181,6 +181,7 @@ class DecayManager:
         - Conectam entidades importantes
         - São referenciados por outras relações
         - Têm muitos participantes
+        - São mencionados textualmente por outros episódios
         """
         episode = graph.get_episode(episode_id)
         if not episode:
@@ -204,14 +205,72 @@ class DecayManager:
             if participant_centralities else 0.0
         )
         
-        # Fator 3: Relações de entrada
+        # Fator 3: Relações de entrada (grafo explícito)
         incoming = len(graph.get_relations(to_id=episode_id))
         relation_factor = min(1.0, incoming / self.config.hub_reference_threshold)
         
-        # Combina fatores
-        centrality = (participant_factor * 0.3) + (avg_participant_centrality * 0.5) + (relation_factor * 0.2)
+        # Fator 4: Referências textuais implícitas
+        # Conta quantos episódios mencionam action/outcome/context deste episódio
+        textual_references = self._count_textual_references(episode, graph)
+        textual_factor = min(1.0, textual_references / self.config.hub_reference_threshold)
+        
+        # Combina fatores (inclui referências textuais)
+        centrality = (
+            (participant_factor * 0.2) + 
+            (avg_participant_centrality * 0.3) + 
+            (relation_factor * 0.2) +
+            (textual_factor * 0.3)  # Referências textuais são importantes
+        )
         
         return min(1.0, centrality)
+    
+    def _count_textual_references(
+        self,
+        episode: "Episode",
+        graph: "MemoryGraph",
+    ) -> int:
+        """
+        Conta quantos outros episódios referenciam este textualmente.
+        
+        Verifica se action, outcome ou w5h.what deste episódio aparecem
+        no context, why ou action de outros episódios.
+        """
+        if not episode:
+            return 0
+        
+        # Termos-chave deste episódio
+        key_terms = set()
+        if episode.action:
+            key_terms.add(episode.action.lower())
+        if episode.outcome:
+            key_terms.add(episode.outcome.lower())
+        
+        # Adiciona W5H se disponível
+        w5h = episode.metadata.get("w5h", {})
+        if w5h.get("what"):
+            key_terms.add(str(w5h["what"]).lower())
+        
+        if not key_terms:
+            return 0
+        
+        # Conta referências em outros episódios
+        count = 0
+        for other_id, other in graph._episodes.items():
+            if other_id == episode.id:
+                continue
+            
+            # Verifica se algum termo-chave aparece no contexto/why do outro
+            other_text = (
+                (other.context or "") + " " +
+                (other.metadata.get("w5h", {}).get("why", "") or "")
+            ).lower()
+            
+            for term in key_terms:
+                if term in other_text:
+                    count += 1
+                    break  # Só conta uma vez por episódio
+        
+        return count
     
     def is_hub(self, entity_or_episode_id: str, graph: "MemoryGraph") -> bool:
         """Verifica se uma memória é um hub (altamente conectada)."""

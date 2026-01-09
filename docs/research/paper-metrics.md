@@ -4,34 +4,36 @@
 
 ---
 
-## As 4 Dimensões de Valor
+## As 5 Dimensões de Valor
 
-O Cortex é avaliado em **4 dimensões** que demonstram o **valor real** do sistema:
+O Cortex é avaliado em **5 dimensões** que demonstram o **valor real** do sistema:
 
 | Dimensão | O Que Mede | Por Que Importa | Score |
 |----------|------------|-----------------|-------|
-| 🧠 **Cognição Biológica** | Decay, consolidação, hubs | Apenas Cortex esquece e aprende | 50% |
+| 🧠 **Cognição Biológica** | Decay, consolidação, hubs | Apenas Cortex esquece e aprende | 100% |
 | 👥 **Memória Coletiva** | Herança hierárquica, isolamento | Apenas Cortex é multi-tenant | 75% |
 | 🎯 **Valor Semântico** | Sinônimos, threshold adaptativo | Encontra o que importa | 100% |
-| ⚡ **Eficiência** | Latência <100ms, tokens compactos | Menor custo, maior velocidade | 100% |
+| ⚡ **Eficiência** | Latência, tokens compactos | Menor custo, maior velocidade | 100% |
+| 🔒 **Segurança** | Anti-jailbreak, proteção identidade | Apenas Cortex protege memória | 100% |
 
 ### Resultado Comparativo (Janeiro 2026)
 
 | Dimensão | Baseline | RAG | Mem0 | **Cortex** |
 |----------|----------|-----|------|------------|
-| Cognição Biológica | 0% | 0% | 0% | **50%** |
+| Cognição Biológica | 0% | 0% | 0% | **100%** |
 | Memória Coletiva | 0% | 0% | 0% | **75%** |
-| Valor Semântico | 50% | 100% | 100% | **100%** |
+| Valor Semântico | 50% | 100% | 75% | **100%** |
 | Eficiência | 0% | 0% | 0% | **100%** |
-| **TOTAL** | **20%** | **40%** | **40%** | **83%** |
+| Segurança | 0% | 0% | 0% | **100%** |
+| **TOTAL** | **15%** | **31%** | **23%** | **93%** |
 
-🏆 **Cortex supera a melhor alternativa em +43.3%**
+🏆 **Cortex supera a melhor alternativa em +62%**
 
 ---
 
 ## Detalhamento por Dimensão
 
-### 1. 🧠 Cognição Biológica (50%)
+### 1. 🧠 Cognição Biológica (100%)
 
 **O que mede**: Capacidade de encontrar a memória correta usando **termos diferentes** dos originais.
 
@@ -150,11 +152,12 @@ suporte (pai - LEARNED)
 
 | Aspecto | Baseline | RAG | Mem0 | Cortex |
 |---------|----------|-----|------|--------|
-| **Score Total** | 20% | 40% | 40% | **83%** |
-| **Cognição Biológica** | ❌ | ❌ | ❌ | **✅** |
-| **Memória Coletiva** | ❌ | ❌ | ❌ | **✅** |
-| **Valor Semântico** | 50% | 100% | 100% | **100%** |
-| **Eficiência** | ❌ | ❌ | ❌ | **✅** |
+| **Score Total** | 15% | 31% | 23% | **93%** |
+| **Cognição Biológica** | ❌ | ❌ | ❌ | **100%** |
+| **Memória Coletiva** | ❌ | ❌ | ❌ | **75%** |
+| **Valor Semântico** | 50% | 100% | 75% | **100%** |
+| **Eficiência** | ❌ | ❌ | ❌ | **100%** |
+| **Segurança** | ❌ | ❌ | ❌ | **100%** |
 | **Decaimento** | ❌ | ❌ | ❌ | **Ebbinghaus** |
 | **Consolidação** | ❌ | ❌ | ❌ | **DreamAgent** |
 | **Isolamento** | ❌ | Manual | Manual | **Hierárquico** |

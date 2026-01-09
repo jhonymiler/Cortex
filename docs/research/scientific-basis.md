@@ -2,7 +2,9 @@
 
 > **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
 > **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
-> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
+> **Projeção teórica*:** até -73% no tempo de atendimento, até -98% nos custos de tokens.
+>
+> *\* Baseado em modelo teórico. Resultados reais dependem do caso de uso.*
 
 *Este documento detalha as bases teóricas com referências acadêmicas.*
 

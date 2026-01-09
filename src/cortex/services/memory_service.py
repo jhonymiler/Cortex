@@ -254,6 +254,7 @@ class MemoryService:
         """
         self.graph = MemoryGraph(storage_path=storage_path)
         self.shared_manager = shared_memory_manager or SharedMemoryManager()
+        self.decay_manager = create_default_decay_manager()
         
         # Cache de recall por sessão (evita recálculos)
         # Chave: (session_id, namespace, owner_id, query_hash) -> RecallResponse
@@ -429,20 +430,36 @@ class MemoryService:
                 
                 # Calcula similaridade
                 sim = cosine_similarity(query_result.vector, ep.embedding)
-                all_candidates.append((ep, sim))
+                
+                # Calcula centralidade do episódio (hub detection)
+                centrality = self.decay_manager.calculate_episode_centrality(ep.id, self.graph)
+                
+                # Score combinado com boost para hubs
+                # Hubs com centralidade > 0.3 recebem boost proporcional
+                # Isso garante que memórias muito referenciadas apareçam
+                hub_boost = 0.0
+                if centrality > 0.3:
+                    # Boost proporcional à centralidade (max 0.15)
+                    hub_boost = min(0.15, (centrality - 0.3) * 0.5)
+                
+                # 70% similaridade + 15% centralidade + 15% hub_boost
+                combined_score = (sim * 0.7) + (centrality * 0.15) + (hub_boost * 0.15) + hub_boost
+                
+                all_candidates.append((ep, sim, combined_score))
             
             if not all_candidates:
                 return []
             
-            # Ordena por similaridade (maior primeiro)
-            all_candidates.sort(key=lambda x: x[1], reverse=True)
+            # Ordena por score COMBINADO (maior primeiro)
+            all_candidates.sort(key=lambda x: x[2], reverse=True)
             
             # ESTRATÉGIA ADAPTATIVA:
             # 1. Se melhor score é alto (> 0.75), aceita independente de outros
             # 2. Gap analysis: se melhor candidato é significativamente melhor, aceita
             # 3. Uniformity check: se TODOS são muito similares E baixos, rejeita
             
-            scores = [s for _, s in all_candidates]
+            # Usa similaridade original para threshold (não o combined_score)
+            scores = [sim for _, sim, _ in all_candidates]
             best_score = scores[0]
             
             # Se melhor score é muito baixo, rejeita tudo
@@ -451,7 +468,7 @@ class MemoryService:
             
             # Se melhor score é muito alto, aceita sem análise adicional
             if best_score >= 0.75:
-                return [ep for ep, _ in all_candidates if ep == all_candidates[0][0]][:limit]
+                return [ep for ep, _, _ in all_candidates if ep == all_candidates[0][0]][:limit]
             
             # Calcula gap entre melhor e média dos outros
             if len(scores) > 1:
@@ -477,10 +494,11 @@ class MemoryService:
             else:
                 threshold = min_similarity
             
-            # Filtra por threshold
-            filtered = [(ep, sim) for ep, sim in all_candidates if sim >= threshold]
+            # Filtra por threshold (usando similaridade original)
+            # Mas mantém ordenação por combined_score (que já foi feita)
+            filtered = [(ep, sim, cs) for ep, sim, cs in all_candidates if sim >= threshold]
             
-            return [ep for ep, _ in filtered[:limit]]
+            return [ep for ep, _, _ in filtered[:limit]]
             
         except Exception:
             # Falha silenciosa - embedding é opcional
@@ -776,6 +794,7 @@ class MemoryService:
                     # Cria serviço temporário para usar embedding
                     temp_service = MemoryService.__new__(MemoryService)
                     temp_service.graph = parent_graph
+                    temp_service.decay_manager = create_default_decay_manager()  # ESSENCIAL: Hub Detection
                     temp_service._recall_cache = {}
                     
                     episodes = temp_service._recall_by_embedding(
@@ -1032,6 +1051,7 @@ class NamespacedMemoryService:
             service = MemoryService.__new__(MemoryService)
             service.graph = graph
             service.shared_manager = SharedMemoryManager()
+            service.decay_manager = create_default_decay_manager()  # ESSENCIAL: Hub Detection
             service.namespaced_service = self  # Referência para buscar grafos pai
             service._current_namespace = namespace  # Namespace atual
             service._recall_cache = {}  # Cache de recall por sessão

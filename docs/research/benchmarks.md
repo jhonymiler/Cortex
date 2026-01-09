@@ -2,7 +2,9 @@
 
 > **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
 > **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
-> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
+> **Projeção teórica*:** até -73% no tempo de atendimento, até -98% nos custos de tokens.
+>
+> *\* Baseado em modelo teórico. Resultados reais dependem do caso de uso.*
 
 ---
 
@@ -23,17 +25,18 @@
 
 Sistemas de memória tradicionais (RAG, VectorDB) são otimizados para **busca semântica em documentos estáticos**. Mas agentes precisam de algo diferente: memória que **evolui, prioriza e compartilha conhecimento**.
 
-Propomos um framework de avaliação baseado em **4 dimensões cognitivas**. Nossos scores refletem essa visão — e convidamos a comunidade a debater e refinar este modelo.
+Propomos um framework de avaliação baseado em **5 dimensões cognitivas**. Nossos scores refletem essa visão — e convidamos a comunidade a debater e refinar este modelo.
 
 ### Índice de Alinhamento Cognitivo
 
 | Dimensão | Baseline | RAG | Mem0 | **Cortex** | Base Científica |
 |----------|----------|-----|------|------------|-----------------|
-| **Cognição Biológica** | 0%† | 0%† | 0%† | **50%** | Ebbinghaus (1885)¹ |
+| **Cognição Biológica** | 0%† | 0%† | 0%† | **100%** | Ebbinghaus (1885)¹ |
 | **Memória Coletiva** | 0%† | 0%† | 0%† | **75%** | Tulving (1972)² |
 | **Valor Semântico** | 50% | 100% | 100% | **100%** | Embedding similarity |
 | **Eficiência** | 0%† | 0%† | 0%† | **100%** | O(1) vs O(log n) |
-| **ÍNDICE TOTAL** | 20% | 40% | 40% | **83%** | — |
+| **Segurança** | 0%† | 0%† | 0%† | **100%** | IdentityKernel |
+| **ÍNDICE TOTAL** | 15% | 31% | 23% | **93%** | — |
 
 **†** = Não é o foco do projeto (escolha de design, não limitação)  
 **¹** = [Curva de esquecimento](./scientific-basis.md#ebbinghaus): R = e^(-t/S), memórias não-acessadas decaem  
@@ -41,12 +44,14 @@ Propomos um framework de avaliação baseado em **4 dimensões cognitivas**. Nos
 
 ### Por Que Essas Dimensões?
 
-| Dimensão | Dor que Resolve | Impacto no Negócio |
-|----------|-----------------|-------------------|
-| **Cognição Biológica** | Contexto poluído com lixo | -98% tokens desperdiçados |
+| Dimensão | Dor que Resolve | Potencial* |
+|----------|-----------------|------------|
+| **Cognição Biológica** | Contexto poluído com lixo | Menos tokens no contexto |
 | **Memória Coletiva** | Conhecimento preso em silos | Resolve 1x, beneficia todos |
-| **Valor Semântico** | "Não entendi sua pergunta" | +85% acurácia de respostas |
-| **Eficiência** | Espera de segundos por resposta | Latência <20ms |
+| **Valor Semântico** | "Não entendi sua pergunta" | Melhor acurácia de respostas |
+| **Eficiência** | Espera de segundos por resposta | Latência ~150ms (API) |
+
+*\* Impacto real varia por caso de uso.*
 
 ---
 

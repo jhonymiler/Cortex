@@ -2,7 +2,9 @@
 
 > **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
 > **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
-> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
+> **Projeção teórica*:** até -73% no tempo de atendimento, até -98% nos custos de tokens.
+>
+> *\* Baseado em modelo teórico. Resultados reais dependem do caso de uso.*
 
 ---
 
@@ -24,17 +26,20 @@
 
 O Cortex brilha onde **memória e personalização** são diferenciais competitivos:
 
-| Indústria | Dor Principal | Ganho com Cortex |
-|-----------|---------------|------------------|
-| [E-commerce](#-e-commerce) | Clientes repetem preferências | +224% conversão |
-| [Saúde](#-saúde) | Histórico perdido entre consultas | -67% tempo triagem |
-| [Suporte Técnico](#-suporte-técnico) | Conhecimento preso em pessoas | -83% onboarding |
-| [Educação](#-educação) | Tutores não lembram progresso | +156% retenção |
-| [Financeiro](#-financeiro) | Contexto fragmentado | -45% tempo análise |
-| [RH/Recrutamento](#-rh-e-recrutamento) | Candidatos repetem história | +89% satisfação |
-| [Desenvolvimento](#-desenvolvimento) | Copilot genérico demais | -80% iterações |
-| [Multi-Agentes](#-sistemas-multi-agentes) | Agentes não colaboram | +300% eficiência |
-| [Segurança/Compliance](#-segurança-e-compliance) | Agentes manipuláveis | **100% proteção** |
+| Indústria | Dor Principal | Potencial com Cortex* |
+|-----------|---------------|----------------------|
+| [E-commerce](#-e-commerce) | Clientes repetem preferências | Melhor conversão |
+| [Saúde](#-saúde) | Histórico perdido entre consultas | Triagem mais rápida |
+| [Suporte Técnico](#-suporte-técnico) | Conhecimento preso em pessoas | Onboarding mais rápido |
+| [Educação](#-educação) | Tutores não lembram progresso | Maior retenção |
+| [Financeiro](#-financeiro) | Contexto fragmentado | Análise mais rápida |
+| [RH/Recrutamento](#-rh-e-recrutamento) | Candidatos repetem história | Melhor satisfação |
+| [Desenvolvimento](#-desenvolvimento) | Copilot genérico demais | Menos iterações |
+| [Multi-Agentes](#-sistemas-multi-agentes) | Agentes não colaboram | Colaboração efetiva |
+| [Segurança/Compliance](#-segurança-e-compliance) | Agentes manipuláveis | **100% proteção†** |
+
+*\* Projeções teóricas baseadas no modelo cognitivo.*
+*† Testado em benchmark de segurança.*
 
 ---
 

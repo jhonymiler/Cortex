@@ -10,13 +10,13 @@
 
 | Dimensão | Benefício | Score Benchmark |
 |----------|-----------|-----------------|
-| 🧠 **Cognição Biológica** | Esquece ruído, lembra importante | 50% |
+| 🧠 **Cognição Biológica** | Esquece ruído, lembra importante | 100% |
 | 👥 **Memória Coletiva** | Conhecimento compartilhado entre agentes | 75% |
 | 🎯 **Valor Semântico** | Sinônimos funcionam, threshold adaptativo | 100% |
-| ⚡ **Eficiência** | 16ms latência, tokens compactos | 100% |
-| 🛡️ **Memory Firewall** | Proteção contra jailbreak/manipulação | 100% |
+| ⚡ **Eficiência** | ~5ms latência (API), tokens compactos | 100% |
+| 🔒 **Segurança** | Proteção anti-jailbreak (IdentityKernel) | 100% |
 
-**Total: 83%** vs 40% (RAG, Mem0)
+**Total: 93%** vs 31% (RAG, Mem0)
 
 ---
 

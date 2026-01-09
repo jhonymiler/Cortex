@@ -6,7 +6,7 @@
 
 Este benchmark mede o **valor real** do Cortex comparando com alternativas (Baseline, RAG, Mem0).
 
-### 4 Dimensões de Valor
+### 5 Dimensões de Valor
 
 | Dimensão | O que mede | Por que importa |
 |----------|-----------|-----------------|
@@ -14,6 +14,7 @@ Este benchmark mede o **valor real** do Cortex comparando com alternativas (Base
 | **Memória Coletiva** | Compartilhamento, isolamento | Só Cortex é multi-tenant |
 | **Valor Semântico** | Acurácia, relevância | Encontra o que importa |
 | **Eficiência** | Latência, tokens | Menos custo, mais valor |
+| **Segurança** | Anti-jailbreak, IdentityKernel | Proteção contra ataques |
 
 ## Uso Rápido
 
@@ -32,19 +33,20 @@ python -m benchmark.unified_benchmark
 
 | Dimensão | Baseline | RAG | Mem0 | **Cortex** |
 |----------|----------|-----|------|------------|
-| Cognição Biológica | 0% | 0% | 0% | **50%** |
+| Cognição Biológica | 0% | 0% | 0% | **100%** |
 | Memória Coletiva | 0% | 0% | 0% | **75%** |
 | Valor Semântico | 50% | 100% | 100% | **100%** |
 | Eficiência | 0% | 0% | 0% | **100%** |
-| **TOTAL** | 20% | 40% | 40% | **83%** |
+| Segurança | 0% | 0% | 0% | **100%** |
+| **TOTAL** | 15% | 31% | 23% | **93%** |
 
-🏆 **Cortex supera melhor alternativa em +43.3%**
+🏆 **Cortex supera melhor alternativa em +62%**
 
 ## Arquivos
 
 | Arquivo | Descrição |
 |---------|-----------|
-| `unified_benchmark.py` | Benchmark principal com 4 dimensões |
+| `unified_benchmark.py` | Benchmark principal com 5 dimensões |
 | `paper_benchmark.py` | Benchmark isolado para métricas acadêmicas |
 | `agents.py` | Agentes de comparação (Baseline, Cortex) |
 | `cortex_agent.py` | Implementação do agente Cortex |

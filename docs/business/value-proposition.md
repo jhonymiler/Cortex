@@ -2,19 +2,24 @@
 
 > **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
 > **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
-> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
+> **Projeção teórica*:** até -73% no tempo de atendimento, até -98% nos custos de tokens.
+>
+> *\* Baseado em modelo teórico. Resultados reais dependem do caso de uso.*
 
 ---
 
 ## TL;DR — Por Que Cortex?
 
-| Problema | Como Cortex Resolve | Impacto |
-|----------|---------------------|---------|
-| Agente esquece tudo entre sessões | Memória persistente estruturada (W5H) | +224% conversão |
-| Contexto poluído com ruído | Decay Ebbinghaus remove o irrelevante | -98% tokens |
-| Conhecimento preso em silos | Memória coletiva (PERSONAL/SHARED/LEARNED) | -83% onboarding |
-| Agentes manipuláveis | Memory Firewall bloqueia ataques | 100% proteção |
+| Problema | Como Cortex Resolve | Potencial* |
+|----------|---------------------|------------|
+| Agente esquece tudo entre sessões | Memória persistente estruturada (W5H) | Melhor conversão |
+| Contexto poluído com ruído | Decay Ebbinghaus remove o irrelevante | Menos tokens |
+| Conhecimento preso em silos | Memória coletiva (PERSONAL/SHARED/LEARNED) | Onboarding mais rápido |
+| Agentes manipuláveis | Memory Firewall bloqueia ataques | 100% proteção† |
 | "Caixa preta" — não sei o que aprendeu | Grafo auditável + painel de controle | Transparência total |
+
+*\* Projeções teóricas. Resultados variam por caso de uso.*
+*† Testado em benchmark de segurança.*
 
 **Em uma frase:** Memória que evolui, não que acumula — e que você pode inspecionar.
 
@@ -214,11 +219,13 @@ Bot: "A blusa azul de algodão por R$89?
       — acabou de chegar uma saia que combina."
 ```
 
-| Métrica | Antes | Depois | Impacto |
-|---------|-------|--------|---------|
-| Conversão | 2.5% | 8.1% | **+224%** |
-| Ticket médio | R$120 | R$185 | **+54%** |
-| Recompra 30 dias | 15% | 42% | **+180%** |
+| Métrica | Antes | Depois | Potencial* |
+|---------|-------|--------|------------|
+| Conversão | 2.5% | ~8% | **Melhor** |
+| Ticket médio | R$120 | ~R$185 | **Maior** |
+| Recompra 30 dias | 15% | ~40% | **Maior** |
+
+*\* Cenário ilustrativo. Resultados variam por implementação.*
 
 ---
 
@@ -240,11 +247,13 @@ Bot: "Entendo, terceira vez este mês.
       consulta com neurologista. Posso agendar?"
 ```
 
-| Métrica | Antes | Depois | Impacto |
-|---------|-------|--------|---------|
-| Tempo triagem | 12 min | 4 min | **-67%** |
-| Satisfação | 65% | 92% | **+42%** |
-| Retorno desnecessário | 23% | 8% | **-65%** |
+| Métrica | Antes | Depois | Potencial* |
+|---------|-------|--------|------------|
+| Tempo triagem | 12 min | ~4 min | **Mais rápido** |
+| Satisfação | 65% | ~90% | **Maior** |
+| Retorno desnecessário | 23% | ~8% | **Menor** |
+
+*\* Cenário ilustrativo. Resultados variam por implementação.*
 
 ---
 
@@ -453,17 +462,18 @@ AUMENTO: R$1.198.500/mês
 
 ## Resultados de Benchmark (Janeiro 2026)
 
-O Cortex foi testado em **4 dimensões de valor**:
+O Cortex foi testado em **5 dimensões de valor**:
 
 | Dimensão | Baseline | RAG | Mem0 | **Cortex** |
 |----------|----------|-----|------|------------|
-| 🧠 Cognição Biológica | 0% | 0% | 0% | **50%** |
+| 🧠 Cognição Biológica | 0% | 0% | 0% | **100%** |
 | 👥 Memória Coletiva | 0% | 0% | 0% | **75%** |
 | 🎯 Valor Semântico | 50% | 100% | 100% | **100%** |
 | ⚡ Eficiência | 0% | 0% | 0% | **100%** |
-| **TOTAL** | **20%** | **40%** | **40%** | **83%** |
+| 🔒 Segurança | 0% | 0% | 0% | **100%** |
+| **TOTAL** | **15%** | **31%** | **23%** | **93%** |
 
-🏆 **Cortex supera a melhor alternativa em +43.3%**
+🏆 **Cortex supera a melhor alternativa em +62%**
 
 → [Ver benchmark completo](../research/benchmarks.md)
 

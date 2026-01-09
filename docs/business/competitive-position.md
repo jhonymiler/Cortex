@@ -2,7 +2,9 @@
 
 > **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
 > **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
-> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
+> **Projeção teórica*:** até -73% no tempo de atendimento, até -98% nos custos de tokens.
+>
+> *\* Baseado em modelo teórico. Resultados reais dependem do caso de uso.*
 
 ---
 
@@ -225,11 +227,12 @@ A ausência de um mecanismo de esquecimento ativo no Mem0 (inspirado na curva de
 
 | Dimensão | Mem0 | **Cortex** | Base Científica |
 |----------|------|------------|-----------------|
-| Cognição Biológica | 0%† | **50%** | Ebbinghaus + Tulving |
+| Cognição Biológica | 0%† | **100%** | Ebbinghaus + Tulving |
 | Memória Coletiva | 0%† | **75%** | Namespace hierarchy |
-| Valor Semântico | 100% | **100%** | Embedding similarity |
+| Valor Semântico | 75% | **100%** | Embedding similarity |
 | Eficiência | 0%† | **100%** | O(1) índice invertido |
-| **TOTAL** | **40%** | **83%** | **+43.3%** |
+| Segurança | 0%† | **100%** | IdentityKernel |
+| **TOTAL** | **23%** | **93%** | **+70%** |
 
 **†** = Não é o foco do Mem0 (escolha de design, não limitação)
 

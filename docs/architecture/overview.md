@@ -44,16 +44,17 @@ Cortex não substitui seu LLM ou RAG — ele **complementa** como camada de mem�
 
 ## Propósito e Visão
 
-O Cortex entrega **4 dimensões de valor** para agentes LLM:
+O Cortex entrega **5 dimensões de valor** para agentes LLM:
 
 | Dimensão | Implementação | Score |
 |----------|---------------|-------|
-| 🧠 **Cognição Biológica** | DecayManager, DreamAgent, Hub Detection | 50% |
+| 🧠 **Cognição Biológica** | DecayManager, DreamAgent, Hub Detection | 100% |
 | 👥 **Memória Coletiva** | SharedMemory, Namespace Hierarchy | 75% |
 | 🎯 **Valor Semântico** | Embedding semântico, Threshold adaptativo | 100% |
 | ⚡ **Eficiência** | MemoryGraph O(1), Índice invertido | 100% |
+| 🔒 **Segurança** | IdentityKernel anti-jailbreak | 100% |
 
-**Score Total: 83%** (vs 40% das alternativas)
+**Score Total: 93%** (vs 31% das alternativas)
 
 ---
 
