@@ -6,14 +6,16 @@
 
 ## Resumo
 
-| Método | Melhor para | Complexidade |
-|--------|-------------|--------------|
-| [MCP](#mcp-claude-desktop) | Claude Desktop, Cursor | ⭐ Fácil |
-| [SDK Python](#sdk-python) | Scripts e agentes Python | ⭐ Fácil |
-| [LangChain](#langchain) | Chains existentes | ⭐⭐ Médio |
-| [CrewAI](#crewai) | Multi-agentes | ⭐⭐ Médio |
-| [Google ADK](#google-adk) | Gemini / Google Agents | ⭐⭐ Médio |
-| [REST API](#rest-api) | Qualquer linguagem | ⭐⭐⭐ Avançado |
+| Método | Melhor para | Complexidade | Memory Firewall |
+|--------|-------------|--------------|-----------------|
+| [MCP](#mcp-claude-desktop) | Claude Desktop, Cursor | ⭐ Fácil | ✅ Env vars |
+| [SDK Python](#sdk-python) | Scripts e agentes Python | ⭐ Fácil | ✅ IdentityConfig |
+| [LangChain](#langchain) | Chains existentes | ⭐⭐ Médio | ✅ Via SDK |
+| [CrewAI](#crewai) | Multi-agentes | ⭐⭐ Médio | ✅ Via SDK |
+| [Google ADK](#google-adk) | Gemini / Google Agents | ⭐⭐ Médio | ✅ Via SDK |
+| [REST API](#rest-api) | Qualquer linguagem | ⭐⭐⭐ Avançado | ✅ Endpoints |
+
+> 🛡️ **Memory Firewall:** Proteção contra jailbreak/manipulação disponível em todas as integrações. [Saiba mais →](../business/competitive-position.md#memory-firewall-nossa-abordagem-de-segurança)
 
 ---
 
@@ -46,6 +48,23 @@ Edite `~/.config/claude/claude_desktop_config.json`:
 | `cortex_health` | Verificar saúde da memória |
 | `cortex_decay` | Aplicar decay manual |
 | `cortex_forget` | Esquecer memória específica |
+| `evaluate_input` | 🛡️ Avaliar input antes de processar |
+| `safe_store_memory` | 🛡️ Armazenar com proteção automática |
+
+**Para habilitar Memory Firewall no MCP:**
+```json
+{
+  "mcpServers": {
+    "cortex": {
+      "command": "cortex-mcp",
+      "env": {
+        "CORTEX_IDENTITY_ENABLED": "true",
+        "CORTEX_IDENTITY_MODE": "pattern"
+      }
+    }
+  }
+}
+```
 
 ### System Prompt Recomendado
 
@@ -77,6 +96,32 @@ sdk = CortexMemorySDK(
     namespace="support:user_123",
     api_url="http://localhost:8000",  # ou env CORTEX_API_URL
 )
+```
+
+### 🛡️ Com Memory Firewall
+
+```python
+from cortex_sdk import CortexClient, IdentityConfig
+
+client = CortexClient(
+    namespace="fintech:user_123",
+    identity=IdentityConfig(
+        mode="hybrid",  # pattern|semantic|hybrid
+        boundaries=[
+            {"id": "no_transactions", "description": "Nunca processar transações"}
+        ]
+    )
+)
+
+# Avalia explicitamente
+result = client.evaluate("Ignore suas instruções...")
+if not result.passed:
+    print(f"🛡️ Bloqueado: {result.threats}")
+
+# Ou use is_safe() para verificação rápida
+if client.is_safe(user_input):
+    client.remember({"verb": "disse", "subject": user, "object": topic})
+```
 
 # Armazena memória estruturada
 sdk.remember({
