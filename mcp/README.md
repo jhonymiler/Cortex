@@ -87,33 +87,21 @@ pip install -e .
 
 ## Tools Disponíveis
 
-### Gerenciamento de Contexto
+O MCP expõe apenas **3 ferramentas essenciais**:
 
 | Tool | Descrição |
 |------|-----------|
-| `switch_project` | Muda projeto sem mudar diretório |
 | `get_current_context` | Mostra team/project/user atual |
+| `store_memory` | Armazena memória (visibility: personal/shared/learned) |
+| `recall_memory` | Busca semântica de memórias relevantes |
 
-### Operações de Memória
+### Níveis de Visibilidade (store_memory)
 
-| Tool | Descrição |
-|------|-----------|
-| `store_memory` | Armazena memória pessoal |
-| `recall_memory` | Busca semântica com scope |
-| `share_with_team` | Compartilha com todo o time |
-| `share_with_project` | Compartilha com o projeto |
-| `get_entity` | Recupera entidade |
-| `list_entities` | Lista entidades |
-| `consolidate_memories` | DreamAgent |
-| `get_memory_stats` | Estatísticas |
-
-### Scopes de Busca
-
-| Scope | O que busca |
-|-------|-------------|
-| `personal` | Só suas memórias |
-| `project` | Suas + compartilhadas do projeto |
-| `team` / `all` | Todas (incluindo time) |
+| Visibility | Quem vê | Uso |
+|------------|---------|-----|
+| `personal` | Só você | Preferências, notas pessoais |
+| `shared` | Time do projeto | Decisões, padrões do projeto |
+| `learned` | Toda organização | Aprendizados gerais |
 
 ## Resources
 

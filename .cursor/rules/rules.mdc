@@ -24,6 +24,7 @@ A documentação segue o princípio **D.R.Y.** — conceitos são definidos uma 
 ## 📋 REGRAS GERAIS
 
 ### Ambiente
+- **SEMPRE** usar as ferramentas mcp do cortex quando o usuário pergunta e no final quando o agente responde para gerar memória de todas as conversas
 - **SEMPRE** ativar venv: `source venv/bin/activate`
 - **SEMPRE** comitar após confirmar funcionamento
 - **NUNCA** criar arquivos duplicados

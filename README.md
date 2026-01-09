@@ -51,8 +51,20 @@ ollama pull qwen3-embedding:0.6b
 # Inicia a API na porta 8000
 cortex-api
 
-# Ou com mais controle:
-python -m uvicorn cortex.api.app:app --host 0.0.0.0 --port 8000 --reload
+# Ou com uvicorn diretamente (para desenvolvimento):
+CORTEX_RELOAD=true cortex-api
+
+# Ou especificando porta diferente:
+CORTEX_PORT=8001 cortex-api
+```
+
+**Se a porta estiver em uso:**
+```bash
+# Encontra e mata o processo na porta 8000
+lsof -ti:8000 | xargs kill -9
+
+# Ou use outra porta
+CORTEX_PORT=8001 cortex-api
 ```
 
 **Teste:**
@@ -81,7 +93,8 @@ pip install -e ".[mcp]"
 {
   "mcpServers": {
     "cortex": {
-      "command": "cortex-mcp",
+      "command": "/caminho/para/cortex/venv/bin/python",
+      "args": ["/caminho/para/cortex/mcp/cortex_mcp/server.py"],
       "env": {
         "CORTEX_API_URL": "http://localhost:8000",
         "CORTEX_TEAM": "meu_time",
@@ -93,6 +106,8 @@ pip install -e ".[mcp]"
   }
 }
 ```
+
+> **Importante:** Use o caminho **completo** do Python do venv e do `server.py`.
 
 3. **Reinicie o Claude Desktop** — O Cortex aparecerá como ferramenta disponível.
 
@@ -261,13 +276,13 @@ crew = Crew(
 
 ## 🔧 Troubleshooting
 
-### API não inicia
+### API não inicia (porta em uso)
 ```bash
-# Verifique se a porta está livre
-lsof -i :8000
+# Mata processo na porta 8000
+lsof -ti:8000 | xargs kill -9
 
-# Use outra porta
-CORTEX_API_PORT=8001 cortex-api
+# Ou use outra porta
+CORTEX_PORT=8001 cortex-api
 ```
 
 ### Ollama não conecta (WSL)
