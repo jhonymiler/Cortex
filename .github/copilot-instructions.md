@@ -1,7 +1,22 @@
 # 🧠 Cortex - Development Instructions
 
 > **Sistema de Memória Cognitiva para Agentes LLM**  
-> Versão: 3.1 | Janeiro 2026
+> *"Porque agentes inteligentes precisam de memória inteligente"*  
+> Versão: 3.2 | Janeiro 2026
+
+---
+
+## 🎯 Propósito
+
+O Cortex é um sistema de **memória cognitiva** que vai além de simples armazenamento:
+
+| Dimensão | O que significa |
+|----------|-----------------|
+| **Memória Coletiva** | Conhecimento evolui e é compartilhado entre agentes/usuários |
+| **Aprendizado Evolutivo** | Consolida padrões, fortalece o útil, esquece o ruído |
+| **Cognição Biológica** | Ebbinghaus (decay), consolidação (sono), hubs (sinapses fortes) |
+| **Alto Valor Semântico** | Recupera o que IMPORTA, não tudo que "parece similar" |
+| **Eficiência de Tokens** | Máximo valor informacional com mínimo custo |
 
 ---
 
@@ -131,14 +146,26 @@ crew = Crew(long_term_memory=CortexCrewAIMemory(namespace="crew"))
 # ❌ Duplicar explicações de conceitos
 # ✅ Referenciar: Ver [Modelo W5H](docs/concepts/memory-model.md)
 
-# ❌ Usar embeddings/vectors
-# ✅ Usar índices O(1) do MemoryGraph
+# ❌ Threshold fixo para embeddings (ex: 0.75)
+# ✅ Threshold adaptativo com gap analysis
 
 # ❌ Old MCP
 # ✅ FastMCP (decorator-based)
 
 # ❌ Misturar camadas (I/O em models)
 # ✅ Models puros, Services com lógica
+```
+
+---
+
+## 🔍 Estratégia de Recall
+
+```python
+# Threshold adaptativo (MemoryService._recall_by_embedding)
+# 1. Score muito alto (≥0.75) → retorna top 1
+# 2. Uniformidade (std < 0.05) → descarta (ruído)
+# 3. Gap grande (>0.10) → ajusta threshold dinamicamente
+# 4. Fallback: threshold base 0.60
 ```
 
 ---

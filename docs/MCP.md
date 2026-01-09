@@ -1,37 +1,54 @@
 # Integração MCP
 
-> **Veja também**: [Integrações](./getting-started/integrations.md) | [Modelo W5H](./concepts/memory-model.md)
+> *"Cortex, porque agentes inteligentes precisam de memória inteligente"*
+
+O MCP (Model Context Protocol) é um projeto **separado** que se integra com a API do Cortex.
+
+📁 **Localização**: [`/mcp`](../mcp/README.md)
 
 ---
 
-## O que é MCP?
+## Hierarquia de Namespace
 
-Model Context Protocol (MCP) é um protocolo para ferramentas que LLMs podem chamar. O Cortex implementa um servidor MCP que expõe funções de memória.
+O MCP usa namespace hierárquico de 3 níveis:
 
-## Modelo W5H
+```
+{team}:{project}:{user}
+  │        │        └── Memória pessoal
+  │        └── Memória do projeto (detectado automaticamente)
+  └── Memória do time (fixo)
+```
 
-O Cortex usa o modelo **W5H** para estruturar memórias:
+### Níveis de Visibilidade
 
-| Campo | Significado | Exemplo |
-|-------|-------------|---------|
-| WHO | Quem participou | `["maria@email.com", "sistema"]` |
-| WHAT | O que aconteceu | `"reportou erro de pagamento"` |
-| WHY | Por que aconteceu | `"cartão expirado"` |
-| WHEN | Quando (automático) | `timestamp` |
-| WHERE | Namespace/contexto | `"suporte_cliente"` |
-| HOW | Resultado/método | `"orientada a atualizar dados"` |
+| Nível | Scope | Quem vê | Uso |
+|-------|-------|---------|-----|
+| **personal** | user | Só você | Preferências, notas |
+| **shared** | project | Time do projeto | Decisões, padrões |
+| **learned** | team | Toda organização | Aprendizados gerais |
+
+### Detecção Automática
+
+O projeto é detectado automaticamente (em ordem):
+1. Variável `CORTEX_PROJECT`
+2. Nome em `pyproject.toml`
+3. Nome em `package.json`
+4. Nome do repositório Git
+5. Nome do diretório atual
+
+---
 
 ## Instalação
 
 ```bash
-pip install cortex-memory[mcp]
+# MCP é projeto separado
+cd mcp
+pip install -e .
 ```
 
-## Configuração
+---
 
-### Claude Desktop
-
-Edite `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) ou `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+## Configuração Claude Desktop
 
 ```json
 {
@@ -39,264 +56,148 @@ Edite `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) 
     "cortex": {
       "command": "cortex-mcp",
       "env": {
-        "CORTEX_DATA_DIR": "/path/to/your/data",
-        "CORTEX_NAMESPACE": "agent:user_123"
+        "CORTEX_API_URL": "http://localhost:8000",
+        "CORTEX_TEAM": "meu_time",
+        "CORTEX_USER": "meu_usuario"
       }
     }
   }
 }
 ```
 
-### Variáveis de Ambiente
+### Localização do arquivo
 
-| Variável | Default | Descrição |
-|----------|---------|-----------|
-| CORTEX_DATA_DIR | ~/.cortex | Diretório de dados |
-| CORTEX_NAMESPACE | default | Isolamento multi-tenant |
+| OS | Caminho |
+|----|---------|
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Windows | `%APPDATA%\Claude\claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
 
-## Ferramentas Disponíveis
+---
 
-### cortex_recall
+## Tools Principais
 
-**Descrição:** OBRIGATÓRIO antes de responder ao usuário. Busca memórias relevantes.
+### Gerenciamento de Contexto
 
-**Parâmetros:**
+| Tool | Descrição |
+|------|-----------|
+| `get_current_context` | Mostra team/project/user atual |
+| `switch_project` | Muda projeto sem mudar diretório |
 
-| Nome | Tipo | Obrigatório | Descrição |
-|------|------|-------------|-----------|
-| query | string | ✅ | Mensagem do usuário ou tópico |
-| context | object | ❌ | Contexto adicional |
-| limit | integer | ❌ | Máximo de resultados |
+### Operações de Memória
 
-**Retorno:**
-```json
-{
-  "entities_found": 2,
-  "episodes_found": 3,
-  "context_summary": "Você já viu isso antes...",
-  "prompt_context": "[MEMORY CONTEXT]...",
-  "entities": [...],
-  "episodes": [...]
-}
-```
+| Tool | Descrição |
+|------|-----------|
+| `store_memory` | Armazena memória pessoal |
+| `recall_memory` | Busca com scope (personal/project/team) |
+| `share_with_project` | Compartilha com o projeto |
+| `share_with_team` | Compartilha com todo o time |
 
-### cortex_remember (W5H) ⭐ PREFERIDO
+### Utilitários
 
-**Descrição:** OBRIGATÓRIO após responder ao usuário. Armazena memória usando modelo W5H.
+| Tool | Descrição |
+|------|-----------|
+| `get_entity` | Recupera entidade |
+| `list_entities` | Lista entidades |
+| `consolidate_memories` | DreamAgent |
+| `get_memory_stats` | Estatísticas |
 
-**Parâmetros:**
+---
 
-| Nome | Tipo | Obrigatório | Descrição |
-|------|------|-------------|-----------|
-| who | array[string] | ✅ | Participantes (nomes, emails, sistemas) |
-| what | string | ✅ | O que aconteceu (ação/fato) |
-| why | string | ❌ | Por que aconteceu (causa) |
-| how | string | ❌ | Resultado/método |
-| where | string | ❌ | Namespace (default: "default") |
-| importance | float | ❌ | Importância 0.0-1.0 (default: 0.5) |
+## Exemplos de Uso
 
-**Exemplo:**
-```json
-{
-  "who": ["maria@email.com", "payment_system"],
-  "what": "reported payment error",
-  "why": "expired card",
-  "how": "guided to update card details",
-  "importance": 0.7
-}
-```
-
-**Retorno:**
-```json
-{
-  "success": true,
-  "memory_id": "abc123...",
-  "who_resolved": ["entity_id_1", "entity_id_2"],
-  "consolidated": false,
-  "consolidation_count": 1,
-  "retrievability": 1.0
-}
-```
-
-### cortex_forget
-
-**Descrição:** Esquece uma memória (marca como esquecida, não deleta).
-
-**Parâmetros:**
-
-| Nome | Tipo | Obrigatório | Descrição |
-|------|------|-------------|-----------|
-| memory_id | string | ✅ | ID da memória a esquecer |
-| reason | string | ❌ | Razão do esquecimento |
-
-**Retorno:**
-```json
-{
-  "success": true,
-  "memory_id": "abc123...",
-  "was_forgotten": false,
-  "message": "Memory forgotten"
-}
-```
-
-### cortex_store (Legacy)
-
-**Descrição:** Formato antigo, ainda funciona. Prefira `cortex_remember`.
-
-**Parâmetros:**
-
-| Nome | Tipo | Obrigatório | Descrição |
-|------|------|-------------|-----------|
-| action | string | ✅ | O que foi feito (verbo) |
-| outcome | string | ✅ | Resultado ou conclusão |
-| participants | array | ❌ | Entidades envolvidas |
-| context | string | ❌ | Situação ou cenário |
-| relations | array | ❌ | Conexões descobertas |
-
-**Participant:**
-```json
-{
-  "type": "person",
-  "name": "João",
-  "identifiers": ["joao@email.com"]
-}
-```
-
-**Relation:**
-```json
-{
-  "from": "erro_404",
-  "type": "caused_by",
-  "to": "rota_faltando"
-}
-```
-
-**Retorno:**
-```json
-{
-  "success": true,
-  "episode_id": "ep_abc123",
-  "entities_created": 1,
-  "consolidated": false
-}
-```
-
-### cortex_stats
-
-**Descrição:** Estatísticas do grafo de memória.
-
-**Parâmetros:** Nenhum.
-
-**Retorno:**
-```json
-{
-  "total_entities": 42,
-  "total_episodes": 128,
-  "total_relations": 67
-}
-```
-
-## Fluxo Obrigatório
-
-O Cortex inclui instruções que orientam o LLM a seguir este fluxo:
+### IDE - Trabalhando em Projetos
 
 ```
-1. Usuário envia mensagem
-        ↓
-2. LLM chama cortex_recall(query=mensagem)
-        ↓
-3. Cortex retorna contexto relevante
-        ↓
-4. LLM processa (considerando contexto)
-        ↓
-5. LLM responde ao usuário
-        ↓
-6. LLM chama cortex_remember(who, what, why, how)  [W5H]
-        ↓
-7. Cortex armazena com decaimento e consolidação
+# Abrindo o Claude no diretório do Cortex
+# Detecta automaticamente: default_team:cortex_memory:jhony
+
+Usuário: O que você sabe sobre este projeto?
+
+Claude: [Usa recall_memory(scope="project")]
+        Encontrei informações sobre o projeto Cortex...
+
+# Mudando de projeto
+Usuário: Preciso trabalhar no cliente_xyz
+
+Claude: [Usa switch_project("cliente_xyz")]
+        Contexto alterado para cliente_xyz.
 ```
 
-## Decaimento (Ebbinghaus)
-
-Memórias seguem a curva de esquecimento:
-
-- **Memórias frescas**: retrievability > 0.7
-- **Memórias estáveis**: 0.4 < retrievability ≤ 0.7
-- **Memórias fracas**: 0.1 < retrievability ≤ 0.4
-- **Memórias esquecidas**: retrievability ≤ 0.1
-
-Fatores que aumentam retenção:
-- Acessos frequentes (spaced repetition)
-- Consolidação (5+ memórias similares)
-- Alta centralidade (hub nodes)
-
-## Recursos MCP
-
-### cortex://stats
-
-Retorna estatísticas do grafo em texto legível.
+### Suporte - Múltiplos Atendentes
 
 ```
-Cortex Memory Statistics
-========================
-Entities: 42
-Episodes: 128
-Relations: 67
+# Config: CORTEX_TEAM=suporte, CORTEX_USER=maria
+# Namespace: suporte:financeiro:maria
+
+Usuário: Como resolver erro de boleto?
+
+Claude: [Usa recall_memory(scope="team")]
+        Encontrei um padrão aprendido pelo time...
+
+# Após resolver
+Claude: [Usa share_with_team("Boleto expirado: orientar a gerar novo")]
+        Compartilhado com todo o time de suporte!
 ```
 
-## Testando Localmente
+### Multi-Agentes - CrewAI
 
-```bash
-# Inicia o servidor MCP em modo debug
-cortex-mcp
-
-# Em outro terminal, use o MCP Inspector
-npx @modelcontextprotocol/inspector cortex-mcp
 ```
+# Config: CORTEX_TEAM=agents, CORTEX_PROJECT=sales_crew
+# Cada agente tem seu CORTEX_USER
 
-## Logs
+# bot_researcher: agents:sales_crew:researcher
+# bot_writer: agents:sales_crew:writer
 
-O servidor MCP escreve logs para stderr. Para debug:
-
-```bash
-cortex-mcp 2>&1 | tee cortex.log
+# Agentes compartilham memória do projeto
+# Mas têm memórias pessoais isoladas
 ```
 
 ---
 
-## 🔌 Alternativa: SDK Python
+## Variáveis de Ambiente
 
-Se você está desenvolvendo um agente programaticamente (não via Claude Desktop), considere usar o **SDK Python** que oferece integração automática:
+| Variável | Default | Descrição |
+|----------|---------|-----------|
+| `CORTEX_API_URL` | `http://localhost:8000` | URL da API |
+| `CORTEX_TEAM` | `default_team` | Time (fixo) |
+| `CORTEX_USER` | `$USER` | Usuário (fixo) |
+| `CORTEX_PROJECT` | (auto) | Override do projeto |
 
-### Decorator Simples
+---
 
-```python
-from cortex_memory import with_memory
+## Documentação Completa
 
-@with_memory(namespace="meu_agente")
-def meu_agente(msg: str, context: str = "") -> str:
-    # context já contém memórias relevantes
-    return f"Resposta: {msg}"
-```
+Veja [mcp/README.md](../mcp/README.md) para documentação completa.
 
-### LangChain
+---
 
-```python
-from integrations.langchain import CortexLangChainMemory
+## Modelo W5H
 
-memory = CortexLangChainMemory(namespace="langchain_agent")
-chain = ConversationChain(llm=llm, memory=memory)
-```
+O Cortex extrai automaticamente:
 
-### CrewAI
+| Campo | Significado | Exemplo |
+|-------|-------------|---------|
+| WHO | Participantes | `["maria", "sistema"]` |
+| WHAT | O que aconteceu | `"resolveu erro de boleto"` |
+| WHY | Por que | `"boleto expirado"` |
+| WHEN | Quando | `timestamp` |
+| WHERE | Namespace | `"suporte:financeiro:maria"` |
+| HOW | Resultado | `"orientou a gerar novo"` |
 
-```python
-from integrations.crewai import CortexCrewAIMemory
+---
 
-crew = Crew(
-    agents=[...],
-    long_term_memory=CortexCrewAIMemory(namespace="crewai_agent")
-)
-```
+## 4 Dimensões de Valor
 
-Veja `sdk/python/README.md` para documentação completa.
+| Dimensão | Score | Exclusivo? |
+|----------|-------|------------|
+| 🧠 Cognição Biológica | 50% | ✅ |
+| 👥 Memória Coletiva | 75% | ✅ |
+| 🎯 Valor Semântico | 100% | Empata |
+| ⚡ Eficiência | 100% | ✅ |
+
+**Score Total: 83%** (vs 40% das alternativas)
+
+---
+
+*Veja também: [Quickstart](./getting-started/quickstart.md) | [Integrações](./getting-started/integrations.md)*

@@ -1,34 +1,72 @@
 # 📊 Benchmarks
 
 > Resultados empíricos e metodologia de avaliação.
+> *"Cortex, porque agentes inteligentes precisam de memória inteligente"*
 
 ---
 
-## Resumo Executivo - Paper Benchmark
+## Resumo Executivo - Benchmark Unificado
 
-O Cortex é avaliado em **5 categorias de valor**, não apenas eficiência operacional:
+O Cortex é avaliado em **4 dimensões de valor**, comparando com alternativas:
 
-| Categoria | Resultado | Descrição |
-|-----------|-----------|-----------|
-| **Acurácia Semântica** | **100%** | Encontra memória certa com termos diferentes |
-| **Recall Contextual** | **100%** | Lembra de fluxos/conversas anteriores |
-| **Memória Coletiva** | **75%** | Compartilha conhecimento entre usuários |
-| **Relevância** | **67%** | Retorna só informação útil (não ruído) |
-| **Eficiência** | **100%** | Latência <500ms, contexto compacto |
+| Dimensão | Baseline | RAG | Mem0 | **Cortex** |
+|----------|----------|-----|------|------------|
+| **Cognição Biológica** | 0% | 0% | 0% | **50%** |
+| **Memória Coletiva** | 0% | 0% | 0% | **75%** |
+| **Valor Semântico** | 50% | 100% | 100% | **100%** |
+| **Eficiência** | 0% | 0% | 0% | **100%** |
+| **TOTAL** | 20% | 40% | 40% | **83%** |
 
-**Resultado Geral: 91.7%** (22/24 testes)
+🏆 **Cortex supera melhor alternativa em +43.3%**
 
-### Eficiência Operacional
+### O Que Cada Dimensão Mede
 
-| Métrica | Valor |
-|---------|-------|
-| **Latência média** | 42ms |
-| **Tokens no contexto** | Compacto |
-| **Modelo de embedding** | qwen3-embedding:0.6b |
+| Dimensão | Descrição |
+|----------|-----------|
+| **Cognição Biológica** | Decay (Ebbinghaus), consolidação de similares, hub detection |
+| **Memória Coletiva** | Compartilhamento hierárquico, isolamento de tenants |
+| **Valor Semântico** | Acurácia com sinônimos, relevância (filtra ruído) |
+| **Eficiência** | Latência <100ms, tokens compactos |
+
+### Por Que Cortex Vence
+
+1. **Única solução com cognição biológica** - RAG e Mem0 não esquecem, não consolidam
+2. **Única solução com memória coletiva** - Baseline, RAG e Mem0 são single-tenant
+3. **Valor semântico igual às melhores** - Threshold adaptativo iguala precisão
+4. **Eficiência exclusiva** - Formato W5H é mais compacto que texto livre
 
 ```bash
-# Rodar benchmark
+# Rodar benchmark unificado (padrão)
+./start_benchmark.sh
+
+# Ou benchmark isolado do Cortex
 ./start_benchmark.sh --paper
+```
+
+---
+
+## Estratégia de Busca Semântica
+
+O Cortex usa **threshold adaptativo** para garantir alta precisão:
+
+1. **Threshold base**: 0.55 de similaridade cosseno
+2. **Gap analysis**: Se o melhor resultado é significativamente melhor que os outros, aceita
+3. **Uniformity check**: Se todos os scores são muito próximos (std < 0.05), provavelmente são ruído
+
+```python
+# Pseudocódigo da estratégia adaptativa
+if best_score >= 0.75:
+    # Score muito alto = confiança total
+    accept(best_only)
+elif std(scores) < 0.05 and best_score < 0.65:
+    # Scores uniformes e baixos = ruído
+    reject_all()
+elif gap(best, avg_others) > 0.10:
+    # Gap significativo = melhor é relevante
+    accept(threshold=best - 0.12)
+else:
+    # Sem padrão claro = threshold conservador
+    accept(threshold=0.60)
 ```
 
 ---

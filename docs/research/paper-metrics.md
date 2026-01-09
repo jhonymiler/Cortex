@@ -1,14 +1,37 @@
 # 📊 Métricas para Paper Acadêmico
 
-> Documentação das métricas coletadas pelo Cortex Paper Benchmark
+> *"Cortex, porque agentes inteligentes precisam de memória inteligente"*
 
 ---
 
-## Categorias de Avaliação
+## As 4 Dimensões de Valor
 
-O Cortex é avaliado em **5 categorias** que demonstram o **valor real** do sistema, não apenas eficiência operacional:
+O Cortex é avaliado em **4 dimensões** que demonstram o **valor real** do sistema:
 
-### 1. Acurácia Semântica (100%)
+| Dimensão | O Que Mede | Por Que Importa | Score |
+|----------|------------|-----------------|-------|
+| 🧠 **Cognição Biológica** | Decay, consolidação, hubs | Apenas Cortex esquece e aprende | 50% |
+| 👥 **Memória Coletiva** | Herança hierárquica, isolamento | Apenas Cortex é multi-tenant | 75% |
+| 🎯 **Valor Semântico** | Sinônimos, threshold adaptativo | Encontra o que importa | 100% |
+| ⚡ **Eficiência** | Latência <100ms, tokens compactos | Menor custo, maior velocidade | 100% |
+
+### Resultado Comparativo (Janeiro 2026)
+
+| Dimensão | Baseline | RAG | Mem0 | **Cortex** |
+|----------|----------|-----|------|------------|
+| Cognição Biológica | 0% | 0% | 0% | **50%** |
+| Memória Coletiva | 0% | 0% | 0% | **75%** |
+| Valor Semântico | 50% | 100% | 100% | **100%** |
+| Eficiência | 0% | 0% | 0% | **100%** |
+| **TOTAL** | **20%** | **40%** | **40%** | **83%** |
+
+🏆 **Cortex supera a melhor alternativa em +43.3%**
+
+---
+
+## Detalhamento por Dimensão
+
+### 1. 🧠 Cognição Biológica (50%)
 
 **O que mede**: Capacidade de encontrar a memória correta usando **termos diferentes** dos originais.
 
@@ -125,18 +148,20 @@ suporte (pai - LEARNED)
 
 ## Comparativo com Sistemas Tradicionais
 
-| Aspecto | RAG | Mem0 | Cortex |
-|---------|-----|------|--------|
-| **Busca** | Similaridade vetorial | Salience extraction | Embedding semântico |
-| **Acurácia semântica** | ~70% | ~75% | **100%** |
-| **Memória coletiva** | ❌ | ❌ | **✅** |
-| **Isolamento** | Manual | Manual | **Hierárquico** |
-| **Decaimento** | ❌ | ❌ | **Ebbinghaus** |
-| **Consolidação** | ❌ | ❌ | **DreamAgent** |
+| Aspecto | Baseline | RAG | Mem0 | Cortex |
+|---------|----------|-----|------|--------|
+| **Score Total** | 20% | 40% | 40% | **83%** |
+| **Cognição Biológica** | ❌ | ❌ | ❌ | **✅** |
+| **Memória Coletiva** | ❌ | ❌ | ❌ | **✅** |
+| **Valor Semântico** | 50% | 100% | 100% | **100%** |
+| **Eficiência** | ❌ | ❌ | ❌ | **✅** |
+| **Decaimento** | ❌ | ❌ | ❌ | **Ebbinghaus** |
+| **Consolidação** | ❌ | ❌ | ❌ | **DreamAgent** |
+| **Isolamento** | ❌ | Manual | Manual | **Hierárquico** |
 
 ---
 
-## Vantagens do Cortex
+## Vantagens Exclusivas do Cortex
 
 ### 1. Embedding Semântico
 - Usa modelos de embedding especializados (qwen3-embedding)

@@ -1,98 +1,89 @@
-# Cortex Benchmark
+# 📊 Cortex Benchmark
 
-Benchmark focado em **VALOR**, não apenas métricas brutas.
+> *"Porque agentes inteligentes precisam de memória inteligente"*
 
-## Filosofia
+## Visão Geral
 
-Este benchmark avalia a **qualidade da informação recuperada**, não apenas velocidade ou tokens.
-O Cortex não compete em quantidade, compete em **inteligência da memória**.
+Este benchmark mede o **valor real** do Cortex comparando com alternativas (Baseline, RAG, Mem0).
 
-## Métricas de VALOR (foco principal)
+### 4 Dimensões de Valor
 
-| Métrica | O que mede |
-|---------|------------|
-| **Acurácia Semântica** | Encontra memória certa com termos diferentes |
-| **Recall Contextual** | Lembra de fluxos anteriores |
-| **Memória Coletiva** | Compartilha conhecimento útil entre usuários |
-| **Relevância** | Retorna informação útil, não ruído |
+| Dimensão | O que mede | Por que importa |
+|----------|-----------|-----------------|
+| **Cognição Biológica** | Decay, consolidação, hubs | Só Cortex esquece e aprende |
+| **Memória Coletiva** | Compartilhamento, isolamento | Só Cortex é multi-tenant |
+| **Valor Semântico** | Acurácia, relevância | Encontra o que importa |
+| **Eficiência** | Latência, tokens | Menos custo, mais valor |
 
-## Métricas de Eficiência (secundárias)
-
-| Métrica | Descrição |
-|---------|-----------|
-| Latência | Tempo de resposta (ms) |
-| Tokens | Tamanho do contexto injetado |
-
-## Benchmarks Disponíveis
-
-### 1. Paper Benchmark (padrão)
-Avalia o Cortex isoladamente com métricas completas para publicação.
+## Uso Rápido
 
 ```bash
+# Benchmark unificado (recomendado)
 ./start_benchmark.sh
-# ou
+
+# Ou diretamente
+python -m benchmark.unified_benchmark
+
+# Apenas métricas do Cortex (para paper)
 ./start_benchmark.sh --paper
 ```
 
-### 2. Comparison Benchmark
-Compara Cortex vs Baseline vs RAG vs Mem0.
+## Resultados Atuais
 
-```bash
-./start_benchmark.sh --compare
-```
+| Dimensão | Baseline | RAG | Mem0 | **Cortex** |
+|----------|----------|-----|------|------------|
+| Cognição Biológica | 0% | 0% | 0% | **50%** |
+| Memória Coletiva | 0% | 0% | 0% | **75%** |
+| Valor Semântico | 50% | 100% | 100% | **100%** |
+| Eficiência | 0% | 0% | 0% | **100%** |
+| **TOTAL** | 20% | 40% | 40% | **83%** |
 
-## Estrutura
+🏆 **Cortex supera melhor alternativa em +43.3%**
 
-```
-benchmark/
-├── paper_benchmark.py       # Benchmark para paper acadêmico
-├── comparison_benchmark.py  # Comparativo Cortex vs RAG vs Mem0
-├── agents.py                # Implementação dos agentes base
-├── cortex_agent.py          # Agente Cortex
-├── rag_agent.py             # Agente RAG (TF-IDF)
-├── mem0_agent.py            # Agente Mem0 (salience)
-├── conversation_generator.py # Gerador de cenários
-└── _old/                    # Arquivos obsoletos
-```
+## Arquivos
 
-## Resultados
-
-Os resultados são salvos em `benchmark_results/`:
-
-```
-benchmark_results/
-├── paper_benchmark_YYYYMMDD_HHMMSS.json
-└── comparison_YYYYMMDD_HHMMSS.json
-```
-
-## Análise
-
-Para analisar resultados existentes:
-
-```bash
-bash ./analyze_results.sh
-```
-
-## Diferenciais do Cortex
-
-1. **Busca Semântica**: 100% de acurácia com embeddings
-2. **Memória Contextual**: Lembra de fluxos completos
-3. **Conhecimento Coletivo**: Compartilha entre usuários do mesmo tenant
-4. **Isolamento**: Separação automática entre tenants (PII/PCI)
-5. **Consolidação**: Compacta memórias similares automaticamente
-
-## Requisitos
-
-- Python 3.11+
-- Ollama com modelo qwen3-embedding:0.6b
-- API Cortex rodando
+| Arquivo | Descrição |
+|---------|-----------|
+| `unified_benchmark.py` | Benchmark principal com 4 dimensões |
+| `paper_benchmark.py` | Benchmark isolado para métricas acadêmicas |
+| `agents.py` | Agentes de comparação (Baseline, Cortex) |
+| `cortex_agent.py` | Implementação do agente Cortex |
+| `rag_agent.py` | Baseline RAG (TF-IDF) |
+| `mem0_agent.py` | Baseline Mem0 |
 
 ## Configuração
 
-Variáveis de ambiente (`.env`):
+```bash
+# Variáveis de ambiente
+export OLLAMA_URL=http://localhost:11434
+export OLLAMA_MODEL=gemma3:4b
+export CORTEX_EMBEDDING_MODEL=qwen3-embedding:0.6b
+```
 
-```ini
-OLLAMA_URL=http://localhost:11434
-CORTEX_API_URL=http://localhost:8000
-CORTEX_EMBEDDING_MODEL=qwen3-embedding:0.6b
+## Interpretação dos Resultados
+
+### Cognição Biológica
+- **100%**: Hub detection + consolidação funcionando
+- **50%**: Apenas um dos dois funcionando
+- **0%**: Sistema não implementa cognição biológica
+
+### Memória Coletiva
+- **100%**: Herança de namespace + isolamento perfeitos
+- **75%**: Maioria dos testes passando
+- **0%**: Sistema é single-tenant
+
+### Valor Semântico
+- **100%**: Encontra memória correta com sinônimos + filtra ruído
+- **50%**: Só acerta com termos exatos
+
+### Eficiência
+- **100%**: Latência <100ms + tokens compactos
+- **0%**: Não otimizado
+
+## Resultados são salvos em
+
+```
+benchmark/results/
+├── unified_YYYYMMDD_HHMMSS.json
+└── paper_YYYYMMDD_HHMMSS.json
 ```

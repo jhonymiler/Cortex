@@ -71,9 +71,9 @@ dev = [
 ]
 
 [project.scripts]
-cortex-mcp = "cortex.mcp.server:main"
 cortex-api = "cortex.api.app:main"
 cortex-ui = "cortex.ui:main"
+# MCP é projeto separado em /mcp - instale com: cd mcp && pip install -e .
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cortex"]

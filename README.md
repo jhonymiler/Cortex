@@ -37,21 +37,25 @@ def agent(msg, context=""):
 
 ---
 
-## 📊 Resultados (Paper Benchmark)
+## 📊 Resultados (Benchmark Unificado)
 
-| Métrica | Resultado |
-|---------|-----------|
-| **Acurácia Semântica** | **100%** |
-| **Recall Contextual** | **100%** |
-| **Memória Coletiva** | **75%** |
-| **Relevância** | **67%** |
-| **Latência Média** | **42ms** |
-| **GERAL** | **91.7%** |
+| Dimensão | Baseline | RAG | Mem0 | **Cortex** |
+|----------|----------|-----|------|------------|
+| Cognição Biológica | 0% | 0% | 0% | **50%** |
+| Memória Coletiva | 0% | 0% | 0% | **75%** |
+| Valor Semântico | 50% | 100% | 100% | **100%** |
+| Eficiência | 0% | 0% | 0% | **100%** |
+| **TOTAL** | 20% | 40% | 40% | **83%** |
+
+🏆 **Cortex supera melhor alternativa em +43.3%**
 
 ```bash
 # Rodar benchmark
-./start_benchmark.sh --paper
+./start_benchmark.sh
 ```
+
+> O benchmark mede 4 dimensões de valor que nenhuma alternativa suporta:
+> cognição biológica, memória coletiva, valor semântico e eficiência.
 
 [→ Ver benchmark completo](docs/research/benchmarks.md)
 

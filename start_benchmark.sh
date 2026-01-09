@@ -1,11 +1,18 @@
 #!/bin/bash
 # Script para executar benchmark do Cortex
-# Foco em VALOR (qualidade) não apenas velocidade/tokens
+# "Porque agentes inteligentes precisam de memória inteligente"
+#
+# Mede o VALOR REAL do sistema em 4 dimensões:
+# 1. Cognição Biológica (decay, consolidação, hubs)
+# 2. Memória Coletiva (compartilhamento, isolamento)
+# 3. Valor Semântico (acurácia, relevância)
+# 4. Eficiência (latência, tokens)
 
 set -e
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🎯 CORTEX BENCHMARK"
+echo "🧠 CORTEX BENCHMARK"
+echo "   \"Porque agentes inteligentes precisam de memória inteligente\""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # === CONFIGURAÇÃO ===
@@ -96,48 +103,59 @@ clean_benchmark_data() {
     rm -rf "$CORTEX_DATA_DIR/paper_bench*" 2>/dev/null || true
 }
 
-run_paper_benchmark() {
+run_unified_benchmark() {
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📊 BENCHMARK PARA PAPER (Cortex isolado)"
-    echo "   Métricas completas para publicação acadêmica"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo ""
-    
-    python benchmark/paper_benchmark.py --save
-    
-    # Executa análise automática
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📊 ANÁLISE DE RESULTADOS"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    bash ./analyze_results.sh
-}
-
-run_comparison_benchmark() {
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📊 BENCHMARK COMPARATIVO"
+    echo "📊 BENCHMARK UNIFICADO (4 Dimensões de Valor)"
     echo "   Cortex vs Baseline vs RAG vs Mem0"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
     
-    python benchmark/comparison_benchmark.py --save
+    python -m benchmark.unified_benchmark --save
+}
+
+run_paper_benchmark() {
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📊 BENCHMARK PAPER (Cortex isolado)"
+    echo "   Métricas para publicação acadêmica"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    
+    python -m benchmark.paper_benchmark --save
+    
+    # Executa análise automática
+    if [ -f "./analyze_results.sh" ]; then
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "📊 ANÁLISE DE RESULTADOS"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        bash ./analyze_results.sh
+    fi
 }
 
 show_help() {
     echo "Uso: ./start_benchmark.sh [COMANDO]"
     echo ""
+    echo "🧠 Cortex Benchmark - Mede o valor real do sistema de memória cognitiva"
+    echo ""
     echo "Comandos:"
-    echo "  (sem args)       Benchmark para paper (padrão)"
-    echo "  --paper          Benchmark completo para paper acadêmico"
-    echo "  --compare        Benchmark comparativo (Cortex vs RAG vs Mem0)"
+    echo "  (sem args)       Benchmark unificado (padrão) - 4 dimensões de valor"
+    echo "  --unified        Benchmark unificado (Cortex vs RAG vs Mem0 vs Baseline)"
+    echo "  --paper          Benchmark para paper acadêmico (Cortex isolado)"
+    echo "  --compare        Alias para --unified"
     echo "  --api-only       Apenas inicia a API"
     echo "  --stop           Para a API"
     echo ""
+    echo "Dimensões de Valor medidas:"
+    echo "  1. Cognição Biológica  - Decay, consolidação, hubs"
+    echo "  2. Memória Coletiva    - Compartilhamento, isolamento"
+    echo "  3. Valor Semântico     - Acurácia, relevância"
+    echo "  4. Eficiência          - Latência, tokens"
+    echo ""
     echo "Exemplos:"
-    echo "  ./start_benchmark.sh              # Benchmark para paper"
-    echo "  ./start_benchmark.sh --compare    # Compara com RAG/Mem0"
+    echo "  ./start_benchmark.sh              # Benchmark unificado completo"
+    echo "  ./start_benchmark.sh --paper      # Só métricas do Cortex"
     echo "  ./start_benchmark.sh --api-only   # Só inicia API"
 }
 
@@ -166,20 +184,28 @@ case "${1:-}" in
         echo "API rodando. Use './start_benchmark.sh --stop' para parar."
         exit 0
         ;;
-    --compare)
+    --compare|--unified)
         check_ollama || exit 1
         check_embedding_model
         start_api || exit 1
         clean_benchmark_data
-        run_comparison_benchmark
+        run_unified_benchmark
         stop_api
         ;;
-    --paper|"")
+    --paper)
         check_ollama || exit 1
         check_embedding_model
         start_api || exit 1
         clean_benchmark_data
         run_paper_benchmark
+        stop_api
+        ;;
+    "")
+        check_ollama || exit 1
+        check_embedding_model
+        start_api || exit 1
+        clean_benchmark_data
+        run_unified_benchmark
         stop_api
         ;;
     *)

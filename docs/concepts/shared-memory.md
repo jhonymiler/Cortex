@@ -5,6 +5,21 @@
 
 ---
 
+## Por Que Isso Importa
+
+A **Memória Coletiva** é uma das [4 dimensões de valor](../research/benchmarks.md) do Cortex:
+
+| Dimensão | Score | Cortex é Único? |
+|----------|-------|-----------------|
+| 🧠 Cognição Biológica | 50% | ✅ Exclusivo |
+| 👥 **Memória Coletiva** | **75%** | ✅ **Exclusivo** |
+| 🎯 Valor Semântico | 100% | Empata |
+| ⚡ Eficiência | 100% | ✅ Exclusivo |
+
+**Nenhum concorrente** (Baseline, RAG, Mem0) oferece memória coletiva com isolamento.
+
+---
+
 ## O Problema
 
 Agentes que atendem **múltiplos usuários** enfrentam um dilema:

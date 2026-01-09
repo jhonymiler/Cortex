@@ -21,7 +21,8 @@ import requests
 
 
 # Configurações
-OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://172.30.64.1:11434")
+# Prioriza OLLAMA_URL, depois OLLAMA_BASE_URL, depois fallback
+OLLAMA_URL = os.getenv("OLLAMA_URL") or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 EMBEDDING_MODEL = os.getenv("CORTEX_EMBEDDING_MODEL", "qwen3-embedding:0.6b")
 EMBEDDING_DIMENSIONS = 1024  # qwen3-embedding usa 1024 dimensões
 EMBEDDING_CACHE_SIZE = 1000  # Máximo de embeddings em cache

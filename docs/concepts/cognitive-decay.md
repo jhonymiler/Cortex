@@ -5,6 +5,21 @@
 
 ---
 
+## Por Que Isso Importa
+
+A **Cognição Biológica** é uma das [4 dimensões de valor](../research/benchmarks.md) do Cortex:
+
+| Dimensão | Score | Cortex é Único? |
+|----------|-------|-----------------|
+| 🧠 **Cognição Biológica** | **50%** | ✅ **Exclusivo** |
+| 👥 Memória Coletiva | 75% | ✅ Exclusivo |
+| 🎯 Valor Semântico | 100% | Empata |
+| ⚡ Eficiência | 100% | ✅ Exclusivo |
+
+**Nenhum concorrente** (Baseline, RAG, Mem0) implementa decaimento ou consolidação.
+
+---
+
 ## Fundamento Científico
 
 O Cortex implementa decaimento de memória baseado na **Curva de Esquecimento de Ebbinghaus** (1885), uma das descobertas mais replicadas da psicologia cognitiva.

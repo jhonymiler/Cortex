@@ -373,13 +373,18 @@ class MemoryService:
         IMPORTANTE: Filtra por namespace e owner_id para evitar vazamento
         de memórias entre usuários/contextos diferentes.
         
+        ESTRATÉGIA DE THRESHOLD ADAPTATIVO:
+        - Threshold base: 0.65 (alto para evitar falsos positivos)
+        - Se há um candidato claramente melhor (gap > 0.15), aceita
+        - Se todos os scores são similares (std < 0.05), rejeita todos
+        
         Args:
             query: Query de busca
             limit: Máximo de episódios a retornar
             exclude_ids: IDs de episódios para excluir
             min_similarity: Similaridade mínima (0.0 a 1.0)
-            namespace: Namespace para filtrar (metadata["namespace"] ou metadata["where"])
-            owner_id: Owner/user_id para filtrar (metadata["owner_id"] ou participants)
+            namespace: Namespace para filtrar
+            owner_id: Owner/user_id para filtrar
             
         Returns:
             Lista de episódios ordenados por similaridade
@@ -394,8 +399,8 @@ class MemoryService:
             if not query_result:
                 return []
             
-            # Busca episódios com embedding E FILTROS DE ISOLAMENTO
-            candidates: list[tuple[Episode, float]] = []
+            # Coleta TODOS os candidatos com seus scores (sem filtro inicial)
+            all_candidates: list[tuple[Episode, float]] = []
             
             for ep_id, ep in self.graph._episodes.items():
                 if ep_id in exclude_ids:
@@ -404,40 +409,78 @@ class MemoryService:
                 if not ep.embedding:
                     continue
                 
-                # FILTRO 1: Namespace - episódio deve pertencer ao mesmo namespace
+                # FILTRO 1: Namespace
                 if namespace:
                     ep_namespace = ep.metadata.get("namespace") or ep.metadata.get("where")
                     if ep_namespace and ep_namespace != namespace:
                         continue
                 
-                # FILTRO 2: Owner/User - episódio deve pertencer ao mesmo owner
-                # Verifica metadata["owner_id"] ou participants
+                # FILTRO 2: Owner/User
                 if owner_id:
                     ep_owner = ep.metadata.get("owner_id", "")
                     ep_who = ep.metadata.get("w5h", {}).get("who", [])
-                    
-                    # Permite se:
-                    # - owner_id está em participants (IDs de entidades)
-                    # - owner_id está em metadata["owner_id"]
-                    # - owner_id está em w5h["who"] (nomes)
                     owner_match = (
                         owner_id in ep.participants or
                         owner_id == ep_owner or
                         owner_id in str(ep_who)
                     )
-                    
                     if not owner_match:
                         continue
                 
                 # Calcula similaridade
                 sim = cosine_similarity(query_result.vector, ep.embedding)
-                if sim >= min_similarity:
-                    candidates.append((ep, sim))
+                all_candidates.append((ep, sim))
             
-            # Ordena por similaridade
-            candidates.sort(key=lambda x: x[1], reverse=True)
+            if not all_candidates:
+                return []
             
-            return [ep for ep, _ in candidates[:limit]]
+            # Ordena por similaridade (maior primeiro)
+            all_candidates.sort(key=lambda x: x[1], reverse=True)
+            
+            # ESTRATÉGIA ADAPTATIVA:
+            # 1. Se melhor score é alto (> 0.75), aceita independente de outros
+            # 2. Gap analysis: se melhor candidato é significativamente melhor, aceita
+            # 3. Uniformity check: se TODOS são muito similares E baixos, rejeita
+            
+            scores = [s for _, s in all_candidates]
+            best_score = scores[0]
+            
+            # Se melhor score é muito baixo, rejeita tudo
+            if best_score < 0.50:
+                return []
+            
+            # Se melhor score é muito alto, aceita sem análise adicional
+            if best_score >= 0.75:
+                return [ep for ep, _ in all_candidates if ep == all_candidates[0][0]][:limit]
+            
+            # Calcula gap entre melhor e média dos outros
+            if len(scores) > 1:
+                avg_others = sum(scores[1:]) / len(scores[1:])
+                gap = best_score - avg_others
+                
+                # Se todos os scores são MUITO próximos (std < 0.05) E scores baixos
+                # provavelmente a query não é específica para nenhuma memória
+                import statistics
+                if len(scores) >= 2:
+                    std = statistics.stdev(scores)
+                    # Só rejeita se std muito baixo E score não é bom
+                    if std < 0.05 and best_score < 0.65:
+                        return []
+                
+                # Se há um gap significativo, o melhor é provavelmente relevante
+                if gap > 0.10:
+                    # Aceita candidatos com score >= (best - 0.12)
+                    threshold = max(best_score - 0.12, min_similarity)
+                else:
+                    # Sem gap claro, usa threshold mais alto
+                    threshold = max(0.60, min_similarity)
+            else:
+                threshold = min_similarity
+            
+            # Filtra por threshold
+            filtered = [(ep, sim) for ep, sim in all_candidates if sim >= threshold]
+            
+            return [ep for ep, _ in filtered[:limit]]
             
         except Exception:
             # Falha silenciosa - embedding é opcional
@@ -485,13 +528,12 @@ class MemoryService:
         owner_id = who_filter[0] if who_filter else request.context.get("user_id")
         
         # 1. BUSCA POR EMBEDDING (principal - alta acurácia)
-        # Usa embeddings para busca semântica de alta qualidade
+        # Usa embeddings para busca semântica com threshold adaptativo
         # CORREÇÃO: Passa namespace e owner_id para filtrar corretamente
-        # Threshold de 0.35 equilibra recall e precisão (testado com qwen3-embedding)
         episodes = self._recall_by_embedding(
             query=request.query,
             limit=request.limit,
-            min_similarity=0.35,  # Threshold balanceado para recall
+            min_similarity=0.55,  # Threshold base (adaptativo interno é mais alto)
             namespace=request.namespace,
             owner_id=owner_id,
         )
@@ -588,49 +630,47 @@ class MemoryService:
         """
         Avalia se o resultado do recall é relevante o suficiente para retornar.
         
-        Critérios:
-        1. Se não há episódios nem entidades úteis → não relevante
-        2. Se a query não tem overlap significativo com as memórias → não relevante
-        3. Se só há memórias genéricas/noise → não relevante
+        IMPORTANTE: Esta função NÃO re-avalia episódios encontrados por embedding.
+        Episódios que chegaram via embedding já passaram pelo threshold de 
+        similaridade (0.35) e são considerados semanticamente relevantes.
+        
+        A avaliação por tokens só é usada para:
+        1. Casos onde não há episódios (apenas entidades)
+        2. Queries conversacionais ("Você lembra de mim?")
         
         Args:
             query: Query original
             result: Resultado do recall
-            min_relevance: Threshold mínimo de relevância (default: 0.35)
+            min_relevance: Threshold mínimo para entidades-only
             
         Returns:
             Dict com should_include (bool) e score (float)
         """
-        from cortex.core.language import tokenize_to_set
-        
         # Caso trivial: sem resultados
         if not result.episodes and not result.entities:
             return {"should_include": False, "score": 0.0, "reason": "no_results"}
         
+        # REGRA 1: Se há episódios, eles vieram de embedding e já são relevantes
+        # O embedding com threshold 0.35 já filtrou por similaridade semântica
+        if result.episodes:
+            # Confiamos no resultado do embedding
+            return {
+                "should_include": True, 
+                "score": 1.0, 
+                "reason": "embedding_match",
+                "episode_count": len(result.episodes),
+            }
+        
+        # REGRA 2: Se só há entidades (sem episódios), avalia relevância por tokens
+        # Isso cobre casos conversacionais como "Você lembra do João?"
+        from cortex.core.language import tokenize_to_set
+        
         query_tokens = tokenize_to_set(query.lower())
         if not query_tokens:
-            # Query vazia ou só stopwords → retorna tudo que tiver
+            # Query vazia ou só stopwords → retorna entidades conhecidas
             return {"should_include": True, "score": 0.5, "reason": "empty_query"}
         
         scores = []
-        
-        # Avalia relevância dos episódios
-        for ep in result.episodes:
-            ep_text = f"{ep.action} {ep.outcome} {ep.context}".lower()
-            ep_tokens = tokenize_to_set(ep_text)
-            
-            if ep_tokens:
-                overlap = len(query_tokens & ep_tokens) / len(query_tokens)
-                
-                # Boost para memórias consolidadas/importantes
-                if ep.is_consolidated or ep.importance > 0.7:
-                    overlap *= 1.3
-                
-                # Boost para memórias LEARNED (coletivas)
-                if ep.metadata.get("visibility") == "learned":
-                    overlap *= 1.2
-                
-                scores.append(min(overlap, 1.0))
         
         # Avalia relevância das entidades (participantes)
         has_known_entities = False
@@ -640,38 +680,29 @@ class MemoryService:
             
             if entity_tokens:
                 overlap = len(query_tokens & entity_tokens) / len(query_tokens)
-                scores.append(min(overlap * 0.5, 0.5))
+                scores.append(min(overlap * 0.8, 0.8))
             
-            # IMPORTANTE: Entidades com access_count > 0 indicam contexto relevante
-            # mesmo que a query seja conversacional ("Você lembra de mim?")
+            # Entidades com access_count > 0 indicam contexto relevante
             if hasattr(entity, 'access_count') and entity.access_count > 0:
                 has_known_entities = True
         
-        # Se há entidades conhecidas, garantir retorno mesmo sem overlap
+        # Se há entidades conhecidas, garantir retorno para contexto conversacional
         if has_known_entities:
-            # Score mínimo garantido para entidades conhecidas
-            scores.append(0.25)
+            scores.append(0.3)
         
         if not scores:
             return {"should_include": False, "score": 0.0, "reason": "no_scorable_items"}
         
-        # Usa o melhor score (não média, pois uma boa memória é suficiente)
-        best_score = max(scores)
-        avg_score = sum(scores) / len(scores)
-        
-        # Combinação: 70% melhor, 30% média
-        final_score = (best_score * 0.7) + (avg_score * 0.3)
-        
+        final_score = max(scores)
         should_include = final_score >= min_relevance
         
         return {
             "should_include": should_include,
             "score": round(final_score, 3),
-            "best_score": round(best_score, 3),
-            "avg_score": round(avg_score, 3),
-            "items_evaluated": len(scores),
+            "entity_count": len(result.entities),
+            "has_known_entities": has_known_entities,
             "threshold": min_relevance,
-            "reason": "relevant" if should_include else "below_threshold",
+            "reason": "entity_relevance" if should_include else "below_threshold",
         }
     
     def _recall_from_parent_namespaces(

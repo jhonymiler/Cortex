@@ -58,7 +58,7 @@ from mem0_agent import Mem0Agent
 # ==================== CONFIGURAÇÃO ====================
 
 CORTEX_URL = os.getenv("CORTEX_API_URL", "http://localhost:8000")
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://172.30.64.1:11434")
+OLLAMA_URL = os.getenv("OLLAMA_URL", "https://c84231491772.ngrok-free.app")
 OUTPUT_DIR = Path("./benchmark_results")
 
 

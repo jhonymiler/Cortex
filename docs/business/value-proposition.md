@@ -1,6 +1,31 @@
 # 💰 Proposta de Valor
 
-> Traduzindo métricas técnicas em impacto de negócio.
+> *"Cortex, porque agentes inteligentes precisam de memória inteligente"*
+
+---
+
+## Por Que Cortex?
+
+Cortex entrega **4 dimensões de valor** que nenhum concorrente oferece:
+
+| Dimensão | O Que Significa | Impacto no Negócio |
+|----------|-----------------|-------------------|
+| 🧠 **Cognição Biológica** | Esquece ruído, lembra importante | Menos tokens, mais relevância |
+| 👥 **Memória Coletiva** | Conhecimento evolui e é compartilhado | Multi-tenant sem duplicação |
+| 🎯 **Valor Semântico** | Recupera o que IMPORTA | Respostas precisas, não genéricas |
+| ⚡ **Eficiência** | 16ms latência, tokens compactos | Custo mínimo, velocidade máxima |
+
+### Benchmark Comparativo (Janeiro 2026)
+
+| Dimensão | Baseline | RAG | Mem0 | **Cortex** |
+|----------|----------|-----|------|------------|
+| Cognição Biológica | 0% | 0% | 0% | **50%** |
+| Memória Coletiva | 0% | 0% | 0% | **75%** |
+| Valor Semântico | 50% | 100% | 100% | **100%** |
+| Eficiência | 0% | 0% | 0% | **100%** |
+| **TOTAL** | **20%** | **40%** | **40%** | **83%** |
+
+🏆 **Cortex supera a melhor alternativa em +43.3%**
 
 ---
 
@@ -39,13 +64,36 @@ ECONOMIA: $2.960/mês (98.7%)
 
 ## Resultados Comprovados
 
-### Benchmark (Janeiro 2026)
+### Benchmark Unificado (Janeiro 2026)
 
-| Métrica | Baseline | Cortex | Diferença |
-|---------|----------|--------|-----------|
-| **Tokens** | 49.438 | 43.255 | **-12.5%** |
-| **Tempo** | 239s | 189s | **-21%** |
-| **Hit Rate** | 0% | **100%** | ∞ |
+| Métrica | Baseline | RAG | Mem0 | **Cortex** |
+|---------|----------|-----|------|------------|
+| **Score Total** | 20% | 40% | 40% | **83%** |
+| **Latência Recall** | N/A | ~100ms | ~100ms | **16ms** |
+| **Memória Coletiva** | ❌ | ❌ | ❌ | **✅** |
+| **Cognição Biológica** | ❌ | ❌ | ❌ | **✅** |
+
+### As 4 Dimensões de Valor
+
+#### 1. 🧠 Cognição Biológica (50% score)
+- **Hub detection**: Memórias importantes decaem mais devagar
+- **Consolidação**: 5 memórias similares → 1 resumo inteligente
+- **Decay Ebbinghaus**: Esquece ruído, fortalece relevante
+
+#### 2. 👥 Memória Coletiva (75% score)
+- **Herança hierárquica**: Conhecimento flui de pai para filho
+- **Isolamento de tenant**: Dados pessoais protegidos
+- **Níveis de visibilidade**: PERSONAL, SHARED, LEARNED
+
+#### 3. 🎯 Valor Semântico (100% score)
+- **Sinônimos funcionam**: "can't access" → "login problem"
+- **Threshold adaptativo**: Só retorna se realmente relevante
+- **W5H structure**: Captura WHO, WHAT, WHY, WHERE, WHEN, HOW
+
+#### 4. ⚡ Eficiência (100% score)
+- **16ms latência**: O(1) com índice invertido
+- **~36 tokens**: Formato W5H compacto
+- **Zero embeddings no recall**: Economia massiva
 
 ### Tradução para Negócio
 

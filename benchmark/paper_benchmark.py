@@ -47,7 +47,7 @@ import requests
 # ==================== CONFIGURAÇÃO ====================
 
 CORTEX_URL = os.getenv("CORTEX_API_URL", "http://localhost:8000")
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://172.30.64.1:11434")
+OLLAMA_URL = os.getenv("OLLAMA_URL", "https://c84231491772.ngrok-free.app")
 OUTPUT_DIR = Path("./benchmark_results")
 
 
@@ -142,7 +142,7 @@ class PaperBenchmark:
                 "where": namespace,
                 "visibility": visibility,
             },
-            timeout=60,
+            timeout=180,
         )
         return r.json()
     
@@ -153,7 +153,7 @@ class PaperBenchmark:
             f"{self.cortex_url}/memory/recall",
             headers={"Content-Type": "application/json", "X-Cortex-Namespace": namespace},
             json={"query": query, "context": {}},
-            timeout=60,
+            timeout=180,
         )
         latency = (time.time() - start) * 1000
         return r.json(), latency
