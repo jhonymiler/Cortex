@@ -158,12 +158,18 @@ CORTEX:
 - Contexto que evolui
 
 **Melhor ainda: Use os dois juntos!**
+
+O RAG é, sem dúvida, a melhor solução para consultar bases de conhecimento estáticas. O Cortex não busca substituí-lo — pelo contrário, **ele o complementa** gerenciando o contexto dinâmico da interação, que é onde o RAG não foi projetado para atuar.
+
 ```
 RAG → "O que diz a política de devolução?"
-      (busca no manual)
+      (busca no manual — RAG brilha aqui)
 
 Cortex → "O João já reclamou disso antes?"
-         (busca no histórico)
+         (busca no histórico — Cortex brilha aqui)
+
+COMBINAÇÃO → Prompt enriquecido com política + contexto pessoal
+             (a mágica acontece aqui)
 ```
 
 ---
@@ -198,7 +204,7 @@ Cortex → "O João já reclamou disso antes?"
 
 **O que é:** Sistema de memória para LLMs focado em "salience extraction".
 
-Esta é a comparação mais próxima — Mem0 também é focado em memória de agentes:
+Esta é a comparação mais próxima — Mem0 também é focado em memória de agentes. A diferença fundamental está nas **escolhas de design**:
 
 | Aspecto | Mem0 | Cortex |
 |---------|------|--------|
@@ -210,26 +216,32 @@ Esta é a comparação mais próxima — Mem0 também é focado em memória de a
 | **Open source** | Parcial | ✅ 100% MIT |
 | **Self-hosted** | Complexo | ✅ Simples |
 
+**Por que isso importa na prática:**
+
+A ausência de um mecanismo de esquecimento ativo no Mem0 (inspirado na curva de Ebbinghaus) significa que o **ruído se acumula ao longo do tempo**. Cada interação irrelevante permanece com o mesmo peso que informações críticas. O Cortex resolve isso em sua concepção, resultando em maior relevância e menor custo a longo prazo.
+
 **Benchmark comparativo:**
 
-| Dimensão | Mem0 | **Cortex** | Diferença |
-|----------|------|------------|-----------|
-| Cognição Biológica | 0% | **50%** | +50% |
-| Memória Coletiva | 0% | **75%** | +75% |
-| Valor Semântico | 100% | **100%** | 0% |
-| Eficiência | 0% | **100%** | +100% |
+| Dimensão | Mem0 | **Cortex** | Base Científica |
+|----------|------|------------|-----------------|
+| Cognição Biológica | 0%† | **50%** | Ebbinghaus + Tulving |
+| Memória Coletiva | 0%† | **75%** | Namespace hierarchy |
+| Valor Semântico | 100% | **100%** | Embedding similarity |
+| Eficiência | 0%† | **100%** | O(1) índice invertido |
 | **TOTAL** | **40%** | **83%** | **+43.3%** |
 
+**†** = Não é o foco do Mem0 (escolha de design, não limitação)
+
 **Quando usar Mem0:**
-- Projetos simples
+- Projetos simples com volume baixo
 - Não precisa de decay/consolidação
 - Não é multi-tenant
 
 **Quando usar Cortex:**
-- Produção enterprise
-- Multi-tenant com isolamento
-- Memória que evolui
-- Custo importa
+- Produção com volume crescente
+- Multi-tenant com isolamento real
+- Memória que precisa evoluir
+- Custo a longo prazo importa
 
 ---
 

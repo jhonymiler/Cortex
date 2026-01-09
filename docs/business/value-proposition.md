@@ -6,6 +6,19 @@
 
 ---
 
+## TL;DR — Por Que Cortex?
+
+| Problema | Como Cortex Resolve | Impacto |
+|----------|---------------------|---------|
+| Agente esquece tudo entre sessões | Memória persistente estruturada (W5H) | +224% conversão |
+| Contexto poluído com ruído | Decay Ebbinghaus remove o irrelevante | -98% tokens |
+| Conhecimento preso em silos | Memória coletiva (PERSONAL/SHARED/LEARNED) | -83% onboarding |
+| Agentes manipuláveis | Memory Firewall bloqueia ataques | 100% proteção |
+
+**Em uma frase:** Memória que evolui, não que acumula.
+
+---
+
 ## A Grande Ideia
 
 Imagine um mundo onde **cada interação com IA fica melhor que a anterior**.
@@ -47,22 +60,26 @@ O Cortex não é um banco de dados. É um **sistema cognitivo** que:
 
 ### 🧠 Lembra o Importante, Esquece o Ruído
 
-Como seu cérebro, o Cortex naturalmente fortalece memórias úteis e deixa o irrelevante desvanecer.
+Isso não é mágica — é a aplicação direta da **curva de esquecimento de Ebbinghaus (1885)**. Memórias não utilizadas perdem relevância exponencialmente (R = e^(-t/S)), garantindo que o contexto enviado ao LLM seja sempre denso em valor.
 
 ```
 Dia 1: "Cliente mencionou que mora em São Paulo"  → Armazena
-Dia 7: (não usado) → Perde relevância
+Dia 7: (não usado) → Perde relevância (Ebbinghaus)
 Dia 30: (nunca usado) → Praticamente esquecido
 
 Dia 1: "Cliente é alérgico a amendoim"  → Armazena
-Dia 7: Usado para sugerir receita → REFORÇA 2x
+Dia 7: Usado para sugerir receita → REFORÇA 2x (retenção ativa)
 Dia 30: Usado novamente → REFORÇA 4x
-Dia 365: Ainda lembra, porque é importante!
+Dia 365: Ainda lembra, porque foi reforçado!
 ```
+
+**É por isso que vemos economia de até 98% em tokens** — o ruído sai naturalmente, sem limpeza manual.
 
 ### 📚 Transforma Experiência em Conhecimento
 
-Depois de 100 atendimentos sobre "luz vermelha no modem", o Cortex consolida:
+Inspirado na teoria de **consolidação de Endel Tulving (1972)** — durante o sono, o cérebro reorganiza memórias episódicas em conhecimento semântico. O Cortex faz o equivalente digital:
+
+Depois de 100 atendimentos sobre "luz vermelha no modem", o DreamAgent consolida:
 
 ```
 ANTES: 100 memórias individuais
@@ -78,7 +95,7 @@ DEPOIS: 1 padrão aprendido
      → 10% precisa trocar equipamento"
 ```
 
-**Resultado:** O próximo atendente já sabe o que fazer.
+**Resultado:** Padrões emergem de experiências individuais — sem análise manual, sem treinamento.
 
 ### 👥 Aprende Coletivamente, Protege Individualmente
 
@@ -138,7 +155,7 @@ Resultado: A memória NUNCA é contaminada.
 - 🚫 Extração de system prompt
 - 🚫 E mais 6 categorias...
 
-> **Nenhum concorrente oferece proteção de memória.** Mem0, LangMem, Zep — todos permitem que ataques contaminem a memória do agente.
+> **Por que priorizamos isso:** A maioria dos sistemas de memória foca em retrieval — e fazem isso muito bem. O Cortex, por ser focado em agentes autônomos, precisa lidar com um risco adicional: manipulação de memória. A ausência de um mecanismo de proteção em sistemas como Mem0, LangMem e Zep significa que ataques podem contaminar a memória do agente permanentemente.
 
 ---
 

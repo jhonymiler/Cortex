@@ -6,6 +6,20 @@
 
 ---
 
+## TL;DR — Navegação Rápida
+
+| Seu cenário | Caso de uso | Ganho principal |
+|-------------|-------------|-----------------|
+| Vendas online | [E-commerce](#-e-commerce) | +224% conversão |
+| Central de atendimento | [Suporte Técnico](#-suporte-técnico) | -83% onboarding |
+| Ensino personalizado | [Educação](#-educação) | +156% retenção |
+| Agentes que trabalham juntos | [Multi-Agentes](#-sistemas-multi-agentes) | +300% eficiência |
+| Compliance e segurança | [Segurança](#-segurança-e-compliance) | 100% proteção |
+
+**Cada caso inclui:** problema, solução, métricas e evolução futura do agente.
+
+---
+
 ## Visão Geral
 
 O Cortex brilha onde **memória e personalização** são diferenciais competitivos:
@@ -198,6 +212,19 @@ Depois de milhares de interações:
 
 "PADRÃO: Abandono de carrinho
  → 50% volta se lembrar item
+```
+
+### 🔮 Evolução do Agente (Roadmap)
+
+O que você constrói hoje habilita o agente de amanhã:
+
+| Hoje (Era 2) | Amanhã (Era 4) |
+|--------------|----------------|
+| Lembra que João prefere tamanho 42 | Processa devolução automaticamente quando recebe 44 |
+| Sugere produtos baseado em histórico | Negocia melhor preço baseado em padrão de compra |
+| Identifica abandono de carrinho | Envia proposta personalizada no momento certo |
+
+**Os trilhos já estão sendo construídos** — cada memória armazenada hoje é insumo para a agência de amanhã.
  → 30% converte com desconto
  → Melhor momento: 2 dias depois"
 ```
@@ -350,6 +377,18 @@ Técnico: "Vamos reiniciar primeiro..."
 │                                                        │
 └────────────────────────────────────────────────────────┘
 ```
+
+### 🔮 Evolução do Agente (Roadmap)
+
+O que você constrói hoje habilita o agente de amanhã:
+
+| Hoje (Era 2) | Amanhã (Era 4) |
+|--------------|----------------|
+| Consolida padrões de 10k chamados | Executa diagnóstico automaticamente antes de escalar |
+| Identifica técnico especialista por área | Roteia chamado direto para quem resolve mais rápido |
+| Lembra histórico do cliente | Antecipa problema recorrente e liga proativamente |
+
+**Cada padrão consolidado hoje é conhecimento procedural amanhã.**
 
 ---
 
