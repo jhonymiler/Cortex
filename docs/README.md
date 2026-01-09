@@ -54,6 +54,7 @@ docs/
 │   └── benchmarks.md       # Resultados empíricos
 │
 ├── business/               # 💰 Stakeholders
+│   ├── project-analysis.md     # Análise completa do projeto
 │   ├── value-proposition.md    # ROI e impacto
 │   ├── competitive-position.md # vs RAG, VectorDB
 │   └── roadmap.md              # Eras estratégicas
@@ -83,6 +84,7 @@ Estes documentos são a **fonte única de verdade** (D.R.Y.):
 ## 🔗 Links Rápidos
 
 - [README principal](../README.md)
+- [Análise do Projeto](./business/project-analysis.md) ⭐ **Novo**
 - [API REST](./API.md)
 - [MCP Tools](./MCP.md)
 - [Benchmark](../benchmark/README.md)
