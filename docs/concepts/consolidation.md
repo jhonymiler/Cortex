@@ -1,7 +1,11 @@
-# 🔄 Consolidação Hierárquica
+# 🔄 Síntese Automática de Padrões
+*(Consolidação Hierárquica)*
 
-> **Documento Canônico** — Esta é a fonte única de verdade sobre consolidação de memórias.  
-> Outros documentos devem referenciar este arquivo em vez de duplicar explicações.
+> **A dor:** 100 atendimentos sobre o mesmo problema = 100 registros separados que ninguém analisa.
+> **A solução:** Cortex agrupa automaticamente experiências similares em insights acionáveis.
+> **O resultado:** Conhecimento que escala sem análise manual.
+
+*Documento Canônico — fonte única de verdade sobre consolidação de memórias.*
 
 ---
 

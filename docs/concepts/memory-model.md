@@ -1,7 +1,10 @@
 # 🧠 Modelo de Memória W5H
 
-> **Documento Canônico** — Esta é a fonte única de verdade sobre o modelo W5H.  
-> Outros documentos devem referenciar este arquivo em vez de duplicar explicações.
+> **A dor:** Agentes de IA perdem contexto entre sessões, forçando usuários a repetir informações.
+> **A solução:** Estrutura W5H captura contexto completo em ~36 tokens — 5x mais compacto que texto livre.
+> **O resultado:** Respostas personalizadas desde a primeira mensagem.
+
+*Documento Canônico — fonte única de verdade sobre o modelo W5H.*
 
 ---
 

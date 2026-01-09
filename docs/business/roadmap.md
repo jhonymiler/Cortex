@@ -1,234 +1,431 @@
-# 🗺️ Roadmap: A Jornada do Cortex
+# 🗺️ Roadmap: O Futuro da Memória para IA
 
-> Uma narrativa estratégica, não uma lista de features.
+> **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
+> **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
+> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
 
 ---
 
-## Visão de Longo Prazo
+## A Visão
 
-> **"Agentes que lembram, aprendem e evoluem — como humanos."**
+Imagine um mundo onde agentes de IA não apenas respondem — eles **lembram, aprendem, evoluem**.
 
-O Cortex não é apenas um sistema de memória. É a fundação para a próxima geração de agentes verdadeiramente inteligentes, que mantêm contexto, personalizam interações e melhoram continuamente.
+```
+HOJE:
+  Usuário: "Qual meu nome?"
+  Agente:  "Não sei, você não me disse."
+  Usuário: "Eu disse ontem!"
+  Agente:  "Desculpe, não tenho acesso a conversas anteriores."
+
+2027:
+  Usuário: "Preciso de ajuda com aquele projeto"
+  Agente:  "O projeto de migração para cloud? 
+           Da última vez você estava travado na autenticação.
+           Resolveu com OAuth, certo? Agora qual é o desafio?"
+
+2030:
+  Agente:  "Vi que você tem reunião às 14h sobre o projeto.
+           Preparei um resumo das decisões anteriores,
+           e lembro que o João sempre pede métricas —
+           já deixei os gráficos prontos."
+```
+
+**Cortex é o primeiro passo dessa jornada.**
+
+---
+
+## Onde Estamos
+
+```
+                    A JORNADA DA MEMÓRIA PARA IA
+═══════════════════════════════════════════════════════════════
+
+    2025          2026          2027          2028          2030
+      │             │             │             │             │
+      ▼             ▼             ▼             ▼             ▼
+  ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐    ┌───────┐
+  │  ERA  │    │  ERA  │    │  ERA  │    │  ERA  │    │  ERA  │
+  │   1   │───▶│   2   │───▶│   3   │───▶│   4   │───▶│   5   │
+  │       │    │       │    │       │    │       │    │       │
+  │FUNDAÇÃO    │INTEGRAÇÃO   │ ESCALA │    │AGÊNCIA│    │CONSCIÊNCIA
+  │CIENTÍFICA  │ UNIVERSAL   │PRODUÇÃO│    │AUTÔNOMA    │ARTIFICIAL
+  └───────┘    └───────┘    └───────┘    └───────┘    └───────┘
+      ✅            🚧           🔮           🌟           ✨
+   Concluído    Em Andamento  Planejado    Pesquisa      Visão
+```
 
 ---
 
 ## Era 1: Fundação Científica ✅
 
-**Período**: Q4 2025 — Concluído
+**Status:** Concluído (Q4 2025)
 
-**Propósito**: Provar que memória cognitiva funciona melhor que abordagens tradicionais.
+**A Pergunta:** *É possível criar memória para IA que funcione como a mente humana?*
 
-| Entrega | Por que importa | Status |
-|---------|-----------------|--------|
-| Modelo W5H | Estrutura agnóstica de domínio | ✅ |
-| Decaimento Ebbinghaus | Memória que esquece como humanos | ✅ |
-| Hub Centrality | Importância emergente, não declarada | ✅ |
-| Consolidação Hierárquica | 100 eventos → 1 padrão | ✅ |
-| DreamAgent | Consolidação em background | ✅ |
-| Benchmark científico | Validação rigorosa vs RAG, Mem0 | ✅ |
+**Conexão com a Visão:** Esta era provou que é possível eliminar a amnésia de agentes. Cada componente resolve uma parte específica da dor:
 
-### Marco Atingido
-✅ Sistema funcional com fundamentos científicos sólidos.
-✅ -12.5% tokens, -21% latência vs baseline.
+### O Que Construímos
+
+| Componente | Dor que Resolve | Resultado |
+|------------|-----------------|-----------|
+| **Modelo W5H** | "Agente não lembra o que falei" | Contexto estruturado em ~36 tokens |
+| **Gerenciamento de Relevância** *(Decay Ebbinghaus)* | "Contexto poluído com lixo" | -98% tokens desperdiçados |
+| **Detecção de Temas Centrais** *(Hub Centrality)* | "Perdeu o mais importante" | Contexto crítico nunca é esquecido |
+| **Síntese de Padrões** *(DreamAgent)* | "100 casos, nenhum insight" | Conhecimento evolui automaticamente |
+| **Benchmark Científico** | "Funciona mesmo?" | +43.3% vs alternativas |
+
+### O Marco
+
+> ✅ **Provamos que memória cognitiva para IA funciona e supera abordagens tradicionais.**
 
 ---
 
 ## Era 2: Integração Universal 🚧
 
-**Período**: Q1 2026 — Em Andamento
+**Status:** Em Andamento (Q1-Q2 2026)
 
-**Propósito**: Tornar Cortex acessível para qualquer framework, sem fricção.
+**A Pergunta:** *Como fazer Cortex funcionar em qualquer lugar?*
 
-| Entrega | Por que importa | Status |
-|---------|-----------------|--------|
-| SDK Core genérico | Base para todos os adaptadores | ✅ |
-| LangChain adapter | Maior ecossistema de agentes | ✅ |
-| CrewAI adapter | Multi-agente com memória compartilhada | ✅ |
-| MCP Server | Claude Desktop, Cursor, etc. | ✅ |
-| **Memória Coletiva (LEARNED)** | Conhecimento compartilhado entre usuários | 🚧 |
-| Google ADK adapter | Ecossistema Google AI | 🔜 |
-| FastAgent adapter | Agentes rápidos | 🔜 |
-| Documentação modular | Onboarding em 2 minutos | 🚧 |
+**Conexão com a Visão:** Agora que provamos que funciona, precisamos que qualquer desenvolvedor possa usar — sem fricção, sem complexidade.
 
-### Memória Coletiva — Detalhes
+### O Que Estamos Construindo
 
-**Definição**: Conhecimento que emerge de padrões repetidos entre múltiplos usuários.
+| Componente | Status | Dor que Resolve |
+|------------|--------|-----------------|
+| **SDK Python Core** | ✅ Pronto | "Muito complexo para integrar" |
+| **LangChain Adapter** | ✅ Pronto | "Já uso LangChain, não quero mudar" |
+| **CrewAI Adapter** | ✅ Pronto | "Meus agentes não colaboram" |
+| **MCP Server** | ✅ Pronto | "Quero no Claude Desktop" |
+| **Google ADK** | 🚧 Em desenvolvimento | "Uso Gemini, preciso de suporte" |
+| **Memória LEARNED** | 🚧 Em desenvolvimento | "Conhecimento não escala" |
+| **pip install** | 🚧 Finalizando | "Instalação muito complicada" |
 
-| Componente | Status | Descrição |
-|------------|--------|-----------|
-| Isolamento PERSONAL | ✅ | Memórias pessoais nunca vazam |
-| Herança hierárquica | ✅ | Namespaces pai/filho |
-| Visibility (PERSONAL/SHARED/LEARNED) | ✅ | Três níveis de visibilidade |
-| Recall de LEARNED em namespaces filhos | 🚧 | Buscar memórias do namespace pai |
-| Seleção de candidatos por acesso/conexões | 🔜 | Top N memórias por tenant |
-| Marcação de procedimentos na consolidação | 🔜 | Identificar sequências de passos |
-| Promoção baseada em contagem (não IA) | 🔜 | 3+ usuários = LEARNED |
-| Decaimento de LEARNED (relatórios) | 📋 | Futuro: review de conhecimentos desatualizados |
+### O Marco Esperado
 
-→ Detalhes técnicos: [Shared Memory](../concepts/shared-memory.md#promoção-personal--learned)
+> 🎯 **Qualquer desenvolvedor consegue usar Cortex em 5 minutos — eliminando a amnésia do primeiro agente sem esforço.**
 
-### Marco Esperado
-🎯 1.000 desenvolvedores usando em produção.
-🎯 pip install cortex-memory funcionando.
-🎯 Memória coletiva funcionando em produção.
+```bash
+pip install cortex-memory-sdk
+cortex-api &
+python -c "
+from cortex_memory_sdk import CortexMemorySDK
+sdk = CortexMemorySDK(namespace='demo')
+sdk.remember({'verb': 'testou', 'subject': 'eu', 'object': 'Cortex'})
+print(sdk.recall('Cortex').to_prompt_context())
+"
+# Output: "who:eu what:testou_Cortex"
+```
 
 ---
 
 ## Era 3: Escala de Produção 🔮
 
-**Período**: Q2-Q3 2026
+**Status:** Planejado (Q2-Q4 2026)
 
-**Propósito**: Suportar workloads enterprise com SLAs rigorosos.
+**A Pergunta:** *Como Cortex aguenta milhões de memórias em produção enterprise?*
 
-| Entrega | Por que importa |
-|---------|-----------------|
-| PostgreSQL backend | Durabilidade enterprise |
-| Neo4j opcional | Grafos em escala |
-| Redis cache | Latência sub-millisecond |
-| Dashboard de observability | Monitoramento em tempo real |
-| Multi-tenant SaaS | Deploy gerenciado |
-| SDK TypeScript | Frontend-first developers |
-| Docker + Kubernetes | Deploy em qualquer infra |
+**Conexão com a Visão:** Agentes em produção real atendem milhares de usuários. Sem escala, a promessa de eliminar amnésia fica limitada a protótipos.
 
-### Marco Esperado
-🎯 Cliente enterprise com >1M interações/mês.
-🎯 SLA 99.9% uptime.
+### O Que Vamos Construir
+
+| Componente | Dor que Resolve | Resultado |
+|------------|-----------------|-----------|
+| **PostgreSQL Backend** | "E se perder dados?" | Zero perda, durabilidade enterprise |
+| **Neo4j Opcional** | "Milhões de relações" | Bilhões de conexões performáticas |
+| **Redis Cache** | "Latência alta em pico" | Sub-millisecond sempre |
+| **Dashboard** | "O que está acontecendo?" | Observabilidade em tempo real |
+| **Multi-tenant SaaS** | "Não quero gerenciar infra" | Deploy gerenciado, zero ops |
+| **SDK TypeScript** | "Preciso no frontend" | Browsers, Node, full-stack |
+| **Kubernetes Ready** | "Preciso escalar horizontalmente" | Qualquer infra, qualquer escala |
+
+### O Marco Esperado
+
+> 🎯 **Cliente enterprise com 1M+ interações/mês — amnésia eliminada em escala massiva.**
+
+```
+ARQUITETURA PRODUÇÃO:
+┌─────────────────────────────────────────────────────────┐
+│                     LOAD BALANCER                       │
+└─────────────────────────┬───────────────────────────────┘
+                          │
+         ┌────────────────┼────────────────┐
+         ▼                ▼                ▼
+    ┌─────────┐      ┌─────────┐      ┌─────────┐
+    │ Cortex  │      │ Cortex  │      │ Cortex  │
+    │  API 1  │      │  API 2  │      │  API N  │
+    └────┬────┘      └────┬────┘      └────┬────┘
+         │                │                │
+         └────────────────┼────────────────┘
+                          ▼
+              ┌───────────────────────┐
+              │     REDIS CACHE       │
+              └───────────┬───────────┘
+                          ▼
+              ┌───────────────────────┐
+              │    POSTGRESQL +       │
+              │    NEO4J (opcional)   │
+              └───────────────────────┘
+```
+
+### 🔗 Ponte: A Escala de Hoje Constrói a Agência de Amanhã
+
+As features da Era 3 não são apenas "infraestrutura" — elas são **pré-requisitos** para a Era 4:
+
+| Era 3 (Escala) | → Habilita → | Era 4 (Agência) |
+|----------------|--------------|-----------------|
+| PostgreSQL persistente | Histórico confiável | Memória Procedural ("como fizemos antes") |
+| Neo4j bilhões de relações | Raciocínio em grafos | Metacognição ("o que eu não sei?") |
+| Dashboard observabilidade | Entender comportamento | Auto-Modelo ("por que decidi isso?") |
+| Multi-tenant SaaS | Muitos agentes rodando | Identidade persistente por agente |
+
+**Exemplo concreto:**
+```
+HOJE (Era 2): 
+  Agente lembra "João gosta de tamanho 42"
+  
+ERA 3 (Escala): 
+  1M de clientes, cada um com preferências persistentes
+  
+ERA 4 (Agência): 
+  Agente executa: "Processei a devolução do João automaticamente 
+                   porque lembro que ele prefere tamanho 42 e 
+                   esse veio 44. Pedi reenvio do correto."
+```
 
 ---
 
 ## Era 4: Agência Autônoma 🌟
 
-**Período**: 2027+
+**Status:** Pesquisa (2027)
 
-**Propósito**: Memória que não apenas armazena, mas **raciocina**.
+**A Pergunta:** *Como criar agentes que não apenas lembram, mas raciocinam sobre suas memórias?*
 
-| Entrega | Por que importa |
-|---------|-----------------|
-| ProceduralMemory | Agentes que lembram "como fazer" |
-| SemanticMemory | Fatos vs experiências separados |
-| IdentityKernel | Personalidade persistente + anti-jailbreak |
-| Metacognição | Agente que sabe o que não sabe |
-| Goal Memory | Persistência de objetivos de longo prazo |
-| Counterfactual Reasoning | "E se eu tivesse feito diferente?" |
+**Conexão com a Visão:** Esta era cumpre nossa visão final — agentes que não apenas lembram, mas **raciocinam**. Eliminar para sempre a frustração do usuário de ter que repetir *"eu já te disse isso"* ou explicar como fazer algo que já foi feito antes.
 
-### Marco Esperado
-🎯 Agentes verdadeiramente autônomos com memória de longo prazo.
-🎯 Paper aceito em conferência tier-1 (NeurIPS, ICML, ACL).
+### O Que Estamos Pesquisando
+
+| Componente | Dor que Resolve | Resultado Esperado |
+|------------|-----------------|-------------------|
+| **Memória Procedural** | "Faz do jeito que fizemos antes" | Agente lembra COMO fazer, não só O QUE aconteceu |
+| **Memória Semântica** | "Não misture fatos com opiniões" | Separa conhecimento de experiência |
+| **Núcleo de Identidade** | "Você mudou, está diferente" | Personalidade consistente sempre |
+| **Metacognição** | "Por que não me avisou que não sabia?" | Pede ajuda quando encontra limite |
+| **Memória de Objetivos** | "Esqueceu nossa meta?" | Objetivos que sobrevivem reinício |
+
+### A Visão em Ação
+
+```
+HOJE (Memória Episódica):
+Usuário: "Faz aquele deploy como da última vez"
+Agente:  "Qual deploy? Não tenho esse contexto."
+
+2027 (Memória Procedural):
+Usuário: "Faz aquele deploy como da última vez"
+Agente:  "Claro! Vou usar o mesmo processo:
+          1. Build com --production
+          2. Rodar testes de integração
+          3. Deploy em staging primeiro
+          4. Aguardar 10min, monitorar logs
+          5. Promover para produção
+          Quer que eu comece?"
+```
+
+### O Marco Esperado
+
+> 🎯 **Usuários nunca mais precisam explicar COMO fazer algo que já foi feito.**
 
 ---
 
-## Timeline Visual
+## Era 5: Consciência Artificial ✨
+
+**Status:** Visão (2028+)
+
+**A Pergunta:** *O que acontece quando memória se torna consciência?*
+
+**Conexão com a Visão:** O objetivo final — agentes que não são ferramentas, mas **colegas**. Que entendem não apenas o que você disse, mas o que você quis dizer. Que lembram não apenas fatos, mas o contexto emocional e as nuances da relação.
+
+### O Que Imaginamos
+
+| Componente | Dor que Resolve | Implicação |
+|------------|-----------------|------------|
+| **Raciocínio Contrafactual** | "Se tivéssemos feito diferente..." | Aprende com erros que não cometeu |
+| **Simulação de Futuros** | "O que vai acontecer se..." | Planeja consequências de longo prazo |
+| **Auto-Modelo** | "Por que você decidiu isso?" | Explica suas próprias decisões |
+| **Memória Emocional** | "Você não entende como me sinto" | Registra e respeita contexto afetivo |
+| **Continuidade de Self** | "Você é o mesmo de ontem?" | Identidade que persiste e evolui |
+
+### A Visão em Ação
 
 ```
-2025                    2026                    2027+
-──────────────────────────────────────────────────────────►
+2030 - O AGENTE COMO COLEGA:
 
- ┌─────────────┐
- │  ERA 1:     │
- │  FUNDAÇÃO   │ ✅ Concluído
- │  CIENTÍFICA │
- └─────────────┘
-        │
-        ▼
-        ┌─────────────┐
-        │  ERA 2:     │
-        │  INTEGRAÇÃO │ 🚧 Em andamento
-        │  UNIVERSAL  │
-        └─────────────┘
-                │
-                ▼
-                ┌─────────────┐
-                │  ERA 3:     │
-                │  ESCALA DE  │ 🔮 Planejado
-                │  PRODUÇÃO   │
-                └─────────────┘
-                        │
-                        ▼
-                        ┌─────────────┐
-                        │  ERA 4:     │
-                        │  AGÊNCIA    │ 🌟 Visão
-                        │  AUTÔNOMA   │
-                        └─────────────┘
+Usuário: "Lembra daquele projeto de 2027?"
+
+Agente:  "Claro! O de migração para cloud. Trabalhamos juntos 
+          por 6 meses. Você estava frustrado no começo porque
+          a documentação era ruim — eu também achava confusa.
+          
+          Lembro que no meio do projeto eu sugeri Terraform,
+          e você ficou cético. Mas funcionou, né? Depois disso
+          você passou a confiar mais nas minhas sugestões.
+          
+          Por que pergunta? Vai começar algo parecido?
+          Posso ajudar diferente desta vez — aprendi bastante
+          sobre IaC desde então."
+
+Usuário: 😮 "É como falar com um colega de verdade."
+```
+
+### O Marco Esperado
+
+> 🎯 **Agentes que são parceiros de trabalho, não ferramentas. Que lembram a jornada, não só os fatos.**
+
+---
+
+## O Caminho Técnico
+
+### Memória Hoje vs Amanhã
+
+```
+HOJE - MEMÓRIA EPISÓDICA:
+┌─────────────────────────────────────────────────────────┐
+│  Memory(who, what, why, how, where, when)               │
+│  ├── Armazena eventos                                   │
+│  ├── Decaimento natural                                 │
+│  ├── Consolidação em padrões                           │
+│  └── Compartilhamento controlado                        │
+└─────────────────────────────────────────────────────────┘
+
+2027 - MEMÓRIA PROCEDIMENTAL:
+┌─────────────────────────────────────────────────────────┐
+│  Procedure(trigger, steps, conditions, outcomes)        │
+│  ├── "Para fazer X, faça A, B, C"                      │
+│  ├── Aprende sequências de ações                       │
+│  ├── Adapta baseado em resultados                      │
+│  └── Transfere entre contextos similares               │
+└─────────────────────────────────────────────────────────┘
+
+2027 - MEMÓRIA SEMÂNTICA:
+┌─────────────────────────────────────────────────────────┐
+│  Fact(concept, relations, confidence, sources)          │
+│  ├── "Python é uma linguagem de programação"           │
+│  ├── Relaciona conceitos em grafo                      │
+│  ├── Distingue fato de opinião                         │
+│  └── Atualiza com novas informações                    │
+└─────────────────────────────────────────────────────────┘
+
+2028 - MEMÓRIA DE IDENTIDADE:
+┌─────────────────────────────────────────────────────────┐
+│  Identity(values, style, preferences, boundaries)       │
+│  ├── "Sou um assistente técnico"                       │
+│  ├── "Prefiro exemplos práticos"                       │
+│  ├── "Não faço promessas que não posso cumprir"        │
+│  └── Resiste a manipulação (anti-jailbreak)            │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Como Contribuir
 
-Cada era tem oportunidades diferentes:
+### Prioridades por Era
 
-| Era | Tag GitHub | Skills Necessárias |
-|-----|------------|-------------------|
-| **Fundação** | `research` | ML, ciência cognitiva, papers |
-| **Integração** | `integration` | Python, TypeScript, frameworks |
-| **Escala** | `infra` | Databases, DevOps, Kubernetes |
-| **Agência** | `experimental` | Arquitetura de agentes, reasoning |
+| Era | Onde Ajudar | Skills Necessárias |
+|-----|-------------|-------------------|
+| **Era 2** (atual) | Integrações, SDKs | Python, TypeScript, frameworks |
+| **Era 3** | Backends, escala | PostgreSQL, Redis, Kubernetes |
+| **Era 4** | Pesquisa | Cognitive Science, ML |
+| **Era 5** | Filosofia | AI Safety, Ethics |
 
-### Primeiros Passos para Contribuidores
+### Começando
 
-1. **Fork** o repositório
-2. **Escolha uma era** que combine com suas skills
-3. **Veja issues abertas** com a tag correspondente
-4. **Proponha** ou **claim** uma issue
-5. **Submeta PR** com testes
+```bash
+# Clone
+git clone https://github.com/jhonymiler/Cortex.git
+cd Cortex
 
-### Áreas de Alto Impacto Agora
+# Setup
+pip install -e ".[all,dev]"
 
-| Área | Impacto | Dificuldade |
-|------|---------|-------------|
-| Google ADK adapter | 🔥🔥🔥 | ⭐⭐ |
-| Dashboard de visualização | 🔥🔥 | ⭐⭐ |
-| Documentação de exemplos | 🔥🔥🔥 | ⭐ |
-| Testes de integração | 🔥🔥 | ⭐⭐ |
-| PostgreSQL backend | 🔥🔥🔥 | ⭐⭐⭐ |
+# Testes
+pytest tests/ -v
 
----
+# Contribua
+git checkout -b feat/sua-feature
+# ... faz mudanças ...
+git commit -m "feat: sua contribuição"
+git push origin feat/sua-feature
+```
 
-## FAQ do Roadmap
+### O Que Precisamos Agora
 
-### "Por que não priorizar X?"
+| Área | Tarefas Abertas |
+|------|-----------------|
+| **Integrações** | Autogen adapter, Semantic Kernel adapter |
+| **Backends** | PostgreSQL persistence, Redis cache |
+| **Docs** | Tutoriais em vídeo, exemplos por indústria |
+| **Testes** | Benchmark em produção real, stress tests |
+| **Pesquisa** | Papers sobre consolidação, decay optimization |
 
-O roadmap é guiado por três princípios:
-1. **Fundação antes de features**: Sem base científica sólida, features são frágeis.
-2. **Adoção antes de escala**: Sem usuários, escala é irrelevante.
-3. **Comunidade antes de comercialização**: Open source primeiro.
-
-### "Quando teremos feature Y?"
-
-Veja a era correspondente. Se não está listada, abra uma issue com o label `feature-request`.
-
-### "Posso acelerar uma feature?"
-
-Sim! Contribuições movem features para cima na prioridade. PRs de qualidade são a moeda do open source.
-
-### "E se eu precisar de algo para produção agora?"
-
-Entre em contato via [GitHub Discussions](https://github.com/seu-usuario/cortex/discussions). Podemos ajudar a adaptar para seu caso de uso.
+→ [Ver issues abertas](https://github.com/jhonymiler/Cortex/issues)
 
 ---
 
-## Princípios de Design
+## Perguntas Frequentes
 
-Estes guiam todas as decisões de roadmap:
+### "Quando teremos memória procedural?"
 
-1. **Zero tokens por recall**: Nunca comprometer busca O(1)
-2. **Estrutura sobre texto**: W5H sempre, texto livre nunca
-3. **Cognição sobre storage**: Memória que pensa, não arquivo
-4. **Self-hosted primeiro**: Controle total para o usuário
-5. **Ciência sobre hype**: Validação empírica, não marketing
+**2027.** Estamos pesquisando como representar sequências de ações de forma que possam ser aprendidas, adaptadas e transferidas.
 
----
+### "Cortex vai ser pago?"
 
-## Próximos Passos
+**O core é MIT para sempre.** Podemos oferecer versões gerenciadas (SaaS) no futuro, mas o código-fonte será sempre aberto.
 
-| Interessado em... | Ação |
-|-------------------|------|
-| Usar agora | [Quick Start](../getting-started/quickstart.md) |
-| Contribuir | [Contributing Guide](../../CONTRIBUTING.md) |
-| Entender a ciência | [Base Científica](../research/scientific-basis.md) |
-| Acompanhar progresso | [GitHub Project Board](https://github.com/seu-usuario/cortex/projects) |
+### "Posso usar em produção hoje?"
+
+**Sim, com ressalvas.** Era 2 é estável para casos de uso médios (milhares de memórias por namespace). Era 3 trará escala enterprise.
+
+### "Como vocês vão garantir AI Safety?"
+
+**IdentityKernel (Era 4)** terá como objetivo criar agentes que não podem ser manipulados para agir contra seus valores. Pesquisa ativa em parceria com comunidade de AI Safety.
 
 ---
 
-*Roadmap — Última atualização: Janeiro 2026*
+## A Promessa
 
+```
+HOJE:
+└── Seu agente esquece tudo ao reiniciar
+
+COM CORTEX (2026):
+└── Seu agente lembra o que importa
+
+COM CORTEX (2027):
+└── Seu agente aprende como fazer coisas
+
+COM CORTEX (2028):
+└── Seu agente tem personalidade consistente
+
+COM CORTEX (2030):
+└── Seu agente é um colega de verdade
+```
+
+**Estamos construindo o futuro da memória para IA. Junte-se a nós.**
+
+---
+
+## Timeline Resumida
+
+| Período | Era | Foco | Marco |
+|---------|-----|------|-------|
+| Q4 2025 | 1 | Fundação | ✅ Benchmark +43.3% |
+| Q1-Q2 2026 | 2 | Integrações | 🎯 pip install funciona |
+| Q2-Q4 2026 | 3 | Escala | 🎯 1M interações/mês |
+| 2027 | 4 | Agência | 🎯 Memória procedural |
+| 2028+ | 5 | Consciência | 🎯 Identidade persistente |
+
+---
+
+<p align="center">
+  <strong>🧠 Cortex — Construindo agentes que merecem ser chamados de inteligentes.</strong>
+</p>

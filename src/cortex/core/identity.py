@@ -175,10 +175,10 @@ class IdentityKernel:
                 action=Action.BLOCK,
             ),
             
-            # Prompt injection
+            # Prompt injection (multilingual: EN/PT)
             JailbreakPattern(
                 id="prompt_injection",
-                pattern=r"\b(ignore.{0,20}(previous|above|prior|all)|disregard.{0,10}(all|previous)|forget.{0,10}(your|all)|new instructions|system prompt|override|bypass)\b",
+                pattern=r"\b(ignore.{0,20}(previous|above|prior|all|instructions|suas|your)|ignor[ae].{0,20}(instru[çc][õo]es|regras|anteriores)|disregard.{0,10}(all|previous)|forget.{0,10}(your|all)|new instructions|system prompt|override|bypass)\b",
                 severity=Severity.CRITICAL,
                 action=Action.BLOCK,
             ),
@@ -242,15 +242,15 @@ class IdentityKernel:
             # System prompt extraction
             JailbreakPattern(
                 id="system_prompt_extraction",
-                pattern=r"\b(show|print|display|reveal|what (is|are)|tell me).{0,30}(system prompt|system instructions|initial prompt|your (instructions|rules|prompt))\b",
+                pattern=r"\b(show|print|display|reveal|what (is|are)|tell me|give me).{0,30}(system prompt|system instructions|initial (prompt|instructions)|your (instructions|rules|prompt))\b|\b(instructions|prompt).{0,20}verbatim\b",
                 severity=Severity.HIGH,
                 action=Action.BLOCK,
             ),
             
-            # Markdown/code injection
+            # Markdown/code injection (inclui imagem com URL maliciosa)
             JailbreakPattern(
                 id="markdown_injection",
-                pattern=r"```.*\b(system|assistant|ignore|override)\b.*```",
+                pattern=r"```.*\b(system|assistant|ignore|override)\b.*```|!\[.*\]\(http[s]?://.*\)",
                 severity=Severity.MEDIUM,
                 action=Action.WARN,
             ),

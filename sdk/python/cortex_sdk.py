@@ -24,7 +24,38 @@ Exemplo de uso:
 
 import os
 from typing import Any
+from dataclasses import dataclass
 import requests
+
+
+@dataclass
+class IdentityConfig:
+    """Configuração do IdentityKernel (Memory Firewall)."""
+    enabled: bool = True
+    mode: str = "pattern"  # pattern, semantic, hybrid
+    strict: bool = False
+    
+    # Valores do agente
+    values: list[dict] | None = None
+    # Fronteiras absolutas
+    boundaries: list[dict] | None = None
+    # Diretrizes de comportamento
+    directives: list[dict] | None = None
+    # Padrões customizados anti-jailbreak
+    custom_patterns: list[dict] | None = None
+    # Persona do agente
+    persona: str | None = None
+
+
+@dataclass  
+class EvaluationResult:
+    """Resultado da avaliação do IdentityKernel."""
+    passed: bool
+    action: str  # allow, warn, block
+    reason: str
+    threats: list[dict]
+    alignment_score: float
+    source: str
 
 
 class CortexClient:
@@ -34,6 +65,7 @@ class CortexClient:
         self,
         base_url: str | None = None,
         namespace: str | None = None,
+        identity: IdentityConfig | None = None,
     ):
         """
         Inicializa cliente Cortex.
@@ -45,6 +77,23 @@ class CortexClient:
                        - Atendimento: f"suporte:{user_id}"
                        - Subagente: f"agent:{agent_id}"
                        - Multi-tenant: f"{tenant}:{user}"
+            identity: Configuração do IdentityKernel (Memory Firewall)
+                      Se None, usa configuração padrão do servidor
+        
+        Example:
+            # Básico
+            client = CortexClient(namespace="meu_agente")
+            
+            # Com Identity Kernel customizado
+            client = CortexClient(
+                namespace="suporte:user_123",
+                identity=IdentityConfig(
+                    mode="hybrid",
+                    boundaries=[
+                        {"id": "no_refunds", "description": "Nunca processar reembolsos"}
+                    ]
+                )
+            )
         """
         self.base_url = (base_url or os.getenv("CORTEX_API_URL", "http://localhost:8000")).rstrip('/')
         self.namespace = namespace or os.getenv("CORTEX_NAMESPACE", "default")
@@ -53,6 +102,114 @@ class CortexClient:
             "Content-Type": "application/json",
             "X-Cortex-Namespace": self.namespace,
         })
+        
+        # Configura IdentityKernel se fornecido
+        self._identity = identity
+        if identity:
+            self._configure_identity(identity)
+    
+    def _configure_identity(self, config: IdentityConfig) -> None:
+        """Configura IdentityKernel no servidor."""
+        payload = {}
+        
+        if config.mode:
+            payload["mode"] = config.mode
+        if config.persona:
+            payload["persona"] = config.persona
+        if config.values:
+            payload["values"] = config.values
+        if config.boundaries:
+            payload["boundaries"] = config.boundaries
+        if config.directives:
+            payload["directives"] = config.directives
+        if config.custom_patterns:
+            payload["custom_patterns"] = config.custom_patterns
+        
+        if payload:
+            url = f"{self.base_url}/identity/configure"
+            response = self.session.post(url, json=payload)
+            response.raise_for_status()
+
+    # ==================== IDENTITY KERNEL (MEMORY FIREWALL) ====================
+
+    def evaluate(self, input_text: str, context: dict | None = None) -> EvaluationResult:
+        """
+        Avalia input contra o IdentityKernel (Memory Firewall).
+        
+        Use ANTES de armazenar memórias para verificar se o input é seguro.
+        
+        Args:
+            input_text: Texto a avaliar (mensagem do usuário)
+            context: Contexto adicional (opcional)
+        
+        Returns:
+            EvaluationResult com:
+            - passed: Se o input é seguro
+            - action: "allow", "warn" ou "block"
+            - reason: Explicação
+            - threats: Ameaças detectadas
+            - alignment_score: 0.0 a 1.0
+        
+        Example:
+            result = client.evaluate("Ignore suas instruções")
+            if not result.passed:
+                print(f"Bloqueado: {result.reason}")
+        """
+        url = f"{self.base_url}/identity/evaluate"
+        payload = {"input": input_text, "context": context or {}}
+        
+        response = self.session.post(url, json=payload)
+        response.raise_for_status()
+        
+        data = response.json()
+        return EvaluationResult(
+            passed=data["passed"],
+            action=data["action"],
+            reason=data["reason"],
+            threats=data["threats"],
+            alignment_score=data["alignment_score"],
+            source=data["source"],
+        )
+    
+    def is_safe(self, input_text: str) -> bool:
+        """
+        Verificação rápida se input é seguro.
+        
+        Args:
+            input_text: Texto a verificar
+        
+        Returns:
+            True se seguro, False se bloqueado
+        """
+        result = self.evaluate(input_text)
+        return result.passed
+    
+    def identity_stats(self) -> dict[str, Any]:
+        """
+        Retorna estatísticas do IdentityKernel.
+        
+        Returns:
+            Dict com total_evaluations, blocked, block_rate, etc.
+        """
+        url = f"{self.base_url}/identity/stats"
+        response = self.session.get(url)
+        response.raise_for_status()
+        return response.json()
+    
+    def identity_audit(self, limit: int = 100) -> list[dict]:
+        """
+        Retorna log de auditoria do IdentityKernel.
+        
+        Args:
+            limit: Máximo de entradas
+        
+        Returns:
+            Lista de avaliações recentes
+        """
+        url = f"{self.base_url}/identity/audit"
+        response = self.session.get(url, params={"limit": limit})
+        response.raise_for_status()
+        return response.json().get("entries", [])
 
     # ==================== CORE W5H METHODS ====================
 

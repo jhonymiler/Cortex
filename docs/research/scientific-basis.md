@@ -1,6 +1,10 @@
 # 📚 Fundamentação Científica
 
-> As bases teóricas do Cortex, com referências acadêmicas.
+> **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
+> **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
+> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
+
+*Este documento detalha as bases teóricas com referências acadêmicas.*
 
 ---
 

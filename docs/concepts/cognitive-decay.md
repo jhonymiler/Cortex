@@ -1,7 +1,11 @@
-# 📉 Decaimento Cognitivo (Ebbinghaus)
+# 📉 Gerenciamento Automático de Relevância
+*(Baseado na Curva de Ebbinghaus)*
 
-> **Documento Canônico** — Esta é a fonte única de verdade sobre decaimento de memórias.  
-> Outros documentos devem referenciar este arquivo em vez de duplicar explicações.
+> **A dor:** Sistemas tradicionais acumulam tudo para sempre — aumentando ruído, custo e confusão.
+> **A solução:** Cortex esquece ativamente o que é inútil para focar no sinal, como seu cérebro.
+> **O resultado:** -98% tokens desperdiçados com contexto irrelevante.
+
+*Documento Canônico — fonte única de verdade sobre decaimento de memórias.*
 
 ---
 

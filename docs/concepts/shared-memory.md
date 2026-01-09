@@ -1,7 +1,11 @@
-# 🔒 Memória Compartilhada com Isolamento
+# 🔒 Aprendizado Coletivo com Privacidade
+*(Memória Compartilhada com Isolamento)*
 
-> **Documento Canônico** — Esta é a fonte única de verdade sobre memória compartilhada.  
-> Outros documentos devem referenciar este arquivo em vez de duplicar explicações.
+> **A dor:** Conhecimento fica preso em silos — cada atendente resolve o mesmo problema do zero.
+> **A solução:** Cortex compartilha padrões aprendidos enquanto isola dados pessoais por design.
+> **O resultado:** Resolva um problema uma vez, beneficie todos os usuários. LGPD/GDPR compliant.
+
+*Documento Canônico — fonte única de verdade sobre memória compartilhada.*
 
 ---
 
