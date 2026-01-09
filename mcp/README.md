@@ -31,8 +31,7 @@ O projeto é detectado automaticamente (em ordem de prioridade):
 1. Variável `CORTEX_PROJECT` (se definida)
 2. Nome em `pyproject.toml`
 3. Nome em `package.json`
-4. Nome do repositório Git
-5. Nome do diretório atual
+4. Nome do diretório atual
 
 ## Instalação
 
@@ -77,46 +76,110 @@ pip install -e .
 | `CORTEX_USER` | `$USER` | Usuário atual (fixo) |
 | `CORTEX_PROJECT` | (auto) | Override do projeto |
 
-### Memory Firewall (Identity Kernel)
+## Tools Disponíveis (Contrato W5H)
 
-| Variável | Default | Descrição |
-|----------|---------|-----------|
-| `CORTEX_IDENTITY_ENABLED` | `true` | Habilita proteção anti-jailbreak |
-| `CORTEX_IDENTITY_MODE` | `pattern` | Modo de detecção: `pattern`, `semantic`, `hybrid` |
-| `CORTEX_IDENTITY_STRICT` | `false` | `true` = bloqueia, `false` = apenas alerta |
+O MCP expõe **3 ferramentas** com parâmetros W5H explícitos. O modelo W5H estrutura memórias de forma compacta (~36 tokens vs 200+ texto livre).
 
-## Tools Disponíveis
+---
 
-O MCP expõe apenas **3 ferramentas essenciais**:
+### `store_memory` — Armazena memória estruturada
 
-| Tool | Descrição |
-|------|-----------|
-| `get_current_context` | Mostra team/project/user atual |
-| `store_memory` | Armazena memória (visibility: personal/shared/learned) |
-| `recall_memory` | Busca semântica de memórias relevantes |
+| Parâmetro | Obrigatório | Descrição | Formato/Exemplos |
+|-----------|-------------|-----------|------------------|
+| `what` | ✅ | O QUE aconteceu? | `verbo_objeto`: `"solicitou_reembolso"`, `"corrigiu_bug_timeout"` |
+| `why` | ✅ | POR QUE aconteceu? | Causa/razão: `"produto_com_defeito"`, `"conexao_nao_fechada"` |
+| `how` | ❌ | COMO foi resolvido? | Resultado: `"aprovado_credito_loja"`, `"adicionou_connection_pool"` |
+| `who` | ❌ | QUEM participou? | Vírgula-separado: `"cliente_vip, atendente_maria"` |
+| `where` | ❌ | ONDE aconteceu? | Contexto: `"suporte:ticket_123"`, `"src/auth/login.py"` |
+| `visibility` | ❌ | Quem vê? | `personal` (só você), `shared` (projeto), `learned` (time) |
+| `importance` | ❌ | Prioridade | `0.1-0.3` baixa, `0.4-0.6` normal, `0.7-1.0` alta |
 
-### Níveis de Visibilidade (store_memory)
+**Exemplos por domínio:**
 
-| Visibility | Quem vê | Uso |
-|------------|---------|-----|
+```python
+# Suporte ao cliente
+store_memory(
+    what="solicitou_reembolso",
+    why="produto_com_defeito",
+    how="aprovado_credito_loja",
+    who="cliente_vip, atendente_maria",
+    where="atendimento:ticket_123",
+    visibility="shared"
+)
+
+# Desenvolvimento
+store_memory(
+    what="corrigiu_bug_timeout",
+    why="conexao_nao_fechada",
+    how="adicionou_connection_pool",
+    who="dev_joao, modulo_auth",
+    where="projeto_x:sprint_15",
+    visibility="shared",
+    importance=0.8
+)
+
+# Preferência pessoal
+store_memory(
+    what="prefere_contato_email",
+    why="responde_mais_rapido",
+    who="cliente_carlos"
+)
+```
+
+---
+
+### `recall_memory` — Busca semântica com filtros
+
+Sinônimos funcionam! "erro de login" encontra "problema de autenticação".
+
+| Parâmetro | Obrigatório | Descrição | Exemplos |
+|-----------|-------------|-----------|----------|
+| `query` | ✅ | O QUE buscar? | `"preferências do cliente"`, `"bugs no módulo auth"` |
+| `limit` | ❌ | Máximo resultados | `1-3` rápido, `10+` análise completa |
+| `who` | ❌ | Filtrar por QUEM | `"cliente_joao"`, `"dev_maria, tech_lead"` |
+| `where` | ❌ | Filtrar por ONDE | `"src/auth/"`, `"suporte_cliente"` |
+
+**Exemplos:**
+
+```python
+# Busca simples
+recall_memory(query="preferências do cliente")
+
+# Filtrar por arquivo/módulo
+recall_memory(query="bugs de timeout", where="src/db/", limit=10)
+
+# Filtrar por pessoa
+recall_memory(query="decisões técnicas", who="tech_lead")
+
+# Contexto de conversa anterior
+recall_memory(query="última solicitação", who="cliente_joao", limit=3)
+```
+
+---
+
+### `get_current_context` — Contexto atual
+
+Retorna o namespace ativo (determina quem vê as memórias).
+
+```python
+get_current_context()
+# {
+#   "team": "dev_team",
+#   "project": "cortex",
+#   "user": "jhony",
+#   "namespace": "dev_team:cortex:jhony"
+# }
+```
+
+---
+
+### Níveis de Visibilidade
+
+| Visibility | Quem vê | Quando usar |
+|------------|---------|-------------|
 | `personal` | Só você | Preferências, notas pessoais |
-| `shared` | Time do projeto | Decisões, padrões do projeto |
-| `learned` | Toda organização | Aprendizados gerais |
-
-## Resources
-
-| Resource | Descrição |
-|----------|-----------|
-| `cortex://context` | Contexto atual completo |
-| `cortex://health` | Status do servidor |
-| `cortex://about` | Informações do Cortex |
-
-## Prompts
-
-| Prompt | Descrição |
-|--------|-----------|
-| `remember_context` | Template para usar memória |
-| `new_project_context` | Iniciar em novo projeto |
+| `shared` | Time do projeto | Decisões, padrões, bugs resolvidos |
+| `learned` | Toda organização | Aprendizados universais, boas práticas |
 
 ## Exemplo de Uso
 
@@ -125,25 +188,27 @@ O MCP expõe apenas **3 ferramentas essenciais**:
 
 Usuário: O que você sabe sobre este projeto?
 
-Claude: [Usa recall_memory com scope="project"]
+Claude: [Usa recall_memory(query="visão geral do projeto")]
         Este é o projeto Cortex. Encontrei que:
         - Usa Python 3.11+ com FastAPI
         - Modelo W5H para estruturar memórias
         - ...
 
-Usuário: Descobri que precisamos usar visibility="shared" para herança
+Usuário: Resolvemos o bug de conexões que não fechavam
 
-Claude: [Usa share_with_project para salvar]
+Claude: [Usa store_memory(
+          what="Bug de conexões resolvido",
+          why="Pool não fechava conexões após timeout",
+          how="Context manager implementado",
+          where="db/pool.py",
+          visibility="shared"
+        )]
         Anotado para todo o time do projeto!
 
-# Mudando de projeto sem sair do Claude
+Usuário: O que sabemos sobre problemas no pool?
 
-Usuário: Agora preciso trabalhar no projeto cliente_xyz
-
-Claude: [Usa switch_project("cliente_xyz")]
-        Contexto alterado para cliente_xyz.
-        [Usa recall_memory para buscar contexto]
-        ...
+Claude: [Usa recall_memory(query="problemas conexão", where="db/")]
+        Encontrei que o bug de conexões foi resolvido com context manager...
 ```
 
 ## Fluxo de Memória
