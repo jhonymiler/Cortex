@@ -32,6 +32,7 @@ Cada solução foi otimizada para um problema específico. A tabela abaixo mostr
 | Memória coletiva | ❌ | — | — | — | ✅ |
 | Zero custo por busca | ❌ | ❌ | ❌ | ❌ | ✅ |
 | **🛡️ Memory Firewall** | ❌ | ❌ | ❌ | ❌ | **✅** |
+| **🔍 Grafo auditável** | ❌ | ❌ | ❌ | ❌ | **✅** |
 | 100% Open Source | N/A | Varia | Varia | Parcial | ✅ |
 
 **—** = Não é o foco do projeto (não é uma limitação, é uma escolha de design)  
@@ -368,6 +369,45 @@ CORTEX:
 | 10K buscas/dia | $10/dia | $0 | **$300/mês** |
 | 100K buscas/dia | $100/dia | $0 | **$3.000/mês** |
 | 1M buscas/dia | $1.000/dia | $0 | **$30.000/mês** |
+
+---
+
+### 5. 🔍 Grafo Auditável
+
+**O que é:** Visualização completa do que seu agente "sabe".
+
+```
+┌─────────────────────────────────────────────────────┐
+│  🧠 MEMORY EXPLORER                                 │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  [Cliente João] ───comprou───▶ [Sapato Oxford]     │
+│        │                            │               │
+│        │                            ▼               │
+│        └───reclamou───▶ [Atraso] ───▶ [Resolvido]  │
+│                                                     │
+│  Memórias: 234  │  Relações: 456  │  Hubs: 12      │
+└─────────────────────────────────────────────────────┘
+```
+
+**Por que funciona:**
+- **Debugging:** "Por que o agente disse isso?" → Veja a memória que influenciou
+- **Compliance:** Demonstre exatamente o que foi armazenado sobre um usuário
+- **Confiança:** Valide aprendizado antes de ir para produção
+- **Otimização:** Identifique memórias de baixo valor
+
+**Acesso:**
+```bash
+# API: grafo completo
+curl http://localhost:8000/memory/graph -H "X-Cortex-Namespace: user:123"
+
+# CLI: inspeção rápida
+cortex inspect --namespace user:123
+
+# Dashboard Web (roadmap Era 3)
+```
+
+**Por que escolhemos essa abordagem:** Fine-tuning é "caixa preta" — você não sabe o que o modelo aprendeu. Cortex é um grafo que você pode abrir, inspecionar e corrigir.
 
 ---
 

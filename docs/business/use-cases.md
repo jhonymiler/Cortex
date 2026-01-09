@@ -125,14 +125,36 @@ if not result.passed:
 | **RH** | Discriminação via bias | Valor: "Avaliação objetiva e justa" |
 | **E-commerce** | Descontos não autorizados | Boundary: "Nunca prometer desconto > 20%" |
 
-### Compliance
+### Compliance e Auditabilidade
 
-O Memory Firewall auxilia em:
+O Memory Firewall + Grafo Auditável auxiliam em:
 
-- **LGPD/GDPR:** Audit log de tentativas de extração de dados
-- **SOC 2:** Controle de acesso e integridade de dados
+- **LGPD/GDPR:** Audit log de tentativas de extração de dados + visualização de dados armazenados
+- **SOC 2:** Controle de acesso e integridade de dados com trilha completa
 - **HIPAA:** Proteção contra vazamento de informações médicas
 - **PCI DSS:** Bloqueio de tentativas de fraude financeira
+
+**Diferencial: Transparência Total**
+
+```bash
+# Inspecionar memórias de um usuário
+curl http://localhost:8000/memory/graph \
+  -H "X-Cortex-Namespace: user:123"
+
+# Retorna:
+# {
+#   "entities": [...],      ← Quem/O quê
+#   "memories": [...],      ← Eventos estruturados
+#   "relations": [...],     ← Conexões entre entidades
+#   "stats": {
+#     "total_memories": 234,
+#     "hubs": ["produto_x", "cliente_123"],
+#     "decay_pending": 12
+#   }
+# }
+```
+
+> **Por que isso importa:** Em auditorias de compliance, você pode demonstrar **exatamente** o que o agente "sabe" sobre um usuário e como esse conhecimento foi adquirido.
 
 ---
 

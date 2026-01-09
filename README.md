@@ -50,7 +50,8 @@ Propomos um novo framework de avaliação para memória de agentes:
 | Valor Semântico | 50% | 100% | 100% | **100%** | Entende sinônimos, filtra irrelevante |
 | Eficiência | 0%* | 0%* | 0%* | **100%** | Latência baixa, tokens compactos |
 | 🛡️ Memory Firewall | 0%* | 0%* | 0%* | **100%** | Protege contra jailbreak/manipulação |
-| **ÍNDICE** | 16% | 33% | 33% | **85%** | — |
+| 🔍 Auditabilidade | 0%* | 0%* | 0%* | **100%** | Grafo inspecionável, não "caixa preta" |
+| **ÍNDICE** | 14% | 29% | 29% | **87%** | — |
 
 **\*** Não projetadas para isso — são ferramentas excelentes para outros propósitos.
 

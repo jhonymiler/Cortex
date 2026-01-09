@@ -14,8 +14,9 @@
 | Contexto poluído com ruído | Decay Ebbinghaus remove o irrelevante | -98% tokens |
 | Conhecimento preso em silos | Memória coletiva (PERSONAL/SHARED/LEARNED) | -83% onboarding |
 | Agentes manipuláveis | Memory Firewall bloqueia ataques | 100% proteção |
+| "Caixa preta" — não sei o que aprendeu | Grafo auditável + painel de controle | Transparência total |
 
-**Em uma frase:** Memória que evolui, não que acumula.
+**Em uma frase:** Memória que evolui, não que acumula — e que você pode inspecionar.
 
 ---
 
@@ -156,6 +157,41 @@ Resultado: A memória NUNCA é contaminada.
 - 🚫 E mais 6 categorias...
 
 > **Por que priorizamos isso:** A maioria dos sistemas de memória foca em retrieval — e fazem isso muito bem. O Cortex, por ser focado em agentes autônomos, precisa lidar com um risco adicional: manipulação de memória. A ausência de um mecanismo de proteção em sistemas como Mem0, LangMem e Zep significa que ataques podem contaminar a memória do agente permanentemente.
+
+### 🔍 Transparência Total: Veja o Que Seu Agente Lembra
+
+Diferente de modelos "caixa preta", o Cortex oferece **visibilidade completa**:
+
+```
+┌─────────────────────────────────────────────┐
+│  🧠 CORTEX MEMORY EXPLORER                │
+├─────────────────────────────────────────────┤
+│  Entidades: 1.234    Memórias: 5.678      │
+│  Relações: 3.456     Hubs: 23             │
+├─────────────────────────────────────────────┤
+│                                             │
+│     [João] ───comprou───▶ [Sapato 42]       │
+│        │                                    │
+│        └──reclamou───▶ [Atraso entrega]     │
+│                          │                  │
+│                          └──▶ [Resolvido]   │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Por que isso importa:**
+
+| Benefício | O Que Você Ganha |
+|-----------|------------------|
+| **Debugging** | "Por que o agente disse isso?" → Veja exatamente qual memória influenciou |
+| **Compliance** | Audit trail completo para LGPD/GDPR — saiba o que foi armazenado e quando |
+| **Confiança** | Valide que o agente está aprendendo corretamente antes de produzir erros |
+| **Otimização** | Identifique memórias de baixo valor e ajuste a estratégia |
+
+**Acesso via:**
+- 💻 **Dashboard Web** (em desenvolvimento)
+- 🖥️ **API REST** `/memory/graph` — retorna grafo completo
+- 🔧 **CLI** `cortex inspect --namespace user:123`
 
 ---
 
