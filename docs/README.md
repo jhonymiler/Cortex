@@ -26,7 +26,7 @@
 |--------------|-------------|
 | **Usar rapidamente** | [Quick Start](./getting-started/quickstart.md) → [Integrações](./getting-started/integrations.md) |
 | **Entender como funciona** | [Modelo W5H](./concepts/memory-model.md) → [Arquitetura](./architecture/overview.md) |
-| **Contribuir/Pesquisar** | [Base Científica](./research/scientific-basis.md) → [Benchmarks](./research/benchmarks.md) |
+| **Base científica** | [Base Científica](./research/scientific-basis.md) → [Benchmarks](./research/benchmarks.md) |
 | **Avaliar para negócio** | [Proposta de Valor](./business/value-proposition.md) → [Posicionamento](./business/competitive-position.md) |
 
 ---

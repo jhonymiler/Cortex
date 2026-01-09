@@ -7,7 +7,7 @@ name = "cortex-memory"
 version = "3.0.0"
 description = "Cognitive memory system for LLM agents - Entities, Episodes, Relations"
 readme = "README.md"
-license = "MIT"
+license = {text = "Proprietary"}
 authors = [
     { name = "Jhony", email = "jhony@example.com" }
 ]
@@ -15,7 +15,7 @@ requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",

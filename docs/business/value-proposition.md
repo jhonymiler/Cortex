@@ -394,7 +394,7 @@ Semana 2:
 | Consolida padrões | ❌ | ✅ DreamAgent |
 | Multi-tenant seguro | Limitado | ✅ Full isolation |
 | Memória coletiva | ❌ | ✅ LEARNED level |
-| Open source | Parcial | 100% MIT |
+| Suporte dedicado | Comunidade | ✅ Comercial |
 
 ---
 

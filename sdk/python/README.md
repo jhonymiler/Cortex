@@ -155,6 +155,6 @@ pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
-## Licença
+## Sobre
 
-MIT
+Cortex SDK é parte do projeto Cortex — memória cognitiva para agentes de IA.

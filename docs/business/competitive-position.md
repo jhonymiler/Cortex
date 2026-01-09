@@ -35,7 +35,7 @@ Cada solução foi otimizada para um problema específico. A tabela abaixo mostr
 | Zero custo por busca | ❌ | ❌ | ❌ | ❌ | ✅ |
 | **🛡️ Memory Firewall** | ❌ | ❌ | ❌ | ❌ | **✅** |
 | **🔍 Grafo auditável** | ❌ | ❌ | ❌ | ❌ | **✅** |
-| 100% Open Source | N/A | Varia | Varia | Parcial | ✅ |
+| Suporte comercial | N/A | Varia | Varia | Limitado | ✅ |
 
 **—** = Não é o foco do projeto (não é uma limitação, é uma escolha de design)  
 **†** = Baseado na curva de esquecimento de Ebbinghaus — memórias menos acessadas decaem naturalmente, similar ao cérebro humano ([Saiba mais](../concepts/cognitive-decay.md))
@@ -216,7 +216,7 @@ Esta é a comparação mais próxima — Mem0 também é focado em memória de a
 | **Memória coletiva** | ❌ Básico | ✅ PERSONAL/SHARED/LEARNED |
 | **Multi-tenant** | Limitado | ✅ Hierárquico |
 | **Hub detection** | ❌ | ✅ Automático |
-| **Open source** | Parcial | ✅ 100% MIT |
+| **Suporte comercial** | Comunidade | ✅ Dedicado |
 | **Self-hosted** | Complexo | ✅ Simples |
 
 **Por que isso importa na prática:**
@@ -579,7 +579,7 @@ client = CortexClient(
 | Custo zero por busca | ✅ Índice local |
 | Conhecimento coletivo | ✅ LEARNED level |
 | **🛡️ Proteção de memória** | **✅ Memory Firewall** |
-| Open source real | ✅ 100% MIT |
+| Suporte comercial dedicado | ✅ SLA garantido |
 | Setup em minutos | ✅ pip install + 3 linhas |
 
 **Cortex é especialista em memória cognitiva para agentes.** Não substitui seu RAG ou VectorDB — trabalha junto com eles, cada um no que faz melhor.

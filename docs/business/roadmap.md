@@ -328,51 +328,6 @@ HOJE - MEMÓRIA EPISÓDICA:
 
 ---
 
-## Como Contribuir
-
-### Prioridades por Era
-
-| Era | Onde Ajudar | Skills Necessárias |
-|-----|-------------|-------------------|
-| **Era 2** (atual) | Integrações, SDKs | Python, TypeScript, frameworks |
-| **Era 3** | Backends, escala | PostgreSQL, Redis, Kubernetes |
-| **Era 4** | Pesquisa | Cognitive Science, ML |
-| **Era 5** | Filosofia | AI Safety, Ethics |
-
-### Começando
-
-```bash
-# Clone
-git clone https://github.com/jhonymiler/Cortex.git
-cd Cortex
-
-# Setup
-pip install -e ".[all,dev]"
-
-# Testes
-pytest tests/ -v
-
-# Contribua
-git checkout -b feat/sua-feature
-# ... faz mudanças ...
-git commit -m "feat: sua contribuição"
-git push origin feat/sua-feature
-```
-
-### O Que Precisamos Agora
-
-| Área | Tarefas Abertas |
-|------|-----------------|
-| **Integrações** | Autogen adapter, Semantic Kernel adapter |
-| **Backends** | PostgreSQL persistence, Redis cache |
-| **Docs** | Tutoriais em vídeo, exemplos por indústria |
-| **Testes** | Benchmark em produção real, stress tests |
-| **Pesquisa** | Papers sobre consolidação, decay optimization |
-
-→ [Ver issues abertas](https://github.com/jhonymiler/Cortex/issues)
-
----
-
 ## Perguntas Frequentes
 
 ### "Quando teremos memória procedural?"
@@ -381,7 +336,7 @@ git push origin feat/sua-feature
 
 ### "Cortex vai ser pago?"
 
-**O core é MIT para sempre.** Podemos oferecer versões gerenciadas (SaaS) no futuro, mas o código-fonte será sempre aberto.
+**Sim.** Cortex é um produto comercial. Ofereceremos planos que atendam desde startups até enterprises, com versões gerenciadas (SaaS) e on-premise.
 
 ### "Posso usar em produção hoje?"
 

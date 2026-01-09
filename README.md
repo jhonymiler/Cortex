@@ -1,11 +1,10 @@
 # 🧠 Cortex
 
-> **Agentes de IA sofrem de amnésia crônica** — frustram usuários e desperdiçam recursos.
-> **Cortex resolve isso** com memória inspirada no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
-> **Resultado comprovado:** -73% no tempo de atendimento, -98% nos custos de tokens.
+> **Porque agentes inteligentes precisam de memória inteligente.**
+
+Um novo conceito de memória cognitiva para agentes de IA — inspirado no cérebro humano: esquece o ruído, fortalece o importante, aprende coletivamente.
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
@@ -34,7 +33,7 @@ def agent(msg, context=""):
 |--------------|-------------|
 | **Usar o Cortex** | [Quick Start](docs/getting-started/quickstart.md) → [Integrações](docs/getting-started/integrations.md) |
 | **Entender como funciona** | [Modelo W5H](docs/concepts/memory-model.md) → [Arquitetura](docs/architecture/overview.md) |
-| **Contribuir/Pesquisar** | [Base Científica](docs/research/scientific-basis.md) → [Benchmarks](docs/research/benchmarks.md) |
+| **Base científica** | [Base Científica](docs/research/scientific-basis.md) → [Benchmarks](docs/research/benchmarks.md) |
 | **Avaliar para negócio** | [Proposta de Valor](docs/business/value-proposition.md) → [Posicionamento](docs/business/competitive-position.md) |
 
 ---
@@ -193,24 +192,6 @@ pytest tests/ -v
 
 ---
 
-## 🤝 Contribuindo
-
-```bash
-pip install -e ".[all,dev]"
-pytest tests/ -v
-ruff check src/
-```
-
-[→ Ver roadmap para contribuidores](docs/business/roadmap.md#como-contribuir)
-
----
-
-## 📄 Licença
-
-MIT — use, modifique, distribua livremente.
-
----
-
 <p align="center">
-  <strong>🧠 Cortex — Porque agentes inteligentes precisam lembrar.</strong>
+  <strong>🧠 Cortex — Porque agentes inteligentes precisam de memória inteligente.</strong>
 </p>
