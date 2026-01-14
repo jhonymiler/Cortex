@@ -17,7 +17,7 @@ Baseado em:
 
 import math
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 from uuid import uuid4
 
@@ -120,10 +120,15 @@ class Memory:
     consolidated_from: list[str] = field(default_factory=list)
     consolidated_into: str | None = None  # ID da memória pai (se foi consolidada)
     is_summary: bool = False  # True se esta memória é um resumo de consolidação
-    
+
+    # SM-2 Adaptive Spaced Repetition
+    easiness: float = 2.5  # EF (Easiness Factor): 1.3 - 2.5
+    interval: int = 1  # Days until next review
+    repetitions: int = 0  # Number of successful reviews
+
     # Metadados
     metadata: dict[str, Any] = field(default_factory=dict)
-    
+
     # Cache de centralidade (atualizado externamente)
     _centrality_score: float = field(default=0.0, repr=False)
     
@@ -199,7 +204,7 @@ class Memory:
     def touch(self) -> None:
         """
         Marca a memória como acessada.
-        
+
         Efeitos:
         - Incrementa access_count
         - Atualiza last_accessed
@@ -208,15 +213,108 @@ class Memory:
         """
         self.access_count += 1
         self.last_accessed = datetime.now()
-        
+
         # Spaced repetition: cada acesso aumenta stability
         # Limite de 10.0 para evitar memórias "imortais"
         self.stability = min(10.0, self.stability * 1.2)
-        
+
         # Se estava esquecida, revive
         if self.metadata.get("forgotten"):
             del self.metadata["forgotten"]
-    
+
+    def update_sm2(self, quality: int) -> None:
+        """
+        Update memory using SM-2 algorithm (adaptive spaced repetition).
+
+        SM-2 adapts the review interval based on recall quality.
+        Memories that are easy to recall get longer intervals.
+        Memories that are hard to recall get shorter intervals.
+
+        Args:
+            quality: Recall quality (0-5)
+                5 = Perfect recall, top-5 result
+                4 = Good recall, top-10 result
+                3 = Acceptable recall, found in results
+                2 = Hard recall, barely found
+                1 = Failed recall, not found but should be
+                0 = Complete failure
+
+        Effects:
+            - Updates easiness factor (EF)
+            - Updates review interval
+            - Updates stability
+            - Updates repetitions count
+        """
+        # SM-2 Algorithm (SuperMemo 2)
+
+        # 1. Update Easiness Factor (EF)
+        # EF' = EF + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
+        # EF is clamped to [1.3, 2.5]
+        ef_delta = 0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)
+        self.easiness = max(1.3, min(2.5, self.easiness + ef_delta))
+
+        # 2. Update interval and repetitions
+        if quality < 3:
+            # Failed recall - restart
+            self.repetitions = 0
+            self.interval = 1
+        else:
+            # Successful recall
+            self.repetitions += 1
+
+            if self.repetitions == 1:
+                self.interval = 1
+            elif self.repetitions == 2:
+                self.interval = 6
+            else:
+                # interval_n = interval_{n-1} * EF
+                self.interval = math.ceil(self.interval * self.easiness)
+
+        # 3. Cap maximum interval at 365 days (prevent immortal memories)
+        self.interval = min(365, self.interval)
+
+        # 4. Update stability to match interval
+        # Stability represents how long the memory stays retrievable
+        self.stability = float(self.interval)
+
+        # 5. Update last access
+        self.last_accessed = datetime.now()
+
+    def get_sm2_status(self) -> dict[str, Any]:
+        """
+        Get SM-2 algorithm status for this memory.
+
+        Returns:
+            Dict with SM-2 metrics:
+            {
+                "easiness": 2.5,
+                "interval": 6,
+                "repetitions": 3,
+                "next_review": datetime,
+                "difficulty": "easy" | "medium" | "hard"
+            }
+        """
+        # Calculate next review date
+        last_access = self.last_accessed or self.when
+        next_review = last_access + timedelta(days=self.interval)
+
+        # Classify difficulty
+        if self.easiness >= 2.3:
+            difficulty = "easy"
+        elif self.easiness >= 1.9:
+            difficulty = "medium"
+        else:
+            difficulty = "hard"
+
+        return {
+            "easiness": round(self.easiness, 2),
+            "interval": self.interval,
+            "repetitions": self.repetitions,
+            "next_review": next_review,
+            "difficulty": difficulty,
+            "stability": round(self.stability, 2),
+        }
+
     def forget(self) -> None:
         """Marca a memória como esquecida."""
         self.metadata["forgotten"] = True

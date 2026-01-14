@@ -28,6 +28,13 @@ from cortex.core.episode import Episode
 from cortex.core.relation import Relation
 from cortex.core.inverted_index import InvertedIndex
 from cortex.core.language import tokenize
+
+# V2.0 Enhancements
+from cortex.core.context_packer import ContextPacker
+from cortex.core.hierarchical_recall import HierarchicalRecall
+from cortex.core.memory_attention import MemoryAttention, AttentionConfig
+from cortex.core.decay import ForgetGate
+from cortex.config import CortexConfig, get_config
 from cortex.core.contradiction import (
     ContradictionDetector,
     Contradiction,
@@ -83,21 +90,46 @@ class RecallResult:
     def _to_yaml_context(self, max_tokens: int = 150) -> str:
         """
         Formato ULTRA-COMPACTO para LLMs.
-        
-        OTIMIZAÇÃO v3: Máximo ~150 tokens (~40 palavras)
-        - 1 linha para entidade principal
-        - 2 episódios máximo (mais recentes/relevantes)
-        - 1 conhecimento coletivo máximo
-        - Cada linha <= 60 chars
+
+        OTIMIZAÇÃO v4 (V2.0): Context Packing Algorithm
+        - Usa ContextPacker para 40-70% de redução de tokens
+        - Priority scoring: importance × retrievability × recency
+        - Grouping de episódios redundantes
+        - Sumarização hierárquica
         """
+        # V2.0: Use Context Packer if enabled
+        if hasattr(self, '_config') and self._config.enable_context_packing:
+            # Separate personal and collective episodes
+            personal_episodes = [
+                ep for ep in self.episodes
+                if ep.metadata.get("visibility", "personal") == "personal"
+                and not ep.metadata.get("inherited_from")
+            ]
+
+            collective_episodes = [
+                ep for ep in self.episodes
+                if ep.metadata.get("visibility") == "learned"
+                or ep.metadata.get("inherited_from")
+            ]
+
+            # Use Context Packer
+            packed = self._context_packer.pack_episodes(
+                episodes=personal_episodes,
+                entities=self.entities,
+                collective_episodes=collective_episodes,
+            )
+
+            return packed
+
+        # Legacy path (if Context Packing disabled)
         parts = []
         token_estimate = 0
-        
+
         # Filtra entidades relevantes (ignora genéricos)
         skip_names = {"user", "assistant", "participant", "none", "", "undefined", "cliente", "sistema"}
         useful_entities = [
             e for e in self.entities[:3]  # Reduzido de 5 para 3
-            if e.name.lower() not in skip_names 
+            if e.name.lower() not in skip_names
             and e.type.lower() not in skip_names
             and not e.name.startswith("[")
             and len(e.name) > 2  # Ignora nomes muito curtos
@@ -264,10 +296,27 @@ class MemoryGraph:
         
         # NOVO: Índice invertido para busca O(log n)
         self._inverted_index = InvertedIndex()
-        
+
         # Detector de contradições
         self._contradiction_detector = create_default_detector()
-        
+
+        # V2.0 Enhancements
+        self._config = get_config()
+        self._context_packer = ContextPacker(max_tokens=self._config.context_max_tokens)
+        self._hierarchical_recall = HierarchicalRecall()
+        self._attention = MemoryAttention(AttentionConfig(
+            d_model=self._config.attention_d_model,
+            n_heads=self._config.attention_heads,
+            temperature=self._config.attention_temperature,
+            use_graph_bias=self._config.attention_use_graph_bias,
+        ))
+        self._forget_gate = ForgetGate(
+            forget_threshold=self._config.forget_gate_threshold,
+            noise_weight=self._config.forget_gate_noise_weight,
+            redundancy_weight=self._config.forget_gate_redundancy_weight,
+            obsolescence_weight=self._config.forget_gate_obsolescence_weight,
+        )
+
         # Carrega se existir
         if self.storage_path:
             self._load()
@@ -377,14 +426,22 @@ class MemoryGraph:
     
     # ==================== EPISODE OPERATIONS ====================
     
-    def add_episode(self, episode: Episode) -> Episode:
+    def add_episode(self, episode: Episode, consolidation_mode: str = "progressive") -> Episode:
         """
         Adiciona um episódio e verifica se deve consolidar.
+
+        Args:
+            episode: Episódio a adicionar
+            consolidation_mode: "progressive" (age-aware) ou "fixed" (legacy)
         """
         # Verifica se deve consolidar com episódios similares
         similar = self._find_similar_episodes(episode)
-        
-        if len(similar) >= 4:  # 5 ou mais = consolida
+
+        # Progressive consolidation: threshold adapts based on pattern age
+        threshold = episode.get_consolidation_threshold(consolidation_mode)
+        required_similar = threshold - 1  # threshold-1 because we add the new episode
+
+        if len(similar) >= required_similar:
             # Consolida todos + o novo
             consolidated = Episode.consolidate(similar + [episode])
             
@@ -870,17 +927,46 @@ class MemoryGraph:
         entity_ids = [e.id for e in entities]
         metrics["entities_found"] = len(entities)
         
-        # 4. Busca episódios com otimizações
+        # 4. Busca episódios com otimizações V2.0
         enriched_context = {**context, "entity_ids": entity_ids}
-        episodes = self.find_episodes(
-            query=query,
-            participant_ids=entity_ids if entity_ids else None,
-            limit=RECALL_MAX_RESULTS,
-            context=enriched_context,
-            min_score=RECALL_MIN_THRESHOLD,
-        )
-        
-        # 4.1. FILTRA memórias que JÁ FORAM CONSOLIDADAS (filhas)
+
+        # 4.1. Hierarchical Recall (se habilitado)
+        if self._config.enable_hierarchical_recall:
+            hierarchical_results = self._hierarchical_recall.recall(
+                query=query,
+                graph=self,
+                context_tokens=self._config.context_max_tokens,
+            )
+            # Flatten results
+            episodes = []
+            for level_name in ["working", "recent", "patterns", "knowledge"]:
+                episodes.extend(hierarchical_results.get(level_name, []))
+            metrics["hierarchical_recall_used"] = True
+        else:
+            # Busca tradicional
+            episodes = self.find_episodes(
+                query=query,
+                participant_ids=entity_ids if entity_ids else None,
+                limit=RECALL_MAX_RESULTS,
+                context=enriched_context,
+                min_score=RECALL_MIN_THRESHOLD,
+            )
+            metrics["hierarchical_recall_used"] = False
+
+        # 4.2. Active Forgetting / Forget Gate (se habilitado)
+        if self._config.enable_active_forgetting:
+            before_forget = len(episodes)
+            episodes = self._forget_gate.apply_gate(episodes, self)
+            metrics["filtered_by_forget_gate"] = before_forget - len(episodes)
+
+        # 4.3. Attention Mechanism Ranking (se habilitado)
+        if self._config.enable_attention_mechanism and episodes:
+            attention_scores = self._attention.compute_attention(query, episodes, self)
+            ranked = self._attention.rank_by_attention(episodes, attention_scores)
+            episodes = [ep for ep, score in ranked]
+            metrics["attention_reranking_used"] = True
+
+        # 4.4. FILTRA memórias que JÁ FORAM CONSOLIDADAS (filhas)
         # Só retorna resumos (consolidadas) e memórias frescas (não consolidadas)
         include_consolidated = context.get("include_consolidated", False)
         if not include_consolidated:
@@ -1149,17 +1235,29 @@ class MemoryGraph:
         
         return None
     
-    def add_episode_with_consolidation(self, episode: Episode) -> tuple[bool, int]:
+    def add_episode_with_consolidation(
+        self,
+        episode: Episode,
+        consolidation_mode: str = "progressive"
+    ) -> tuple[bool, int]:
         """
         Adiciona episódio e verifica se deve consolidar.
-        
+
+        Args:
+            episode: Episódio a adicionar
+            consolidation_mode: "progressive" (age-aware) ou "fixed" (legacy)
+
         Returns:
             Tuple of (was_consolidated, consolidation_count)
         """
         # Busca episódios similares
         similar = self._find_similar_episodes(episode)
-        
-        if len(similar) >= 4:  # 5+ similares = consolida
+
+        # Progressive consolidation
+        threshold = episode.get_consolidation_threshold(consolidation_mode)
+        required_similar = threshold - 1
+
+        if len(similar) >= required_similar:
             # Encontra o mais consolidado
             most_consolidated = max(
                 similar,

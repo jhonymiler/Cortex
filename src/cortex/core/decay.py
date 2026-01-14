@@ -535,3 +535,254 @@ def create_gentle_decay_manager() -> DecayManager:
         hub_bonus=2.0,
         consolidation_bonus=3.0,
     ))
+
+
+class ForgetGate:
+    """
+    LSTM-inspired Forget Gate for active memory management.
+
+    Computes a forget signal (0-1) based on three factors:
+    - Noise (0.4): How likely the memory is noise vs signal
+    - Redundancy (0.35): Is this memory redundant with others?
+    - Obsolescence (0.25): Is this memory outdated or superseded?
+
+    High forget score → accelerate decay (2x)
+    Low forget score → preserve memory
+
+    Inspired by LSTM forget gates and active forgetting in human cognition.
+    """
+
+    def __init__(
+        self,
+        noise_weight: float = 0.4,
+        redundancy_weight: float = 0.35,
+        obsolescence_weight: float = 0.25,
+        forget_threshold: float = 0.6,
+    ):
+        """
+        Args:
+            noise_weight: Weight for noise signal (default 0.4)
+            redundancy_weight: Weight for redundancy signal (default 0.35)
+            obsolescence_weight: Weight for obsolescence signal (default 0.25)
+            forget_threshold: Threshold above which to accelerate decay (default 0.6)
+        """
+        self.noise_weight = noise_weight
+        self.redundancy_weight = redundancy_weight
+        self.obsolescence_weight = obsolescence_weight
+        self.forget_threshold = forget_threshold
+
+    def compute_forget_signal(
+        self,
+        episode: "Episode",
+        graph: "MemoryGraph",
+    ) -> float:
+        """
+        Compute forget signal for an episode.
+
+        Args:
+            episode: Episode to evaluate
+            graph: Memory graph for context
+
+        Returns:
+            Forget score 0.0-1.0 (higher = should forget)
+        """
+        noise_score = self._noise_score(episode)
+        redundancy_score = self._redundancy_score(episode, graph)
+        obsolescence_score = self._obsolescence_score(episode, graph)
+
+        forget_signal = (
+            self.noise_weight * noise_score +
+            self.redundancy_weight * redundancy_score +
+            self.obsolescence_weight * obsolescence_score
+        )
+
+        return min(1.0, max(0.0, forget_signal))
+
+    def apply_gate(
+        self,
+        episodes: list["Episode"],
+        graph: "MemoryGraph",
+    ) -> list["Episode"]:
+        """
+        Filter episodes by forget gate.
+
+        Episodes with high forget signal are excluded.
+
+        Args:
+            episodes: Episodes to filter
+            graph: Memory graph
+
+        Returns:
+            Filtered list of episodes
+        """
+        filtered = []
+
+        for episode in episodes:
+            forget_signal = self.compute_forget_signal(episode, graph)
+
+            # Keep if forget signal is below threshold
+            if forget_signal < self.forget_threshold:
+                filtered.append(episode)
+
+        return filtered
+
+    def accelerate_decay(
+        self,
+        episode: "Episode",
+        graph: "MemoryGraph",
+        decay_multiplier: float = 2.0,
+    ) -> None:
+        """
+        Accelerate decay for high-forget-score episodes.
+
+        Args:
+            episode: Episode to accelerate decay
+            graph: Memory graph
+            decay_multiplier: How much to accelerate (default 2x)
+        """
+        forget_signal = self.compute_forget_signal(episode, graph)
+
+        if forget_signal >= self.forget_threshold:
+            # Reduce importance (accelerates decay)
+            episode.decay_importance(0.9 ** decay_multiplier)
+
+    def _noise_score(self, episode: "Episode") -> float:
+        """
+        Estimate if episode is noise vs signal.
+
+        Indicators of noise:
+        - Very low importance
+        - No participants
+        - Empty or very short action/outcome
+        - No consolidation
+        - Generic/undefined values
+
+        Returns:
+            Noise score 0.0-1.0 (higher = more likely noise)
+        """
+        score = 0.0
+
+        # Factor 1: Low importance (0-0.3)
+        if episode.importance < 0.3:
+            score += 0.3
+        elif episode.importance < 0.5:
+            score += 0.1
+
+        # Factor 2: No participants (0.25)
+        if not episode.participants or len(episode.participants) == 0:
+            score += 0.25
+
+        # Factor 3: Empty/short content (0.25)
+        action_len = len(episode.action) if episode.action else 0
+        outcome_len = len(episode.outcome) if hasattr(episode, 'outcome') and episode.outcome else 0
+        total_len = action_len + outcome_len
+
+        if total_len < 10:
+            score += 0.25
+        elif total_len < 30:
+            score += 0.1
+
+        # Factor 4: Generic values (0.2)
+        noise_terms = {"undefined", "none", "null", "unknown", ""}
+        if episode.action.lower().strip() in noise_terms:
+            score += 0.2
+
+        # Factor 5: Not consolidated (consolidation = signal) (0.1)
+        if not episode.is_consolidated:
+            score += 0.1
+
+        return min(1.0, score)
+
+    def _redundancy_score(
+        self,
+        episode: "Episode",
+        graph: "MemoryGraph",
+    ) -> float:
+        """
+        Estimate if episode is redundant with others.
+
+        Indicators of redundancy:
+        - Many similar episodes exist
+        - Episode is not the consolidated version
+        - Low occurrence count despite age
+
+        Returns:
+            Redundancy score 0.0-1.0 (higher = more redundant)
+        """
+        score = 0.0
+
+        # Find similar episodes
+        try:
+            similar = graph._find_similar_episodes(episode, threshold=0.7)
+        except:
+            similar = []
+
+        # Factor 1: Many similar episodes (0.5)
+        if len(similar) >= 5:
+            score += 0.5
+        elif len(similar) >= 3:
+            score += 0.3
+        elif len(similar) >= 1:
+            score += 0.1
+
+        # Factor 2: Not consolidated but should be (0.3)
+        if len(similar) >= 2 and not episode.is_consolidated:
+            score += 0.3
+
+        # Factor 3: Low occurrence count despite age (0.2)
+        if episode.timestamp:
+            days_old = (datetime.now() - episode.timestamp).days
+            if days_old > 30 and episode.occurrence_count == 1:
+                score += 0.2
+
+        return min(1.0, score)
+
+    def _obsolescence_score(
+        self,
+        episode: "Episode",
+        graph: "MemoryGraph",
+    ) -> float:
+        """
+        Estimate if episode is obsolete/superseded.
+
+        Indicators of obsolescence:
+        - Very old with no recent access
+        - Low retrievability
+        - Superseded by newer episodes with same pattern
+
+        Returns:
+            Obsolescence score 0.0-1.0 (higher = more obsolete)
+        """
+        score = 0.0
+
+        # Factor 1: Old with no recent access (0.4)
+        if episode.timestamp:
+            days_old = (datetime.now() - episode.timestamp).days
+            last_accessed = getattr(episode, 'last_accessed', episode.timestamp)
+            days_since_access = (datetime.now() - last_accessed).days
+
+            if days_old > 90 and days_since_access > 60:
+                score += 0.4
+            elif days_old > 30 and days_since_access > 30:
+                score += 0.2
+
+        # Factor 2: Low retrievability (0.4)
+        retrievability = episode.metadata.get("retrievability", 1.0)
+        if retrievability < 0.2:
+            score += 0.4
+        elif retrievability < 0.4:
+            score += 0.2
+
+        # Factor 3: Superseded by newer consolidated version (0.2)
+        try:
+            similar = graph._find_similar_episodes(episode, threshold=0.7)
+            for sim in similar:
+                if (sim.is_consolidated and
+                    not episode.is_consolidated and
+                    sim.timestamp > episode.timestamp):
+                    score += 0.2
+                    break
+        except:
+            pass
+
+        return min(1.0, score)
