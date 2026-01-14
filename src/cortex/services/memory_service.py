@@ -69,10 +69,6 @@ class StoreRequest(BaseModel):
     conversation_id: str | None = Field(default=None, description="ID of the active conversation")
     session_id: str | None = Field(default=None, description="ID of the current session")
     namespace: str = Field(default="default", description="Namespace for isolation")
-    
-    # Context tracking
-    conversation_id: str | None = Field(default=None, description="ID of the active conversation")
-    session_id: str | None = Field(default=None, description="ID of the current session")
 
 
 class StoreResponse(BaseModel):
@@ -93,11 +89,6 @@ class RecallRequest(BaseModel):
     query: str = Field(..., description="The topic or message to search for")
     context: dict[str, Any] = Field(default_factory=dict, description="Additional context")
     limit: int = Field(default=5, description="Maximum results per category")
-    
-    # Context tracking
-    conversation_id: str | None = Field(default=None, description="ID of the active conversation")
-    session_id: str | None = Field(default=None, description="ID of the current session")
-    namespace: str = Field(default="default", description="Namespace to search in")
     
     # Context tracking
     conversation_id: str | None = Field(default=None, description="ID of the active conversation")

@@ -201,16 +201,7 @@ class RecallResult:
         if problema and solucao:
             return f"{problema[:20]}→{solucao[:25]}"
         return problema[:45] if problema else ""
-    
-    def _format_episode_line(self, ep: Episode, skip_names: set) -> str:
-        """Formata linha de episódio pessoal (legacy, usa compact)."""
-        return self._format_episode_compact(ep)
-    
-    def _format_collective_line(self, ep: Episode) -> str:
-        """Formata linha de conhecimento coletivo (legacy, usa compact)."""
-        line = self._format_collective_compact(ep)
-        return f"  💡 {line}" if line else ""
-    
+
     def _sanitize_value(self, value: Any) -> str:
         """Sanitiza valor para evitar undefined, null, arrays como string."""
         if value is None:
