@@ -189,7 +189,42 @@ class Episode:
                     score = min(1.0, score + 0.2)
         
         return min(1.0, score)
-    
+
+    def get_consolidation_threshold(self, mode: str = "progressive") -> int:
+        """
+        Calcula threshold dinâmico para consolidação baseado na idade do padrão.
+
+        Progressive Consolidation (age-aware):
+        - Padrões emergentes (< 7 dias): threshold = 2 (consolida rápido)
+        - Padrões recorrentes (7-30 dias): threshold = 4
+        - Padrões estáveis (30-90 dias): threshold = 8
+        - Padrões cristalizados (> 90 dias): threshold = 16
+
+        Args:
+            mode: "progressive" (age-aware) ou "fixed" (legacy, threshold=5)
+
+        Returns:
+            Threshold de consolidação (número de ocorrências necessárias)
+        """
+        if mode == "fixed":
+            return 5  # Legacy behavior
+
+        # Calculate pattern age
+        if not self.timestamp:
+            return 2  # Default to emerging pattern
+
+        days_old = (datetime.now() - self.timestamp).days
+
+        # Progressive thresholds based on age
+        if days_old < 7:
+            return 2  # Emerging: consolidate fast
+        elif days_old < 30:
+            return 4  # Recurring: medium threshold
+        elif days_old < 90:
+            return 8  # Stable: higher evidence needed
+        else:
+            return 16  # Crystallized: very high threshold
+
     def to_summary(self) -> str:
         """Gera um resumo legível do episódio."""
         parts = [f"[{self.timestamp.strftime('%Y-%m-%d %H:%M')}]"]
