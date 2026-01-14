@@ -11,6 +11,11 @@ V2.0 Components:
 from cortex.core.learning.decay import (
     DecayManager,
     ForgetGate,
+    DecayConfig,
+    create_decay_manager,
+    create_default_decay_manager,
+    create_aggressive_decay_manager,
+    create_gentle_decay_manager,
 )
 from cortex.core.learning.memory_attention import (
     MemoryAttention,
@@ -27,6 +32,11 @@ from cortex.core.learning.contradiction import (
 __all__ = [
     "DecayManager",
     "ForgetGate",
+    "DecayConfig",
+    "create_decay_manager",
+    "create_default_decay_manager",
+    "create_aggressive_decay_manager",
+    "create_gentle_decay_manager",
     "MemoryAttention",
     "AttentionConfig",
     "ContradictionDetector",
