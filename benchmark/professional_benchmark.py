@@ -29,12 +29,17 @@ import sys
 import time
 import tempfile
 import shutil
+import os
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from collections import defaultdict
 import math
+
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -95,6 +100,11 @@ class ProfessionalBenchmark:
 
         # Create temporary directory for test data
         self.tmpdir = Path(tempfile.mkdtemp(prefix="cortex_bench_"))
+
+        # Read environment variables for config
+        self.data_dir = os.getenv("CORTEX_DATA_DIR", "./data")
+        self.ollama_base_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        self.embedding_model = os.getenv("CORTEX_EMBEDDING_MODEL", "qwen3-embedding:0.6b")
 
     def __enter__(self):
         return self
@@ -172,25 +182,35 @@ class ProfessionalBenchmark:
             graph = MemoryGraph(storage_path=self.tmpdir / "semantic_test")
 
             # Store memories with specific concepts
-            graph.add_entity("user_123", "customer")
-            graph.add_episode(
-                entities=["user_123"],
+            entity = Entity(type="customer", name="user_123")
+            graph.add_entity(entity)
+
+            episode1 = Episode(
                 action="login_failed",
+                participants=[entity.id],
+                context="",
                 outcome="password_incorrect",
                 importance=0.8,
             )
-            graph.add_episode(
-                entities=["user_123"],
+            graph.add_episode(episode1)
+
+            episode2 = Episode(
                 action="authentication_error",
+                participants=[entity.id],
+                context="",
                 outcome="credentials_invalid",
                 importance=0.8,
             )
-            graph.add_episode(
-                entities=["user_123"],
+            graph.add_episode(episode2)
+
+            episode3 = Episode(
                 action="produto_azul",  # Noise
+                participants=[entity.id],
+                context="",
                 outcome="entrega_pendente",
                 importance=0.5,
             )
+            graph.add_episode(episode3)
 
             # Test synonym matching
             result = graph.recall("não consigo acessar minha conta", top_k=5)
@@ -236,14 +256,18 @@ class ProfessionalBenchmark:
             graph = MemoryGraph(storage_path=self.tmpdir / "latency_test")
 
             # Add test data
-            graph.add_entity("test_user", "customer")
+            entity = Entity(type="customer", name="test_user")
+            graph.add_entity(entity)
+
             for i in range(10):
-                graph.add_episode(
-                    entities=["test_user"],
+                episode = Episode(
                     action=f"action_{i}",
+                    participants=[entity.id],
+                    context="",
                     outcome=f"outcome_{i}",
                     importance=0.7,
                 )
+                graph.add_episode(episode)
 
             # Cold start (first call)
             cold_start = time.time()
@@ -293,14 +317,18 @@ class ProfessionalBenchmark:
 
             # Session 1: Store
             graph1 = MemoryGraph(storage_path=storage_path)
-            graph1.add_entity("persistent_user", "test")
-            graph1.add_episode(
-                entities=["persistent_user"],
+            entity = Entity(type="test", name="persistent_user")
+            graph1.add_entity(entity)
+
+            episode = Episode(
                 action="test_action",
+                participants=[entity.id],
+                context="",
                 outcome="test_outcome",
                 importance=0.9,
             )
-            graph1.save()
+            graph1.add_episode(episode)
+            # Note: save() is called automatically by add_episode
             del graph1
 
             # Session 2: Load
@@ -338,14 +366,18 @@ class ProfessionalBenchmark:
             graph = MemoryGraph(storage_path=self.tmpdir / "scale_test")
 
             # Add 100 memories
-            graph.add_entity("scale_user", "test")
+            entity = Entity(type="test", name="scale_user")
+            graph.add_entity(entity)
+
             for i in range(100):
-                graph.add_episode(
-                    entities=["scale_user"],
+                episode = Episode(
                     action=f"action_{i}",
+                    participants=[entity.id],
+                    context="",
                     outcome=f"outcome_{i}",
                     importance=0.5,
                 )
+                graph.add_episode(episode)
 
             # Measure recall time
             recall_start = time.time()
@@ -384,11 +416,29 @@ class ProfessionalBenchmark:
             graph = MemoryGraph(storage_path=self.tmpdir / "concurrent_test")
 
             # Sequential operations (simulated concurrent)
-            graph.add_entity("user_a", "test")
-            graph.add_entity("user_b", "test")
+            entity_a = Entity(type="test", name="user_a")
+            graph.add_entity(entity_a)
 
-            graph.add_episode(entities=["user_a"], action="action_a", outcome="outcome_a", importance=0.7)
-            graph.add_episode(entities=["user_b"], action="action_b", outcome="outcome_b", importance=0.7)
+            entity_b = Entity(type="test", name="user_b")
+            graph.add_entity(entity_b)
+
+            episode_a = Episode(
+                action="action_a",
+                participants=[entity_a.id],
+                context="",
+                outcome="outcome_a",
+                importance=0.7
+            )
+            graph.add_episode(episode_a)
+
+            episode_b = Episode(
+                action="action_b",
+                participants=[entity_b.id],
+                context="",
+                outcome="outcome_b",
+                importance=0.7
+            )
+            graph.add_episode(episode_b)
 
             result_a = graph.recall("action_a")
             result_b = graph.recall("action_b")
@@ -442,10 +492,15 @@ class ProfessionalBenchmark:
             graph = MemoryGraph(storage_path=self.tmpdir / "decay_test")
             decay_manager = create_default_decay_manager()
 
+            # Create entity first
+            entity = Entity(type="user", name="test_user")
+            graph.add_entity(entity)
+
             # Create old memory
             old_episode = Episode(
-                entities=["user"],
                 action="old_action",
+                participants=[entity.id],
+                context="",
                 outcome="old_outcome",
                 importance=0.7,
                 timestamp=datetime.now() - timedelta(days=14),  # 2 weeks old
@@ -453,8 +508,9 @@ class ProfessionalBenchmark:
 
             # Create recent memory
             recent_episode = Episode(
-                entities=["user"],
                 action="recent_action",
+                participants=[entity.id],
+                context="",
                 outcome="recent_outcome",
                 importance=0.7,
                 timestamp=datetime.now() - timedelta(days=1),  # 1 day old
