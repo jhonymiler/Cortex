@@ -24,9 +24,9 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from cortex.core.memory_graph import MemoryGraph
-from cortex.core.episode import Episode
-from cortex.core.entity import Entity
+from cortex.core.graph import MemoryGraph
+from cortex.core.primitives import Episode
+from cortex.core.primitives import Entity
 
 
 @dataclass

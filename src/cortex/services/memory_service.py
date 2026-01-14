@@ -24,14 +24,14 @@ from typing import Any, Optional
 from pydantic import BaseModel, Field
 
 from cortex.core import Entity, Episode, MemoryGraph, Relation
-from cortex.core.memory import Memory
-from cortex.core.memory_graph import RecallResult
-from cortex.core.decay import DecayManager, create_default_decay_manager
-from cortex.core.namespace import NamespacedMemoryManager
-from cortex.core.embedding import get_embedding_service, cosine_similarity
-from cortex.core.shared_memory import (
-    SharedMemoryManager, 
-    SharedMemoryContext, 
+from cortex.core.primitives import Memory
+from cortex.core.graph import RecallResult
+from cortex.core.learning import DecayManager, create_default_decay_manager
+from cortex.core.primitives import NamespacedMemoryManager
+from cortex.core.processing.embedding import get_embedding_service, cosine_similarity
+from cortex.core.storage import (
+    SharedMemoryManager,
+    SharedMemoryContext,
     MemoryVisibility,
     NamespaceConfig,
 )

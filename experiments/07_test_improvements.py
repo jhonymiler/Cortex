@@ -25,9 +25,8 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from cortex.core.memory_graph import MemoryGraph
-from cortex.core.entity import Entity
-from cortex.core.episode import Episode
+from cortex.core.graph import MemoryGraph
+from cortex.core.primitives import Entity, Episode
 from cortex.config import CortexConfig, set_config
 from datetime import datetime, timedelta
 import tempfile
@@ -294,7 +293,7 @@ def test_sm2_adaptive():
     """Teste 6: SM-2 adapta easiness factor"""
     print("\n=== TESTE 6: SM-2 Adaptive ===")
 
-    from cortex.core.memory import Memory
+    from cortex.core.primitives import Memory
 
     # Cria memória com EF inicial menor (para permitir aumento)
     mem = Memory(

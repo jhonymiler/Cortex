@@ -25,7 +25,7 @@ from datetime import datetime
 import sys
 sys.path.insert(0, str(__file__).replace("/benchmark/security_benchmark.py", "/src"))
 
-from cortex.core.identity import (
+from cortex.core.storage import (
     IdentityKernel,
     create_default_kernel,
     create_strict_kernel,

@@ -49,7 +49,7 @@ from cortex.services.memory_service import (
     ForgetRequest,
     ForgetResponse,
 )
-from cortex.core.identity import (
+from cortex.core.storage import (
     IdentityKernel,
     EvaluationResult,
     Action,

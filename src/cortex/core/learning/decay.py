@@ -19,9 +19,8 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cortex.core.memory_graph import MemoryGraph
-    from cortex.core.episode import Episode
-    from cortex.core.entity import Entity
+    from cortex.core.graph import MemoryGraph
+    from cortex.core.primitives import Episode, Entity
 
 
 @dataclass

@@ -15,7 +15,7 @@ O namespace é definido pelo usuário do Cortex - total flexibilidade.
 from pathlib import Path
 from typing import Any
 
-from cortex.core.memory_graph import MemoryGraph
+from cortex.core.graph import MemoryGraph
 
 
 class NamespacedMemoryManager:

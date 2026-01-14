@@ -23,19 +23,15 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from cortex.core.entity import Entity
-from cortex.core.episode import Episode
-from cortex.core.relation import Relation
-from cortex.core.inverted_index import InvertedIndex
-from cortex.core.language import tokenize
+from cortex.core.primitives import Entity, Episode, Relation
+from cortex.core.recall import InvertedIndex
+from cortex.core.processing.language import tokenize
 
 # V2.0 Enhancements
-from cortex.core.context_packer import ContextPacker
-from cortex.core.hierarchical_recall import HierarchicalRecall
-from cortex.core.memory_attention import MemoryAttention, AttentionConfig
-from cortex.core.decay import ForgetGate
+from cortex.core.recall import ContextPacker, HierarchicalRecall
+from cortex.core.learning import MemoryAttention, AttentionConfig, ForgetGate
 from cortex.config import CortexConfig, get_config
-from cortex.core.contradiction import (
+from cortex.core.learning.contradiction import (
     ContradictionDetector,
     Contradiction,
     ResolutionStrategy,

@@ -16,7 +16,7 @@ from typing import Any
 import math
 
 # Importa tokenização centralizada
-from cortex.core.language import tokenize, extract_key_terms
+from cortex.core.processing.language import tokenize, extract_key_terms
 
 
 @dataclass

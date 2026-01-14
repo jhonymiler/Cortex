@@ -19,10 +19,10 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from cortex.core.memory_graph import MemoryGraph
-from cortex.core.entity import Entity
-from cortex.core.episode import Episode
-from cortex.core.relation import Relation
+from cortex.core.graph import MemoryGraph
+from cortex.core.primitives import Entity
+from cortex.core.primitives import Episode
+from cortex.core.primitives import Relation
 from datetime import datetime, timedelta
 
 

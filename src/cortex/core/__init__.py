@@ -1,12 +1,14 @@
 """Core components of Cortex memory system."""
 
-from cortex.core.entity import Entity
-from cortex.core.episode import Episode
-from cortex.core.relation import Relation
-from cortex.core.memory import Memory  # W5H memory model
-from cortex.core.memory_graph import MemoryGraph, RecallResult
-from cortex.core.namespace import NamespacedMemoryManager, get_memory_manager, reset_memory_manager
-from cortex.core.decay import (
+# Primitives (basic memory types)
+from cortex.core.primitives import Entity, Episode, Relation, Memory, NamespacedMemoryManager
+from cortex.core.primitives.namespace import get_memory_manager, reset_memory_manager
+
+# Graph (memory graph and recall)
+from cortex.core.graph import MemoryGraph, RecallResult
+
+# Learning (decay, forgetting, attention, contradiction)
+from cortex.core.learning.decay import (
     DecayManager,
     DecayConfig,
     create_decay_manager,
@@ -14,7 +16,18 @@ from cortex.core.decay import (
     create_aggressive_decay_manager,
     create_gentle_decay_manager,
 )
-from cortex.core.shared_memory import (
+from cortex.core.learning.contradiction import (
+    ContradictionDetector,
+    Contradiction,
+    ResolutionStrategy,
+    ResolutionResult,
+    create_default_detector,
+    create_conservative_detector,
+    create_strict_detector,
+)
+
+# Storage (shared memory, collective memory, identity)
+from cortex.core.storage.shared_memory import (
     SharedMemoryManager,
     MemoryVisibility,
     SharedMemoryContext,
@@ -22,7 +35,7 @@ from cortex.core.shared_memory import (
     NamespaceConfig,
     create_shared_memory_manager,
 )
-from cortex.core.identity import (
+from cortex.core.storage.identity import (
     IdentityKernel,
     JailbreakPattern,
     EvaluationResult,
@@ -34,15 +47,6 @@ from cortex.core.identity import (
     Directive,
     create_default_kernel,
     create_strict_kernel,
-)
-from cortex.core.contradiction import (
-    ContradictionDetector,
-    Contradiction,
-    ResolutionStrategy,
-    ResolutionResult,
-    create_default_detector,
-    create_conservative_detector,
-    create_strict_detector,
 )
 
 __all__ = [

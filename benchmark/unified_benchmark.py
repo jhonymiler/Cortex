@@ -803,7 +803,7 @@ class UnifiedBenchmark:
         - Taxa de falsos positivos
         - Latência de avaliação
         """
-        from cortex.core.identity import IdentityKernel, create_default_kernel, Action
+        from cortex.core.storage import IdentityKernel, create_default_kernel, Action
         
         dim = DimensionMetrics(
             name="Segurança",

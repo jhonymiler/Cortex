@@ -20,8 +20,8 @@ from typing import TYPE_CHECKING, Any
 import math
 
 if TYPE_CHECKING:
-    from cortex.core.memory_graph import MemoryGraph
-    from cortex.core.episode import Episode
+    from cortex.core.graph import MemoryGraph
+    from cortex.core.primitives import Episode
 
 
 @dataclass

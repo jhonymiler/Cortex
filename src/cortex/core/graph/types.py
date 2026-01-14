@@ -7,9 +7,7 @@ Contains RecallResult and shared types.
 from dataclasses import dataclass, field
 from typing import Any
 
-from cortex.core.entity import Entity
-from cortex.core.episode import Episode
-from cortex.core.relation import Relation
+from cortex.core.primitives import Entity, Episode, Relation
 
 
 @dataclass

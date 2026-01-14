@@ -21,10 +21,7 @@ from streamlit_agraph import agraph, Node, Edge, Config
 # Adiciona o src ao path para importar cortex
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from cortex.core.memory_graph import MemoryGraph
-from cortex.core.entity import Entity
-from cortex.core.episode import Episode
-from cortex.core.relation import Relation
+from cortex.core import MemoryGraph, Entity, Episode, Relation
 
 
 # ==================== CONFIG ====================

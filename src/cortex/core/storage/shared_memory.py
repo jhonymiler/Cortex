@@ -47,7 +47,7 @@ from typing import Any, TYPE_CHECKING
 from uuid import uuid4
 
 if TYPE_CHECKING:
-    from cortex.core.memory_graph import MemoryGraph
+    from cortex.core.graph import MemoryGraph
 
 
 class MemoryVisibility(str, Enum):

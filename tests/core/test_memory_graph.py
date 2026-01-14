@@ -18,10 +18,10 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../src'))
 
-from cortex.core.memory_graph import MemoryGraph, RecallResult
-from cortex.core.entity import Entity
-from cortex.core.episode import Episode
-from cortex.core.relation import Relation
+from cortex.core.graph import MemoryGraph, RecallResult
+from cortex.core.primitives import Entity
+from cortex.core.primitives import Episode
+from cortex.core.primitives import Relation
 
 
 class TestRecallResult:

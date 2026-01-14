@@ -11,17 +11,16 @@ New Modular Imports:
     from cortex.core.graph.types import RecallResult
 """
 
-# Import from original location for now (backward compatibility)
-from cortex.core.memory_graph import MemoryGraph, RECALL_MIN_THRESHOLD, RECALL_MAX_CANDIDATES, RECALL_MAX_RESULTS
+# Import from new location
+from cortex.core.graph.memory_graph import MemoryGraph, RECALL_MIN_THRESHOLD, RECALL_MAX_CANDIDATES, RECALL_MAX_RESULTS
 
 # Import types
-from cortex.core.graph.types import RecallResult as RecallResultNew
+from cortex.core.graph.types import RecallResult
 
 # Export all
 __all__ = [
     "MemoryGraph",
-    "RecallResult",  # From original
-    "RecallResultNew",  # From modular structure
+    "RecallResult",
     "RECALL_MIN_THRESHOLD",
     "RECALL_MAX_CANDIDATES",
     "RECALL_MAX_RESULTS",

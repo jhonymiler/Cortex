@@ -17,7 +17,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../src'))
 
-from cortex.core.decay import (
+from cortex.core.learning import (
     DecayManager,
     DecayConfig,
     create_decay_manager,

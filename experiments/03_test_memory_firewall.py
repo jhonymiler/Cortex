@@ -232,7 +232,7 @@ def test_integration():
     """Teste 4: Integração com armazenamento de memória"""
     print("\n=== TESTE 4: Integração com Memória ===")
 
-    from cortex.core.memory import Memory
+    from cortex.core.primitives import Memory
 
     firewall = MemoryFirewallDetector()
 

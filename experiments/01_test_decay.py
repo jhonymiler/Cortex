@@ -19,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from datetime import datetime, timedelta
-from cortex.core.memory import Memory
+from cortex.core.primitives import Memory
 import math
 
 
