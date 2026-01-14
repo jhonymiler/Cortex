@@ -27,6 +27,9 @@ python -m benchmark.unified_benchmark
 
 # Apenas métricas do Cortex (para paper)
 ./start_benchmark.sh --paper
+
+# 🆕 Benchmark v2.0 (compara v1.x vs v2.0)
+python -m benchmark.v2_comparison_benchmark
 ```
 
 ## Resultados Atuais
@@ -48,6 +51,7 @@ python -m benchmark.unified_benchmark
 |---------|-----------|
 | `unified_benchmark.py` | Benchmark principal com 5 dimensões |
 | `paper_benchmark.py` | Benchmark isolado para métricas acadêmicas |
+| `v2_comparison_benchmark.py` | 🆕 Compara v1.x (legacy) vs v2.0 (performance) |
 | `agents.py` | Agentes de comparação (Baseline, Cortex) |
 | `cortex_agent.py` | Implementação do agente Cortex |
 | `rag_agent.py` | Baseline RAG (TF-IDF) |
