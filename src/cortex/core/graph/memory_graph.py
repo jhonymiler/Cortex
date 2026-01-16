@@ -39,6 +39,9 @@ from cortex.core.learning.contradiction import (
     create_default_detector,
 )
 
+# Logging
+from cortex.utils.logging import get_audit_logger, get_performance_logger, get_logger
+
 # Configurações de recall (podem ser sobrescritas via .env)
 RECALL_MIN_THRESHOLD = float(os.getenv("CORTEX_RECALL_THRESHOLD", "0.25"))
 RECALL_MAX_CANDIDATES = int(os.getenv("CORTEX_RECALL_MAX_CANDIDATES", "50"))
@@ -316,13 +319,18 @@ class MemoryGraph:
     def __init__(self, storage_path: Path | str | None = None):
         """
         Inicializa o grafo de memória.
-        
+
         Args:
             storage_path: Caminho para persistência (None = apenas memória)
             contradiction_strategy: Estratégia para resolver contradições
         """
         self.storage_path = Path(storage_path) if storage_path else None
-        
+
+        # Logging
+        self._logger = get_logger("memory_graph")
+        self._audit = get_audit_logger("memory_graph")
+        self._perf = get_performance_logger("memory_graph")
+
         # Índices em memória
         self._entities: dict[str, Entity] = {}
         self._episodes: dict[str, Episode] = {}
@@ -367,7 +375,7 @@ class MemoryGraph:
         """Adiciona ou atualiza uma entidade."""
         # Verifica se já existe uma similar
         existing = self.resolve_entity(entity.name, entity.identifiers)
-        
+
         if existing:
             # Atualiza a existente
             for ident in entity.identifiers:
@@ -375,12 +383,32 @@ class MemoryGraph:
             existing.attributes.update(entity.attributes)
             existing.touch()
             self._save()
+
+            # Audit log: UPDATE
+            self._audit.log_update(
+                "entity",
+                entity_id=existing.id,
+                type=existing.type,
+                name=existing.name,
+                identifiers_count=len(existing.identifiers),
+                attributes_count=len(existing.attributes)
+            )
             return existing
-        
+
         # Adiciona nova
         self._entities[entity.id] = entity
         self._index_entity(entity)
         self._save()
+
+        # Audit log: CREATE
+        self._audit.log_create(
+            "entity",
+            entity_id=entity.id,
+            type=entity.type,
+            name=entity.name,
+            identifiers_count=len(entity.identifiers),
+            attributes_count=len(entity.attributes)
+        )
         return entity
     
     def get_entity(self, entity_id: str) -> Entity | None:
@@ -475,7 +503,8 @@ class MemoryGraph:
             consolidation_mode: "progressive" (age-aware) ou "fixed" (legacy)
         """
         # Verifica se deve consolidar com episódios similares
-        similar = self._find_similar_episodes(episode)
+        with self._perf.measure("find_similar_episodes"):
+            similar = self._find_similar_episodes(episode)
 
         # Progressive consolidation: threshold adapts based on pattern age
         threshold = episode.get_consolidation_threshold(consolidation_mode)
@@ -484,26 +513,53 @@ class MemoryGraph:
         if len(similar) >= required_similar:
             # Consolida todos + o novo
             consolidated = Episode.consolidate(similar + [episode])
-            
+
             # Remove os antigos do índice invertido
             for old in similar:
                 self._inverted_index.remove_episode(old.id)
                 self._episodes.pop(old.id, None)
-            
+
             # Adiciona consolidado
             self._episodes[consolidated.id] = consolidated
             self._index_episode(consolidated)
             self._save()
+
+            # Audit log: CONSOLIDATION
+            occurrences = getattr(consolidated, 'occurrences', 1)
+            self._audit.log_create(
+                "episode_consolidated",
+                episode_id=consolidated.id,
+                action=consolidated.action,
+                occurrences=occurrences,
+                consolidated_count=len(similar) + 1,
+                consolidation_mode=consolidation_mode,
+                threshold=threshold,
+                participants=len(consolidated.participants)
+            )
+            self._logger.info(
+                f"Episode consolidated: {consolidated.action} (occurrences={occurrences})"
+            )
             return consolidated
-        
+
         # Adiciona normal
         self._episodes[episode.id] = episode
         self._index_episode(episode)
-        
+
         # Cria relações automáticas episódio ↔ participantes
         self._create_episode_relations(episode)
-        
+
         self._save()
+
+        # Audit log: CREATE
+        self._audit.log_create(
+            "episode",
+            episode_id=episode.id,
+            action=episode.action,
+            occurrences=getattr(episode, 'occurrences', 1),
+            participants=len(episode.participants),
+            context_length=len(episode.context) if episode.context else 0,
+            outcome_length=len(episode.outcome) if episode.outcome else 0
+        )
         return episode
     
     def _index_episode(self, episode: Episode) -> None:
@@ -902,15 +958,15 @@ class MemoryGraph:
     ) -> RecallResult:
         """
         Busca memórias relevantes para uma query.
-        
+
         Este é o método principal para agentes obterem contexto.
-        
+
         OTIMIZAÇÕES v2:
         - Índice invertido para busca O(log n)
         - Threshold mínimo de relevância (0.25)
         - Boost por retrievability
         - Métricas de recall para debug
-        
+
         Args:
             query: Texto da pergunta/contexto do usuário
             context: Informações adicionais:
@@ -919,17 +975,27 @@ class MemoryGraph:
                 - namespace: Namespace para busca
                 - entity_ids: IDs de entidades conhecidas
             limit: Máximo de resultados por tipo
-            
+
         Returns:
             RecallResult com entidades, episódios, relações e métricas
         """
         import time
         start_time = time.time()
-        
+
         context = context or {}
         conversation_id = context.get("conversation_id")
         session_id = context.get("session_id")
         namespace = context.get("namespace", "default")
+
+        # Audit log: QUERY
+        self._audit.log_query(
+            "recall",
+            query_text=query[:100],  # Primeiros 100 chars
+            conversation_id=conversation_id,
+            session_id=session_id,
+            namespace=namespace,
+            limit=limit
+        )
         
         # Métricas
         metrics = {
@@ -1063,9 +1129,26 @@ class MemoryGraph:
         self._save()
         
         # Finaliza métricas
-        metrics["recall_time_ms"] = round((time.time() - start_time) * 1000, 2)
+        recall_time_ms = round((time.time() - start_time) * 1000, 2)
+        metrics["recall_time_ms"] = recall_time_ms
         metrics["threshold_used"] = RECALL_MIN_THRESHOLD
-        
+
+        # Performance log
+        self._perf.log_metric(
+            "recall",
+            duration_ms=recall_time_ms,
+            entities_found=len(entities),
+            episodes_found=len(episodes),
+            relations_found=len(unique_relations),
+            hierarchical_recall=metrics.get("hierarchical_recall_used", False),
+            attention_reranking=metrics.get("attention_reranking_used", False),
+            forget_gate_filtered=metrics.get("filtered_by_forget_gate", 0)
+        )
+
+        self._logger.debug(
+            f"Recall completed: {len(episodes)} episodes, {len(entities)} entities in {recall_time_ms:.1f}ms"
+        )
+
         return RecallResult(
             entities=entities,
             episodes=episodes,

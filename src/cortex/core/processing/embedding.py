@@ -19,6 +19,8 @@ from datetime import datetime
 
 import requests
 
+from cortex.utils.logging import get_logger, get_performance_logger
+
 
 # Configurações
 # Prioriza OLLAMA_URL, depois OLLAMA_BASE_URL, depois fallback
@@ -84,11 +86,15 @@ class EmbeddingService:
         self.ollama_url = ollama_url.rstrip("/")
         self.model = model
         self.timeout = timeout
-        
+
+        # Logging
+        self._logger = get_logger("embedding_service")
+        self._perf = get_performance_logger("embedding_service")
+
         # Cache: hash do texto -> EmbeddingResult
         self._cache: dict[str, EmbeddingResult] = {}
         self._cache_size = cache_size
-        
+
         # Stats
         self._stats = {
             "requests": 0,
@@ -97,6 +103,10 @@ class EmbeddingService:
             "errors": 0,
             "total_latency_ms": 0,
         }
+
+        self._logger.info(
+            f"EmbeddingService initialized: url={self.ollama_url}, model={self.model}, timeout={self.timeout}s"
+        )
     
     def _text_hash(self, text: str) -> str:
         """Gera hash do texto para cache."""
@@ -145,15 +155,24 @@ class EmbeddingService:
             
             if response.status_code != 200:
                 self._stats["errors"] += 1
+                error_text = response.text[:200] if response.text else "No error message"
+                self._logger.error(
+                    f"Embedding API error: status={response.status_code}, url={self.ollama_url}, "
+                    f"model={self.model}, error={error_text}"
+                )
                 return None
-            
+
             data = response.json()
             embeddings = data.get("embeddings", [])
-            
+
             if not embeddings or not embeddings[0]:
                 self._stats["errors"] += 1
+                self._logger.error(
+                    f"Empty embeddings returned: url={self.ollama_url}, model={self.model}, "
+                    f"data_keys={list(data.keys())}"
+                )
                 return None
-            
+
             result = EmbeddingResult(
                 vector=embeddings[0],
                 dimensions=len(embeddings[0]),
@@ -161,14 +180,45 @@ class EmbeddingService:
                 latency_ms=latency_ms,
                 cached=False,
             )
-            
+
+            # Performance log
+            self._perf.log_metric(
+                "embed",
+                duration_ms=latency_ms,
+                dimensions=result.dimensions,
+                cached=False,
+                text_length=len(text)
+            )
+
             # Adiciona ao cache
             self._add_to_cache(text_hash, result)
-            
+
+            self._logger.debug(
+                f"Embedding generated: text_length={len(text)}, dimensions={result.dimensions}, "
+                f"latency={latency_ms:.1f}ms"
+            )
+
             return result
-            
+
+        except requests.exceptions.Timeout:
+            self._stats["errors"] += 1
+            self._logger.error(
+                f"Embedding request timeout: url={self.ollama_url}, model={self.model}, "
+                f"timeout={self.timeout}s"
+            )
+            return None
+        except requests.exceptions.ConnectionError as e:
+            self._stats["errors"] += 1
+            self._logger.error(
+                f"Embedding connection error: url={self.ollama_url}, error={str(e)}"
+            )
+            return None
         except Exception as e:
             self._stats["errors"] += 1
+            self._logger.error(
+                f"Unexpected embedding error: url={self.ollama_url}, model={self.model}, "
+                f"error_type={type(e).__name__}, error={str(e)}"
+            )
             return None
     
     def embed_batch(self, texts: list[str]) -> list[EmbeddingResult | None]:

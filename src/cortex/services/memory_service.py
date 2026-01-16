@@ -36,6 +36,9 @@ from cortex.core.storage import (
     NamespaceConfig,
 )
 
+# Logging
+from cortex.utils.logging import get_audit_logger, get_performance_logger, get_logger
+
 
 # ==================== REQUEST/RESPONSE MODELS ====================
 
@@ -231,13 +234,13 @@ class MemoryService:
     """
     
     def __init__(
-        self, 
+        self,
         storage_path: Path | str | None = None,
         shared_memory_manager: SharedMemoryManager | None = None,
     ):
         """
         Initialize the memory service.
-        
+
         Args:
             storage_path: Path for data persistence. None = in-memory only.
             shared_memory_manager: Optional SharedMemoryManager for visibility control.
@@ -246,19 +249,42 @@ class MemoryService:
         self.graph = MemoryGraph(storage_path=storage_path)
         self.shared_manager = shared_memory_manager or SharedMemoryManager()
         self.decay_manager = create_default_decay_manager()
-        
+
+        # Logging
+        self._logger = get_logger("memory_service")
+        self._audit = get_audit_logger("memory_service")
+        self._perf = get_performance_logger("memory_service")
+
         # Cache de recall por sessão (evita recálculos)
         # Chave: (session_id, namespace, owner_id, query_hash) -> RecallResponse
         # CORREÇÃO: Inclui namespace e owner_id para evitar vazamento entre usuários
         self._recall_cache: dict[tuple[str, str, str, int], "RecallResponse"] = {}
         self._cache_max_size = 100  # Limita tamanho do cache
+
+        self._logger.info(
+            f"MemoryService initialized: storage_path={storage_path}"
+        )
     
     def store(self, request: StoreRequest) -> StoreResponse:
         """
         Store a new memory (episode + entities + relations).
-        
+
         This is called AFTER responding to the user to record what happened.
         """
+        import time
+        start_time = time.time()
+
+        # Audit log: Store request
+        self._audit.log_create(
+            "memory_store",
+            action=request.action,
+            namespace=request.namespace,
+            conversation_id=request.conversation_id,
+            session_id=request.session_id,
+            participants_count=len(request.participants),
+            relations_count=len(request.relations)
+        )
+
         entities_created = 0
         entities_updated = 0
         participant_ids: list[str] = []
@@ -321,7 +347,25 @@ class MemoryService:
                 )
                 _, _ = self.graph.add_relation(relation)
                 relations_created += 1
-        
+
+        # Performance log
+        duration_ms = (time.time() - start_time) * 1000
+        self._perf.log_metric(
+            "store",
+            duration_ms=duration_ms,
+            entities_created=entities_created,
+            entities_updated=entities_updated,
+            relations_created=relations_created,
+            consolidated=consolidated,
+            consolidation_count=consolidation_count
+        )
+
+        self._logger.info(
+            f"Memory stored: action='{request.action}', episode={episode.id}, "
+            f"entities={entities_created}+{entities_updated}, relations={relations_created}, "
+            f"consolidated={consolidated} ({duration_ms:.1f}ms)"
+        )
+
         return StoreResponse(
             success=True,
             episode_id=episode.id,
@@ -335,7 +379,7 @@ class MemoryService:
     def _generate_episode_embedding(self, episode: Episode) -> None:
         """
         Gera embedding para um episódio (para busca semântica).
-        
+
         Usa o EmbeddingService singleton. Loga warning se falhar
         para ajudar no diagnóstico de problemas de configuração.
         """
@@ -348,17 +392,13 @@ class MemoryService:
                     episode.embedding = result.vector
                 else:
                     # Log warning para ajudar diagnóstico
-                    import logging
-                    logger = logging.getLogger("cortex.memory")
-                    logger.warning(
+                    self._logger.warning(
                         f"Embedding não gerado para episódio {episode.id[:8]}. "
                         f"Verifique se OLLAMA_URL está configurado e Ollama está rodando."
                     )
         except Exception as e:
             # Log error para diagnóstico
-            import logging
-            logger = logging.getLogger("cortex.memory")
-            logger.error(f"Erro ao gerar embedding: {e}")
+            self._logger.error(f"Erro ao gerar embedding para episódio {episode.id[:8]}: {e}")
     
     def _recall_by_embedding(
         self,

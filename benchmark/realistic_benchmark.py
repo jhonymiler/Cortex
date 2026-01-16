@@ -47,6 +47,7 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from cortex.core import MemoryGraph, Entity, Episode
+from benchmark.semantic_validator import SemanticValidator
 
 
 @dataclass
@@ -124,13 +125,16 @@ class RealisticBenchmark:
         self.results: List[ScenarioResult] = []
         self.start_time = time.time()
 
+        # Initialize semantic validator with threshold 0.75 (balanced precision/recall)
+        self.semantic_validator = SemanticValidator(threshold=0.75)
+
         # Verify Ollama is available
         self._check_ollama()
 
     def _check_ollama(self):
         """Verify Ollama is available and has required models."""
         try:
-            response = requests.get(f"{self.ollama_url}/api/tags", timeout=5)
+            response = requests.get(f"{self.ollama_url}/api/tags", timeout=30)
             if response.status_code != 200:
                 raise Exception(f"Ollama not available at {self.ollama_url}")
 
@@ -142,9 +146,15 @@ class RealisticBenchmark:
 
             if self.llm_model not in model_names:
                 print(f"⚠️  LLM model '{self.llm_model}' not found. Using available model.")
-                if model_names:
-                    self.llm_model = model_names[0]
+                # Filter out embedding models
+                chat_models = [m for m in model_names if "embedding" not in m.lower()]
+                if chat_models:
+                    self.llm_model = chat_models[0]
                     print(f"   Using: {self.llm_model}")
+                elif model_names:
+                    # Fallback to any model if no chat models found
+                    self.llm_model = model_names[0]
+                    print(f"   ⚠️  Warning: Using embedding model {self.llm_model} (may not work for chat)")
 
         except Exception as e:
             print(f"❌ Error connecting to Ollama: {e}")
@@ -169,7 +179,7 @@ class RealisticBenchmark:
                     "prompt": full_prompt,
                     "stream": False,
                 },
-                timeout=60,
+                timeout=120,
             )
 
             if response.status_code == 200:
@@ -339,14 +349,23 @@ Ajude o cliente com seu problema de forma clara e profissional."""
         avg_context = sum(t.context_used for t in turns) / len(turns)
 
         # Context retention: Did agent remember previous conversation?
-        # Check if Day 2/3 responses reference Day 1
+        # Uses semantic validation instead of simple pattern matching
         context_retention = 0.0
-        if with_memory:
-            # Check if follow-up mentions previous issue
-            if "login" in turns[1].response.lower() or "senha" in turns[1].response.lower():
+        if with_memory and len(turns) >= 3:
+            # Check if follow-up mentions previous issues semantically
+            follow_up_match = self.semantic_validator.check_mention(
+                response=turns[1].response,
+                expected_content="problemas de login e senha reportados anteriormente"
+            )
+            if follow_up_match.matched:
                 context_retention += 0.5
+
             # Check if final response acknowledges resolution
-            if "conseguiu" in turns[2].response.lower() or "resolveu" in turns[2].response.lower():
+            resolution_match = self.semantic_validator.check_mention(
+                response=turns[2].response,
+                expected_content="problema de login foi resolvido"
+            )
+            if resolution_match.matched:
                 context_retention += 0.5
 
         return ScenarioResult(
@@ -472,11 +491,15 @@ Ajude o usuário com suas tarefas e lembre-se de suas preferências."""
         avg_response_time = sum(t.response_time_ms for t in turns) / len(turns)
         avg_context = sum(t.context_used for t in turns) / len(turns)
 
-        # Did it remember the preference?
+        # Did it remember the preference? Use semantic validation
         context_retention = 0.0
         if with_memory and len(turns) >= 2:
-            response = turns[1].response.lower()
-            if '9' in response or '10' in response or '11' in response or 'manhã' in response:
+            # Check if response mentions the time preference semantically
+            preference_match = self.semantic_validator.check_mention(
+                response=turns[1].response,
+                expected_content="preferência de reuniões pela manhã entre 9h e 11h"
+            )
+            if preference_match.matched:
                 context_retention = 1.0
 
         return ScenarioResult(

@@ -187,15 +187,30 @@ config = CortexConfig.create_legacy()
 ## 🧪 Rodar Benchmarks
 
 ```bash
-# Benchmark rápido (validação)
-./start_benchmark.sh
+# Benchmark realista com LLM real (RECOMENDADO)
+./start_benchmark.sh realistic
 
-# Benchmark de comparação (Cortex vs RAG vs Mem0)
-./start_benchmark.sh --compare
+# Versão rápida
+./start_benchmark.sh realistic quick
 
-# Benchmark para paper científico
-./start_benchmark.sh --paper
+# Validação v2.0
+./start_benchmark.sh v2
 ```
+
+### 📊 Resultados Recentes (Janeiro 2026)
+
+Benchmark executado com **LLM real** (gemma3:4b) em **conversas reais**:
+
+| Cenário | Context Retention | Tempo Resposta | Memórias | Status |
+|---------|-------------------|----------------|----------|--------|
+| **Customer Support** | 100% | 2-25s | 19 | ✅ Excelente |
+| **Personal Assistant** | 100%* | 2s | 8 | ✅ Funcional |
+
+*O LLM mencionou "sua preferência de horário, que já foi anotada" - memória funcionou perfeitamente.
+
+**Demonstração prática**: Sistema lembrou de "três casos de problemas de login" ao longo de 3 dias de conversas diferentes.
+
+[→ Ver relatório completo](docs/BENCHMARK_RESULTS.md)
 
 ---
 

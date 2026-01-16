@@ -4,49 +4,39 @@ Benchmark Package - Avaliação do Cortex Memory System
 "Cortex, porque agentes inteligentes precisam de memória inteligente"
 
 Componentes principais:
-- unified_benchmark: Benchmark completo com 4 dimensões de valor (RECOMENDADO)
-- paper_benchmark: Benchmark isolado do Cortex para métricas acadêmicas
-- agents: Agentes de comparação (Baseline, RAG, Mem0, Cortex)
+- realistic_benchmark: Benchmarks com LLM real e cenários realistas (RECOMENDADO)
+- professional_benchmark: Testes técnicos isolados de componentes
+- v2_validation: Validação das melhorias v2.0
 
 Dimensões de Valor medidas:
-1. Cognição Biológica - Decay, consolidação, hubs
-2. Memória Coletiva   - Compartilhamento, isolamento
-3. Valor Semântico    - Acurácia, relevância
-4. Eficiência         - Latência, tokens
+1. Contexto Real - Conversas e casos de uso reais com LLM
+2. Cognição Biológica - Decay, consolidação, aprendizado
+3. Valor Semântico - Retenção de contexto, qualidade de resposta
+4. Eficiência - Latência, tokens, performance
 
 Uso:
-    ./start_benchmark.sh              # Benchmark unificado (padrão)
-    ./start_benchmark.sh --paper      # Apenas Cortex
-    
+    ./start_benchmark.sh realistic         # Benchmark realista com LLM (padrão)
+    ./start_benchmark.sh realistic quick   # Versão rápida
+    ./start_benchmark.sh v2                # Validação v2.0
+
     # Ou diretamente:
-    python -m benchmark.unified_benchmark
-    python -m benchmark.paper_benchmark
+    python -m benchmark.realistic_benchmark
+    python benchmark/v2_validation.py
+    python -m benchmark.professional_benchmark
 """
 
-from .agents import BaselineAgent, CortexAgent, AgentResponse
-from .conversation_generator import ConversationGenerator, Conversation, Session, Message
-
-# Importações opcionais
+# Importações dos benchmarks disponíveis
 try:
-    from .rag_agent import RAGAgent
+    from .realistic_benchmark import RealisticBenchmark
 except ImportError:
-    RAGAgent = None
+    RealisticBenchmark = None
 
 try:
-    from .mem0_agent import Mem0Agent
+    from .professional_benchmark import ProfessionalBenchmark
 except ImportError:
-    Mem0Agent = None
+    ProfessionalBenchmark = None
 
 __all__ = [
-    # Core
-    "BaselineAgent",
-    "CortexAgent",
-    "AgentResponse",
-    "ConversationGenerator",
-    "Conversation",
-    "Session",
-    "Message",
-    # Baselines alternativos
-    "RAGAgent",
-    "Mem0Agent",
+    "RealisticBenchmark",
+    "ProfessionalBenchmark",
 ]

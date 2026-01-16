@@ -18,7 +18,7 @@ fi
 # Configuração
 export CORTEX_DATA_DIR="${CORTEX_DATA_DIR:-./data}"
 export OLLAMA_URL="${OLLAMA_URL:-http://localhost:11434}"
-export CORTEX_LLM_MODEL="${CORTEX_LLM_MODEL:-llama3.2:3b}"
+export CORTEX_LLM_MODEL="${CORTEX_LLM_MODEL:-gemma3:4b}"
 
 echo "⚙️  Configuração:"
 echo "   OLLAMA_URL=$OLLAMA_URL"
