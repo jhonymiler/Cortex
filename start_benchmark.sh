@@ -31,9 +31,9 @@ echo ""
 # Executa benchmark realista
 if [ "${1:-realistic}" = "realistic" ]; then
     python -m benchmark.realistic_benchmark ${2:+--$2}
-elif [ "$1" = "v2" ]; then
-    python benchmark/v2_validation.py
+elif [ "$1" = "validation" ]; then
+    python benchmark/validation.py
 else
-    echo "Uso: ./start_benchmark.sh [realistic|v2] [quick]"
+    echo "Uso: ./start_benchmark.sh [realistic|validation] [quick]"
     exit 1
 fi

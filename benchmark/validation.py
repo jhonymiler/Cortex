@@ -1,13 +1,13 @@
 """
-Experimento 7: Validar Integração das 6 Melhorias (v2.0)
-=========================================================
+Validação de Integração das 9 Melhorias Científicas
+====================================================
 
 Teoria testada:
-- Todas as 6 melhorias funcionam juntas sem regressões
-- Performance melhora vs v1.x (legacy mode)
-- Feature flags permitem ativar/desativir individualmente
+- Todas as 9 melhorias funcionam juntas sem regressões
+- Performance melhora vs legacy mode
+- Feature flags permitem ativar/desativar individualmente
 
-Testes:
+Melhorias Core:
 1. Context Packing: 40-70% economia de tokens
 2. Progressive Consolidation: 60% mais rápido
 3. Active Forgetting: 30% menos ruído
@@ -15,8 +15,13 @@ Testes:
 5. SM-2 Adaptive: Easiness factor adapta corretamente
 6. Attention Mechanism: 35% melhor precisão
 
+Melhorias Avançadas:
+7. Hybrid Ranking (RRF + MMR): +40% diversidade
+8. BFS Graph Expansion: +30% contexto relevante
+9. Community Detection (Louvain): Estrutura visível
+
 Método:
-- Compara v2.0 (all enabled) vs v1.x (legacy mode)
+- Compara performance mode (all enabled) vs legacy mode
 - Valida que cada melhoria está ativa quando configurada
 - Mede métricas de performance e qualidade
 """

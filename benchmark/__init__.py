@@ -6,7 +6,7 @@ Benchmark Package - Avaliação do Cortex Memory System
 Componentes principais:
 - realistic_benchmark: Benchmarks com LLM real e cenários realistas (RECOMENDADO)
 - professional_benchmark: Testes técnicos isolados de componentes
-- v2_validation: Validação das melhorias v2.0
+- validation: Validação das melhorias científicas
 
 Dimensões de Valor medidas:
 1. Contexto Real - Conversas e casos de uso reais com LLM
@@ -17,11 +17,11 @@ Dimensões de Valor medidas:
 Uso:
     ./start_benchmark.sh realistic         # Benchmark realista com LLM (padrão)
     ./start_benchmark.sh realistic quick   # Versão rápida
-    ./start_benchmark.sh v2                # Validação v2.0
+    ./start_benchmark.sh validation        # Validação das melhorias
 
     # Ou diretamente:
     python -m benchmark.realistic_benchmark
-    python benchmark/v2_validation.py
+    python benchmark/validation.py
     python -m benchmark.professional_benchmark
 """
 

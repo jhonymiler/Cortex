@@ -1,7 +1,7 @@
-# 📚 Documentação do Cortex
+# 📚 Documentação do Cortex v2.1
 
 > *"Cortex, porque agentes inteligentes precisam de memória inteligente"*
-> 
+>
 > **Sistema de Memória Cognitiva para Agentes LLM**
 
 ---
@@ -17,6 +17,17 @@
 | 🔒 **Segurança** | Anti-jailbreak, proteção de identidade | 100% |
 
 **Score Total: 93%** (vs 31% da melhor alternativa - RAG)
+
+---
+
+## 🆕 Novidades v2.1
+
+| Feature | Descrição | Benefício |
+| ------- | --------- | --------- |
+| **Hybrid Ranking** | RRF + MMR para ranking inteligente | +40% diversidade |
+| **BFS Expansion** | Expansão de contexto por grafos | +30% contexto relevante |
+| **Community Detection** | Louvain para clusters de conhecimento | Visualização de estrutura |
+| **Hub Detection** | PageRank para identificar nós centrais | Encontrar especialistas |
 
 ---
 

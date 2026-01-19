@@ -277,12 +277,17 @@ class MemoryGraph:
 8. Filtrar Consolidadas
    └─ Excluir filhas (consolidated_into != null)
    ↓
-9. Rankear por Relevância
-   └─ Score = recency × importance × access_count
+9. Hybrid Ranking (v2.1)
+   └─ RRF: Funde rankings de TF-IDF, embeddings, importância
+   └─ MMR: Garante diversidade nos resultados
    ↓
-10. Formatar Response (YAML)
+10. Graph Expansion (v2.1)
+    └─ BFS para descobrir conexões indiretas
+    └─ Enriquece contexto com vizinhos relevantes
+   ↓
+11. Formatar Response (YAML)
     ↓
-11. Touch (aumentar stability das acessadas)
+12. Touch (aumentar stability das acessadas)
 ```
 
 ---

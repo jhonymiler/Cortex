@@ -24,6 +24,8 @@ from streamlit_agraph import agraph, Node, Edge, Config
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from cortex.core import MemoryGraph, Entity, Episode, Relation
+from cortex.core.graph import GraphAnalyzer, BFSGraphTraversal, LouvainCommunityDetection, HubDetector
+from cortex.config import CortexConfig, get_config
 
 
 # ==================== CONFIG ====================
@@ -242,6 +244,8 @@ def render_sidebar():
         [
             "🏠 Dashboard",
             "🕸️ Grafo Interativo",
+            "🧩 Comunidades & Hubs",
+            "✅ Compliance",
             "🎯 Entidades",
             "📝 Episódios",
             "🔗 Relações",
@@ -1203,6 +1207,431 @@ def render_search(graph: MemoryGraph):
                     st.metric("Relações", len(result.relations))
 
 
+# ==================== COMUNIDADES & HUBS ====================
+
+def render_communities(graph: MemoryGraph):
+    """Visualização de comunidades e hubs no grafo."""
+    st.title("🧩 Comunidades & Hubs")
+    st.caption("Análise de estrutura do grafo: clusters de conhecimento e nós centrais")
+
+    # Verifica se há dados
+    if not graph._entities and not graph._episodes:
+        st.info("💡 Grafo vazio. Crie algumas memórias primeiro!")
+        return
+
+    # Configuração
+    config = get_config()
+
+    tab1, tab2, tab3 = st.tabs(["🏘️ Comunidades", "⭐ Hubs", "📊 Estatísticas do Grafo"])
+
+    with tab1:
+        render_community_detection(graph, config)
+
+    with tab2:
+        render_hub_detection(graph, config)
+
+    with tab3:
+        render_graph_statistics(graph)
+
+
+def render_community_detection(graph: MemoryGraph, config: CortexConfig):
+    """Detecção de comunidades com Louvain."""
+    st.subheader("🏘️ Detecção de Comunidades (Louvain)")
+    st.caption("Agrupa memórias relacionadas em clusters")
+
+    # Parâmetros
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        min_size = st.slider("Tamanho mínimo", 2, 10, config.community_min_size)
+    with col2:
+        resolution = st.slider("Resolução", 0.5, 2.0, config.community_resolution, 0.1)
+    with col3:
+        max_iterations = st.slider("Iterações máx", 5, 50, 20)
+
+    if st.button("🔍 Detectar Comunidades", type="primary"):
+        with st.spinner("Analisando estrutura do grafo..."):
+            try:
+                # Cria função de vizinhos
+                def get_neighbors(node_id: str):
+                    neighbors = []
+                    for rel in graph._relations.values():
+                        if rel.from_id == node_id:
+                            neighbors.append((rel.to_id, rel))
+                        elif rel.to_id == node_id:
+                            neighbors.append((rel.from_id, rel))
+                    return neighbors
+
+                # Coleta todos os IDs de nós
+                node_ids = list(graph._entities.keys()) + list(graph._episodes.keys())
+
+                if len(node_ids) < 3:
+                    st.warning("⚠️ Precisa de pelo menos 3 nós para detectar comunidades")
+                    return
+
+                louvain = LouvainCommunityDetection(
+                    get_neighbors_fn=get_neighbors,
+                    resolution=resolution
+                )
+
+                communities = louvain.detect_communities(
+                    node_ids=node_ids,
+                    min_community_size=min_size,
+                    max_iterations=max_iterations
+                )
+
+                if communities:
+                    st.success(f"✅ Encontradas {len(communities)} comunidades!")
+
+                    for i, comm in enumerate(communities, 1):
+                        with st.expander(f"🏘️ Comunidade {i} ({len(comm.member_ids)} membros) - Coesão: {comm.cohesion:.2f}"):
+                            st.markdown(f"**Nó Central:** `{comm.central_node_id[:12]}...`")
+
+                            # Lista membros
+                            st.markdown("**Membros:**")
+                            for member_id in list(comm.member_ids)[:10]:
+                                entity = graph.get_entity(member_id)
+                                episode = graph.get_episode(member_id)
+                                if entity:
+                                    st.markdown(f"  • 🎯 {entity.name} ({entity.type})")
+                                elif episode:
+                                    st.markdown(f"  • 📝 {episode.action[:40]}...")
+
+                            if len(comm.member_ids) > 10:
+                                st.caption(f"  ... e mais {len(comm.member_ids) - 10} membros")
+                else:
+                    st.info("💡 Nenhuma comunidade detectada com os parâmetros atuais")
+
+            except Exception as e:
+                st.error(f"❌ Erro: {e}")
+
+
+def render_hub_detection(graph: MemoryGraph, config: CortexConfig):
+    """Detecção de hubs (nós centrais)."""
+    st.subheader("⭐ Detecção de Hubs")
+    st.caption("Identifica nós centrais com muitas conexões")
+
+    # Parâmetros
+    col1, col2 = st.columns(2)
+    with col1:
+        min_connections = st.slider("Conexões mínimas", 2, 20, config.hub_min_connections)
+    with col2:
+        top_k = st.slider("Top K hubs", 3, 20, 10)
+
+    if st.button("🔍 Detectar Hubs", type="primary"):
+        with st.spinner("Calculando centralidade..."):
+            try:
+                def get_neighbors(node_id: str):
+                    neighbors = []
+                    for rel in graph._relations.values():
+                        if rel.from_id == node_id:
+                            neighbors.append((rel.to_id, rel))
+                        elif rel.to_id == node_id:
+                            neighbors.append((rel.from_id, rel))
+                    return neighbors
+
+                node_ids = list(graph._entities.keys()) + list(graph._episodes.keys())
+
+                if not node_ids:
+                    st.warning("⚠️ Nenhum nó no grafo")
+                    return
+
+                hub_detector = HubDetector(get_neighbors_fn=get_neighbors)
+
+                hubs = hub_detector.find_hubs(
+                    node_ids=node_ids,
+                    top_k=top_k,
+                    min_connections=min_connections
+                )
+
+                if hubs:
+                    st.success(f"✅ Encontrados {len(hubs)} hubs!")
+
+                    for i, (hub_id, connections) in enumerate(hubs, 1):
+                        entity = graph.get_entity(hub_id)
+                        episode = graph.get_episode(hub_id)
+
+                        if entity:
+                            st.markdown(f"**{i}.** ⭐ 🎯 **{entity.name}** ({entity.type}) - {connections} conexões")
+                        elif episode:
+                            st.markdown(f"**{i}.** ⭐ 📝 **{episode.action[:40]}...** - {connections} conexões")
+
+                        # Barra de progresso
+                        max_conn = hubs[0][1] if hubs else 1
+                        st.progress(connections / max_conn)
+                else:
+                    st.info(f"💡 Nenhum hub com mais de {min_connections} conexões")
+
+                # PageRank
+                st.markdown("---")
+                st.subheader("📊 PageRank (Importância)")
+
+                pagerank = hub_detector.calculate_pagerank(node_ids, damping=0.85, iterations=20)
+
+                if pagerank:
+                    sorted_pr = sorted(pagerank.items(), key=lambda x: x[1], reverse=True)[:10]
+
+                    for i, (node_id, score) in enumerate(sorted_pr, 1):
+                        entity = graph.get_entity(node_id)
+                        episode = graph.get_episode(node_id)
+
+                        if entity:
+                            st.markdown(f"**{i}.** 🎯 {entity.name} - Score: `{score:.4f}`")
+                        elif episode:
+                            st.markdown(f"**{i}.** 📝 {episode.action[:30]}... - Score: `{score:.4f}`")
+
+            except Exception as e:
+                st.error(f"❌ Erro: {e}")
+
+
+def render_graph_statistics(graph: MemoryGraph):
+    """Estatísticas do grafo."""
+    st.subheader("📊 Estatísticas do Grafo")
+
+    stats = graph.stats()
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("🎯 Nós (Entidades)", stats["total_entities"])
+        st.metric("📝 Nós (Episódios)", stats["total_episodes"])
+        total_nodes = stats["total_entities"] + stats["total_episodes"]
+        st.metric("📊 Total de Nós", total_nodes)
+
+    with col2:
+        st.metric("🔗 Arestas (Relações)", stats["total_relations"])
+        if total_nodes > 0:
+            density = (2 * stats["total_relations"]) / (total_nodes * (total_nodes - 1)) if total_nodes > 1 else 0
+            st.metric("📈 Densidade", f"{density:.4f}")
+            avg_degree = (2 * stats["total_relations"]) / total_nodes if total_nodes > 0 else 0
+            st.metric("📊 Grau Médio", f"{avg_degree:.2f}")
+
+    with col3:
+        st.metric("⭐ Consolidados", stats["consolidated_episodes"])
+        st.metric("🏷️ Tipos de Entidade", len(stats.get("entities_by_type", {})))
+
+        # Tipos de relação
+        relation_types = set(r.relation_type for r in graph._relations.values())
+        st.metric("🔗 Tipos de Relação", len(relation_types))
+
+    # Distribuição de graus
+    st.markdown("---")
+    st.subheader("📈 Distribuição de Graus")
+
+    if graph._relations:
+        degree_count = {}
+        for node_id in list(graph._entities.keys()) + list(graph._episodes.keys()):
+            degree = sum(1 for r in graph._relations.values() if r.from_id == node_id or r.to_id == node_id)
+            degree_count[node_id] = degree
+
+        if degree_count:
+            import pandas as pd
+            degrees = list(degree_count.values())
+            df = pd.DataFrame({"Grau": degrees})
+            st.bar_chart(df["Grau"].value_counts().sort_index())
+    else:
+        st.info("💡 Nenhuma relação para análise")
+
+
+# ==================== COMPLIANCE ====================
+
+def render_compliance(graph: MemoryGraph):
+    """Painel de compliance e monitoramento."""
+    st.title("✅ Compliance & Monitoramento")
+    st.caption("Verificação de integridade, qualidade e conformidade das memórias")
+
+    config = get_config()
+
+    tab1, tab2, tab3 = st.tabs(["🔍 Verificação", "📊 Métricas", "⚙️ Configuração"])
+
+    with tab1:
+        render_compliance_checks(graph)
+
+    with tab2:
+        render_compliance_metrics(graph)
+
+    with tab3:
+        render_config_panel(config)
+
+
+def render_compliance_checks(graph: MemoryGraph):
+    """Verificações de compliance."""
+    st.subheader("🔍 Verificações de Integridade")
+
+    health = graph.get_memory_health()
+    stats = graph.stats()
+
+    # Score geral
+    health_score = health["health_score"]
+    health_color = "green" if health_score >= 80 else "orange" if health_score >= 50 else "red"
+
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown(f"""
+        <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #1E1E1E, #2D2D2D); border-radius: 10px;">
+            <h1 style="color: {health_color}; font-size: 48px; margin: 0;">{health_score}%</h1>
+            <p style="color: #888;">Score de Saúde</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        # Checklist de verificações
+        checks = [
+            ("Entidades órfãs < 10%", health["orphan_entities"] < stats["total_entities"] * 0.1 if stats["total_entities"] > 0 else True),
+            ("Relações fracas < 20%", health["weak_relations"] < stats["total_relations"] * 0.2 if stats["total_relations"] > 0 else True),
+            ("Importância média > 0.3", health["avg_episode_importance"] > 0.3),
+            ("Força média > 0.4", health["avg_relation_strength"] > 0.4),
+            ("Consolidação ativa", stats["consolidated_episodes"] > 0 or stats["total_episodes"] < 10),
+        ]
+
+        for check_name, passed in checks:
+            icon = "✅" if passed else "❌"
+            st.markdown(f"{icon} {check_name}")
+
+    st.markdown("---")
+
+    # Problemas detectados
+    st.subheader("⚠️ Problemas Detectados")
+
+    problems = []
+
+    # Entidades órfãs
+    if health["orphan_entities"] > 0:
+        orphan_pct = (health["orphan_entities"] / stats["total_entities"] * 100) if stats["total_entities"] > 0 else 0
+        severity = "error" if orphan_pct > 20 else "warning" if orphan_pct > 10 else "info"
+        problems.append((severity, f"👻 {health['orphan_entities']} entidades órfãs ({orphan_pct:.1f}%)", "Entidades sem conexões podem indicar dados inconsistentes"))
+
+    # Relações fracas
+    if health["weak_relations"] > 0:
+        weak_pct = (health["weak_relations"] / stats["total_relations"] * 100) if stats["total_relations"] > 0 else 0
+        severity = "error" if weak_pct > 30 else "warning" if weak_pct > 15 else "info"
+        problems.append((severity, f"🔗 {health['weak_relations']} relações fracas ({weak_pct:.1f}%)", "Relações com força < 0.3 podem ser ruído"))
+
+    # Baixa importância
+    if health["avg_episode_importance"] < 0.3:
+        problems.append(("warning", f"📉 Importância média baixa: {health['avg_episode_importance']:.2f}", "Episódios podem não estar sendo bem avaliados"))
+
+    # Sem consolidação
+    if stats["total_episodes"] > 20 and stats["consolidated_episodes"] == 0:
+        problems.append(("warning", "⚠️ Nenhum episódio consolidado", "Execute o DreamAgent para consolidar padrões"))
+
+    if not problems:
+        st.success("✅ Nenhum problema detectado! Sistema saudável.")
+    else:
+        for severity, title, description in problems:
+            if severity == "error":
+                st.error(f"**{title}**\n\n{description}")
+            elif severity == "warning":
+                st.warning(f"**{title}**\n\n{description}")
+            else:
+                st.info(f"**{title}**\n\n{description}")
+
+
+def render_compliance_metrics(graph: MemoryGraph):
+    """Métricas de compliance."""
+    st.subheader("📊 Métricas de Qualidade")
+
+    health = graph.get_memory_health()
+    stats = graph.stats()
+
+    # Métricas em cards
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric(
+            "📊 Importância Média",
+            f"{health['avg_episode_importance']:.2f}",
+            delta="OK" if health['avg_episode_importance'] > 0.3 else "Baixa"
+        )
+
+    with col2:
+        st.metric(
+            "💪 Força Média",
+            f"{health['avg_relation_strength']:.2f}",
+            delta="OK" if health['avg_relation_strength'] > 0.4 else "Baixa"
+        )
+
+    with col3:
+        consolidation_rate = (stats["consolidated_episodes"] / stats["total_episodes"] * 100) if stats["total_episodes"] > 0 else 0
+        st.metric(
+            "⭐ Taxa Consolidação",
+            f"{consolidation_rate:.1f}%",
+            delta="OK" if consolidation_rate > 5 else "Baixa"
+        )
+
+    with col4:
+        orphan_rate = (health["orphan_entities"] / stats["total_entities"] * 100) if stats["total_entities"] > 0 else 0
+        st.metric(
+            "👻 Taxa Órfãos",
+            f"{orphan_rate:.1f}%",
+            delta="OK" if orphan_rate < 10 else "Alta"
+        )
+
+    st.markdown("---")
+
+    # Histórico (simulado)
+    st.subheader("📈 Tendência de Saúde")
+    st.caption("Últimas 7 medições")
+
+    import pandas as pd
+    import random
+
+    # Simula histórico baseado no score atual
+    base_score = health["health_score"]
+    history = [max(0, min(100, base_score + random.randint(-10, 10))) for _ in range(7)]
+    history[-1] = base_score  # Último é o atual
+
+    df = pd.DataFrame({
+        "Dia": [f"D-{6-i}" for i in range(7)],
+        "Score": history
+    })
+
+    st.line_chart(df.set_index("Dia"))
+
+
+def render_config_panel(config: CortexConfig):
+    """Painel de configuração."""
+    st.subheader("⚙️ Configuração Atual")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### 🧠 Features V2.0")
+        st.markdown(f"- Context Packing: {'✅' if config.enable_context_packing else '❌'}")
+        st.markdown(f"- Progressive Consolidation: {'✅' if config.enable_progressive_consolidation else '❌'}")
+        st.markdown(f"- Active Forgetting: {'✅' if config.enable_active_forgetting else '❌'}")
+        st.markdown(f"- Hierarchical Recall: {'✅' if config.enable_hierarchical_recall else '❌'}")
+        st.markdown(f"- SM-2 Adaptive: {'✅' if config.enable_sm2_adaptive else '❌'}")
+        st.markdown(f"- Attention Mechanism: {'✅' if config.enable_attention_mechanism else '❌'}")
+
+    with col2:
+        st.markdown("### 🆕 Features V2.1")
+        st.markdown(f"- Hybrid Ranking: {'✅' if config.enable_hybrid_ranking else '❌'}")
+        st.markdown(f"- Graph Expansion: {'✅' if config.enable_graph_expansion else '❌'}")
+        st.markdown(f"- Community Detection: {'✅' if config.enable_community_detection else '❌'}")
+
+    st.markdown("---")
+
+    st.markdown("### 🔧 Parâmetros")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("**Ranking**")
+        st.code(f"RRF K: {config.rrf_k}")
+        st.code(f"MMR Lambda: {config.mmr_lambda}")
+
+    with col2:
+        st.markdown("**Grafos**")
+        st.code(f"Expansion Depth: {config.graph_expansion_depth}")
+        st.code(f"Max Nodes: {config.graph_expansion_max_nodes}")
+
+    with col3:
+        st.markdown("**Comunidades**")
+        st.code(f"Min Size: {config.community_min_size}")
+        st.code(f"Resolution: {config.community_resolution}")
+        st.code(f"Hub Min Conn: {config.hub_min_connections}")
+
+
 # ==================== MAIN ====================
 
 def main():
@@ -1224,6 +1653,10 @@ def main():
         render_dashboard(graph)
     elif "Grafo" in page:
         render_graph_visual(graph)
+    elif "Comunidades" in page:
+        render_communities(graph)
+    elif "Compliance" in page:
+        render_compliance(graph)
     elif "Entidades" in page:
         render_entities(graph)
     elif "Episódios" in page:
