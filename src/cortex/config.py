@@ -1,13 +1,20 @@
 """
 Cortex Configuration - Feature flags and tuning parameters for memory enhancements.
 
-This module provides configuration for all 6 scientific improvements:
+This module provides configuration for all scientific improvements:
+
+V2.0:
 1. Context Packing
 2. Progressive Consolidation
 3. Active Forgetting
 4. Hierarchical Recall
 5. SM-2 Adaptive
 6. Attention Mechanism
+
+V2.1 (Graphiti-inspired):
+7. Hybrid Ranking (RRF + MMR)
+8. BFS Graph Expansion
+9. Community Detection
 
 All features are opt-in for backward compatibility.
 """
@@ -57,6 +64,15 @@ class CortexConfig:
     # Attention Mechanism (35% better precision)
     enable_attention_mechanism: bool = True
 
+    # V2.1: Hybrid Ranking with RRF + MMR (inspired by Graphiti)
+    enable_hybrid_ranking: bool = True
+
+    # V2.1: BFS Graph Expansion for context enrichment
+    enable_graph_expansion: bool = True
+
+    # V2.1: Community Detection for knowledge clustering
+    enable_community_detection: bool = True
+
     # ==================== TUNING PARAMETERS ====================
 
     # Context Packing
@@ -99,6 +115,21 @@ class CortexConfig:
     attention_temperature: float = 1.0  # Softmax temperature
     attention_use_graph_bias: bool = True  # Include graph structure
 
+    # V2.1: Hybrid Ranking (RRF + MMR)
+    rrf_k: int = 60  # RRF constant (higher = more weight to lower ranks)
+    mmr_lambda: float = 0.7  # MMR tradeoff (1.0 = only relevance, 0.0 = only diversity)
+    hybrid_ranking_importance_weight: float = 0.3  # Weight for importance signal
+
+    # V2.1: BFS Graph Expansion
+    graph_expansion_depth: int = 1  # BFS depth for context expansion
+    graph_expansion_max_nodes: int = 15  # Max nodes to add via expansion
+    graph_expansion_min_strength: float = 0.3  # Min relation strength to follow
+
+    # V2.1: Community Detection
+    community_min_size: int = 3  # Minimum members for a valid community
+    community_resolution: float = 1.0  # Higher = more smaller communities
+    hub_min_connections: int = 5  # Minimum connections to be considered a hub
+
     # ==================== BACKWARD COMPATIBILITY ====================
 
     # Legacy mode: Disable all improvements (v1.x behavior)
@@ -113,6 +144,9 @@ class CortexConfig:
             self.enable_hierarchical_recall = False
             self.enable_sm2_adaptive = False
             self.enable_attention_mechanism = False
+            self.enable_hybrid_ranking = False
+            self.enable_graph_expansion = False
+            self.enable_community_detection = False
             self.consolidation_mode = "fixed"
 
     def to_dict(self) -> dict:
@@ -125,6 +159,9 @@ class CortexConfig:
             "enable_hierarchical_recall": self.enable_hierarchical_recall,
             "enable_sm2_adaptive": self.enable_sm2_adaptive,
             "enable_attention_mechanism": self.enable_attention_mechanism,
+            "enable_hybrid_ranking": self.enable_hybrid_ranking,
+            "enable_graph_expansion": self.enable_graph_expansion,
+            "enable_community_detection": self.enable_community_detection,
 
             # Context packing
             "context_max_tokens": self.context_max_tokens,
@@ -143,6 +180,14 @@ class CortexConfig:
 
             # Attention
             "attention_heads": self.attention_heads,
+
+            # V2.1: Hybrid ranking
+            "rrf_k": self.rrf_k,
+            "mmr_lambda": self.mmr_lambda,
+
+            # V2.1: Graph expansion
+            "graph_expansion_depth": self.graph_expansion_depth,
+            "graph_expansion_max_nodes": self.graph_expansion_max_nodes,
 
             # Legacy
             "legacy_mode": self.legacy_mode,

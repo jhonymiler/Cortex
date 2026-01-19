@@ -31,6 +31,10 @@ from cortex.core.processing.language import tokenize
 from cortex.core.recall import ContextPacker, HierarchicalRecall
 from cortex.core.learning import MemoryAttention, AttentionConfig, ForgetGate
 from cortex.config import CortexConfig, get_config
+
+# V2.1 Enhancements (Graphiti-inspired)
+from cortex.core.recall.ranking import HybridRanker, RankedItem
+from cortex.core.graph.graph_algorithms import GraphAnalyzer
 from cortex.core.learning.contradiction import (
     ContradictionDetector,
     Contradiction,
@@ -314,6 +318,11 @@ class MemoryGraph:
     - Hierarchical Recall: 2x faster, multi-level
     - SM-2 Adaptive: 25% better retention
     - Attention Mechanism: 35% better coherence
+
+    V2.1 Enhancements (Graphiti-inspired):
+    - Hybrid Ranking: RRF + MMR for better ranking
+    - Graph Expansion: BFS traversal for context enrichment
+    - Community Detection: Louvain clustering for knowledge groups
     """
     
     def __init__(self, storage_path: Path | str | None = None):
@@ -364,6 +373,16 @@ class MemoryGraph:
             redundancy_weight=self._config.forget_gate_redundancy_weight,
             obsolescence_weight=self._config.forget_gate_obsolescence_weight,
         )
+
+        # V2.1: Hybrid Ranking (RRF + MMR)
+        self._hybrid_ranker = HybridRanker(
+            rrf_k=self._config.rrf_k,
+            mmr_lambda=self._config.mmr_lambda,
+            enable_mmr=True,
+        )
+
+        # V2.1: Graph Analyzer (BFS + Community Detection)
+        self._graph_analyzer = GraphAnalyzer(memory_graph=self)
 
         # Carrega se existir
         if self.storage_path:
@@ -1072,7 +1091,48 @@ class MemoryGraph:
             episodes = [ep for ep, score in ranked]
             metrics["attention_reranking_used"] = True
 
-        # 4.4. FILTRA memórias que JÁ FORAM CONSOLIDADAS (filhas)
+        # 4.4. V2.1: Hybrid Ranking (RRF + MMR) - Graphiti-inspired
+        if self._config.enable_hybrid_ranking and episodes:
+            before_hybrid = len(episodes)
+            # Build TF-IDF scores from inverted index
+            tfidf_results = self._inverted_index.search(query, limit=len(episodes) * 2)
+            tfidf_scores = {ep_id: score for ep_id, score in tfidf_results}
+
+            # Rank with hybrid approach
+            ranked_episodes = self._hybrid_ranker.rank_episodes(
+                episodes=episodes,
+                query=query,
+                tfidf_scores=tfidf_scores,
+                importance_weight=self._config.hybrid_ranking_importance_weight,
+                limit=RECALL_MAX_RESULTS * 2,  # Get extra for diversity
+            )
+            episodes = [ep for ep, _ in ranked_episodes]
+            metrics["hybrid_ranking_used"] = True
+            metrics["hybrid_candidates"] = before_hybrid
+
+        # 4.5. V2.1: Graph Expansion (BFS) - Graphiti-inspired
+        if self._config.enable_graph_expansion and episodes:
+            seed_ids = {ep.id for ep in episodes[:5]}  # Top 5 as seeds
+            expanded_ids = self._graph_analyzer.expand_recall(
+                seed_ids=seed_ids,
+                max_expansion=self._config.graph_expansion_max_nodes,
+                depth=self._config.graph_expansion_depth,
+            )
+            # Add expanded episodes not already in results
+            episode_ids = {ep.id for ep in episodes}
+            expanded_count = 0
+            for exp_id in expanded_ids:
+                if exp_id not in episode_ids and exp_id in self._episodes:
+                    exp_episode = self._episodes[exp_id]
+                    # Only add if above minimum threshold
+                    if exp_episode.importance >= RECALL_MIN_THRESHOLD:
+                        episodes.append(exp_episode)
+                        expanded_count += 1
+                        if expanded_count >= self._config.graph_expansion_max_nodes:
+                            break
+            metrics["graph_expansion_added"] = expanded_count
+
+        # 4.7. FILTRA memórias que JÁ FORAM CONSOLIDADAS (filhas)
         # Só retorna resumos (consolidadas) e memórias frescas (não consolidadas)
         include_consolidated = context.get("include_consolidated", False)
         if not include_consolidated:
@@ -1142,7 +1202,10 @@ class MemoryGraph:
             relations_found=len(unique_relations),
             hierarchical_recall=metrics.get("hierarchical_recall_used", False),
             attention_reranking=metrics.get("attention_reranking_used", False),
-            forget_gate_filtered=metrics.get("filtered_by_forget_gate", 0)
+            forget_gate_filtered=metrics.get("filtered_by_forget_gate", 0),
+            # V2.1 metrics
+            hybrid_ranking=metrics.get("hybrid_ranking_used", False),
+            graph_expansion_added=metrics.get("graph_expansion_added", 0),
         )
 
         self._logger.debug(
@@ -1601,6 +1664,207 @@ class MemoryGraph:
             return "#F39C12"  # Laranja
         else:
             return "#95A5A6"  # Cinza
+
+    # ==================== V2.1 GRAPH ALGORITHMS ====================
+
+    def detect_communities(
+        self,
+        min_size: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        V2.1: Detecta comunidades de conhecimento no grafo.
+
+        Usa o algoritmo Louvain para identificar clusters de
+        memórias relacionadas. Útil para:
+        - Identificar tópicos/domínios
+        - Agrupar conhecimento coletivo
+        - Encontrar padrões de interesse
+
+        Args:
+            min_size: Tamanho mínimo da comunidade (default: config)
+
+        Returns:
+            Lista de comunidades com membros e metadados
+        """
+        if not self._config.enable_community_detection:
+            return []
+
+        min_size = min_size or self._config.community_min_size
+        communities = self._graph_analyzer.detect_knowledge_clusters(min_size=min_size)
+
+        # Convert to dict format with enriched info
+        result = []
+        for comm in communities:
+            # Get info about members
+            member_info = []
+            for member_id in list(comm.member_ids)[:10]:  # Limit for performance
+                if member_id in self._entities:
+                    ent = self._entities[member_id]
+                    member_info.append({"id": member_id, "type": "entity", "name": ent.name})
+                elif member_id in self._episodes:
+                    ep = self._episodes[member_id]
+                    member_info.append({"id": member_id, "type": "episode", "action": ep.action[:50]})
+
+            result.append({
+                "id": comm.id,
+                "size": len(comm.member_ids),
+                "cohesion": round(comm.cohesion, 3),
+                "central_node_id": comm.central_node_id,
+                "members": member_info,
+                "member_ids": list(comm.member_ids),
+            })
+
+        return result
+
+    def find_hub_memories(
+        self,
+        top_k: int = 10,
+    ) -> list[dict[str, Any]]:
+        """
+        V2.1: Encontra memórias "hub" que conectam muitos conceitos.
+
+        Hubs são nós centrais importantes que:
+        - Conectam muitas outras memórias
+        - São protegidos do esquecimento (decay)
+        - Servem como pontos de ancoragem para recall
+
+        Args:
+            top_k: Número de hubs a retornar
+
+        Returns:
+            Lista de hubs com scores e metadados
+        """
+        hubs = self._graph_analyzer.identify_hub_memories(top_k=top_k)
+
+        result = []
+        for hub_id, score in hubs:
+            hub_info = {"id": hub_id, "hub_score": round(score, 3)}
+
+            if hub_id in self._entities:
+                ent = self._entities[hub_id]
+                hub_info.update({
+                    "type": "entity",
+                    "name": ent.name,
+                    "entity_type": ent.type,
+                    "access_count": ent.access_count,
+                })
+            elif hub_id in self._episodes:
+                ep = self._episodes[hub_id]
+                hub_info.update({
+                    "type": "episode",
+                    "action": ep.action[:50],
+                    "importance": ep.importance,
+                    "occurrence_count": ep.occurrence_count,
+                })
+
+            result.append(hub_info)
+
+        return result
+
+    def is_hub_node(self, node_id: str) -> bool:
+        """
+        V2.1: Verifica se um nó é um hub.
+
+        Hubs são protegidos do esquecimento agressivo.
+
+        Args:
+            node_id: ID do nó a verificar
+
+        Returns:
+            True se o nó é um hub
+        """
+        return self._graph_analyzer.hubs.is_hub(
+            node_id,
+            threshold=self._config.hub_min_connections,
+        )
+
+    def find_related_memories(
+        self,
+        memory_id: str,
+        max_results: int = 10,
+        relation_types: set[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        V2.1: Encontra memórias relacionadas via BFS.
+
+        Explora o grafo a partir de uma memória para descobrir
+        conexões diretas e indiretas.
+
+        Args:
+            memory_id: ID da memória de origem
+            max_results: Máximo de resultados
+            relation_types: Filtrar por tipos de relação
+
+        Returns:
+            Lista de memórias relacionadas com distância
+        """
+        if not self._config.enable_graph_expansion:
+            return []
+
+        result = self._graph_analyzer.bfs.traverse(
+            start_ids={memory_id},
+            max_depth=self._config.graph_expansion_depth + 1,
+            max_nodes=max_results + 1,
+            relation_types=relation_types,
+            min_strength=self._config.graph_expansion_min_strength,
+        )
+
+        related = []
+        for node_id in result.visited_ids:
+            if node_id == memory_id:
+                continue
+
+            distance = result.distances.get(node_id, 0)
+            path = result.paths.get(node_id, [])
+
+            info = {
+                "id": node_id,
+                "distance": distance,
+                "path": path,
+            }
+
+            if node_id in self._entities:
+                ent = self._entities[node_id]
+                info.update({"type": "entity", "name": ent.name})
+            elif node_id in self._episodes:
+                ep = self._episodes[node_id]
+                info.update({"type": "episode", "action": ep.action[:50]})
+
+            related.append(info)
+
+        # Sort by distance
+        related.sort(key=lambda x: x["distance"])
+        return related[:max_results]
+
+    def get_graph_statistics(self) -> dict[str, Any]:
+        """
+        V2.1: Retorna estatísticas avançadas do grafo.
+
+        Inclui métricas de:
+        - Tamanho e densidade
+        - Grau médio das conexões
+        - Número de comunidades
+        - Identificação de hubs
+
+        Returns:
+            Dicionário com estatísticas
+        """
+        basic_stats = self._graph_analyzer.get_graph_stats()
+
+        # Add community info
+        if self._config.enable_community_detection:
+            communities = self.detect_communities()
+            basic_stats["communities_count"] = len(communities)
+            basic_stats["largest_community_size"] = (
+                communities[0]["size"] if communities else 0
+            )
+
+        # Add hub info
+        hubs = self.find_hub_memories(top_k=5)
+        basic_stats["hub_count"] = len(hubs)
+        basic_stats["top_hubs"] = [h["id"] for h in hubs[:3]]
+
+        return basic_stats
 
     # ==================== MEMORY DYNAMICS ====================
     

@@ -143,7 +143,7 @@ class Episode:
         - Match por todos os campos (action, context, outcome)
         - Boost por importância e consolidação
         """
-        from cortex.core.language import tokenize_to_set
+        from cortex.core.processing.language import tokenize_to_set
         
         query_tokens = tokenize_to_set(query)
         if not query_tokens:
