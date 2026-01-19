@@ -234,7 +234,7 @@ class MemoryNormalizer:
     
     def _fallback_normalize(self, text: str) -> str:
         """Fallback quando spaCy não está disponível."""
-        from cortex.core.language import tokenize
+        from cortex.core.processing.language import tokenize
         
         # Usa tokenização centralizada (já remove stopwords)
         words = tokenize(text)

@@ -1,7 +1,7 @@
 """
 Tests for V2.1 Advanced Ranking Algorithms (RRF + MMR).
 
-Tests the Graphiti-inspired ranking improvements:
+Tests the ranking improvements:
 - ReciprocalRankFusion: Combines multiple ranking signals
 - MaximalMarginalRelevance: Ensures diversity in results
 - HybridRanker: Full pipeline integration

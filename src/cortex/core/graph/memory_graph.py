@@ -32,7 +32,7 @@ from cortex.core.recall import ContextPacker, HierarchicalRecall
 from cortex.core.learning import MemoryAttention, AttentionConfig, ForgetGate
 from cortex.config import CortexConfig, get_config
 
-# V2.1 Enhancements (Graphiti-inspired)
+# V2.1 Enhancements
 from cortex.core.recall.ranking import HybridRanker, RankedItem
 from cortex.core.graph.graph_algorithms import GraphAnalyzer
 from cortex.core.learning.contradiction import (
@@ -319,7 +319,7 @@ class MemoryGraph:
     - SM-2 Adaptive: 25% better retention
     - Attention Mechanism: 35% better coherence
 
-    V2.1 Enhancements (Graphiti-inspired):
+    V2.1 Enhancements:
     - Hybrid Ranking: RRF + MMR for better ranking
     - Graph Expansion: BFS traversal for context enrichment
     - Community Detection: Louvain clustering for knowledge groups
@@ -1091,7 +1091,7 @@ class MemoryGraph:
             episodes = [ep for ep, score in ranked]
             metrics["attention_reranking_used"] = True
 
-        # 4.4. V2.1: Hybrid Ranking (RRF + MMR) - Graphiti-inspired
+        # 4.4. V2.1: Hybrid Ranking (RRF + MMR) 
         if self._config.enable_hybrid_ranking and episodes:
             before_hybrid = len(episodes)
             # Build TF-IDF scores from inverted index
@@ -1110,7 +1110,7 @@ class MemoryGraph:
             metrics["hybrid_ranking_used"] = True
             metrics["hybrid_candidates"] = before_hybrid
 
-        # 4.5. V2.1: Graph Expansion (BFS) - Graphiti-inspired
+        # 4.5. V2.1: Graph Expansion (BFS)
         if self._config.enable_graph_expansion and episodes:
             seed_ids = {ep.id for ep in episodes[:5]}  # Top 5 as seeds
             expanded_ids = self._graph_analyzer.expand_recall(

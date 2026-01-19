@@ -26,8 +26,8 @@ import requests
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from cortex.core.memory_normalizer import MemoryNormalizer
-from cortex.core.collective_memory import CollectiveMemoryCollector
+from cortex.core.processing.memory_normalizer import MemoryNormalizer
+from cortex.core.storage.collective_memory import CollectiveMemoryCollector
 
 
 @dataclass

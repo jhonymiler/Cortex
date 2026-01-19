@@ -781,7 +781,7 @@ class ForgetGate:
                     sim.timestamp > episode.timestamp):
                     score += 0.2
                     break
-        except:
-            pass
+        except Exception:
+            pass  # Ignore errors in similarity calculation
 
         return min(1.0, score)

@@ -1,7 +1,7 @@
 """
 Tests for V2.1 Graph Algorithms (BFS, Community Detection, Hub Detection).
 
-Tests the Graphiti-inspired graph enhancements:
+Tests graph enhancements:
 - BFSGraphTraversal: Neighborhood exploration
 - LouvainCommunityDetection: Knowledge clustering
 - HubDetector: Central node identification

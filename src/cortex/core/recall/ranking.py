@@ -1,7 +1,7 @@
 """
 Advanced Ranking Algorithms for Memory Retrieval.
 
-Implements state-of-the-art ranking techniques inspired by Graphiti:
+Implements state-of-the-art ranking techniques:
 
 1. RRF (Reciprocal Rank Fusion): Combines multiple ranking signals
 2. MMR (Maximal Marginal Relevance): Balances relevance with diversity

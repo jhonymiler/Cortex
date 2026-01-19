@@ -6,7 +6,7 @@ V2.0 Components:
 - ContextPacker: Information density optimization (40-70% token reduction)
 - InvertedIndex: Fast O(log n) search
 
-V2.1 Advanced Ranking (inspired by Graphiti):
+V2.1 Advanced Ranking:
 - HybridRanker: Combines RRF + MMR for optimal ranking
 - ReciprocalRankFusion: Fuses multiple ranking signals
 - MaximalMarginalRelevance: Ensures diversity in results

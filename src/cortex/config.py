@@ -11,7 +11,7 @@ V2.0:
 5. SM-2 Adaptive
 6. Attention Mechanism
 
-V2.1 (Graphiti-inspired):
+V2.1
 7. Hybrid Ranking (RRF + MMR)
 8. BFS Graph Expansion
 9. Community Detection
@@ -64,7 +64,7 @@ class CortexConfig:
     # Attention Mechanism (35% better precision)
     enable_attention_mechanism: bool = True
 
-    # V2.1: Hybrid Ranking with RRF + MMR (inspired by Graphiti)
+    # V2.1: Hybrid Ranking with RRF + MMR
     enable_hybrid_ranking: bool = True
 
     # V2.1: BFS Graph Expansion for context enrichment

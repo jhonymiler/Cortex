@@ -732,7 +732,7 @@ class MemoryService:
         
         # REGRA 2: Se só há entidades (sem episódios), avalia relevância por tokens
         # Isso cobre casos conversacionais como "Você lembra do João?"
-        from cortex.core.language import tokenize_to_set
+        from cortex.core.processing.language import tokenize_to_set
         
         query_tokens = tokenize_to_set(query.lower())
         if not query_tokens:
