@@ -473,17 +473,198 @@ else:
 
 ---
 
-## 📝 Commits
+## 🧪 Testes & Qualidade
 
+### Estrutura de Testes
 ```
-feat: nova funcionalidade
-fix: correção de bug
-docs: documentação
-refactor: sem mudar comportamento
-test: testes
-bench: benchmark
+tests/
+├── core/              # Testes de models puros
+│   ├── test_memory.py       # Memory W5H
+│   ├── test_decay.py        # DecayManager
+│   └── test_identity.py     # IdentityKernel
+└── test_*.py          # Integrações
+```
+
+### Padrões de Teste
+```python
+# ✅ CORRETO - Testar lógica, não I/O
+def test_decay_calculation():
+    manager = DecayManager(DecayConfig(...))
+    memory = Memory(...)
+    
+    retrievability = manager.calculate_retrievability(memory)
+    assert 0.0 <= retrievability <= 1.0
+
+# ✅ CORRETO - Fixtures para setup complexo
+@pytest.fixture
+def memory_service():
+    return MemoryService(storage_path=":memory:")  # In-memory
+
+# ❌ EVITAR - Testes que dependem de arquivos externos
+def test_load_from_disk():  # Frágil, depende de estado
+    ...
+```
+
+### Cobertura Mínima
+- Core models: 80%+
+- Services: 70%+
+- APIs: 60%+ (integration tests)
+
+---
+
+## 📝 Convenções de Commits
+
+```bash
+# Estrutura
+<tipo>: <descrição curta>
+
+[corpo opcional com detalhes]
+
+# Tipos
+feat:      # Nova funcionalidade
+fix:       # Correção de bug
+docs:      # Documentação
+refactor:  # Refatoração (sem mudar comportamento)
+test:      # Adicionar/modificar testes
+bench:     # Benchmark
+perf:      # Melhoria de performance
+style:     # Formatação (sem mudar lógica)
+chore:     # Manutenção (deps, config)
+```
+
+**Exemplos:**
+```bash
+feat: adiciona threshold adaptativo para recall semântico
+fix: corrige cálculo de stability em memórias consolidadas
+docs: atualiza README com instruções de instalação
+refactor: separa lógica de embedding em módulo próprio
 ```
 
 ---
 
-*Última atualização: Janeiro 2026*
+## 🔧 Debugging & Troubleshooting
+
+### Porta já em uso
+```bash
+# Encontrar processo
+lsof -ti:8000
+
+# Matar processo
+lsof -ti:8000 | xargs kill -9
+
+# Ou usar porta alternativa
+CORTEX_PORT=8001 cortex-api
+```
+
+### Logs
+```bash
+# Logs estruturados em logs/
+logs/
+├── audit/              # Operações de memória (GDPR)
+├── cortex.log          # Aplicação
+└── performance.log     # Métricas
+```
+
+### Debug de Recall
+```python
+# Ver detalhes do threshold adaptativo
+import logging
+logging.getLogger("cortex.services").setLevel(logging.DEBUG)
+
+# Logs mostram:
+# - Scores de similaridade
+# - Threshold calculado
+# - Gap analysis
+# - Filtros aplicados
+```
+
+### Ollama não responde
+```bash
+# Verificar se Ollama está rodando
+curl http://localhost:11434/api/tags
+
+# Reiniciar Ollama
+ollama serve
+
+# Verificar modelos instalados
+ollama list
+```
+
+---
+
+## 📍 Arquivos Importantes (Guia de Referência)
+
+| Arquivo | Propósito | Quando consultar |
+|---------|-----------|------------------|
+| [`src/cortex/core/primitives/memory.py`](../src/cortex/core/primitives/memory.py) | Dataclass Memory W5H | Modificar estrutura de memória |
+| [`src/cortex/services/memory_service.py`](../src/cortex/services/memory_service.py) | Orquestrador central | Lógica de remember/recall |
+| [`src/cortex/core/learning/decay.py`](../src/cortex/core/learning/decay.py) | DecayManager (Ebbinghaus) | Ajustar decay |
+| [`src/cortex/workers/dream_agent.py`](../src/cortex/workers/dream_agent.py) | Consolidação automática | Modificar consolidação |
+| [`src/cortex/core/storage/shared_memory.py`](../src/cortex/core/storage/shared_memory.py) | SharedMemoryManager | Namespaces PERSONAL/SHARED/LEARNED |
+| [`src/cortex/api/app.py`](../src/cortex/api/app.py) | FastAPI REST | Endpoints HTTP |
+| [`mcp/cortex_mcp/server.py`](../mcp/cortex_mcp/server.py) | MCP Server (FastMCP) | Tools para Claude/Cursor |
+| [`src/cortex/config.py`](../src/cortex/config.py) | CortexConfig | Feature flags (v2.0 enhancements) |
+| [`benchmark/realistic_benchmark.py`](../benchmark/realistic_benchmark.py) | Sistema de benchmark | Adicionar cenários |
+| [`pyproject.toml`](../pyproject.toml) | Dependências & scripts | Adicionar deps ou comandos |
+
+---
+
+## 💡 Fluxos Comuns de Trabalho
+
+### Adicionar nova feature
+```bash
+# 1. Criar branch
+git checkout -b feat/nome-feature
+
+# 2. Implementar (seguir camadas)
+# - Models puros em core/
+# - Lógica em services/
+# - I/O em api/
+
+# 3. Testes
+pytest tests/ -v -k "test_nome_feature"
+
+# 4. Lint & format
+ruff check src/ && ruff format src/
+
+# 5. Commit & push
+git add . && git commit -m "feat: descrição"
+git push origin feat/nome-feature
+```
+
+### Debugar recall ruim
+```bash
+# 1. Ativar debug logs
+export LOG_LEVEL=DEBUG
+
+# 2. Rodar query problemática
+curl -X POST http://localhost:8000/memory/recall \
+  -H "Content-Type: application/json" \
+  -d '{"query": "problema X", "namespace": "test"}'
+
+# 3. Verificar logs/cortex.log
+# - Threshold calculado
+# - Gap analysis
+# - Scores de similaridade
+
+# 4. Ajustar threshold em config.py se necessário
+```
+
+### Adicionar integração (LangChain, CrewAI, etc.)
+```python
+# 1. Criar adapter em sdk/python/integrations/
+# 2. Usar padrão existente:
+from cortex_memory_sdk import CortexMemorySDK
+
+class NewFrameworkMemory:
+    def __init__(self, namespace: str):
+        self.sdk = CortexMemorySDK(namespace=namespace)
+    
+    def load_memory_variables(self, inputs):
+        # Adaptar para framework
+        ...
+```
+
+---
+
+*Última atualização: Fevereiro 2026*
