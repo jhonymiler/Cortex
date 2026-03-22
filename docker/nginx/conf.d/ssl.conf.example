@@ -1,0 +1,35 @@
+# SSL Configuration (for production)
+#
+# Uncomment and configure for HTTPS
+# Generate certificates with:
+#   openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+#     -keyout ssl/cortex.key -out ssl/cortex.crt
+
+# server {
+#     listen 443 ssl http2;
+#     listen [::]:443 ssl http2;
+#     server_name cortex.yourdomain.com;
+#
+#     ssl_certificate /etc/nginx/ssl/cortex.crt;
+#     ssl_certificate_key /etc/nginx/ssl/cortex.key;
+#     ssl_session_timeout 1d;
+#     ssl_session_cache shared:SSL:50m;
+#     ssl_session_tickets off;
+#
+#     ssl_protocols TLSv1.2 TLSv1.3;
+#     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
+#     ssl_prefer_server_ciphers off;
+#
+#     # HSTS
+#     add_header Strict-Transport-Security "max-age=63072000" always;
+#
+#     # ... (copy location blocks from main server)
+# }
+#
+# # Redirect HTTP to HTTPS
+# server {
+#     listen 80;
+#     listen [::]:80;
+#     server_name cortex.yourdomain.com;
+#     return 301 https://$host$request_uri;
+# }

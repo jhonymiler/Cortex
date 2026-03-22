@@ -1107,6 +1107,12 @@ class NamespacedMemoryService:
             service._current_namespace = namespace  # Namespace atual
             service._recall_cache = {}  # Cache de recall por sessão
             service._cache_max_size = 100  # Limite do cache
+            
+            # Logging (necessário porque __new__ não chama __init__)
+            service._logger = get_logger("memory_service")
+            service._audit = get_audit_logger("memory_service")
+            service._perf = get_performance_logger("memory_service")
+            
             self._services[namespace] = service
         
         return self._services[namespace]

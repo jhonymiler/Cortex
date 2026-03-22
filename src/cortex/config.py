@@ -19,6 +19,7 @@ V2.1
 All features are opt-in for backward compatibility.
 """
 
+import os
 from dataclasses import dataclass, field
 from typing import Literal
 
@@ -72,6 +73,32 @@ class CortexConfig:
 
     # V2.1: Community Detection for knowledge clustering
     enable_community_detection: bool = True
+
+    # ==================== STORAGE ====================
+
+    # Backend de persistência: "json" (arquivo local) ou "neo4j" (banco de grafos)
+    storage_backend: Literal["json", "neo4j"] = field(
+        default_factory=lambda: os.getenv("CORTEX_STORAGE_BACKEND", "json")
+    )
+
+    # Diretório para dados (usado por JSONStorageAdapter)
+    data_dir: str = field(
+        default_factory=lambda: os.getenv("CORTEX_DATA_DIR", "./data")
+    )
+
+    # Neo4j connection settings
+    neo4j_uri: str = field(
+        default_factory=lambda: os.getenv("NEO4J_URI", "bolt://localhost:7687")
+    )
+    neo4j_user: str = field(
+        default_factory=lambda: os.getenv("NEO4J_USER", "neo4j")
+    )
+    neo4j_password: str = field(
+        default_factory=lambda: os.getenv("NEO4J_PASSWORD", "")
+    )
+    neo4j_database: str = field(
+        default_factory=lambda: os.getenv("NEO4J_DATABASE", "neo4j")
+    )
 
     # ==================== TUNING PARAMETERS ====================
 
@@ -188,6 +215,14 @@ class CortexConfig:
             # V2.1: Graph expansion
             "graph_expansion_depth": self.graph_expansion_depth,
             "graph_expansion_max_nodes": self.graph_expansion_max_nodes,
+
+            # Storage
+            "storage_backend": self.storage_backend,
+            "data_dir": self.data_dir,
+            "neo4j_uri": self.neo4j_uri,
+            "neo4j_user": self.neo4j_user,
+            "neo4j_database": self.neo4j_database,
+            # Nota: neo4j_password NÃO é exportado por segurança
 
             # Legacy
             "legacy_mode": self.legacy_mode,

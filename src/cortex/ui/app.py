@@ -240,7 +240,7 @@ def render_sidebar():
     # Navegação principal
     st.sidebar.subheader("📍 Navegação")
     page = st.sidebar.radio(
-        "",
+        "Selecione a página",
         [
             "🏠 Dashboard",
             "🕸️ Grafo Interativo",
@@ -433,200 +433,388 @@ def render_dashboard(graph: MemoryGraph):
 # ==================== GRAFO VISUAL ====================
 
 def render_graph_visual(graph: MemoryGraph):
-    """Visualização interativa avançada do grafo."""
-    st.title("🕸️ Grafo Interativo de Memória")
-    st.caption("Visualize e explore as conexões entre entidades, episódios e relações")
-
-    graph_data = get_cached_graph_data(st.session_state.namespace)
-
-    if not graph_data["nodes"]:
-        st.info("💡 Grafo vazio. Crie algumas memórias primeiro!")
-        return
-
-    # Controles principais em tabs
-    tab1, tab2, tab3 = st.tabs(["🎛️ Controles", "📊 Estatísticas", "ℹ️ Legenda"])
-
-    with tab1:
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            show_entities = st.checkbox("🎯 Entidades", value=True)
-        with col2:
-            show_episodes = st.checkbox("📝 Episódios", value=True)
-        with col3:
-            min_weight = st.slider("Peso mínimo", 0.0, 1.0, 0.0, 0.1)
-        with col4:
-            node_size_mult = st.slider("Tamanho dos nós", 0.5, 2.0, 1.0, 0.1)
-
-    with tab2:
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("📊 Nós Visíveis", len([n for n in graph_data["nodes"] if n["weight"] >= min_weight]))
-        with col2:
-            st.metric("🔗 Arestas", len(graph_data["edges"]))
-        with col3:
-            avg_degree = len(graph_data["edges"]) * 2 / max(len(graph_data["nodes"]), 1)
-            st.metric("📈 Grau Médio", f"{avg_degree:.1f}")
-
-    with tab3:
-        st.markdown("""
-        **Cores:**
-        - 🔴 person/user
-        - 🔵 concept
-        - 🟢 file
-        - 🟡 episode consolidado
-        - 🟢 episode normal
-
-        **Tamanho:** Proporcional ao peso do nó (conexões + importância)
-        **Largura:** Proporcional à força da relação
-        """)
-
-    # Layout controls
-    with st.expander("⚙️ Configurações de Layout", expanded=False):
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            layout_type = st.selectbox("Algoritmo", [
-                "spring",
-                "kamada_kawai",
-                "shell",
-                "radial",
-                "circular",
-            ], index=0)
-        with col2:
-            layout_scale = st.slider("Escala", 5, 50, 20, 1)
-        with col3:
-            layout_k = st.slider("Espaçamento", 1.0, 15.0, 5.0, 0.5)
-        with col4:
-            layout_seed = st.number_input("Seed", 0, 9999, 42)
-
-    # Prepara visualização
+    """Visualização interativa do grafo de memória com física e movimento."""
     import networkx as nx
     import math
+    
+    # Header
+    st.markdown("""
+    <div style="text-align: center; padding: 15px 0;">
+        <h1 style="font-size: 2.2em; margin-bottom: 5px;">🧠 Mapa de Memórias</h1>
+        <p style="color: #888; font-size: 1em;">
+            Arraste as bolinhas • Clique para detalhes • O grafo se auto-organiza
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
+    # Legenda compacta
+    st.markdown("""
+    <div style="display: flex; justify-content: center; gap: 25px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 15px; flex-wrap: wrap;">
+        <span style="color: #FF6B6B;">● Pessoas</span>
+        <span style="color: #45B7D1;">● Conceitos</span>
+        <span style="color: #90EE90;">● Eventos</span>
+        <span style="color: #FFD700;">● Padrões</span>
+        <span style="color: #888;">― Conexões</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Controles
+    col1, col2, col3 = st.columns([2, 2, 1])
+    with col1:
+        show_labels = st.checkbox("📝 Mostrar nomes", value=True)
+    with col2:
+        physics_enabled = st.checkbox("🌊 Movimento ativo", value=True)
+    with col3:
+        if st.button("🔄 Atualizar", use_container_width=True):
+            reload_graph(st.session_state.namespace)
+            st.rerun()
+
+    # Coleta dados do grafo
+    entities = list(graph._entities.values())
+    episodes = list(graph._episodes.values())
+    relations = list(graph._relations.values())
+    
+    if not entities and not episodes:
+        st.markdown("""
+        <div style="text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 20px;">
+            <div style="font-size: 4em;">🌱</div>
+            <h2 style="color: #fff;">Grafo vazio</h2>
+            <p style="color: #aaa;">Crie memórias para ver o grafo ganhar vida!</p>
+        </div>
+        """, unsafe_allow_html=True)
+        return
+
+    # Constrói grafo NetworkX com TODAS as conexões
     G = nx.Graph()
-    visible_ids = set()
-    node_data = {}
+    node_info = {}  # id -> {label, type, weight, color, size}
+    
+    # Adiciona entidades como nós
+    for entity in entities:
+        weight = graph.get_node_weight(entity.id)
+        node_type = entity.type.lower()
+        
+        if node_type in ["person", "user"]:
+            color = "#FF6B6B"
+        elif node_type in ["concept", "file"]:
+            color = "#45B7D1"
+        else:
+            color = "#9B59B6"
+        
+        G.add_node(entity.id)
+        node_info[entity.id] = {
+            "label": entity.name,
+            "type": "entity",
+            "subtype": entity.type,
+            "weight": weight,
+            "color": color,
+            "size": 20 + weight * 35,
+        }
+    
+    # Adiciona episódios como nós
+    for episode in episodes:
+        weight = graph.get_node_weight(episode.id)
+        
+        if episode.is_consolidated:
+            color = "#FFD700"
+        else:
+            color = "#90EE90"
+        
+        label = episode.action[:20] + "..." if len(episode.action) > 20 else episode.action
+        
+        G.add_node(episode.id)
+        node_info[episode.id] = {
+            "label": label,
+            "type": "episode",
+            "subtype": "consolidated" if episode.is_consolidated else "normal",
+            "weight": weight,
+            "color": color,
+            "size": 18 + weight * 30,
+            "outcome": episode.outcome[:50] if episode.outcome else "",
+        }
+    
+    # CONEXÕES: Entidade → Episódio (via participants)
+    edges_data = []
+    for episode in episodes:
+        for participant_id in episode.participants:
+            if participant_id in node_info:
+                G.add_edge(participant_id, episode.id)
+                edges_data.append({
+                    "from": participant_id,
+                    "to": episode.id,
+                    "label": "participou",
+                    "weight": 0.8,
+                    "color": "rgba(144, 238, 144, 0.6)",  # Verde suave
+                })
+    
+    # CONEXÕES: Relações explícitas
+    for relation in relations:
+        if relation.from_id in node_info and relation.to_id in node_info:
+            G.add_edge(relation.from_id, relation.to_id)
+            edges_data.append({
+                "from": relation.from_id,
+                "to": relation.to_id,
+                "label": relation.relation_type,
+                "weight": relation.strength,
+                "color": "rgba(52, 152, 219, 0.6)",  # Azul suave
+            })
+    
+    # CONEXÕES: Consolidação (episódio filho → pai)
+    for episode in episodes:
+        if episode.metadata.get("consolidated_into"):
+            parent_id = episode.metadata["consolidated_into"]
+            if parent_id in node_info:
+                G.add_edge(episode.id, parent_id)
+                edges_data.append({
+                    "from": episode.id,
+                    "to": parent_id,
+                    "label": "consolidado em",
+                    "weight": 0.9,
+                    "color": "rgba(255, 215, 0, 0.6)",  # Dourado suave
+                })
+    
+    # CONEXÕES: Entre episódios com mesmos participantes
+    episode_list = list(episodes)
+    for i, ep1 in enumerate(episode_list):
+        for ep2 in episode_list[i+1:]:
+            # Se compartilham participantes, cria conexão
+            shared = set(ep1.participants) & set(ep2.participants)
+            if shared and len(shared) > 0:
+                G.add_edge(ep1.id, ep2.id)
+                edges_data.append({
+                    "from": ep1.id,
+                    "to": ep2.id,
+                    "label": "relacionado",
+                    "weight": 0.5,
+                    "color": "rgba(150, 150, 150, 0.4)",  # Cinza suave
+                })
 
-    # Filtra nós visíveis
-    for node in graph_data["nodes"]:
-        if node["weight"] < min_weight:
-            continue
-        if node["type"] == "entity" and not show_entities:
-            continue
-        if node["type"] == "episode" and not show_episodes:
-            continue
-        visible_ids.add(node["id"])
-        node_data[node["id"]] = node
-        G.add_node(node["id"])
+    if len(G.nodes()) == 0:
+        st.info("Nenhum nó para exibir")
+        return
 
-    # Adiciona arestas
-    for edge in graph_data["edges"]:
-        if edge["from"] in visible_ids and edge["to"] in visible_ids:
-            G.add_edge(edge["from"], edge["to"])
-
-    # Calcula layout
-    if len(G.nodes()) > 0:
-        scale = layout_scale * 50
-
-        try:
-            if layout_type == "spring":
-                pos = nx.spring_layout(
-                    G,
-                    k=layout_k / math.sqrt(len(G.nodes())),
-                    iterations=100,
-                    seed=int(layout_seed),
-                    scale=scale,
-                )
-            elif layout_type == "kamada_kawai":
-                pos = nx.kamada_kawai_layout(G, scale=scale)
-            elif layout_type == "shell":
-                degrees = dict(G.degree())
-                sorted_nodes = sorted(degrees.keys(), key=lambda x: degrees[x], reverse=True)
-                n_shells = min(5, len(sorted_nodes) // 3 + 1)
-                shell_size = len(sorted_nodes) // n_shells
-                shells = [sorted_nodes[i*shell_size:(i+1)*shell_size] for i in range(n_shells)]
-                if len(sorted_nodes) % n_shells:
-                    shells[-1].extend(sorted_nodes[n_shells*shell_size:])
-                pos = nx.shell_layout(G, nlist=shells, scale=scale)
-            elif layout_type == "radial":
-                degrees = dict(G.degree())
-                if degrees:
-                    center = max(degrees.keys(), key=lambda x: degrees[x])
-                    lengths = nx.single_source_shortest_path_length(G, center)
-                    max_dist = max(lengths.values()) if lengths else 1
-                    shells = [[] for _ in range(max_dist + 1)]
-                    for node, dist in lengths.items():
-                        shells[dist].append(node)
-                    shells = [s for s in shells if s]
-                    pos = nx.shell_layout(G, nlist=shells, scale=scale)
-                else:
-                    pos = nx.spring_layout(G, scale=scale, seed=int(layout_seed))
-            else:  # circular
-                pos = nx.circular_layout(G, scale=scale)
-        except Exception as e:
-            st.warning(f"⚠️ Erro no layout {layout_type}, usando spring: {e}")
-            pos = nx.spring_layout(G, scale=scale, seed=int(layout_seed))
-    else:
-        pos = {}
-
-    # Cria nós para visualização
+    # Cria nós para agraph
     nodes = []
-    for node_id in visible_ids:
-        node = node_data[node_id]
-        x, y = pos.get(node_id, (0, 0))
+    for node_id in G.nodes():
+        info = node_info.get(node_id, {})
+        
+        label = info.get("label", "?") if show_labels else ""
+        
+        # Tooltip rico
+        tooltip = f"🔹 {info.get('label', '?')}\n"
+        tooltip += f"📊 Tipo: {info.get('subtype', info.get('type', '?'))}\n"
+        tooltip += f"💪 Peso: {info.get('weight', 0):.0%}"
+        if info.get("outcome"):
+            tooltip += f"\n📋 {info.get('outcome')}"
+        
         nodes.append(Node(
-            id=node["id"],
-            label=node["label"],
-            size=node["size"] * node_size_mult,
-            color=node["color"],
-            title=f"{node['type']}: {node['label']}\nPeso: {node['weight']:.2f}",
-            x=x * 10,
-            y=y * 10,
+            id=node_id,
+            label=label,
+            size=info.get("size", 20),
+            color=info.get("color", "#888"),
+            title=tooltip,
+            font={"size": max(10, int(info.get("size", 20) * 0.6)), "color": "white"},
         ))
 
-    # Cria arestas
+    # Cria arestas para agraph
     edges = []
-    for edge in graph_data["edges"]:
-        if edge["from"] in visible_ids and edge["to"] in visible_ids:
-            edges.append(Edge(
-                source=edge["from"],
-                target=edge["to"],
-                label=edge["label"],
-                width=edge["width"],
-                color=edge["color"],
-            ))
+    for edge in edges_data:
+        edges.append(Edge(
+            source=edge["from"],
+            target=edge["to"],
+            label=edge.get("label", ""),
+            width=1 + edge.get("weight", 0.5) * 2,
+            color=edge.get("color", "rgba(150,150,150,0.5)"),
+        ))
 
-    # Configuração do grafo
+    # Configuração com física para movimento suave
     config = Config(
-        width=1600,
-        height=800,
-        directed=True,
-        physics=False,
+        width=1400,
+        height=700,
+        directed=False,
+        physics={
+            "enabled": physics_enabled,
+            "barnesHut": {
+                "gravitationalConstant": -3000,
+                "centralGravity": 0.3,
+                "springLength": 120,
+                "springConstant": 0.04,
+                "damping": 0.09,
+                "avoidOverlap": 0.1,
+            },
+            "stabilization": {
+                "enabled": False,  # Desabilita estabilização para ver movimento
+            },
+        },
         hierarchical=False,
-        staticGraph=True,
-        staticGraphWithDragAndDrop=True,
         nodeHighlightBehavior=True,
-        highlightColor="#F7A7A6",
+        highlightColor="#FFD700",
         collapsible=False,
+        node={
+            "highlightStrokeColor": "#FFFFFF",
+            "highlightFontWeight": "bold",
+        },
+        link={
+            "highlightColor": "#FFD700",
+            "renderLabel": False,
+        },
     )
-
-    st.markdown("---")
 
     # Renderiza grafo
     selected = agraph(nodes=nodes, edges=edges, config=config)
 
-    # Painel de detalhes do nó selecionado
+    # Painel de detalhes quando nó selecionado
     if selected:
-        st.markdown("---")
-        st.subheader(f"📍 Detalhes do Nó Selecionado")
-
-        # Busca detalhes
         entity = graph.get_entity(selected)
         episode = graph.get_episode(selected)
-
+        
+        st.markdown("---")
+        
         if entity:
-            render_entity_details(entity, graph)
+            render_entity_details_card(entity, graph)
         elif episode:
-            render_episode_details(episode, graph)
+            render_episode_details_card(episode, graph)
+    
+    # Estatísticas do grafo
+    with st.expander("📊 Estatísticas do Grafo"):
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("👤 Entidades", len(entities))
+        with col2:
+            st.metric("📝 Episódios", len(episodes))
+        with col3:
+            st.metric("🔗 Conexões", len(edges_data))
+        with col4:
+            consolidated = sum(1 for ep in episodes if ep.is_consolidated)
+            st.metric("⭐ Padrões", consolidated)
+
+
+def render_entity_details_card(entity: Entity, graph: MemoryGraph):
+    """Card de detalhes bonito para entidade."""
+    
+    # Cores por tipo
+    type_colors = {
+        "person": ("#FF6B6B", "👤"),
+        "user": ("#FF6B6B", "👤"),
+        "concept": ("#45B7D1", "💡"),
+        "file": ("#4ECDC4", "📁"),
+    }
+    color, emoji = type_colors.get(entity.type.lower(), ("#95A5A6", "🔹"))
+    
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, {color}22 0%, {color}11 100%); 
+                border-left: 4px solid {color}; 
+                border-radius: 15px; 
+                padding: 25px; 
+                margin: 10px 0;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <div style="font-size: 2.5em;">{emoji}</div>
+            <div>
+                <h2 style="margin: 0; color: #fff;">{entity.name}</h2>
+                <span style="color: {color}; font-weight: 500;">{entity.type.title()}</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Métricas
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("👁️ Acessos", entity.access_count)
+    with col2:
+        weight = graph.get_node_weight(entity.id)
+        st.metric("💪 Relevância", f"{weight:.0%}")
+    with col3:
+        days_ago = (datetime.now() - entity.created_at).days
+        st.metric("📅 Idade", f"{days_ago} dias")
+    
+    # Identificadores
+    if entity.identifiers:
+        st.markdown("**🏷️ Identificadores:**")
+        for ident in entity.identifiers:
+            st.markdown(f"  • `{ident}`")
+    
+    # Episódios relacionados
+    related_episodes = [
+        ep for ep in graph._episodes.values()
+        if entity.id in ep.participants
+    ]
+    
+    if related_episodes:
+        st.markdown(f"**📝 Participou em {len(related_episodes)} eventos:**")
+        for ep in related_episodes[:5]:
+            st.markdown(f"  • {ep.action[:50]}{'...' if len(ep.action) > 50 else ''}")
+        if len(related_episodes) > 5:
+            st.caption(f"  ... e mais {len(related_episodes) - 5} eventos")
+
+
+def render_episode_details_card(episode: Episode, graph: MemoryGraph):
+    """Card de detalhes bonito para episódio."""
+    
+    is_consolidated = episode.is_consolidated
+    color = "#FFD700" if is_consolidated else "#90EE90"
+    emoji = "⭐" if is_consolidated else "📝"
+    badge = "Padrão Identificado" if is_consolidated else "Evento"
+    
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, {color}22 0%, {color}11 100%); 
+                border-left: 4px solid {color}; 
+                border-radius: 15px; 
+                padding: 25px; 
+                margin: 10px 0;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <div style="font-size: 2.5em;">{emoji}</div>
+            <div>
+                <h2 style="margin: 0; color: #fff;">{episode.action[:60]}{'...' if len(episode.action) > 60 else ''}</h2>
+                <span style="color: {color}; font-weight: 500;">{badge}</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Resultado/Outcome
+    if episode.outcome:
+        st.markdown(f"""
+        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin: 10px 0;">
+            <b>📋 Resultado:</b><br>
+            {episode.outcome}
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Contexto
+    if episode.context:
+        st.markdown(f"""
+        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin: 10px 0;">
+            <b>🎯 Contexto:</b><br>
+            {episode.context}
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Métricas
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("🔄 Ocorrências", episode.occurrence_count)
+    with col2:
+        st.metric("⚡ Importância", f"{episode.importance:.0%}")
+    with col3:
+        days_ago = (datetime.now() - episode.timestamp).days
+        st.metric("📅 Há", f"{days_ago} dias")
+    with col4:
+        weight = graph.get_node_weight(episode.id)
+        st.metric("💪 Relevância", f"{weight:.0%}")
+    
+    # Participantes
+    if episode.participants:
+        st.markdown("**👥 Participantes:**")
+        cols = st.columns(min(len(episode.participants), 4))
+        for i, participant_id in enumerate(episode.participants[:4]):
+            entity = graph.get_entity(participant_id)
+            with cols[i]:
+                if entity:
+                    st.markdown(f"  👤 **{entity.name}**")
+                else:
+                    st.markdown(f"  🔹 `{participant_id[:8]}...`")
+        if len(episode.participants) > 4:
+            st.caption(f"  ... e mais {len(episode.participants) - 4} participantes")
 
 
 # ==================== ENTIDADES ====================
@@ -1142,6 +1330,184 @@ def render_create_relation(graph: MemoryGraph):
 
 # ==================== BUSCA ====================
 
+
+def _episode_matches_query(episode: Episode, query: str, graph: MemoryGraph) -> bool:
+    """
+    Verifica se um episódio corresponde à query.
+    
+    Busca em:
+    - action (ação)
+    - outcome (resultado)
+    - context (contexto)
+    - participants (participantes - resolvendo IDs para nomes)
+    - metadata (metadados W5H se existirem)
+    """
+    query_lower = query.lower()
+    
+    # Busca em campos de texto
+    if query_lower in episode.action.lower():
+        return True
+    if query_lower in episode.outcome.lower():
+        return True
+    if episode.context and query_lower in episode.context.lower():
+        return True
+    
+    # Busca em participantes (resolve IDs para nomes)
+    for participant_id in episode.participants:
+        entity = graph.get_entity(participant_id)
+        if entity and query_lower in entity.name.lower():
+            return True
+    
+    # Busca em metadata W5H
+    w5h = episode.metadata.get("w5h", {})
+    for field in ["what", "why", "how"]:
+        value = w5h.get(field, "")
+        if value and query_lower in str(value).lower():
+            return True
+    
+    # Busca em who do W5H
+    who_list = w5h.get("who", [])
+    for who in who_list:
+        if query_lower in str(who).lower():
+            return True
+    
+    return False
+
+
+def _get_episode_participants_names(episode: Episode, graph: MemoryGraph) -> str:
+    """Retorna os nomes dos participantes de um episódio."""
+    names = []
+    for participant_id in episode.participants:
+        entity = graph.get_entity(participant_id)
+        if entity:
+            names.append(entity.name)
+        else:
+            # Fallback para o ID truncado
+            names.append(participant_id[:8])
+    return ", ".join(names) if names else "Desconhecido"
+
+
+def render_search_mini_graph(graph: MemoryGraph, entities: list, episodes: list):
+    """
+    Renderiza um mini-grafo mostrando as conexões entre entidades e episódios encontrados.
+    
+    Mostra:
+    - Entidades como nós vermelhos/azuis
+    - Episódios como nós verdes/amarelos
+    - Relações "participated_in" entre eles
+    - Outras relações existentes no grafo
+    """
+    if not entities and not episodes:
+        st.info("💡 Nenhum resultado para visualizar")
+        return
+    
+    nodes = []
+    edges = []
+    node_ids = set()
+    
+    # Adiciona entidades encontradas
+    for entity in entities[:15]:  # Limita para não sobrecarregar
+        entity_id = entity.id if hasattr(entity, 'id') else str(entity)
+        if entity_id not in node_ids:
+            node_ids.add(entity_id)
+            entity_name = entity.name if hasattr(entity, 'name') else str(entity)
+            entity_type = entity.type if hasattr(entity, 'type') else "entity"
+            
+            # Cores por tipo
+            color_map = {
+                "person": "#FF6B6B",
+                "user": "#FF6B6B",
+                "concept": "#45B7D1",
+                "file": "#4ECDC4",
+            }
+            color = color_map.get(entity_type.lower(), "#95A5A6")
+            
+            nodes.append(Node(
+                id=entity_id,
+                label=entity_name[:20],
+                size=25,
+                color=color,
+                title=f"🎯 {entity_type}: {entity_name}",
+            ))
+    
+    # Adiciona episódios encontrados
+    for episode in episodes[:15]:  # Limita para não sobrecarregar
+        episode_id = episode.id if hasattr(episode, 'id') else str(episode)
+        if episode_id not in node_ids:
+            node_ids.add(episode_id)
+            action = episode.action if hasattr(episode, 'action') else str(episode)
+            is_consolidated = getattr(episode, 'is_consolidated', False)
+            
+            nodes.append(Node(
+                id=episode_id,
+                label=action[:25] + "..." if len(action) > 25 else action,
+                size=20,
+                color="#FFD700" if is_consolidated else "#90EE90",
+                title=f"📝 Episódio: {action}\n📊 Outcome: {getattr(episode, 'outcome', 'N/A')[:50]}",
+            ))
+            
+            # Adiciona conexões com participantes
+            participants = getattr(episode, 'participants', [])
+            for participant_id in participants:
+                # Adiciona o participante se não existir ainda
+                if participant_id not in node_ids:
+                    participant_entity = graph.get_entity(participant_id)
+                    if participant_entity:
+                        node_ids.add(participant_id)
+                        nodes.append(Node(
+                            id=participant_id,
+                            label=participant_entity.name[:20],
+                            size=22,
+                            color="#FF6B6B" if participant_entity.type in ["person", "user"] else "#45B7D1",
+                            title=f"🎯 {participant_entity.type}: {participant_entity.name}",
+                        ))
+                
+                # Adiciona aresta de participação
+                if participant_id in node_ids:
+                    edges.append(Edge(
+                        source=participant_id,
+                        target=episode_id,
+                        label="participated_in",
+                        width=2,
+                        color="#888888",
+                    ))
+    
+    # Adiciona relações existentes entre os nós encontrados
+    for relation in graph._relations.values():
+        if relation.from_id in node_ids and relation.to_id in node_ids:
+            # Evita duplicar arestas de participação
+            if relation.relation_type != "participated_in":
+                edges.append(Edge(
+                    source=relation.from_id,
+                    target=relation.to_id,
+                    label=relation.relation_type,
+                    width=1 + relation.strength * 3,
+                    color="#27AE60" if relation.strength >= 0.7 else "#F39C12",
+                ))
+    
+    if not nodes:
+        st.info("💡 Nenhum nó para visualizar")
+        return
+    
+    # Configuração do mini-grafo
+    config = Config(
+        width=800,
+        height=400,
+        directed=True,
+        physics=True,
+        hierarchical=False,
+        nodeHighlightBehavior=True,
+        highlightColor="#F7A7A6",
+        collapsible=False,
+    )
+    
+    # Renderiza o mini-grafo
+    try:
+        agraph(nodes=nodes, edges=edges, config=config)
+    except Exception as e:
+        st.warning(f"⚠️ Erro ao renderizar grafo: {e}")
+
+
 def render_search(graph: MemoryGraph):
     """Busca avançada."""
     st.title("🔍 Busca Avançada de Memórias")
@@ -1166,16 +1532,30 @@ def render_search(graph: MemoryGraph):
 
         with col2:
             st.subheader("📝 Episódios")
+            # Busca aprimorada: considera action, outcome, context, participants e metadata
             matching_episodes = [
                 e for e in graph._episodes.values()
-                if query.lower() in e.action.lower() or query.lower() in e.outcome.lower()
+                if _episode_matches_query(e, query, graph)
             ]
 
             if matching_episodes:
                 for episode in matching_episodes[:10]:
-                    st.markdown(f"• **{episode.action[:40]}...** - {episode.timestamp.strftime('%d/%m %H:%M')}")
+                    participants = _get_episode_participants_names(episode, graph)
+                    action_display = episode.action[:35] + "..." if len(episode.action) > 35 else episode.action
+                    st.markdown(
+                        f"• **{action_display}**\n"
+                        f"  👥 {participants} | 📅 {episode.timestamp.strftime('%d/%m %H:%M')}"
+                    )
             else:
                 st.info("Nenhum episódio encontrado")
+
+        # Visualização do Mini-Grafo das Conexões
+        if matching_entities or matching_episodes:
+            st.markdown("---")
+            st.subheader("🕸️ Grafo de Conexões")
+            st.caption("Visualização das conexões entre entidades e episódios encontrados")
+            
+            render_search_mini_graph(graph, matching_entities, matching_episodes)
 
         # Recall contextual
         st.markdown("---")
@@ -1205,6 +1585,11 @@ def render_search(graph: MemoryGraph):
                     st.metric("Episódios", len(result.episodes))
                 with col4:
                     st.metric("Relações", len(result.relations))
+                
+                # Grafo do Recall
+                if result.entities or result.episodes:
+                    st.markdown("### 🕸️ Grafo do Recall")
+                    render_search_mini_graph(graph, result.entities, result.episodes)
 
 
 # ==================== COMUNIDADES & HUBS ====================

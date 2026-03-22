@@ -46,6 +46,9 @@ from cortex.core.learning.contradiction import (
 # Logging
 from cortex.utils.logging import get_audit_logger, get_performance_logger, get_logger
 
+# Storage adapters
+from cortex.core.storage import StorageAdapter, create_storage_adapter
+
 # Configurações de recall (podem ser sobrescritas via .env)
 RECALL_MIN_THRESHOLD = float(os.getenv("CORTEX_RECALL_THRESHOLD", "0.25"))
 RECALL_MAX_CANDIDATES = int(os.getenv("CORTEX_RECALL_MAX_CANDIDATES", "50"))
@@ -325,15 +328,30 @@ class MemoryGraph:
     - Community Detection: Louvain clustering for knowledge groups
     """
     
-    def __init__(self, storage_path: Path | str | None = None):
+    def __init__(
+        self,
+        storage_path: Path | str | None = None,
+        storage_adapter: StorageAdapter | None = None,
+    ):
         """
         Inicializa o grafo de memória.
 
         Args:
             storage_path: Caminho para persistência (None = apenas memória)
-            contradiction_strategy: Estratégia para resolver contradições
+                         DEPRECATED: Use storage_adapter para novos projetos.
+            storage_adapter: Adaptador de storage (JSONStorageAdapter, Neo4jStorageAdapter, etc.)
+                            Se não fornecido, usa factory baseada em CORTEX_STORAGE_BACKEND.
         """
         self.storage_path = Path(storage_path) if storage_path else None
+        
+        # Storage adapter (pluggable backend)
+        if storage_adapter:
+            self._storage_adapter = storage_adapter
+        elif self.storage_path:
+            # Cria adapter baseado no ambiente ou usa JSON como default
+            self._storage_adapter = create_storage_adapter(storage_path=self.storage_path)
+        else:
+            self._storage_adapter = None
 
         # Logging
         self._logger = get_logger("memory_graph")
@@ -384,8 +402,9 @@ class MemoryGraph:
         # V2.1: Graph Analyzer (BFS + Community Detection)
         self._graph_analyzer = GraphAnalyzer(memory_graph=self)
 
-        # Carrega se existir
-        if self.storage_path:
+        # Carrega dados do storage adapter se disponível
+        if self._storage_adapter:
+            self._storage_adapter.connect()
             self._load()
     
     # ==================== ENTITY OPERATIONS ====================
@@ -1350,58 +1369,67 @@ class MemoryGraph:
     # ==================== PERSISTENCE ====================
     
     def _save(self) -> None:
-        """Persiste o grafo em disco."""
-        if not self.storage_path:
+        """
+        Persiste o grafo usando o storage adapter.
+        
+        Suporta múltiplos backends:
+        - JSON: Salva em arquivo memory_graph.json
+        - Neo4j: Sincroniza com banco de dados
+        
+        Se não houver adapter configurado, não faz nada (in-memory only).
+        """
+        if not self._storage_adapter:
             return
         
-        self.storage_path.mkdir(parents=True, exist_ok=True)
-        
-        data = {
-            "entities": {k: v.to_dict() for k, v in self._entities.items()},
-            "episodes": {k: v.to_dict() for k, v in self._episodes.items()},
-            "relations": {k: v.to_dict() for k, v in self._relations.items()},
-            "inverted_index": self._inverted_index.to_dict(),
-            "saved_at": datetime.now().isoformat(),
-        }
-        
-        graph_file = self.storage_path / "memory_graph.json"
-        with open(graph_file, "w") as f:
-            json.dump(data, f, indent=2)
+        # Usa o método bulk do adapter para persistência eficiente
+        self._storage_adapter.save_all(
+            entities=list(self._entities.values()),
+            episodes=list(self._episodes.values()),
+            relations=list(self._relations.values()),
+            inverted_index=self._inverted_index,
+        )
     
     def _load(self) -> None:
-        """Carrega o grafo do disco."""
-        if not self.storage_path:
+        """
+        Carrega o grafo usando o storage adapter.
+        
+        Suporta múltiplos backends:
+        - JSON: Lê de arquivo memory_graph.json
+        - Neo4j: Carrega do banco de dados
+        
+        Se não houver adapter ou dados, mantém grafo vazio.
+        """
+        if not self._storage_adapter:
             return
         
-        graph_file = self.storage_path / "memory_graph.json"
-        if not graph_file.exists():
+        # Carrega tudo de uma vez usando o adapter
+        # load_all retorna tupla: (entities, episodes, relations, inverted_index)
+        result = self._storage_adapter.load_all()
+        
+        if not result:
             return
         
-        with open(graph_file) as f:
-            data = json.load(f)
+        entities, episodes, relations, inverted_index = result
         
         # Carrega entidades
-        for entity_data in data.get("entities", {}).values():
-            entity = Entity.from_dict(entity_data)
-            self._entities[entity.id] = entity
+        for entity_id, entity in entities.items():
+            self._entities[entity_id] = entity
             self._index_entity(entity)
         
         # Carrega episódios
-        for episode_data in data.get("episodes", {}).values():
-            episode = Episode.from_dict(episode_data)
-            self._episodes[episode.id] = episode
+        for episode_id, episode in episodes.items():
+            self._episodes[episode_id] = episode
         
         # Carrega relações
-        for relation_data in data.get("relations", {}).values():
-            relation = Relation.from_dict(relation_data)
-            self._relations[relation.id] = relation
+        for relation_id, relation in relations.items():
+            self._relations[relation_id] = relation
             self._index_relation(relation)
         
         # Carrega índice invertido (ou reconstrói se não existir)
-        if "inverted_index" in data:
-            self._inverted_index = InvertedIndex.from_dict(data["inverted_index"])
+        if inverted_index:
+            self._inverted_index = inverted_index
         else:
-            # Reconstrói índice para grafos antigos
+            # Reconstrói índice para grafos antigos ou backends sem índice
             self._rebuild_inverted_index()
     
     # ==================== ADDITIONAL METHODS ====================
