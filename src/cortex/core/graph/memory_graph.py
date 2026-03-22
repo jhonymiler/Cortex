@@ -1383,9 +1383,9 @@ class MemoryGraph:
         
         # Usa o método bulk do adapter para persistência eficiente
         self._storage_adapter.save_all(
-            entities=list(self._entities.values()),
-            episodes=list(self._episodes.values()),
-            relations=list(self._relations.values()),
+            entities=self._entities,
+            episodes=self._episodes,
+            relations=self._relations,
             inverted_index=self._inverted_index,
         )
     
