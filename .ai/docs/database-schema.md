@@ -1,0 +1,1 @@
+../../docs/architecture/storage-adapters.md

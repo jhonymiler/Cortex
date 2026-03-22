@@ -123,7 +123,7 @@ pip install -e ".[mcp]"
 | `CORTEX_IDENTITY_MODE`    | `pattern`               | Modo: `pattern`, `semantic`, `hybrid` |
 | `CORTEX_IDENTITY_STRICT`  | `false`                 | Bloqueia ou apenas alerta             |
 
-[→ Documentação completa do MCP](docs/MCP.md)
+[→ Documentação completa da API](.ai/docs/API.md)
 
 ### SDK Python
 
@@ -228,7 +228,7 @@ Benchmark executado com **LLM real** (gemma3:4b) em **conversas reais**:
 
 **Demonstração prática**: Sistema lembrou de "três casos de problemas de login" ao longo de 3 dias de conversas diferentes.
 
-[→ Ver relatório completo](docs/BENCHMARK_RESULTS.md)
+[→ Ver relatório completo](.ai/docs/PERFORMANCE_ANALYSIS.md)
 
 ---
 
@@ -245,7 +245,7 @@ Benchmark executado com **LLM real** (gemma3:4b) em **conversas reais**:
 
 **\*** Não projetadas para isso — são ferramentas excelentes para outros propósitos.
 
-[→ Entenda o framework e metodologia](docs/research/benchmarks.md)
+[→ Entenda o framework e metodologia](.ai/docs/research/benchmarks.md)
 
 ---
 
@@ -310,7 +310,7 @@ crew = Crew(
 )
 ```
 
-[→ Ver todas integrações](docs/getting-started/integrations.md)
+[→ Ver todas integrações](.ai/docs/getting-started/integrations.md)
 
 ---
 
@@ -318,19 +318,19 @@ crew = Crew(
 
 | Você quer...               | Comece aqui                                                                                                       |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Usar o Cortex**          | [Quick Start](docs/getting-started/quickstart.md) → [Integrações](docs/getting-started/integrations.md)           |
-| **Entender como funciona** | [Modelo W5H](docs/concepts/memory-model.md) → [Arquitetura](docs/architecture/overview.md)                        |
-| **Base científica**        | [Base Científica](docs/research/scientific-basis.md) → [Benchmarks](docs/research/benchmarks.md)                  |
-| **Avaliar para negócio**   | [Proposta de Valor](docs/business/value-proposition.md) → [Posicionamento](docs/business/competitive-position.md) |
+| **Usar o Cortex**          | [Quick Start](.ai/docs/getting-started/quickstart.md) → [Integrações](.ai/docs/getting-started/integrations.md)           |
+| **Entender como funciona** | [Modelo W5H](.ai/docs/concepts/memory-model.md) → [Arquitetura](.ai/docs/architecture/overview.md)                        |
+| **Base científica**        | [Base Científica](.ai/docs/research/scientific-basis.md) → [Benchmarks](.ai/docs/research/benchmarks.md)                  |
+| **Avaliar para negócio**   | [Proposta de Valor](.ai/docs/business/value-proposition.md) → [Posicionamento](.ai/docs/business/competitive-position.md) |
 
 ### Referência Rápida
 
 | Documento                                   | Descrição                      |
 | ------------------------------------------- | ------------------------------ |
-| [API REST](docs/API.md)                     | Endpoints e exemplos           |
-| [MCP Tools](docs/MCP.md)                    | Integração Claude Desktop      |
-| [Modelo W5H](docs/concepts/memory-model.md) | Como memórias são estruturadas |
-| [Roadmap](docs/business/roadmap.md)         | O futuro do Cortex             |
+| [API REST](.ai/docs/API.md)                     | Endpoints e exemplos           |
+| [MCP Tools](.ai/docs/API.md#mcp)                    | Integração Claude Desktop      |
+| [Modelo W5H](.ai/docs/concepts/memory-model.md) | Como memórias são estruturadas |
+| [Roadmap](.ai/docs/business/roadmap.md)         | O futuro do Cortex             |
 
 ---
 
