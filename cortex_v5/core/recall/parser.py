@@ -24,24 +24,32 @@ class StructuralQueryParser:
     """
     Recall memories by matching query intent (W5H) to memory contents.
 
-    Three modes of operation:
-      1. Structural match (W5H exact/partial)
-      2. Token Jaccard (semantic fallback, language-agnostic)
-      3. External Extractor (LLM, optional, pluggable)
+    Three modes of operation (in order):
+      1. Structural match (W5H exact/partial) — free, fast
+      2. Token Jaccard (semantic fallback, language-agnostic) — free
+      3. Embedding similarity (multilingual跨语) — optional, requires
+         sentence-transformers
     """
 
     def __init__(
         self,
         extractor: Optional[Extractor] = None,
+        embedding_recall: Optional["EmbeddingRecall"] = None,
         enable_semantic_fallback: bool = True,
+        enable_embedding_recall: bool = True,
     ) -> None:
         """
         Args:
             extractor: pluggable Extractor (default: RegexExtractor with PT/EN/ES)
+            embedding_recall: optional EmbeddingRecall for cross-language semantic
             enable_semantic_fallback: if True, use token Jaccard when structural returns few results
+            enable_embedding_recall: if True, use embeddings (when available) as 3rd tier
         """
+        from cortex_v5.core.recall.embedding import EmbeddingRecall
         self.extractor = extractor or RegexExtractor()
+        self.embedding_recall = embedding_recall or EmbeddingRecall()
         self.enable_semantic_fallback = enable_semantic_fallback
+        self.enable_embedding_recall = enable_embedding_recall
 
     def parse(self, query: str, lang: str = "auto") -> QueryIntent:
         """Parse query into W5H intent."""

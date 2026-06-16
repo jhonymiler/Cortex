@@ -156,7 +156,42 @@ class Memory:
             last_accessed=datetime.fromisoformat(data["last_accessed"]) if data.get("last_accessed") else None,
             created_at=datetime.fromisoformat(data["created_at"]) if data.get("created_at") else datetime.now(),
             metadata=data.get("metadata", {}),
+            lang=data.get("lang"),
         )
+
+    @classmethod
+    def from_text(
+        cls,
+        text: str,
+        similar_to: Optional["Memory"] = None,
+        importance: float = 0.5,
+    ) -> "Memory":
+        """
+        Create a Memory from free text, optionally inheriting structure from
+        a similar existing memory.
+
+        This is the FLEXIBLE ENTRY POINT for noisy/short/informal input
+        (typos, abbreviations, slang, mixed-language). Schema validation
+        in __post_init__ still enforces non-empty `what`.
+
+        Args:
+            text: the content (becomes `what`)
+            similar_to: optional reference memory; its `where`, `lang`, and
+                       scaled `importance` are inherited
+            importance: explicit importance if similar_to is None
+
+        Returns:
+            Memory with at minimum {what: text}, optionally with inherited structure
+        """
+        if similar_to is not None:
+            return cls(
+                what=text.strip(),
+                where=similar_to.where,
+                how=similar_to.how,  # inherit "how" as default context
+                importance=similar_to.importance * 0.8,  # slight decay
+                lang=similar_to.lang,
+            )
+        return cls(what=text.strip(), importance=importance)
 
     def __repr__(self) -> str:
         who_str = ",".join(self.who[:2]) if self.who else "?"
