@@ -67,6 +67,11 @@ class Memory:
     # Custom metadata (extensible per use case)
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    # Language tag (informational; the schema is universal but values
+    # are in a specific language. Used for tokenization hints and
+    # cross-language debug, NOT for retrieval decisions.)
+    lang: str | None = None
+
     def __post_init__(self) -> None:
         """Enforce minimal schema (E2 — syntax)."""
         # Strip whitespace and validate required fields
