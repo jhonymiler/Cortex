@@ -140,7 +140,7 @@ _PATTERNS_EN: list[tuple[re.Pattern, Callable]] = [
     (re.compile(r"what\s+is\s+([\w\s\-]+?)\s*\??\s*$", re.IGNORECASE), _extract_identity),
     (re.compile(r"tell\s+me\s+about\s+([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_identity),
     # ACTION: "what did X do?" / "what does X want?"
-    (re.compile(r"what\s+(?:did|does|is)\s+(?:the\s+)?([\w]+)\s+(do|eat|buy|sell|want|say|tell|have|need|like|love|hate|know|see)\s*\??\s*$", re.IGNORECASE), _extract_action),
+    (re.compile(r"what\s+(?:did|does|is|are)\s+(?:the\s+)?([\w]+)\s+(do|eat|buy|sell|want|say|tell|have|need|like|love|hate|know|see|ask|find|get|make|take|give|show|use|try|go|come|leave|bring|send|write|read|call|start|stop|begin|finish|complete|reach|hold|keep|put|set|turn|move|run|walk|talk|play)\s*\??\s*$", re.IGNORECASE), _extract_action),
     (re.compile(r"what\s+happened\s+(?:to|with)\s+(?:the\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_action),
     # LOCATION: "where does X live?"
     (re.compile(r"where\s+(?:does|did|is|are)\s+(?:the\s+)?([\w]+)\s+(live|work|stay|go|come|be)\s*\??\s*$", re.IGNORECASE), _extract_location),

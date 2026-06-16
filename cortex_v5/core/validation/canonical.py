@@ -106,12 +106,15 @@ _NEGATION_SIGNALS = {
     "não", "nao", "nunca", "jamais", "rejeitou", "rejeita", "recusou",
     "recusa", "negou", "nega", "reprovou", "reprova", "detestou", "odeia",
     "abomina", "nenhum", "nenhuma", "impossível", "impossivel",
+    "sem",  # "without" (sem açúcar = no sugar)
     # English
     "not", "no", "never", "rejected", "refused", "denied", "hates",
     "detests", "abominates", "dislikes", "neither", "none", "impossible",
+    "without",
     # Spanish
     "no", "nunca", "jamás", "rechazó", "rechaza", "negó", "niega", "odia",
     "detesta", "abomina", "ninguno", "ninguna", "imposible",
+    "sin",  # "without" (sin azúcar = no sugar)
 }
 
 

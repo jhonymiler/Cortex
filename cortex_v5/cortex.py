@@ -33,9 +33,17 @@ from typing import Optional, Any
 
 from cortex_v5.core.memory import Memory
 from cortex_v5.core.graph import MemoryGraph
-from cortex_v5.core.validation import CanonicalValidator, ValidationPolicy
-from cortex_v5.core.recall import StructuralQueryParser, pack_for_context
+from cortex_v5.core.validation import CanonicalValidator
+from cortex_v5.core.validation import ValidationPolicy
+from cortex_v5.core.recall import StructuralQueryParser
+from cortex_v5.core.recall.pack import pack_for_context
 from cortex_v5.core.recall.embedding import EmbeddingRecall
+from cortex_v5.core.recall.text_extractor import (
+    TextToMemory,
+    default_extractor as default_text_extractor,
+    heuristic_only_extractor,
+    full_extractor,
+)
 from cortex_v5.workers import DreamAgent
 
 
