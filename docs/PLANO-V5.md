@@ -38,11 +38,21 @@ e estender com internacionalização desde o dia 1.
 ### 2.2 O que SIMPLIFICAR (cortar inchaço)
 
 - **9 feature flags** → 2-3 importantes (relevance, decay_mode, agent_mode)
-- **SM-2 adaptativo** → fórmula simples (EF fixo + decay)
+- **SM-2 adaptativo** → remover. Ebbinghaus R = e^(-t/S) é suficiente
 - **Context Packer (300 linhas)** → reescrever como `pack_for_context` (50 linhas)
-- **BFS Expansion, Louvain, PageRank** → mover pra módulo opcional `cortex_v5.contrib.graph` (só importar se precisar)
+- **BFS Expansion, Louvain, PageRank** → **DESCARTADOS**. Não contribuem
+  pro detector e adicionam complexidade. Substituídos por decay simples
+  + clustering opcional no Dream Agent.
 - **Hierarchical Recall com 4 níveis** → 2 níveis (active/archived) com decay
 - **Inverted Index** → opcional, só pra escala >10k memories
+
+### 2.3 O que MANTER (decisões firmes do começo da conversa)
+
+- **Curva de esquecimento Ebbinghaus** — R = e^(-t/S), 1 fórmula,
+  expansível via modificadores de stability. Sem SM-2.
+- **Dream Agent (consolidação)** — background worker que roda replay
+  + clustering + cleanup. SIMPLIFICADO: sem LLM, sem sleep cycles
+  automáticos (vira cron externo). Opt-in por padrão.
 
 ### 2.3 O que ADICIONAR (v5 novo)
 
@@ -102,13 +112,16 @@ cortex-v5/
 │   │   │   ├── parser.py        # StructuralQueryParser (refatorado)
 │   │   │   ├── pack.py          # pack_for_context compacto
 │   │   │   └── ranking.py       # RRF + MMR (refatorado)
-│   │   ├── decay/
-│   │   │   ├── __init__.py
-│   │   │   ├── ebbinghaus.py    # Curva R = e^(-t/S)
-│   │   │   └── forget_gate.py   # 3 sinais
-│   │   └── integration/
-│   │       ├── __init__.py
-│   │       └── agent_wrapper.py # Modo 2 (interceptação)
+│   ├── decay/
+│   │   ├── __init__.py
+│   │   ├── ebbinghaus.py    # Curva R = e^(-t/S) — minimal
+│   │   └── forget_gate.py   # 3 sinais
+│   ├── integration/
+│   │   ├── __init__.py
+│   │   └── agent_wrapper.py # Modo 2 (interceptação)
+│   └── workers/
+│       ├── __init__.py
+│       └── dream_agent.py   # Background consolidator (simplificado)
 │   ├── api.py                   # API REST enxuta
 │   └── version.py
 ├── tests/
@@ -220,10 +233,11 @@ F4: Recall (Parser + Pack + Ranking) (~2h)
     - RRF + MMR simplificado
     - Tests (10+ testes)
 
-F5: Decay + Forget Gate (~1h)
+F5: Decay + Forget Gate + Dream Agent (~2h)
     - Ebbinghaus simples
     - Forget Gate
-    - Tests (8+ testes)
+    - Dream Agent (background consolidator)
+    - Tests (12+ testes)
 
 F6: AgentWrapper (Modo 2) (~2-3h)
     - Interceptação automática
