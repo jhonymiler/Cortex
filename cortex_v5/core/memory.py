@@ -67,6 +67,12 @@ class Memory:
     # Custom metadata (extensible per use case)
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    # Consolidation state (used by Dream Agent and decay)
+    occurrence_count: int = 1
+    consolidated_from: list[str] = field(default_factory=list)
+    consolidated_into: Optional[str] = None
+    is_summary: bool = False
+
     # Language tag (informational; the schema is universal but values
     # are in a specific language. Used for tokenization hints and
     # cross-language debug, NOT for retrieval decisions.)
@@ -105,6 +111,16 @@ class Memory:
         """Check if memory is about a given entity (case-insensitive)."""
         who_lower = who.lower()
         return any(w.lower() == who_lower or who_lower in w.lower() for w in self.who)
+
+    @property
+    def is_consolidated(self) -> bool:
+        """True if this memory is a summary of consolidation (from DreamAgent or manual)."""
+        return self.is_summary or len(self.consolidated_from) > 0
+
+    @property
+    def was_consolidated(self) -> bool:
+        """True if this memory was merged into another (is a child)."""
+        return self.consolidated_into is not None
 
     def matches_text(self, text: str) -> float:
         """
