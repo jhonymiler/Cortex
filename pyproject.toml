@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cortex-v5"
+version = "5.0.0"
+description = "Memory system for AI agents — 5-element detector compliant, internationalized, efficient"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Jhony Miler", email = "jonatasmiler@gmail.com" }]
+requires-python = ">=3.10"
+keywords = ["memory", "agents", "llm", "ai", "rag"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1",
+]
+ollama = []  # uses httpx if needed
+openai = []  # user provides their own client
+embeddings = [
+    "sentence-transformers>=2.2",  # optional, for semantic跨语
+]
+all = [
+    "sentence-transformers>=2.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/seu-usuario/cortex-v5"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cortex_v5*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-q --tb=short"
