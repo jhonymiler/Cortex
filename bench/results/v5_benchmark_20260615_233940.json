@@ -1,0 +1,134 @@
+{
+  "timestamp": "20260615_233940",
+  "scenarios": [
+    {
+      "scenario": "customer_support",
+      "n_memories": 8,
+      "n_queries": 6,
+      "v3_total_tokens": 540,
+      "v5_total_tokens": 123,
+      "token_savings_pct": 77.2,
+      "v3_avg_precision_at_5": 0.367,
+      "v5_avg_precision_at_5": 0.778,
+      "v5_avg_latency_ms": 0.115,
+      "contradiction_detection_pct": 0.0,
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "retrieval_results": [
+        {
+          "query": "O que Maria pediu?",
+          "v3_tokens": 90,
+          "v5_tokens": 37,
+          "v3_p5": 0.4,
+          "v5_p5": 0.5,
+          "v5_latency_ms": 0.115
+        },
+        {
+          "query": "Quem ligou pedindo segunda via?",
+          "v3_tokens": 90,
+          "v5_tokens": 8,
+          "v3_p5": 0.4,
+          "v5_p5": 1.0,
+          "v5_latency_ms": 0.193
+        },
+        {
+          "query": "O que João pediu?",
+          "v3_tokens": 90,
+          "v5_tokens": 28,
+          "v3_p5": 0.4,
+          "v5_p5": 0.667,
+          "v5_latency_ms": 0.083
+        },
+        {
+          "query": "Por que Ana cancelou?",
+          "v3_tokens": 90,
+          "v5_tokens": 10,
+          "v3_p5": 0.2,
+          "v5_p5": 1.0,
+          "v5_latency_ms": 0.137
+        },
+        {
+          "query": "O que você sabe sobre Pedro?",
+          "v3_tokens": 90,
+          "v5_tokens": 20,
+          "v3_p5": 0.4,
+          "v5_p5": 1.0,
+          "v5_latency_ms": 0.065
+        },
+        {
+          "query": "Quem pediu reembolso?",
+          "v3_tokens": 90,
+          "v5_tokens": 20,
+          "v3_p5": 0.4,
+          "v5_p5": 0.5,
+          "v5_latency_ms": 0.097
+        }
+      ]
+    },
+    {
+      "scenario": "personal_assistant",
+      "n_memories": 7,
+      "n_queries": 5,
+      "v3_total_tokens": 380,
+      "v5_total_tokens": 111,
+      "token_savings_pct": 70.8,
+      "v3_avg_precision_at_5": 0.84,
+      "v5_avg_precision_at_5": 0.86,
+      "v5_avg_latency_ms": 0.097,
+      "contradiction_detection_pct": 0.0,
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "retrieval_results": [
+        {
+          "query": "Como o User prefere o café?",
+          "v3_tokens": 76,
+          "v5_tokens": 7,
+          "v3_p5": 1.0,
+          "v5_p5": 1.0,
+          "v5_latency_ms": 0.105
+        },
+        {
+          "query": "Quando User tem reunião?",
+          "v3_tokens": 76,
+          "v5_tokens": 9,
+          "v3_p5": 1.0,
+          "v5_p5": 1.0,
+          "v5_latency_ms": 0.091
+        },
+        {
+          "query": "Quem é Maria?",
+          "v3_tokens": 76,
+          "v5_tokens": 14,
+          "v3_p5": 0.2,
+          "v5_p5": 0.5,
+          "v5_latency_ms": 0.119
+        },
+        {
+          "query": "O que User comprou para Maria?",
+          "v3_tokens": 76,
+          "v5_tokens": 38,
+          "v3_p5": 1.0,
+          "v5_p5": 0.8,
+          "v5_latency_ms": 0.101
+        },
+        {
+          "query": "O que você sabe sobre User?",
+          "v3_tokens": 76,
+          "v5_tokens": 43,
+          "v3_p5": 1.0,
+          "v5_p5": 1.0,
+          "v5_latency_ms": 0.067
+        }
+      ]
+    }
+  ],
+  "aggregate": {
+    "n_scenarios": 2,
+    "avg_token_savings_pct": 74.0,
+    "avg_v3_precision": 0.603,
+    "avg_v5_precision": 0.819,
+    "avg_contradiction_detection_pct": 0.0
+  }
+}

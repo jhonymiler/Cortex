@@ -1,0 +1,29 @@
+{
+  "scenario": "customer_support",
+  "description": "Suporte técnico com múltiplos clientes, problemas recorrentes",
+  "language": "pt-BR",
+  "memories": [
+    {"who": ["Maria"], "what": "reportou erro de pagamento", "why": "cartão expirado", "where": "suporte", "how": "orientada a atualizar dados", "importance": 0.7},
+    {"who": ["Maria"], "what": "ligou pedindo segunda via", "where": "suporte", "importance": 0.5},
+    {"who": ["João"], "what": "elogiou tempo de resposta", "where": "suporte", "importance": 0.4},
+    {"who": ["João"], "what": "pediu reembolso do pedido 12345", "why": "produto com defeito", "where": "suporte", "importance": 0.7},
+    {"who": ["Ana"], "what": "cancelou assinatura", "why": "achou caro", "where": "suporte", "importance": 0.5},
+    {"who": ["Pedro"], "what": "pediu suporte técnico para servidor", "where": "infra", "importance": 0.6},
+    {"who": ["Pedro"], "what": "reportou bug crítico em produção", "why": "memory leak", "where": "infra", "how": "patch aplicado em 2h", "importance": 0.9},
+    {"who": ["Carla"], "what": "solicitou upgrade de plano", "where": "vendas", "importance": 0.4}
+  ],
+  "queries": [
+    {"query": "O que Maria pediu?", "relevant_who": ["Maria"]},
+    {"query": "Quem ligou pedindo segunda via?", "relevant_who": ["Maria"]},
+    {"query": "O que João pediu?", "relevant_who": ["João"]},
+    {"query": "Por que Ana cancelou?", "relevant_who": ["Ana"]},
+    {"query": "O que você sabe sobre Pedro?", "relevant_who": ["Pedro"]},
+    {"query": "Quem pediu reembolso?", "relevant_who": ["João"]}
+  ],
+  "candidate_writes_contradicting": [
+    {"who": ["Maria"], "what": "não reportou erro", "where": "suporte", "should_block": true, "reason": "Contradiz 'reportou erro de pagamento'"},
+    {"who": ["Pedro"], "what": "não reportou bug", "where": "infra", "should_block": true, "reason": "Contradiz 'reportou bug crítico'"},
+    {"who": ["Maria"], "what": "comprou produto", "where": "suporte", "should_block": false, "reason": "Memória nova, não relacionada"},
+    {"who": ["João"], "what": "elogiou atendimento", "where": "suporte", "should_block": false, "reason": "Compatível com 'elogiou tempo de resposta'"}
+  ]
+}

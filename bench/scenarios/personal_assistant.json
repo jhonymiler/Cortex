@@ -1,0 +1,27 @@
+{
+  "scenario": "personal_assistant",
+  "description": "Assistente pessoal com preferências e hábitos",
+  "language": "pt-BR",
+  "memories": [
+    {"who": ["User"], "what": "prefere café sem açúcar", "where": "preferences", "importance": 0.5},
+    {"who": ["User"], "what": "trabalha melhor de manhã", "where": "preferences", "importance": 0.6},
+    {"who": ["User"], "what": "tem reunião toda terça às 10h", "where": "calendar", "importance": 0.7},
+    {"who": ["User"], "what": "gosta de livros de ficção científica", "where": "interests", "importance": 0.4},
+    {"who": ["Maria"], "what": "é esposa do User", "where": "family", "importance": 0.8},
+    {"who": ["João"], "what": "é filho do User", "where": "family", "importance": 0.7},
+    {"who": ["User"], "what": "comprou presente para Maria", "why": "aniversário", "where": "shopping", "importance": 0.5}
+  ],
+  "queries": [
+    {"query": "Como o User prefere o café?", "relevant_who": ["User"]},
+    {"query": "Quando User tem reunião?", "relevant_who": ["User"]},
+    {"query": "Quem é Maria?", "relevant_who": ["Maria"]},
+    {"query": "O que User comprou para Maria?", "relevant_who": ["User"]},
+    {"query": "O que você sabe sobre User?", "relevant_who": ["User"]}
+  ],
+  "candidate_writes_contradicting": [
+    {"who": ["User"], "what": "prefere café com açúcar", "where": "preferences", "should_block": true, "reason": "Contradiz 'prefere café sem açúcar'"},
+    {"who": ["User"], "what": "trabalha melhor de noite", "where": "preferences", "should_block": true, "reason": "Contradiz 'trabalha melhor de manhã'"},
+    {"who": ["User"], "what": "tem reunião toda quarta", "where": "calendar", "should_block": false, "reason": "Refinamento, não contradição"},
+    {"who": ["User"], "what": "odeia ficção científica", "where": "interests", "should_block": true, "reason": "Contradiz 'gosta de livros de ficção científica'"}
+  ]
+}
