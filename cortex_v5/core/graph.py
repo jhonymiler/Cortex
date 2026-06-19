@@ -161,6 +161,54 @@ class MemoryGraph:
             results.append(rel)
         return results
 
+    # === Persistence ===
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize the whole graph to a plain dict (JSON-ready)."""
+        return {
+            "namespace": self.namespace,
+            "memories": [m.to_dict() for m in self._memories.values()],
+            "entities": [e.to_dict() for e in self._entities.values()],
+            "relations": [r.to_dict() for r in self._relations.values()],
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "MemoryGraph":
+        """Reconstruct a graph from a dict produced by ``to_dict``."""
+        graph = cls(namespace=data.get("namespace", "default"))
+        for m in data.get("memories", []):
+            graph.add_memory(Memory.from_dict(m))
+        for e in data.get("entities", []):
+            graph.add_entity(Entity.from_dict(e))
+        for r in data.get("relations", []):
+            graph.add_relation(Relation.from_dict(r))
+        return graph
+
+    def save(self, path: Any) -> None:
+        """Persist the graph to a JSON file at ``path`` (atomic write)."""
+        import json
+        import os
+        from pathlib import Path
+
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(self.to_dict(), f, ensure_ascii=False, default=str)
+        os.replace(tmp, path)
+
+    @classmethod
+    def load(cls, path: Any, namespace: str = "default") -> "MemoryGraph":
+        """Load a graph from a JSON file. Returns an empty graph if missing."""
+        import json
+        from pathlib import Path
+
+        path = Path(path)
+        if not path.exists():
+            return cls(namespace=namespace)
+        with open(path, encoding="utf-8") as f:
+            return cls.from_dict(json.load(f))
+
     # === Stats ===
 
     def stats(self) -> dict[str, Any]:

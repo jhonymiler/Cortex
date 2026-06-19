@@ -96,6 +96,18 @@ class Memory:
         if not self.where:
             self.where = "default"
 
+        # Coerce when to a datetime (callers may pass a string like "hoje"
+        # or an empty string from text extraction; the schema requires a
+        # timestamp). Try ISO parse, else fall back to now().
+        if not isinstance(self.when, datetime):
+            parsed = None
+            if isinstance(self.when, str) and self.when.strip():
+                try:
+                    parsed = datetime.fromisoformat(self.when.strip())
+                except ValueError:
+                    parsed = None
+            self.when = parsed or datetime.now()
+
         # Validate importance range
         if not 0.0 <= self.importance <= 1.0:
             raise ValueError(f"importance must be in [0.0, 1.0], got {self.importance}")

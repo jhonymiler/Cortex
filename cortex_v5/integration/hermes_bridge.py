@@ -116,6 +116,20 @@ class HermesCortexBridge:
         """Alias for pre_chat — clear method name for prompt injection."""
         return self.pre_chat(query, lang)
 
+    # === Inspection / audit API (for an opt-in agent tool) ===
+
+    def inspect(self, query: str, lang: str = "auto", max_results: int = 5) -> dict:
+        """Structured recall with full W5H metadata + match scores.
+
+        For an opt-in agent tool that lets the model audit *why* a memory
+        surfaced — distinct from pre_chat(), which returns a packed string.
+        """
+        return self.cortex.inspect(query, lang=lang, max_results=max_results)
+
+    def about(self, entity: str, max_results: int = 20) -> dict:
+        """All memories about a given entity (who-match)."""
+        return self.cortex.about(entity, max_results=max_results)
+
     def stats(self) -> dict:
         """Return bridge statistics."""
         return self.cortex.stats()

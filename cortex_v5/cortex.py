@@ -176,6 +176,7 @@ class CortexV5:
         lang: str = "auto",
         max_results: int = 5,
         max_tokens: int = 200,
+        touch: bool = True,
     ) -> tuple[str, Any]:
         """
         Recall memories matching the query. Returns compact context string.
@@ -185,11 +186,24 @@ class CortexV5:
             lang: language hint (pt, en, es, auto=detect)
             max_results: max memories to return
             max_tokens: max tokens in the packed context
+            touch: if True (default), increment access_count / last_accessed on
+                   each returned memory. This is the usage signal that feeds
+                   E5 functional semantics (ForgetGate/decay). Audit/inspection
+                   reads should pass touch=False so debugging doesn't inflate
+                   access counts.
 
         Returns:
             (packed_context_string, RecallResult) tuple
         """
         result = self.parser.recall(query, self.graph, lang=lang, max_results=max_results)
+        # Drop memories that were merged away by consolidation — the canonical
+        # memory (or LLM-produced summary) represents them now. Without this,
+        # consolidation would be cosmetic: duplicates would still surface.
+        if result.memories:
+            result.memories = [m for m in result.memories if not m.consolidated_into]
+        if touch:
+            for memory in result.memories:
+                memory.touch()
         intent = result.metrics.get("intent")
         if isinstance(intent, dict):
             from cortex_v5.core.recall.extractor import QueryIntent
@@ -224,6 +238,75 @@ class CortexV5:
         # Recall using the new memory as context
         context, _ = self.recall(what, max_results=3)
         return memory, context
+
+    # === Inspection / audit API ===
+
+    @staticmethod
+    def _memory_to_record(memory: Memory, query: Optional[str] = None) -> dict[str, Any]:
+        """Serialize a memory to an audit record (W5H + metadata + score)."""
+        when = memory.when
+        record = {
+            "id": memory.id,
+            "who": list(memory.who or []),
+            "what": memory.what,
+            "why": memory.why,
+            "when": when.isoformat() if hasattr(when, "isoformat") else when,
+            "where": memory.where,
+            "how": memory.how,
+            "importance": round(memory.importance, 3),
+            "access_count": memory.access_count,
+            "lang": memory.lang,
+        }
+        if query is not None:
+            record["match_score"] = round(memory.matches_text(query), 3)
+        return record
+
+    def inspect(
+        self,
+        query: str,
+        lang: str = "auto",
+        max_results: int = 5,
+    ) -> dict[str, Any]:
+        """
+        Structured recall for auditing. Unlike recall() (which returns a
+        packed string for prompt injection), inspect() exposes the full W5H
+        decomposition, importance, access_count, and per-memory match score
+        so a caller can audit *why* a memory surfaced.
+
+        Returns a JSON-serializable dict.
+        """
+        # touch=False: auditing must not inflate access counts.
+        _, result = self.recall(query, lang=lang, max_results=max_results, touch=False)
+        # Keep only JSON-safe metric primitives (drop the QueryIntent object).
+        metrics = {}
+        if isinstance(result.metrics, dict):
+            metrics = {
+                k: v
+                for k, v in result.metrics.items()
+                if isinstance(v, (str, int, float, bool, type(None)))
+            }
+        return {
+            "query": query,
+            "namespace": self.namespace,
+            "count": len(result.memories),
+            "memories": [self._memory_to_record(m, query) for m in result.memories],
+            "metrics": metrics,
+        }
+
+    def about(self, entity: str, max_results: int = 20) -> dict[str, Any]:
+        """
+        Return all memories about a given entity (who-match), ranked by
+        importance then recency. For 'what do you know about X' audits.
+        """
+        mems = self.graph.find_memories(who=entity)
+        mems.sort(key=lambda m: (m.importance, m.created_at), reverse=True)
+        mems = mems[:max_results]
+        return {
+            "entity": entity,
+            "namespace": self.namespace,
+            "count": len(mems),
+            "memories": [self._memory_to_record(m) for m in mems],
+        }
 
     # === Background ===
 
