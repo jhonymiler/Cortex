@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cortex-v5"
+name = "cortext"
 version = "5.0.0"
-description = "Memory system for AI agents — 5-element detector compliant, internationalized, efficient"
+description = "Cognitive memory for AI agents — W5H-structured, contradiction-aware, internationalized, token-efficient"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Jhony Miler", email = "jonatasmiler@gmail.com" }]
@@ -32,18 +32,20 @@ dev = [
 ollama = []  # uses httpx if needed
 openai = []  # user provides their own client
 embeddings = [
-    "sentence-transformers>=2.2",  # optional, for semantic跨语
+    "sentence-transformers>=2.2",  # optional, for embedding-level contradiction checks
 ]
 all = [
     "sentence-transformers>=2.2",
 ]
 
 [project.urls]
-Homepage = "https://github.com/seu-usuario/cortex-v5"
+Homepage = "https://github.com/jhonymiler/-Cortex"
+Repository = "https://github.com/jhonymiler/-Cortex"
+Issues = "https://github.com/jhonymiler/-Cortex/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["cortex_v5*"]
+include = ["cortext*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

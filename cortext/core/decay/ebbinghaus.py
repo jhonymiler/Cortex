@@ -24,7 +24,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cortex_v5.core.memory import Memory
+    from cortext.core.memory import Memory
 
 
 @dataclass

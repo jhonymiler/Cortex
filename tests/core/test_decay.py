@@ -9,9 +9,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from cortex_v5.core.memory import Memory
-from cortex_v5.core.graph import MemoryGraph
-from cortex_v5.core.decay import (
+from cortext.core.memory import Memory
+from cortext.core.graph import MemoryGraph
+from cortext.core.decay import (
     DecayConfig,
     retrievability,
     effective_stability,
@@ -19,7 +19,7 @@ from cortex_v5.core.decay import (
     ForgetGate,
     ForgetGateConfig,
 )
-from cortex_v5.workers import DreamAgent
+from cortext.workers import DreamAgent
 
 
 class TestEbbinghausDecay:

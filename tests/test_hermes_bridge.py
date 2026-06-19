@@ -8,8 +8,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from cortex_v5.integration import HermesCortexBridge
-from cortex_v5.core.validation import ValidationStatus
+from cortext.integration import HermesCortexBridge
+from cortext.core.validation import ValidationStatus
 
 
 class TestBridgeBasics:

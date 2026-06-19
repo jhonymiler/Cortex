@@ -12,18 +12,18 @@ Public API:
   - detect_lang (language detection)
 """
 
-from cortex_v5.core.recall.extractor import (
+from cortext.core.recall.extractor import (
     Extractor,
     QueryIntent,
     detect_lang,
 )
-from cortex_v5.core.recall.extractors.regex_lang import (
+from cortext.core.recall.extractors.regex_lang import (
     RegexExtractor,
     HybridExtractor,
     LLMExtractor,
 )
-from cortex_v5.core.recall.parser import StructuralQueryParser
-from cortex_v5.core.recall.pack import pack_for_context, rough_token_count
+from cortext.core.recall.parser import StructuralQueryParser
+from cortext.core.recall.pack import pack_for_context, rough_token_count
 
 __all__ = [
     "Extractor",

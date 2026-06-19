@@ -31,8 +31,8 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional
 
 if TYPE_CHECKING:
-    from cortex_v5.core.memory import Memory, Entity
-    from cortex_v5.core.graph import MemoryGraph
+    from cortext.core.memory import Memory, Entity
+    from cortext.core.graph import MemoryGraph
 
 
 class ValidationStatus(str, Enum):
@@ -189,7 +189,7 @@ class CanonicalValidator:
         self._embedding_recall = None
         if enable_embedding_check:
             try:
-                from cortex_v5.core.recall.embedding import EmbeddingRecall
+                from cortext.core.recall.embedding import EmbeddingRecall
                 self._embedding_recall = EmbeddingRecall()
             except ImportError:
                 self._embedding_recall = None
@@ -410,7 +410,7 @@ class CanonicalValidator:
             b_emb = self._embedding_recall.embed(memory_b.what)
             if a_emb is None or b_emb is None:
                 return 1.0
-            from cortex_v5.core.recall.embedding import cosine_similarity
+            from cortext.core.recall.embedding import cosine_similarity
             return cosine_similarity(a_emb, b_emb)
         except Exception:
             return 1.0

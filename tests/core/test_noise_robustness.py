@@ -13,8 +13,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from cortex_v5.core.memory import Memory
-from cortex_v5.core.graph import MemoryGraph
+from cortext.core.memory import Memory
+from cortext.core.graph import MemoryGraph
 
 
 class TestFromText:
@@ -125,7 +125,7 @@ class TestNoisyRecallRobustness:
 
         # Token overlap (weak) is below 0.5 — this is expected.
         # In production, embeddings跨城跨this 0.5 threshold.
-        from cortex_v5.core.memory import _tokenize
+        from cortext.core.memory import _tokenize
         a_tok = _tokenize("reemb pdd xpto")
         b_tok = _tokenize("pedido de volta")
         overlap = len(a_tok & b_tok) / len(a_tok | b_tok)
@@ -152,7 +152,7 @@ class TestNoisyRecallRobustness:
         g._memories["a"] = Memory(what="Maria pediu reembolso do pedido")
         g._memories["b"] = Memory(what="Maria pediu reemb do pedido")  # abbrev
 
-        from cortex_v5.core.memory import _tokenize
+        from cortext.core.memory import _tokenize
         full = _tokenize("pediu reembolso pedido")
         abbrev = _tokenize("pediu reemb pedido")
         overlap = len(full & abbrev) / len(full | abbrev)

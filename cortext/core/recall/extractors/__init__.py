@@ -1,6 +1,6 @@
 """Pluggable extractors (regex per language, LLM fallback, hybrid)."""
 
-from cortex_v5.core.recall.extractors.regex_lang import (
+from cortext.core.recall.extractors.regex_lang import (
     RegexExtractor,
     HybridExtractor,
     LLMExtractor,

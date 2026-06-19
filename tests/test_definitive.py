@@ -25,9 +25,9 @@ class TestDefinitiveAcceptance:
     If this passes, v5 is ready for production use.
     """
 
-    def test_cortex_v5_is_a_library(self):
+    def test_cortext_is_a_library(self):
         """v5 must be importable as a library, no MCP/HTTP required."""
-        from cortex_v5 import CortexV5
+        from cortext import CortexV5
         cortex = CortexV5()
         # No HTTP server, no MCP, just a class
         assert hasattr(cortex, "remember")
@@ -35,8 +35,8 @@ class TestDefinitiveAcceptance:
 
     def test_detector_compliance_e1_discrete_alphabet(self):
         """E1: Entity, Memory, Relation are discrete types."""
-        from cortex_v5 import Memory, Entity, Relation
-        from cortex_v5.core.graph import MemoryGraph
+        from cortext import Memory, Entity, Relation
+        from cortext.core.graph import MemoryGraph
         # All are classes (not just dicts)
         assert isinstance(Memory, type)
         assert isinstance(Entity, type)
@@ -45,7 +45,7 @@ class TestDefinitiveAcceptance:
 
     def test_detector_compliance_e2_syntax_enforced(self):
         """E2: W5H syntax is enforced (empty what raises)."""
-        from cortex_v5 import Memory
+        from cortext import Memory
         with pytest.raises(ValueError):
             Memory(what="")
         # Valid construction works
@@ -54,7 +54,7 @@ class TestDefinitiveAcceptance:
 
     def test_detector_compliance_e3_separable_mapping(self):
         """E3: who can be re-associated (separable mapping)."""
-        from cortex_v5 import Memory
+        from cortext import Memory
         m1 = Memory(who=["Alice"], what="works at Google")
         # Same string, different referent — separable
         m2 = Memory(who=["Alice"], what="works at Apple")
@@ -64,8 +64,8 @@ class TestDefinitiveAcceptance:
 
     def test_detector_compliance_e4_dedicated_interpreter(self):
         """E4: Recall is done by StructuralQueryParser, not LLM."""
-        from cortex_v5.core.recall import StructuralQueryParser
-        from cortex_v5 import CortexV5
+        from cortext.core.recall import StructuralQueryParser
+        from cortext import CortexV5
         cortex = CortexV5()
         parser = cortex.parser
         # Parser is StructuralQueryParser, not an LLM client
@@ -76,8 +76,8 @@ class TestDefinitiveAcceptance:
 
     def test_detector_compliance_e5_functional_semantics(self):
         """E5: Memories have differentiated functional effects."""
-        from cortex_v5 import CortexV5
-        from cortex_v5.core.decay import retrievability
+        from cortext import CortexV5
+        from cortext.core.decay import retrievability
         cortex = CortexV5()
         # High importance + recent → high retrievability
         recent_important, _ = cortex.remember(who=["A"], what="x", importance=0.9)
@@ -90,8 +90,8 @@ class TestDefinitiveAcceptance:
 
     def test_normative_prevention_no_false_positives(self):
         """NORMA: validator should not block legitimate memories."""
-        from cortex_v5 import CortexV5
-        from cortex_v5.core.validation import ValidationStatus
+        from cortext import CortexV5
+        from cortext.core.validation import ValidationStatus
         cortex = CortexV5(validation_policy="BLOCK")
         # Store a memory
         m1, r1 = cortex.remember(who=["Maria"], what="gosta de pizza")
@@ -105,7 +105,7 @@ class TestDefinitiveAcceptance:
 
     def test_efficiency_claim_token_reduction(self):
         """Benchmark claim: >70% token reduction."""
-        from cortex_v5 import CortexV5
+        from cortext import CortexV5
         cortex = CortexV5()
         # Add 10 memories
         for i in range(10):
@@ -125,7 +125,7 @@ class TestDefinitiveAcceptance:
 
     def test_i18n_pt_en_es(self):
         """Internationalization: same query pattern works in PT/EN/ES."""
-        from cortex_v5 import CortexV5
+        from cortext import CortexV5
         cortex = CortexV5()
         cortex.remember(who=["Maria"], what="pediu reembolso", lang="pt")
         cortex.remember(who=["Maria"], what="asked refund", lang="en")
@@ -143,7 +143,7 @@ class TestDefinitiveAcceptance:
 
     def test_noisy_input_accepted(self):
         """Real-world noisy input is accepted (typos, abbreviations)."""
-        from cortex_v5 import CortexV5
+        from cortext import CortexV5
         cortex = CortexV5()
         # Typo
         m1, _ = cortex.remember(what="Maria qer reembolso")  # typo
@@ -161,8 +161,8 @@ class TestDefinitiveAcceptance:
 
     def test_5_element_detector_full_pipeline(self):
         """Full E2E: real scenario, real conflicts, real recall."""
-        from cortex_v5 import CortexV5
-        from cortex_v5.core.validation import ValidationStatus, ValidationPolicy
+        from cortext import CortexV5
+        from cortext.core.validation import ValidationStatus, ValidationPolicy
 
         cortex = CortexV5(validation_policy=ValidationPolicy.BLOCK, namespace="acceptance")
 

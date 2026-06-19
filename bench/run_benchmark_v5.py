@@ -18,8 +18,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from cortex_v5 import CortexV5
-from cortex_v5.core.validation import (
+from cortext import CortexV5
+from cortext.core.validation import (
     CanonicalValidator,
     ValidationPolicy,
 )
@@ -85,7 +85,7 @@ def _precision_at_k(returned_ids: list[str], relevant_who: list[str], graph, k: 
 def _test_contradictions(scenario: dict, validator: CanonicalValidator) -> dict:
     """Test validator catches real contradictions."""
     result = {"true_positives": 0, "false_negatives": 0, "false_positives": 0, "true_negatives": 0}
-    from cortex_v5 import Memory, MemoryGraph
+    from cortext import Memory, MemoryGraph
 
     # Build the graph with ALL existing memories (unique keys)
     g = MemoryGraph()
@@ -121,8 +121,8 @@ def run_scenario(scenario_path: Path) -> dict:
         scenario = json.load(f)
 
     print(f"\n{'='*60}")
-    print(f"Cenário: {scenario['scenario']} (lang: {scenario['language']})")
-    print(f"Memórias: {len(scenario['memories'])}, Queries: {len(scenario['queries'])}")
+    print(f"Scenario: {scenario['scenario']} (lang: {scenario['language']})")
+    print(f"Memories: {len(scenario['memories'])}, Queries: {len(scenario['queries'])}")
     print(f"{'='*60}")
 
     # v3 baseline
@@ -201,11 +201,11 @@ def run_scenario(scenario_path: Path) -> dict:
         "retrieval_results": retrieval_results,
     }
 
-    print(f"\n[Resultados]")
+    print(f"\n[Results]")
     print(f"  Tokens:    v3={v3_total} → v5={v5_total} ({token_savings:.1f}% reduction)")
     print(f"  P@5:       v3={avg_v3_p:.3f} → v5={avg_v5_p:.3f}")
-    print(f"  Latência:  v5={avg_v5_lat:.2f}ms (média por query)")
-    print(f"  Conflitos: detectados {cd_pct*100:.0f}% (TP={cd_result['true_positives']}, FP={cd_result['false_positives']}, FN={cd_result['false_negatives']})")
+    print(f"  Latency:   v5={avg_v5_lat:.2f}ms (avg per query)")
+    print(f"  Conflicts: detected {cd_pct*100:.0f}% (TP={cd_result['true_positives']}, FP={cd_result['false_positives']}, FN={cd_result['false_negatives']})")
     return summary
 
 
@@ -226,7 +226,7 @@ def main():
     out_path = RESULTS_DIR / f"v5_benchmark_{timestamp}.json"
     with open(out_path, "w") as f:
         json.dump(combined, f, indent=2, ensure_ascii=False)
-    print(f"\nSalvo: {out_path}")
+    print(f"\nSaved: {out_path}")
 
     print_aggregate_table(summaries)
 
@@ -246,9 +246,9 @@ def _aggregate(summaries: list[dict]) -> dict:
 
 def print_aggregate_table(summaries: list[dict]) -> None:
     print("\n" + "=" * 80)
-    print("TABELA AGREGADA — Cortex v3 (baseline) vs Cortex v5 (greenfield)")
+    print("AGGREGATE TABLE — Cortex v3 (baseline) vs Cortex v5 (greenfield)")
     print("=" * 80)
-    print(f"\n{'Cenário':<22} {'Tok v3':>8} {'Tok v5':>8} {'Save%':>7} {'P@5 v3':>7} {'P@5 v5':>7} {'CD':>6}")
+    print(f"\n{'Scenario':<22} {'Tok v3':>8} {'Tok v5':>8} {'Save%':>7} {'P@5 v3':>7} {'P@5 v5':>7} {'CD':>6}")
     print("-" * 80)
     for s in summaries:
         print(
@@ -264,7 +264,7 @@ def print_aggregate_table(summaries: list[dict]) -> None:
         agg = _aggregate(summaries)
         print("-" * 80)
         print(
-            f"{'MÉDIA':<22} "
+            f"{'AVERAGE':<22} "
             f"{'':>8} "
             f"{'':>8} "
             f"{agg['avg_token_savings_pct']:>6.1f}% "

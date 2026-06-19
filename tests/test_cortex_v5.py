@@ -8,14 +8,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from cortex_v5 import (
+from cortext import (
     CortexV5,
     Memory,
     Entity,
     Relation,
     ValidationStatus,
 )
-from cortex_v5.core.validation import ValidationPolicy
+from cortext.core.validation import ValidationPolicy
 
 
 class TestCortexV5Init:

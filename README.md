@@ -1,39 +1,26 @@
-# Cortex v5
+# Cortex
 
-> **Memory system for AI agents — 5-element detector compliant, internationalized, efficient.**
+*Read this in [Português](README.pt-br.md).*
 
-Cortex v5 is a complete rewrite of [Cortex v3](../memorias/cortex/) implementing
-the **5-element detector** of the framework in
-*"Código: Uma Teoria da Informação Funcional"*.
+> **A cognitive memory system for AI agents — structured, internationalized, contradiction-aware, and token-efficient.**
 
-The framework's core claim: a memory system is **encoded information** (not mere
-correlation) when it satisfies five structural elements — discrete alphabet,
-syntax, separable arbitrary mapping with external referent, independent
-interpreter, and functional semantics.
+Cortex gives an LLM agent a long-term memory that is *structured* rather than a
+flat vector store. Every memory is decomposed into a **W5H** record (who, what,
+why, when, where, how), validated against what is already known so the agent
+does not silently store contradictions, and recalled through a deterministic
+structural parser that returns a **compact** context string instead of a wall
+of raw chunks.
 
-Cortex v5 implements this detector as an **operational tool**: every component
-contributes to one or more elements, and you can audit the system against the
-framework directly.
-
-## Key properties
-
-- **5/5 detector compliance** — every element implemented and tested
-- **Internationalized** — W5H schema is universal, but extraction is pluggable
-  (PT, EN, ES via regex; LLM fallback for arbitrary languages)
-- **Normative** — CanonicalValidator with 3 detection levels prevents
-  contradictions at write time, not just detects them after
-- **Efficient** — empirical 77%+ token reduction vs unstructured retrieval
-- **Simple** — no 9-feature-flag hell, no SM-2, no BFS expansion. Just decay
-  and forget gate, with optional dream agent consolidation.
-
-## Quick start
+It is a pure Python library with **zero required dependencies**, local-first,
+and designed to plug into an agent loop as a transparent memory layer (recall
+before the turn, store after it).
 
 ```python
-from cortex_v5 import CortexV5
+from cortext import CortexV5
 
 cortex = CortexV5(namespace="myapp")
 
-# Store a memory (W5H structure)
+# Store a structured memory (W5H)
 cortex.remember(
     who=["Maria"],
     what="reportou erro de pagamento",
@@ -43,104 +30,133 @@ cortex.remember(
     lang="pt",
 )
 
-# Recall with deterministic structural parsing
-context = cortex.recall("O que Maria pediu?")
+# Recall — returns (compact_context, RecallResult)
+context, result = cortex.recall("O que Maria pediu?")
 print(context)
-# Output: Maria | reportou erro de pagamento → orientada a atualizar dados
-
-# Or use the agent wrapper (Modo 2) for full auto-interception
-from cortex_v5.integration import AgentWrapper
-
-agent = AgentWrapper(llm=my_llm, cortex=cortex)
-response = agent.chat("Maria ligou reclamando do mesmo problema")
-# Cortex auto-injects context; LLM doesn't need to know about memory
+# Maria | reportou erro de pagamento
 ```
 
-## Multi-language
+## Why structured memory
 
-```python
-# Portuguese (default)
-cortex.recall("O que Maria pediu?")
+Most agent memory is "embed the turn, retrieve top-k chunks." That works until
+it doesn't: chunks are bulky, retrieval mixes unrelated facts, and nothing stops
+the store from holding `X` and `not X` at the same time.
 
-# English (auto-detected or explicit)
-cortex.recall("What did Maria ask?", lang="en")
-# → Maria | reportou erro de pagamento (or english equivalent if stored)
+Cortex takes a different stance — memory is **encoded information**, not mere
+correlation. It is built around five structural properties (discrete schema,
+syntax, an arbitrary-but-stable mapping to external referents, an independent
+interpreter, and functional semantics driven by usage). In practice that buys
+you four concrete things:
 
-# Spanish
-cortex.recall("¿Qué pidió María?", lang="es")
-```
-
-The W5H schema is universal. The **extraction** of W5H values from text is
-the only language-specific part, and it's pluggable:
-
-```python
-from cortex_v5.recall import HybridExtractor, RegexExtractor, LLMExtractor
-
-# Fast path: regex (PT, EN, ES)
-extractor = HybridExtractor(
-    primary=RegexExtractor(lang="auto"),   # detects per-query
-    fallback=LLMExtractor(model="gemma3:4b"),  # when regex fails
-)
-```
-
-## Architecture
-
-See `docs/PLANO-V5.md` for the full architectural plan and rationale.
-
-Briefly:
-
-```
-[Query] → [LangDetector] → [HybridExtractor] → [QueryIntent (W5H)]
-                                                    ↓
-[Memory write] → [CanonicalValidator V2] → [3-level contradiction check]
-                                                    ↓
-                                            [Memory Graph]
-                                                    ↓
-[Recall] → [StructuralQueryParser] → [pack_for_context] → [compact prompt]
-```
-
-## Detection levels
-
-The CanonicalValidator runs 3 levels of contradiction detection:
-
-1. **Heuristic** (always): negation words + polarity inversion
-2. **Embedding** (optional, requires `sentence-transformers`):
-   semantic similarity for implicit contradictions
-3. **LLM-as-judge** (optional, requires LLM call): for ambiguous cases
-   where 1+2 disagree
+| Property | What it means in practice |
+|---|---|
+| **Structured (W5H)** | Recall returns `Maria \| reportou erro → orientada a atualizar dados`, not a 90-token chunk. |
+| **Normative** | A `CanonicalValidator` detects contradictions *at write time* (3 levels: heuristic → embedding → LLM-as-judge) and can warn or block. |
+| **Internationalized** | The W5H schema is language-neutral; only extraction is language-specific, and it is pluggable (PT/EN/ES regex + optional LLM fallback). |
+| **Self-pruning** | Ebbinghaus decay + a forget gate + an optional background `DreamAgent` that replays, consolidates duplicates, and prunes what is no longer used. |
 
 ## Benchmarks
 
-See `bench/results/` for empirical comparison vs Cortex v3.
+Reproducible on this repo (`python bench/run_benchmark_v5.py`), comparing Cortex
+against an unstructured top-k baseline ("v3") across 2 scenarios:
 
-Headline result (4 scenarios, 5 metrics):
-- **77.9% token reduction** on context injection
-- **+37% Precision@5** in retrieval
-- **0 false positives** in contradiction detection
+| Scenario | Tokens (baseline → Cortex) | Savings | P@5 (baseline → Cortex) | Contradiction detection |
+|---|---|---|---|---|
+| customer_support | 540 → 123 | **77.2%** | 0.367 → 0.778 | 100% |
+| personal_assistant | 380 → 111 | **70.8%** | 0.840 → 0.860 | 67% |
+| **Average** | — | **74.0%** | **0.603 → 0.819** | 83.5% |
+
+- **~74% fewer context tokens** for the same retrieved information.
+- **Precision@5 up from 0.60 to 0.82** — recall returns the *right* memories.
+- **Zero false positives** in contradiction detection across both scenarios.
+- **~0.1 ms** average recall latency (pure Python, in-memory graph).
+
+Token savings directly cut prompt cost and free context budget for the actual
+task; higher precision means the agent sees fewer irrelevant memories.
+
+## Install
+
+```bash
+pip install cortext
+```
+
+Optional extras:
+
+```bash
+pip install "cortext[embeddings]"   # sentence-transformers for embedding-level validation
+pip install "cortext[dev]"          # pytest, ruff
+```
+
+Cortex runs with **no extra dependencies** by default. The embedding and
+LLM-as-judge contradiction levels are opt-in.
+
+## How it works
+
+```
+WRITE   text/W5H ──▶ CanonicalValidator (3-level) ──▶ Memory Graph
+                         (warn or block contradictions)
+
+RECALL  query ──▶ LangDetector ──▶ HybridExtractor ──▶ QueryIntent (W5H)
+                                                            │
+              Memory Graph ──▶ StructuralQueryParser ──▶ pack_for_context
+                                                            │
+                                                   compact context string
+
+DECAY   Ebbinghaus retrievability + ForgetGate, with an optional background
+        DreamAgent that replays, consolidates duplicates, and prunes.
+```
+
+### Internationalization
+
+The W5H schema is universal; **extraction** is the only language-specific part,
+and it is pluggable:
+
+```python
+from cortext import RegexExtractor, HybridExtractor, LLMExtractor
+
+extractor = HybridExtractor(
+    primary=RegexExtractor(default_lang="auto"),   # PT, EN, ES — detected per query
+    fallback=LLMExtractor(model_fn=my_llm_call),   # any language, when regex misses
+)
+```
+
+Recall is matched within the language of the stored content — store and query in
+the same language for best results, or wire an LLM extractor for arbitrary
+languages.
+
+## Using it inside an agent
+
+The intended pattern is a transparent memory layer: recall before the LLM call,
+store after it. `HermesCortexBridge` is a reference implementation of exactly
+this:
+
+```python
+from cortext.integration import HermesCortexBridge
+
+bridge = HermesCortexBridge(namespace="session-1")
+
+# Before the LLM call — inject recalled context:
+context = bridge.pre_chat(user_input)
+system_prompt = context + "\n\n" + base_system_prompt
+
+# After the turn — persist it:
+bridge.post_chat(user_message=user_input, assistant_message=reply)
+```
+
+See [docs/INTEGRATION.md](docs/INTEGRATION.md) for plugging Cortex into an agent
+(including the Hermes memory plugin) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+for the component-by-component design.
 
 ## Development
 
 ```bash
-# Setup
-python -m venv venv
-source venv/bin/activate
+python -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
 
-# Run tests
-pytest tests/
-
-# Run benchmarks
-PYTHONPATH=. python bench/run_benchmark_v5.py
+pytest                                  # 190+ tests
+python bench/run_benchmark_v5.py        # reproduce the benchmarks
 ```
 
 ## License
 
-MIT — see `LICENSE`.
-
-## Related projects
-
-- [Cortex v3](../memorias/cortex/) — predecessor (legacy, preserved)
-- [Fase 1 extensions](../memorias/cortex/tree/refactor/v4-extensions) —
-  CanonicalValidator and StructuralQueryParser that v5 builds on
-- [The framework book](../../Livros/Código: Uma Teoria da Informação Funcional/) —
-  the theoretical foundation
+MIT — see [LICENSE](LICENSE).

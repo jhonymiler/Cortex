@@ -22,8 +22,8 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cortex_v5.core.memory import Memory
-    from cortex_v5.core.graph import MemoryGraph
+    from cortext.core.memory import Memory
+    from cortext.core.graph import MemoryGraph
 
 
 @dataclass
@@ -158,7 +158,7 @@ class ForgetGate:
 
         # Low retrievability (uses ebbinghaus)
         try:
-            from cortex_v5.core.decay.ebbinghaus import retrievability
+            from cortext.core.decay.ebbinghaus import retrievability
             r = retrievability(memory)
             if r < 0.2:
                 score += 0.4

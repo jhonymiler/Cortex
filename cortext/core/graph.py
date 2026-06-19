@@ -11,9 +11,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Iterator, Optional
 
-from cortex_v5.core.memory import Memory
-from cortex_v5.core.entity import Entity
-from cortex_v5.core.relation import Relation
+from cortext.core.memory import Memory
+from cortext.core.entity import Entity
+from cortext.core.relation import Relation
 
 
 @dataclass

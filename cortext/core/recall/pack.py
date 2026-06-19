@@ -11,8 +11,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cortex_v5.core.memory import Memory
-    from cortex_v5.core.recall.extractor import QueryIntent
+    from cortext.core.memory import Memory
+    from cortext.core.recall.extractor import QueryIntent
 
 
 def rough_token_count(text: str) -> int:

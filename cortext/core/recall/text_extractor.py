@@ -15,8 +15,8 @@ import re
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
 if TYPE_CHECKING:
-    from cortex_v5.core.memory import Memory
-    from cortex_v5.core.graph import MemoryGraph
+    from cortext.core.memory import Memory
+    from cortext.core.graph import MemoryGraph
 
 
 # Regex patterns for heuristic extraction
@@ -82,7 +82,7 @@ def extract_via_embedding_similar(
         return {}
 
     # Try to find similar memory
-    from cortex_v5.core.memory import Memory
+    from cortext.core.memory import Memory
     results = embedding_recall.rank_memories(text, list(graph.iter_memories()), top_k=1)
     if not results:
         return {}
@@ -145,7 +145,7 @@ class TextToMemory:
         self.llm_fn = llm_fn
         self._embedding_recall = None
         if enable_embedding:
-            from cortex_v5.core.recall.embedding import EmbeddingRecall
+            from cortext.core.recall.embedding import EmbeddingRecall
             self._embedding_recall = EmbeddingRecall()
 
     def extract(
@@ -196,7 +196,7 @@ class TextToMemory:
         """
         Direct text → Memory. Returns a fully-formed Memory.
         """
-        from cortex_v5.core.memory import Memory
+        from cortext.core.memory import Memory
         data = self.extract(text, graph)
         return Memory(
             who=data.get("who", []),

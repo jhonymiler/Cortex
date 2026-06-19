@@ -1,6 +1,6 @@
 """Validation subsystem: CanonicalValidator V2 (3-level NORMA detection)."""
 
-from cortex_v5.core.validation.canonical import (
+from cortext.core.validation.canonical import (
     CanonicalValidator,
     ValidationResult,
     ValidationStatus,

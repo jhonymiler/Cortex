@@ -6,16 +6,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from cortex_v5.core.recall.extractor import QueryIntent, detect_lang
-from cortex_v5.core.recall.extractors.regex_lang import (
+from cortext.core.recall.extractor import QueryIntent, detect_lang
+from cortext.core.recall.extractors.regex_lang import (
     RegexExtractor,
     HybridExtractor,
     LLMExtractor,
 )
-from cortex_v5.core.recall.parser import StructuralQueryParser
-from cortex_v5.core.recall.pack import pack_for_context, rough_token_count
-from cortex_v5.core.memory import Memory
-from cortex_v5.core.graph import MemoryGraph
+from cortext.core.recall.parser import StructuralQueryParser
+from cortext.core.recall.pack import pack_for_context, rough_token_count
+from cortext.core.memory import Memory
+from cortext.core.graph import MemoryGraph
 
 
 # Helper to populate graph directly (bypassing any complex add methods)

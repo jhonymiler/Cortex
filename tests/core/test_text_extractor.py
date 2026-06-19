@@ -9,8 +9,8 @@ from datetime import datetime
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from cortex_v5 import Memory, MemoryGraph
-from cortex_v5.core.recall.text_extractor import (
+from cortext import Memory, MemoryGraph
+from cortext.core.recall.text_extractor import (
     TextToMemory,
     extract_who,
     extract_when,

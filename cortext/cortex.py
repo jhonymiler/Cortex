@@ -8,7 +8,7 @@ This is the public API that users import. It's a thin facade over:
   - DreamAgent (opt-in background consolidation)
 
 Usage:
-    from cortex_v5 import CortexV5
+    from cortext import CortexV5
 
     cortex = CortexV5(namespace="myapp")
 
@@ -31,20 +31,20 @@ from __future__ import annotations
 
 from typing import Optional, Any
 
-from cortex_v5.core.memory import Memory
-from cortex_v5.core.graph import MemoryGraph
-from cortex_v5.core.validation import CanonicalValidator
-from cortex_v5.core.validation import ValidationPolicy
-from cortex_v5.core.recall import StructuralQueryParser
-from cortex_v5.core.recall.pack import pack_for_context
-from cortex_v5.core.recall.embedding import EmbeddingRecall
-from cortex_v5.core.recall.text_extractor import (
+from cortext.core.memory import Memory
+from cortext.core.graph import MemoryGraph
+from cortext.core.validation import CanonicalValidator
+from cortext.core.validation import ValidationPolicy
+from cortext.core.recall import StructuralQueryParser
+from cortext.core.recall.pack import pack_for_context
+from cortext.core.recall.embedding import EmbeddingRecall
+from cortext.core.recall.text_extractor import (
     TextToMemory,
     default_extractor as default_text_extractor,
     heuristic_only_extractor,
     full_extractor,
 )
-from cortex_v5.workers import DreamAgent
+from cortext.workers import DreamAgent
 
 
 class CortexV5:
@@ -154,7 +154,7 @@ class CortexV5:
         # Validate (unless skipped)
         result = None
         if validate:
-            from cortex_v5.core.validation import ValidationStatus
+            from cortext.core.validation import ValidationStatus
             result = self.validator.validate_write(memory, self.graph)
             self._stats["writes_total"] += 1
             if result.status == ValidationStatus.BLOCKED:
@@ -206,7 +206,7 @@ class CortexV5:
                 memory.touch()
         intent = result.metrics.get("intent")
         if isinstance(intent, dict):
-            from cortex_v5.core.recall.extractor import QueryIntent
+            from cortext.core.recall.extractor import QueryIntent
             intent_obj = QueryIntent(**{k: v for k, v in intent.items() if k in QueryIntent.__dataclass_fields__})
         else:
             intent_obj = intent

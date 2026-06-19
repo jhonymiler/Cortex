@@ -11,13 +11,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from cortex_v5.core.recall.extractor import Extractor, QueryIntent
-from cortex_v5.core.recall.extractors.regex_lang import RegexExtractor
-from cortex_v5.core.recall.pack import pack_for_context
+from cortext.core.recall.extractor import Extractor, QueryIntent
+from cortext.core.recall.extractors.regex_lang import RegexExtractor
+from cortext.core.recall.pack import pack_for_context
 
 if TYPE_CHECKING:
-    from cortex_v5.core.memory import Memory
-    from cortex_v5.core.graph import MemoryGraph, RecallResult
+    from cortext.core.memory import Memory
+    from cortext.core.graph import MemoryGraph, RecallResult
 
 
 class StructuralQueryParser:
@@ -45,7 +45,7 @@ class StructuralQueryParser:
             enable_semantic_fallback: if True, use token Jaccard when structural returns few results
             enable_embedding_recall: if True, use embeddings (when available) as 3rd tier
         """
-        from cortex_v5.core.recall.embedding import EmbeddingRecall
+        from cortext.core.recall.embedding import EmbeddingRecall
         self.extractor = extractor or RegexExtractor()
         self.embedding_recall = embedding_recall or EmbeddingRecall()
         self.enable_semantic_fallback = enable_semantic_fallback
@@ -67,7 +67,7 @@ class StructuralQueryParser:
 
         Returns RecallResult with memories, sorted by structural + token relevance.
         """
-        from cortex_v5.core.graph import RecallResult
+        from cortext.core.graph import RecallResult
 
         intent = self.parse(query, lang=lang)
         result = RecallResult()
@@ -174,7 +174,7 @@ class StructuralQueryParser:
             return []
 
         # Strip stopwords
-        from cortex_v5.core.memory import _tokenize
+        from cortext.core.memory import _tokenize
         query_tokens = _tokenize(query)
         if not query_tokens:
             return []

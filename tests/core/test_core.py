@@ -5,13 +5,13 @@ import sys
 from pathlib import Path
 from datetime import datetime, timedelta
 
-# Add cortex_v5 to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "cortex-v5"))
+# Add cortext to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "cortext"))
 
-from cortex_v5.core.memory import Memory, _tokenize
-from cortex_v5.core.entity import Entity
-from cortex_v5.core.relation import Relation, RelationType
-from cortex_v5.core.graph import MemoryGraph, RecallResult
+from cortext.core.memory import Memory, _tokenize
+from cortext.core.entity import Entity
+from cortext.core.relation import Relation, RelationType
+from cortext.core.graph import MemoryGraph, RecallResult
 
 
 class TestMemory:

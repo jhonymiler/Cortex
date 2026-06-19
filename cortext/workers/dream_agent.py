@@ -15,8 +15,8 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cortex_v5.core.memory import Memory
-    from cortex_v5.core.graph import MemoryGraph
+    from cortext.core.memory import Memory
+    from cortext.core.graph import MemoryGraph
 
 
 @dataclass
@@ -208,7 +208,7 @@ class DreamAgent:
         """
         import json
 
-        from cortex_v5.core.memory import Memory
+        from cortext.core.memory import Memory
 
         lines = []
         for idx, m in enumerate(cluster, 1):
@@ -277,7 +277,7 @@ class DreamAgent:
         """Delete memories with very low retrievability."""
         if not hasattr(graph, "iter_memories"):
             return 0
-        from cortex_v5.core.decay.ebbinghaus import retrievability
+        from cortext.core.decay.ebbinghaus import retrievability
 
         to_delete = []
         for mem in graph.iter_memories():

@@ -10,7 +10,7 @@ from __future__ import annotations
 import re
 from typing import Callable
 
-from cortex_v5.core.recall.extractor import Extractor, QueryIntent, detect_lang
+from cortext.core.recall.extractor import Extractor, QueryIntent, detect_lang
 
 
 def _extract_identity(match: re.Match, lang: str = "pt") -> QueryIntent:

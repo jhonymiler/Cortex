@@ -7,7 +7,7 @@
 
 | Element | Status | Implementation |
 |---------|--------|----------------|
-| **E1. Discrete alphabet** | ✅ | `Entity`, `Memory`, `Relation` types in `cortex_v5.core.{memory,entity,relation}` |
+| **E1. Discrete alphabet** | ✅ | `Entity`, `Memory`, `Relation` types in `cortext.core.{memory,entity,relation}` |
 | **E2. Syntax** | ✅ | W5H enforced in `Memory.__post_init__` (raises if `what` empty, importance out of range) |
 | **E3. Separable mapping + external referent** | ✅ | `who` points to real-world entities; `where`/`when` are physical/contextual referents |
 | **E4. Independent interpreter** | ✅ | `StructuralQueryParser` (deterministic regex) + `EmbeddingRecall` (multilingual) + `LLMExtractor` (fallback) — LLM is NOT the interpreter |

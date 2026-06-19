@@ -8,10 +8,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from cortex_v5.core.memory import Memory
-from cortex_v5.core.entity import Entity
-from cortex_v5.core.graph import MemoryGraph
-from cortex_v5.core.validation import (
+from cortext.core.memory import Memory
+from cortext.core.entity import Entity
+from cortext.core.graph import MemoryGraph
+from cortext.core.validation import (
     CanonicalValidator,
     ValidationResult,
     ValidationStatus,

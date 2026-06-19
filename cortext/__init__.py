@@ -3,12 +3,12 @@
 5-element detector compliant, internationalized, efficient.
 """
 
-from cortex_v5.cortex import CortexV5
-from cortex_v5.core.memory import Memory
-from cortex_v5.core.entity import Entity
-from cortex_v5.core.relation import Relation, RelationType
-from cortex_v5.core.graph import MemoryGraph, RecallResult
-from cortex_v5.core.validation import (
+from cortext.cortex import CortexV5
+from cortext.core.memory import Memory
+from cortext.core.entity import Entity
+from cortext.core.relation import Relation, RelationType
+from cortext.core.graph import MemoryGraph, RecallResult
+from cortext.core.validation import (
     CanonicalValidator,
     ValidationResult,
     ValidationStatus,
@@ -16,7 +16,7 @@ from cortex_v5.core.validation import (
     create_default_validator,
     create_strict_validator,
 )
-from cortex_v5.core.recall import (
+from cortext.core.recall import (
     StructuralQueryParser,
     QueryIntent,
     pack_for_context,
@@ -24,7 +24,7 @@ from cortex_v5.core.recall import (
     LLMExtractor,
     HybridExtractor,
 )
-from cortex_v5.core.decay import (
+from cortext.core.decay import (
     DecayConfig,
     retrievability,
     effective_stability,
@@ -32,7 +32,7 @@ from cortex_v5.core.decay import (
     ForgetGate,
     ForgetGateConfig,
 )
-from cortex_v5.workers import DreamAgent
+from cortext.workers import DreamAgent
 
 __version__ = "5.0.0"
 

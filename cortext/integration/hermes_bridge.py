@@ -12,12 +12,12 @@ from __future__ import annotations
 
 from typing import Optional
 
-from cortex_v5 import CortexV5
-from cortex_v5.core.recall.text_extractor import (
+from cortext import CortexV5
+from cortext.core.recall.text_extractor import (
     default_extractor,
     heuristic_only_extractor,
 )
-from cortex_v5.core.validation import ValidationPolicy
+from cortext.core.validation import ValidationPolicy
 
 
 class HermesCortexBridge:

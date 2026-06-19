@@ -22,7 +22,7 @@ import os
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from cortex_v5.core.memory import Memory
+    from cortext.core.memory import Memory
 
 
 # Lazy import to avoid hard dependency
