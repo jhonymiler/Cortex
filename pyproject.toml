@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cortext"
+name = "cortext-memory"
 version = "0.1.0"
 description = "Cognitive memory for AI agents — W5H-structured, contradiction-aware, internationalized, token-efficient"
 readme = "README.md"

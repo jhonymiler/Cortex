@@ -77,14 +77,14 @@ task; higher precision means the agent sees fewer irrelevant memories.
 ## Install
 
 ```bash
-pip install cortext
+pip install cortext-memory
 ```
 
 Optional extras:
 
 ```bash
-pip install "cortext[embeddings]"   # sentence-transformers for embedding-level validation
-pip install "cortext[dev]"          # pytest, ruff
+pip install "cortext-memory[embeddings]"   # sentence-transformers for embedding-level validation
+pip install "cortext-memory[dev]"          # pytest, ruff
 ```
 
 Cortex runs with **no extra dependencies** by default. The embedding and

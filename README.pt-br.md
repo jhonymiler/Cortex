@@ -74,14 +74,14 @@ Cortex com um baseline top-k não estruturado em 2 cenários:
 ## Instalação
 
 ```bash
-pip install cortext
+pip install cortext-memory
 ```
 
 Extras opcionais:
 
 ```bash
-pip install "cortext[embeddings]"   # sentence-transformers para checagem de contradição por embedding
-pip install "cortext[dev]"          # pytest, ruff
+pip install "cortext-memory[embeddings]"   # sentence-transformers para checagem de contradição por embedding
+pip install "cortext-memory[dev]"          # pytest, ruff
 ```
 
 O Cortex roda **sem dependências extras** por padrão. Os níveis de contradição
