@@ -38,12 +38,6 @@ from cortext.core.validation import ValidationPolicy
 from cortext.core.recall import StructuralQueryParser
 from cortext.core.recall.pack import pack_for_context
 from cortext.core.recall.embedding import EmbeddingRecall
-from cortext.core.recall.text_extractor import (
-    TextToMemory,
-    default_extractor as default_text_extractor,
-    heuristic_only_extractor,
-    full_extractor,
-)
 from cortext.workers import DreamAgent
 
 

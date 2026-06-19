@@ -2,7 +2,6 @@
 Tests for Ebbinghaus decay, Forget Gate, and Dream Agent.
 """
 
-import pytest
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -12,12 +11,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from cortext.core.memory import Memory
 from cortext.core.graph import MemoryGraph
 from cortext.core.decay import (
-    DecayConfig,
     retrievability,
     effective_stability,
     decay_status,
     ForgetGate,
-    ForgetGateConfig,
 )
 from cortext.workers import DreamAgent
 

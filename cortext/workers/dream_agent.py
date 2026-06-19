@@ -15,7 +15,6 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cortext.core.memory import Memory
     from cortext.core.graph import MemoryGraph
 
 
@@ -206,7 +205,6 @@ class DreamAgent:
         Returns True if a merge happened. On any failure, returns False so the
         caller falls back to the heuristic merge.
         """
-        import json
 
         from cortext.core.memory import Memory
 

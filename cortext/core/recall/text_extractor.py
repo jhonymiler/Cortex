@@ -82,7 +82,6 @@ def extract_via_embedding_similar(
         return {}
 
     # Try to find similar memory
-    from cortext.core.memory import Memory
     results = embedding_recall.rank_memories(text, list(graph.iter_memories()), top_k=1)
     if not results:
         return {}

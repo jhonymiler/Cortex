@@ -18,6 +18,7 @@ from cortext.core.recall.pack import pack_for_context
 if TYPE_CHECKING:
     from cortext.core.memory import Memory
     from cortext.core.graph import MemoryGraph, RecallResult
+    from cortext.core.recall.embedding import EmbeddingRecall
 
 
 class StructuralQueryParser:
@@ -27,7 +28,7 @@ class StructuralQueryParser:
     Three modes of operation (in order):
       1. Structural match (W5H exact/partial) — free, fast
       2. Token Jaccard (semantic fallback, language-agnostic) — free
-      3. Embedding similarity (multilingual跨语) — optional, requires
+      3. Embedding similarity (multilingual) — optional, requires
          sentence-transformers
     """
 

@@ -11,8 +11,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from cortext import (
     CortexV5,
     Memory,
-    Entity,
-    Relation,
     ValidationStatus,
 )
 from cortext.core.validation import ValidationPolicy

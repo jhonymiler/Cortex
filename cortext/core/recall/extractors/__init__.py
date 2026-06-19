@@ -9,4 +9,11 @@ from cortext.core.recall.extractors.regex_lang import (
     _PATTERNS_ES,
 )
 
-__all__ = ["RegexExtractor", "HybridExtractor", "LLMExtractor"]
+__all__ = [
+    "RegexExtractor",
+    "HybridExtractor",
+    "LLMExtractor",
+    "_PATTERNS_PT",
+    "_PATTERNS_EN",
+    "_PATTERNS_ES",
+]

@@ -5,13 +5,11 @@ Tests for TextToMemory — the abstraction layer for free text input.
 import pytest
 import sys
 from pathlib import Path
-from datetime import datetime
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from cortext import Memory, MemoryGraph
 from cortext.core.recall.text_extractor import (
-    TextToMemory,
     extract_who,
     extract_when,
     extract_where,

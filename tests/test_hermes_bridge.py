@@ -2,14 +2,12 @@
 Tests for HermesCortexBridge — the integration with Hermes agent.
 """
 
-import pytest
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from cortext.integration import HermesCortexBridge
-from cortext.core.validation import ValidationStatus
 
 
 class TestBridgeBasics:

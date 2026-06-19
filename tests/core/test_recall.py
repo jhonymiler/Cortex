@@ -1,6 +1,5 @@
 """Tests for Cortext i18n extractors and parser."""
 
-import pytest
 import sys
 from pathlib import Path
 

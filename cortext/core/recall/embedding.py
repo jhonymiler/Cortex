@@ -18,7 +18,6 @@ Model: paraphrase-multilingual-MiniLM-L12-v2
 
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:

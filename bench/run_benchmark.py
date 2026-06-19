@@ -148,9 +148,7 @@ def run_scenario(scenario_path: Path) -> dict:
         query = q_data["query"]
         relevant_who = q_data.get("relevant_who", [])
 
-        # v3 has no precision (returns everything); assume 1.0 since all there
-        v3_p = 1.0  # all memories returned → recall = 1, but precision diluted
-        # Actually measure: how many of returned are relevant
+        # Baseline returns everything; measure how many returned are relevant.
         v3_relevant = sum(1 for who_list in [m.get("who", []) for m in scenario["memories"]]
                           if any(r.lower() in [w.lower() for w in who_list] for r in relevant_who))
         v3_p_at_k = v3_relevant / min(5, len(scenario["memories"]))
@@ -202,7 +200,7 @@ def run_scenario(scenario_path: Path) -> dict:
         "retrieval_results": retrieval_results,
     }
 
-    print(f"\n[Results]")
+    print("\n[Results]")
     print(f"  Tokens:    baseline={v3_total} → cortext={v5_total} ({token_savings:.1f}% reduction)")
     print(f"  P@5:       baseline={avg_v3_p:.3f} → cortext={avg_v5_p:.3f}")
     print(f"  Latency:   cortext={avg_v5_lat:.2f}ms (avg per query)")

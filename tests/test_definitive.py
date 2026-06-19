@@ -13,7 +13,7 @@ If this test fails, Cortext is not ready.
 import pytest
 import sys
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -192,7 +192,3 @@ class TestDefinitiveAcceptance:
         stats = cortex.stats()
         assert stats["graph"]["total_memories"] == 3
         assert stats["writes"]["writes_blocked"] == 1
-
-
-# Fix the missing import
-from datetime import timedelta
