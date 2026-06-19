@@ -57,8 +57,8 @@ entrega quatro coisas concretas:
 
 ## Benchmarks
 
-Reproduzível neste repositório (`python bench/run_benchmark_v5.py`), comparando o
-Cortex com um baseline top-k não estruturado ("v3") em 2 cenários:
+Reproduzível neste repositório (`python bench/run_benchmark.py`), comparando o
+Cortex com um baseline top-k não estruturado em 2 cenários:
 
 | Cenário | Tokens (baseline → Cortex) | Economia | P@5 (baseline → Cortex) | Detecção de contradição |
 |---|---|---|---|---|
@@ -99,7 +99,7 @@ python -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
 
 pytest                                  # 190+ testes
-python bench/run_benchmark_v5.py        # reproduz os benchmarks
+python bench/run_benchmark.py        # reproduz os benchmarks
 ```
 
 ## Licença

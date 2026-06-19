@@ -1,9 +1,10 @@
 """
-Benchmark v3 vs v5: token reduction, precision, contradiction detection.
+Benchmark: Cortext vs an unstructured top-k baseline.
+  token reduction, precision, contradiction detection.
 
 Approach:
-  - v3 baseline: naive retrieval (return ALL memories as context)
-  - v5: CortexV5.remember() + recall() with W5H + parser + pack
+  - baseline: naive retrieval (return ALL memories as context)
+  - cortext: CortexV5.remember() + recall() with W5H + parser + pack
   - Same scenarios, same queries
   - Compare: tokens, precision@5, contradiction detection rate
 """
@@ -202,9 +203,9 @@ def run_scenario(scenario_path: Path) -> dict:
     }
 
     print(f"\n[Results]")
-    print(f"  Tokens:    v3={v3_total} → v5={v5_total} ({token_savings:.1f}% reduction)")
-    print(f"  P@5:       v3={avg_v3_p:.3f} → v5={avg_v5_p:.3f}")
-    print(f"  Latency:   v5={avg_v5_lat:.2f}ms (avg per query)")
+    print(f"  Tokens:    baseline={v3_total} → cortext={v5_total} ({token_savings:.1f}% reduction)")
+    print(f"  P@5:       baseline={avg_v3_p:.3f} → cortext={avg_v5_p:.3f}")
+    print(f"  Latency:   cortext={avg_v5_lat:.2f}ms (avg per query)")
     print(f"  Conflicts: detected {cd_pct*100:.0f}% (TP={cd_result['true_positives']}, FP={cd_result['false_positives']}, FN={cd_result['false_negatives']})")
     return summary
 
@@ -223,7 +224,7 @@ def main():
         "scenarios": summaries,
         "aggregate": _aggregate(summaries),
     }
-    out_path = RESULTS_DIR / f"v5_benchmark_{timestamp}.json"
+    out_path = RESULTS_DIR / f"benchmark_{timestamp}.json"
     with open(out_path, "w") as f:
         json.dump(combined, f, indent=2, ensure_ascii=False)
     print(f"\nSaved: {out_path}")
@@ -246,9 +247,9 @@ def _aggregate(summaries: list[dict]) -> dict:
 
 def print_aggregate_table(summaries: list[dict]) -> None:
     print("\n" + "=" * 80)
-    print("AGGREGATE TABLE — Cortex v3 (baseline) vs Cortex v5 (greenfield)")
+    print("AGGREGATE TABLE — unstructured baseline vs Cortext")
     print("=" * 80)
-    print(f"\n{'Scenario':<22} {'Tok v3':>8} {'Tok v5':>8} {'Save%':>7} {'P@5 v3':>7} {'P@5 v5':>7} {'CD':>6}")
+    print(f"\n{'Scenario':<22} {'Tok base':>8} {'Tok ctx':>8} {'Save%':>7} {'P@5 base':>8} {'P@5 ctx':>8} {'CD':>6}")
     print("-" * 80)
     for s in summaries:
         print(

@@ -51,7 +51,7 @@ class MemoryGraph:
     """
 
     def __init__(self, namespace: str = "default") -> None:
-        """Initialize an in-memory graph (no persistence in v5 core)."""
+        """Initialize an in-memory graph (no persistence in core)."""
         self.namespace = namespace
         self._memories: dict[str, Memory] = {}
         self._entities: dict[str, Entity] = {}

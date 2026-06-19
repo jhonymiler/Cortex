@@ -1,5 +1,5 @@
 """
-DEFINITIVE TEST: end-to-end validation of Cortex v5.
+DEFINITIVE TEST: end-to-end validation of Cortext.
 
 This is the final acceptance test. It validates:
   1. All components work together
@@ -7,7 +7,7 @@ This is the final acceptance test. It validates:
   3. The benchmark claims hold
   4. Public API is usable
 
-If this test fails, v5 is not ready.
+If this test fails, Cortext is not ready.
 """
 
 import pytest
@@ -20,13 +20,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 class TestDefinitiveAcceptance:
     """
-    The single acceptance test for Cortex v5.
+    The single acceptance test for Cortext.
 
-    If this passes, v5 is ready for production use.
+    If this passes, Cortext is ready for production use.
     """
 
     def test_cortext_is_a_library(self):
-        """v5 must be importable as a library, no MCP/HTTP required."""
+        """Cortext must be importable as a library, no MCP/HTTP required."""
         from cortext import CortexV5
         cortex = CortexV5()
         # No HTTP server, no MCP, just a class

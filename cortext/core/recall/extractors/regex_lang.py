@@ -271,7 +271,7 @@ class LLMExtractor:
     because there's no actual LLM call here — the user provides their
     own model_fn (e.g., lambda q: my_llm.generate(q)).
 
-    In v5 production, users wire this to Ollama, OpenAI, etc.
+    In production, users wire this to Ollama, OpenAI, etc.
     """
 
     def __init__(self, model_fn=None, default_lang: str = "auto") -> None:

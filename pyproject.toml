@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cortext"
-version = "5.0.0"
+version = "0.1.0"
 description = "Cognitive memory for AI agents — W5H-structured, contradiction-aware, internationalized, token-efficient"
 readme = "README.md"
 license = { text = "MIT" }
@@ -39,9 +39,9 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jhonymiler/-Cortex"
-Repository = "https://github.com/jhonymiler/-Cortex"
-Issues = "https://github.com/jhonymiler/-Cortex/issues"
+Homepage = "https://github.com/jhonymiler/Cortex"
+Repository = "https://github.com/jhonymiler/Cortex"
+Issues = "https://github.com/jhonymiler/Cortex/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

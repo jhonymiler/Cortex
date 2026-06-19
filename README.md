@@ -57,8 +57,8 @@ you four concrete things:
 
 ## Benchmarks
 
-Reproducible on this repo (`python bench/run_benchmark_v5.py`), comparing Cortex
-against an unstructured top-k baseline ("v3") across 2 scenarios:
+Reproducible on this repo (`python bench/run_benchmark.py`), comparing Cortex
+against an unstructured top-k baseline across 2 scenarios:
 
 | Scenario | Tokens (baseline → Cortex) | Savings | P@5 (baseline → Cortex) | Contradiction detection |
 |---|---|---|---|---|
@@ -154,7 +154,7 @@ python -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
 
 pytest                                  # 190+ tests
-python bench/run_benchmark_v5.py        # reproduce the benchmarks
+python bench/run_benchmark.py        # reproduce the benchmarks
 ```
 
 ## License

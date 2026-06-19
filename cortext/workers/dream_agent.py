@@ -4,7 +4,7 @@ Dream Agent — background consolidator.
 Inspired by human sleep consolidation: replay high-utility memories,
 cluster similar ones, and clean up forgotten ones. Opt-in (default off).
 
-This is a SIMPLIFIED version of the v3 dream_agent. No LLM-based
+This is a simplified dream agent. No LLM-based
 reflection, no auto-sleep cycles (use external cron for that).
 """
 
@@ -50,7 +50,7 @@ class DreamAgent:
         cluster is sent to the LLM, which writes a single merged memory that
         preserves the union of facts.
 
-    v5 simplifications vs v3:
+    Simplifications:
       - No auto-sleep cycles (external cron or background thread)
       - No spaced-repetition scheduling
     """

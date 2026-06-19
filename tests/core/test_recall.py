@@ -1,4 +1,4 @@
-"""Tests for Cortex v5 i18n extractors and parser."""
+"""Tests for Cortext i18n extractors and parser."""
 
 import pytest
 import sys

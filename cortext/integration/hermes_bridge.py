@@ -1,5 +1,5 @@
 """
-HermesCortexBridge — connect Cortex v5 memory to the Hermes agent.
+HermesCortexBridge — connect Cortext memory to the Hermes agent.
 
 This is the integration point. When Hermes chats:
   - pre_chat(query)  → returns context string to inject into LLM prompt
@@ -22,7 +22,7 @@ from cortext.core.validation import ValidationPolicy
 
 class HermesCortexBridge:
     """
-    Bridge between Cortex v5 memory and Hermes agent.
+    Bridge between Cortext memory and Hermes agent.
 
     Usage:
         bridge = HermesCortexBridge(namespace="hermes-session-1")

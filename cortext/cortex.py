@@ -49,7 +49,7 @@ from cortext.workers import DreamAgent
 
 class CortexV5:
     """
-    Main entry point for the Cortex v5 memory system.
+    Main entry point for the Cortext memory system.
 
     A thin facade over the core components. The public API is minimal
     on purpose — anything more complex can be done by accessing the

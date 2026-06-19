@@ -15,7 +15,7 @@ RAG, reasoning, planning).
 The natural evolution of Cortex:
 
 ```
-v5 (current):  Regex + embeddings + LLM fallback
+Cortext (current):  Regex + embeddings + LLM fallback
 v6:            Universal Event Extractor
                → Entity Memory
                → Incremental Coreference
@@ -209,7 +209,7 @@ Incremental Coreference (entity memory + heuristics)
 5W1H projection (when downstream needs it)
 ```
 
-Replaces v5's `RegexExtractor` + `EmbeddingRecall` + `LLMExtractor`
+Replaces Cortext's `RegexExtractor` + `EmbeddingRecall` + `LLMExtractor`
 with a single, fast, specialized model.
 
 ### v7 — Reasoning layer
