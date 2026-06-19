@@ -1,0 +1,10 @@
+name: cortext
+version: 0.2.0
+description: >-
+  Cortext — cognitive memory: W5H-structured, contradiction-validated at write
+  time, internationalized (PT/EN/ES), with decay/forget gate, background
+  consolidation, and JSON disk persistence. Local, zero external deps.
+pip_dependencies:
+  - cortext-memory
+hooks:
+  - on_session_end

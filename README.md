@@ -126,26 +126,54 @@ languages.
 
 ## Using it inside an agent
 
-The intended pattern is a transparent memory layer: recall before the LLM call,
-store after it. `HermesCortexBridge` is a reference implementation of exactly
-this:
+Cortext is **framework-agnostic** — it has zero dependency on any agent
+framework. `CortextV5` (shown above) is the universal entry point: call
+`remember()` / `recall()` from anywhere.
+
+For the common "recall before the call, store after it" loop there is an
+optional, framework-neutral `AgentMemoryBridge`:
 
 ```python
-from cortext.integration import HermesCortexBridge
+from cortext.integration import AgentMemoryBridge
 
-bridge = HermesCortexBridge(namespace="session-1")
+bridge = AgentMemoryBridge(namespace="session-1")
 
-# Before the LLM call — inject recalled context:
-context = bridge.pre_chat(user_input)
-system_prompt = context + "\n\n" + base_system_prompt
+context = bridge.recall_context(user_input)            # before the LLM call
+system_prompt = (context + "\n\n" + base_prompt) if context else base_prompt
 
-# After the turn — persist it:
-bridge.post_chat(user_message=user_input, assistant_message=reply)
+bridge.store_turn(user_message=user_input, assistant_message=reply)  # after the turn
 ```
 
-See [docs/INTEGRATION.md](docs/INTEGRATION.md) for plugging Cortex into an agent
-(including the Hermes memory plugin) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-for the component-by-component design.
+### LangChain / LangGraph / any framework
+
+```python
+from cortext import CortextV5
+
+cortex = CortextV5(namespace="user-42")
+
+# In a LangGraph node (or a LangChain Runnable / tool):
+def memory_node(state):
+    context, _ = cortex.recall(state["input"])
+    state["system"] = f"{context}\n\n{state['system']}" if context else state["system"]
+    return state
+
+# After the model replies, persist the turn:
+cortex.remember(what=state["input"], how=reply, who=["user-42"])
+```
+
+### Hermes
+
+A ready-made **plug-and-play** Hermes memory plugin ships in
+[integrations/hermes/](integrations/hermes/):
+
+```bash
+pip install cortext-memory
+ln -s "$PWD/integrations/hermes/cortext" ~/.hermes/plugins/cortext
+hermes memory setup            # pick "cortext"
+```
+
+See [docs/INTEGRATION.md](docs/INTEGRATION.md) for full per-framework wiring and
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
 
 ## Development
 

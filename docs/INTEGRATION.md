@@ -1,52 +1,93 @@
 # Integration
 
-Cortex is designed to be a **transparent memory layer** around an agent loop:
-recall relevant memories before the LLM call, store the turn after it. The model
-never needs to manage memory explicitly.
+Cortext is **framework-agnostic**: the library has no dependency on any agent
+framework. There are two ways to use it.
 
-## The bridge pattern
+1. **`CortextV5` directly** — the universal API (`remember` / `recall` /
+   `inspect`). Works in any framework or plain code.
+2. **`AgentMemoryBridge`** — optional convenience for the "recall before the
+   call, store after it" chat pattern.
 
-`HermesCortexBridge` is the reference implementation:
+```bash
+pip install cortext-memory     # provides the `cortext` import package
+```
+
+## The bridge pattern (any framework)
 
 ```python
-from cortext.integration import HermesCortexBridge
+from cortext.integration import AgentMemoryBridge
 
-bridge = HermesCortexBridge(
+bridge = AgentMemoryBridge(
     namespace="session-1",        # isolate memory per session/user
     max_context_tokens=300,       # cap on injected context
 )
 
 # 1. Before the LLM call — recall and inject:
-context = bridge.pre_chat(user_input)
+context = bridge.recall_context(user_input)
 system_prompt = (context + "\n\n" + base_system_prompt) if context else base_system_prompt
 
 # 2. Call your LLM with system_prompt ...
 
 # 3. After the turn — persist it:
-bridge.post_chat(user_message=user_input, assistant_message=reply)
+bridge.store_turn(user_message=user_input, assistant_message=reply)
 ```
 
-`pre_chat` returns a compact recalled-context string (or empty). `post_chat`
-extracts W5H from the turn and stores it, running contradiction validation.
+> `HermesCortexBridge` is a deprecated alias of `AgentMemoryBridge`, kept for
+> backward compatibility.
+
+## LangChain
+
+```python
+from cortext import CortextV5
+
+cortex = CortextV5(namespace="user-42")
+
+def with_memory(user_input: str, base_system: str) -> str:
+    context, _ = cortex.recall(user_input)
+    return f"{context}\n\n{base_system}" if context else base_system
+
+# ... after the chain produces `reply`:
+cortex.remember(what=user_input, how=reply, who=["user-42"])
+```
+
+You can also wrap `cortex.recall` / `cortex.remember` as LangChain tools if you
+want the model to query memory explicitly.
+
+## LangGraph
+
+```python
+from cortext import CortextV5
+
+cortex = CortextV5(namespace="user-42")
+
+def recall_node(state):
+    context, _ = cortex.recall(state["input"])
+    if context:
+        state["system"] = f"{context}\n\n{state['system']}"
+    return state
+
+def persist_node(state):
+    cortex.remember(what=state["input"], how=state["reply"], who=[state["user"]])
+    return state
+
+# graph.add_node("recall", recall_node) -> model -> graph.add_node("persist", persist_node)
+```
 
 ## Persistence
 
-The bridge holds an in-memory graph. Persist it across sessions:
+The bridge holds an in-memory graph. Persist it across runs:
 
 ```python
 from cortext.core.graph import MemoryGraph
 
-# load on startup
-bridge.cortex.graph = MemoryGraph.load(store_path, namespace="session-1")
-
-# save after writes
-bridge.cortex.graph.save(store_path)
+bridge.cortex.graph = MemoryGraph.load(store_path, namespace="session-1")  # startup
+bridge.cortex.graph.save(store_path)                                       # after writes
 ```
 
 ## Background consolidation
 
 Run the `DreamAgent` periodically (e.g. on a timer thread) to consolidate
-duplicates and prune forgotten memories while the agent is idle:
+duplicates and prune forgotten memories while idle:
 
 ```python
 from cortext.workers.dream_agent import DreamAgent
@@ -56,14 +97,19 @@ result = dream.run_cycle(bridge.cortex.graph)
 # result.n_replayed, result.n_consolidated, result.n_cleaned
 ```
 
-## Reference: the Hermes memory plugin
+## Hermes (plug-and-play plugin)
 
-A production integration exists as a Hermes `MemoryProvider`. It wires the bridge
-into the agent's `prefetch` (recall before turn) and `sync_turn` (store after
-turn) hooks, adds JSON persistence under `$HERMES_HOME`, runs the DreamAgent on a
-background thread, and optionally exposes a `cortex_inspect` tool for auditing the
-W5H structure, match scores, and graph stats on demand.
+A ready-made Hermes memory provider ships in
+[`integrations/hermes/`](../integrations/hermes/). Per Hermes policy it is a
+**standalone** plugin (not bundled into the Hermes tree):
 
-The key property: it is a **plugin**. Memory is recalled and stored transparently;
-no memory tool is forced on the model. This is the recommended shape for adding
-Cortex to any agent framework that has pre/post-turn hooks.
+```bash
+pip install cortext-memory
+ln -s "$PWD/integrations/hermes/cortext" ~/.hermes/plugins/cortext
+hermes memory setup            # select "cortext"
+```
+
+It recalls before each turn, stores after, persists to
+`$HERMES_HOME/cortext_<namespace>.json`, runs the DreamAgent in the background,
+and optionally exposes a `cortext_inspect` tool. See
+[integrations/hermes/README.md](../integrations/hermes/README.md) for details.

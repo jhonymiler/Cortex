@@ -87,6 +87,54 @@ pip install "cortext-memory[dev]"          # pytest, ruff
 O Cortex roda **sem dependências extras** por padrão. Os níveis de contradição
 por embedding e LLM-as-judge são opt-in.
 
+## Usando em um agente
+
+O Cortext é **agnóstico de framework** — não depende de nenhum framework de
+agente. A `CortextV5` é a porta de entrada universal: chame `remember()` /
+`recall()` de qualquer lugar.
+
+Para o laço comum "recall antes da chamada, store depois" há um
+`AgentMemoryBridge` neutro e opcional:
+
+```python
+from cortext.integration import AgentMemoryBridge
+
+bridge = AgentMemoryBridge(namespace="session-1")
+
+context = bridge.recall_context(user_input)            # antes da chamada ao LLM
+system_prompt = (context + "\n\n" + base_prompt) if context else base_prompt
+
+bridge.store_turn(user_message=user_input, assistant_message=reply)  # após o turno
+```
+
+### LangChain / LangGraph / qualquer framework
+
+```python
+from cortext import CortextV5
+
+cortex = CortextV5(namespace="user-42")
+
+# Num node do LangGraph (ou Runnable/tool do LangChain):
+def memory_node(state):
+    context, _ = cortex.recall(state["input"])
+    state["system"] = f"{context}\n\n{state['system']}" if context else state["system"]
+    return state
+
+# Depois que o modelo responde, persista o turno:
+cortex.remember(what=state["input"], how=reply, who=["user-42"])
+```
+
+### Hermes
+
+Um plugin de memória **plug-and-play** para o Hermes está em
+[integrations/hermes/](integrations/hermes/):
+
+```bash
+pip install cortext-memory
+ln -s "$PWD/integrations/hermes/cortext" ~/.hermes/plugins/cortext
+hermes memory setup            # escolha "cortext"
+```
+
 ## Documentação
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — desenho componente a componente.

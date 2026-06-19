@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cortext-memory"
-version = "0.1.0"
+version = "0.2.0"
 description = "Cognitive memory for AI agents — W5H-structured, contradiction-aware, internationalized, token-efficient"
 readme = "README.md"
 license = { text = "MIT" }
@@ -48,7 +48,7 @@ where = ["."]
 include = ["cortext*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "integrations/hermes/tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
