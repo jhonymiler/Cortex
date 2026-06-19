@@ -174,17 +174,44 @@ def _write_native_config(home: Path, values: dict) -> Path:
 
 
 def _set_provider_in_yaml(home: Path) -> bool:
-    """Best-effort: set memory.provider: cortext in config.yaml. Returns True if set."""
+    """Set ``provider: cortext`` *inside the top-level ``memory:`` block only*.
+
+    Scoped to the memory block so it never touches an unrelated ``provider:``
+    (e.g. ``model.provider``). If the block has no ``provider:`` key, one is
+    inserted. Returns True on change. Best-effort and indentation-preserving.
+    """
     cfg = home / "config.yaml"
     if not cfg.exists():
         return False
     try:
-        text = cfg.read_text(encoding="utf-8")
         import re
 
-        new, n = re.subn(r"(?m)^(\s*provider:\s*).+$", r"\1cortext", text, count=1)
-        if n and new != text:
-            cfg.write_text(new, encoding="utf-8")
+        lines = cfg.read_text(encoding="utf-8").splitlines(keepends=True)
+        in_memory = False
+        mem_indent = ""
+        insert_at = None
+        for i, line in enumerate(lines):
+            if re.match(r"^memory:\s*$", line):
+                in_memory = True
+                insert_at = i + 1
+                continue
+            if in_memory:
+                stripped = line.strip()
+                # A non-indented, non-blank line ends the block.
+                if stripped and not line[0].isspace():
+                    break
+                m = re.match(r"^(\s+)provider:\s*.*$", line)
+                if m:
+                    lines[i] = f"{m.group(1)}provider: cortext\n"
+                    cfg.write_text("".join(lines), encoding="utf-8")
+                    return True
+                if stripped and mem_indent == "":
+                    mem_indent = line[: len(line) - len(line.lstrip())]
+        # No provider key in the memory block — insert one.
+        if insert_at is not None:
+            indent = mem_indent or "  "
+            lines.insert(insert_at, f"{indent}provider: cortext\n")
+            cfg.write_text("".join(lines), encoding="utf-8")
             return True
     except Exception:
         pass

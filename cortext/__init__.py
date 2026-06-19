@@ -34,7 +34,7 @@ from cortext.core.decay import (
 )
 from cortext.workers import DreamAgent
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 __all__ = [
     # Main entry point
