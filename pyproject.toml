@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cortext-memory"
-version = "0.2.0"
+version = "0.3.0"
 description = "Cognitive memory for AI agents — W5H-structured, contradiction-aware, internationalized, token-efficient"
 readme = "README.md"
 license = { text = "MIT" }
@@ -43,9 +43,15 @@ Homepage = "https://github.com/jhonymiler/Cortex"
 Repository = "https://github.com/jhonymiler/Cortex"
 Issues = "https://github.com/jhonymiler/Cortex/issues"
 
+[project.scripts]
+cortext-memory = "cortext.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["cortext*"]
+
+[tool.setuptools.package-data]
+"cortext.hermes_plugin" = ["plugin.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "integrations/hermes/tests"]

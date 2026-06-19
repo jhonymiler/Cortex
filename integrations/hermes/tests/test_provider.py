@@ -5,11 +5,9 @@ stubbed, and the Cortext bridge is mocked, so we test the provider's own wiring
 (config persistence, prefetch/sync hooks, locking) in isolation.
 """
 
-import importlib.util
 import json
 import sys
 import types
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -27,11 +25,10 @@ def _load_provider_module():
     mp_mod.MemoryProvider = MemoryProvider
     sys.modules["agent.memory_provider"] = mp_mod
 
-    pkg_init = Path(__file__).resolve().parents[1] / "cortext" / "__init__.py"
-    spec = importlib.util.spec_from_file_location("cortext_hermes_plugin", pkg_init)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    # The plugin now ships inside the installed package as cortext.hermes_plugin.
+    import importlib
+
+    return importlib.import_module("cortext.hermes_plugin")
 
 
 @pytest.fixture()

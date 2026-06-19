@@ -1,9 +1,10 @@
 # Cortext memory provider for Hermes
 
 A **standalone, plug-and-play** [Hermes](https://github.com/NousResearch/hermes-agent)
-memory provider backed by Cortext. It is *not* bundled into the Hermes tree —
-per Hermes policy, new memory backends ship as standalone plugins installed
-under `~/.hermes/plugins/`.
+memory provider backed by Cortext. Per Hermes policy it is *not* bundled into the
+Hermes tree — it installs as a standalone plugin under `~/.hermes/plugins/`. The
+plugin ships **inside the `cortext-memory` package**, so there is nothing to
+clone.
 
 > **Don't use Hermes?** You don't need it. Cortext is a framework-agnostic
 > library — use `cortext.CortextV5` or `cortext.integration.AgentMemoryBridge`
@@ -14,28 +15,21 @@ under `~/.hermes/plugins/`.
 ## Install (one command)
 
 ```bash
-./install.sh
+pip install cortext-memory
+cortext-memory setup
 ```
 
-The script: installs `cortext-memory` from PyPI if missing, symlinks this plugin
-into `$HERMES_HOME/plugins/cortext`, and prints the activation step. If Hermes
-isn't detected it tells you how to use Cortext as a plain library instead.
+`cortext-memory setup` is a small wizard that:
+- detects Hermes (`$HERMES_HOME`, default `~/.hermes`),
+- installs the bundled plugin into `~/.hermes/plugins/cortext`,
+- writes `$HERMES_HOME/cortext.json` and sets `memory.provider: cortext`.
 
-### Manual install
+Non-interactive: `cortext-memory setup --yes`. Files-only (no config):
+`cortext-memory hermes-install`. Status: `cortext-memory info`.
 
-```bash
-pip install cortext-memory                                   # the library
-ln -sfn "$PWD/cortext" ~/.hermes/plugins/cortext             # the plugin
-hermes memory setup                                          # pick "cortext"
-```
+## Activate manually (optional)
 
-`hermes memory setup` auto-installs `pip_dependencies` (declared in
-`plugin.yaml`), so a fresh profile gets `cortext-memory` pulled in for you.
-
-## Activate
-
-Either run `hermes memory setup` (recommended — writes `$HERMES_HOME/cortext.json`),
-or set it directly in `$HERMES_HOME/config.yaml`:
+`setup` does this for you. To do it by hand, set in `$HERMES_HOME/config.yaml`:
 
 ```yaml
 memory:
@@ -86,11 +80,11 @@ rm ~/.hermes/plugins/cortext        # remove the plugin
 # set memory.provider back to your previous backend in config.yaml
 ```
 
-## Files
+## Where the code lives
 
-| File | Purpose |
-|------|---------|
-| `cortext/__init__.py` | the `CortextMemoryProvider` (lifecycle, persistence, DreamAgent, inspect tool) |
-| `cortext/plugin.yaml` | manifest: `version`, `pip_dependencies`, hooks |
-| `install.sh` | plug-and-play installer |
-| `tests/` | unit tests (run without Hermes; the base class is stubbed) |
+The provider ships inside the package at `cortext/hermes_plugin/`
+(`__init__.py` = `CortextMemoryProvider`; `plugin.yaml` = manifest with
+`version` + `pip_dependencies`). The `cortext-memory` CLI
+([`cortext/cli.py`](../../cortext/cli.py)) installs it. Unit tests that run
+without Hermes (the base class is stubbed) live in
+[`tests/`](tests/).

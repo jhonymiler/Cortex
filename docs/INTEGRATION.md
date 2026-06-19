@@ -99,17 +99,19 @@ result = dream.run_cycle(bridge.cortex.graph)
 
 ## Hermes (plug-and-play plugin)
 
-A ready-made Hermes memory provider ships in
-[`integrations/hermes/`](../integrations/hermes/). Per Hermes policy it is a
-**standalone** plugin (not bundled into the Hermes tree):
+A ready-made Hermes memory provider ships **inside the package**. Per Hermes
+policy it installs as a *standalone* plugin (not bundled into the Hermes tree),
+in one command:
 
 ```bash
 pip install cortext-memory
-ln -s "$PWD/integrations/hermes/cortext" ~/.hermes/plugins/cortext
-hermes memory setup            # select "cortext"
+cortext-memory setup           # wizard: detect Hermes, install plugin, configure
 ```
 
-It recalls before each turn, stores after, persists to
+The `cortext-memory` CLI bundles the plugin in the wheel and drops it into
+`~/.hermes/plugins/cortext`, then writes `$HERMES_HOME/cortext.json`. The
+provider recalls before each turn, stores after, persists to
 `$HERMES_HOME/cortext_<namespace>.json`, runs the DreamAgent in the background,
 and optionally exposes a `cortext_inspect` tool. See
-[integrations/hermes/README.md](../integrations/hermes/README.md) for details.
+[integrations/hermes/README.md](../integrations/hermes/README.md) for the full
+manual and the annotated config.

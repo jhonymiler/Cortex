@@ -163,14 +163,17 @@ cortex.remember(what=state["input"], how=reply, who=["user-42"])
 
 ### Hermes
 
-A ready-made **plug-and-play** Hermes memory plugin ships in
-[integrations/hermes/](integrations/hermes/):
+A ready-made **plug-and-play** Hermes memory plugin ships *inside the package* —
+one command installs and configures it:
 
 ```bash
 pip install cortext-memory
-ln -s "$PWD/integrations/hermes/cortext" ~/.hermes/plugins/cortext
-hermes memory setup            # pick "cortext"
+cortext-memory setup           # detects Hermes, installs the plugin, configures
 ```
+
+The `setup` wizard detects Hermes, drops the plugin into `~/.hermes/plugins/`,
+and writes the config. If Hermes isn't present it just shows you the library
+usage above. See [integrations/hermes/README.md](integrations/hermes/README.md).
 
 See [docs/INTEGRATION.md](docs/INTEGRATION.md) for full per-framework wiring and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
