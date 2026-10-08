@@ -50,6 +50,7 @@ class AgentMemoryBridge:
         validation_policy: ValidationPolicy = ValidationPolicy.WARN,
         use_llm_extractor: bool = False,
         max_context_tokens: int = 300,
+        path=None,
     ) -> None:
         """
         Args:
@@ -57,10 +58,12 @@ class AgentMemoryBridge:
             validation_policy: WARN (default) or BLOCK for strict
             use_llm_extractor: if True, use an LLM for extraction (slower, better)
             max_context_tokens: max tokens for the injected context
+            path: optional persistence file (.db -> SQLite, .json -> JSON)
         """
         self.cortex = CortexV5(
             namespace=namespace,
             validation_policy=validation_policy,
+            path=path,
         )
         self.text_extractor = (
             default_extractor() if use_llm_extractor else heuristic_only_extractor()
@@ -96,16 +99,12 @@ class AgentMemoryBridge:
             (memory, validation_result) from ``cortex.remember()``.
         """
         user_data = self.text_extractor.extract(user_message)
-        # `when` from text extraction is a string ("today"); Memory expects a
-        # datetime or None, so drop non-datetime values.
-        when_value = user_data.get("when")
-        if when_value is not None:
-            when_value = None
+        # `when` from text extraction is a relative marker ("hoje"), not a
+        # timestamp; the memory keeps the default (now).
         memory, result = self.cortex.remember(
             who=who or user_data.get("who", []),
             what=user_data.get("what", user_message),
             why=user_data.get("why", ""),
-            when=when_value,
             where=user_data.get("where", "default"),
             how=assistant_message,
             importance=0.6,

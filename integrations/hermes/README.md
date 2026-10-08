@@ -69,7 +69,7 @@ Transparent, context-only memory — no tool is forced on the model:
 |------|--------------|
 | `prefetch` | Recalls relevant W5H memories, injects a compact `Cortext Memory (recalled)` block before the turn. |
 | `sync_turn` | Stores the completed exchange (contradiction-validated at write time). |
-| persistence | Graph saved to `$HERMES_HOME/cortext_<namespace>.json`. |
+| persistence | Incremental SQLite at `$HERMES_HOME/cortext.db` (all namespaces; a legacy `cortext_<namespace>.json` is imported once and renamed `.json.migrated`). |
 | DreamAgent | Optional background thread: replays, consolidates duplicates, prunes forgotten. |
 | `cortext_inspect` | Opt-in tool (off by default) to audit W5H, match scores, and stats. |
 

@@ -1,156 +1,148 @@
-# Cortex
+# Cortext
 
 *Read this in [English](README.md).*
 
-> **Um sistema de memória cognitiva para agentes de IA — estruturado, internacionalizado, ciente de contradições e econômico em tokens.**
+> **Memória de longo prazo para agentes de IA: um grafo de memória W5H indexado
+> que grava e recupera em menos de um milissegundo, conecta-se ao Claude Code, ao
+> Cursor e ao Copilot e mostra os níveis de memória num painel ao vivo.**
 
-O Cortex dá a um agente LLM uma memória de longo prazo *estruturada*, em vez de
-um vector store plano. Cada memória é decomposta em um registro **W5H** (quem, o
-quê, por quê, quando, onde, como), validada contra o que já se sabe — para que o
-agente não armazene contradições silenciosamente — e recuperada por um parser
-estrutural determinístico que retorna um contexto **compacto** em vez de um
-amontoado de chunks crus.
+![Painel do Cortext: nuvens de memória por nível, KPIs, recall ao vivo](docs/assets/dashboard.png)
 
-É uma biblioteca Python pura com **zero dependências obrigatórias**, local-first,
-projetada para entrar no loop de um agente como uma camada de memória
-transparente (recall antes do turno, store depois dele).
+O Cortext dá ao agente uma memória *estruturada*, e não um vector store plano. Cada
+memória é um registro **W5H** (quem, o quê, por quê, quando, onde, como), checado
+contra o que já se sabe para que contradições não entrem, e recuperado por um parser
+determinístico apoiado em índices, que devolve um bloco de contexto **compacto** em
+vez de chunks crus. Python puro, **zero dependências obrigatórias**, local-first.
 
-```python
-from cortext import CortexV5
-
-cortex = CortexV5(namespace="myapp")
-
-# Armazena uma memória estruturada (W5H)
-cortex.remember(
-    who=["Maria"],
-    what="reportou erro de pagamento",
-    why="cartão expirado",
-    where="suporte",
-    how="orientada a atualizar dados",
-    lang="pt",
-)
-
-# Recall — retorna (contexto_compacto, RecallResult)
-context, result = cortex.recall("O que Maria pediu?")
-print(context)
-# Maria | reportou erro de pagamento
+```bash
+pip install cortext-memory
+cortext-memory install claude     # ou: cursor | copilot | vscode | mcp
+cortext-memory dashboard
 ```
 
-## Por que memória estruturada
+## O que tem dentro
 
-A maioria das memórias de agente é "embeda o turno, recupera top-k chunks". Isso
-funciona até não funcionar: chunks são volumosos, o retrieval mistura fatos não
-relacionados, e nada impede o store de guardar `X` e `não X` ao mesmo tempo.
-
-O Cortex adota outra postura — memória é **informação codificada**, não mera
-correlação. É construído em torno de cinco propriedades estruturais (esquema
-discreto, sintaxe, mapeamento arbitrário-mas-estável para referentes externos,
-intérprete independente e semântica funcional guiada pelo uso). Na prática, isso
-entrega quatro coisas concretas:
-
-| Propriedade | O que significa na prática |
+| | |
 |---|---|
-| **Estruturado (W5H)** | O recall retorna `Maria \| reportou erro → orientada a atualizar dados`, não um chunk de 90 tokens. |
-| **Normativo** | Um `CanonicalValidator` detecta contradições *na escrita* (3 níveis: heurístico → embedding → LLM-as-judge) e pode avisar ou bloquear. |
-| **Internacionalizado** | O esquema W5H é neutro de idioma; só a extração é específica de idioma, e ela é plugável (regex PT/EN/ES + fallback LLM opcional). |
-| **Auto-poda** | Decaimento de Ebbinghaus + forget gate + um `DreamAgent` opcional em background que faz replay, consolida duplicatas e poda o que não é mais usado. |
+| **Grafo de memória indexado** | Índices invertidos por token, participante e local; os candidatos vêm dos índices, nunca de varredura. Entidades ligam as memórias num grafo. |
+| **SQLite incremental** | Store em modo WAL que grava só o que mudou, um arquivo para todos os namespaces. Contadores de acesso são gravados em segundo plano, então leituras nunca esperam o disco. |
+| **Níveis de memória** | trabalho → episódica → semântica → esmaecendo → arquivada, a partir de idade, reforço, importância e retenção de Ebbinghaus. |
+| **Escrita ciente de contradições** | O `CanonicalValidator` sinaliza ou bloqueia `X` vs `não X` na escrita (níveis heurístico → embedding → LLM). |
+| **Auto-poda** | Decaimento de Ebbinghaus, forget gate e um DreamAgent que une duplicatas e poda o que não é mais usado. Memórias importantes e resumos nunca são podados. |
+| **Integração com agentes** | **Mod** do Claude Code (function hooks), **adaptador universal de hooks** (Claude Code, Cursor, Copilot), **servidor MCP** para qualquer cliente, instaladores de um comando. |
+| **Painel de controle** | Painel ao vivo servido pelo daemon local: nuvens de memória por nível, latência, playground de recall, navegador de memórias, feed de atividade. |
 
-## Benchmarks
+## Desempenho
 
-Reproduzível neste repositório (`python bench/run_benchmark.py`), comparando o
-Cortex com um baseline top-k não estruturado em 2 cenários:
+Medido com `python bench/latency_benchmark.py` (corpus sintético: 300
+participantes, um verbo presente em 10% das memórias; Linux, CPython 3.10, NVMe).
+As escritas são validadas **e** gravadas no SQLite antes de retornar.
 
-| Cenário | Tokens (baseline → Cortex) | Economia | P@5 (baseline → Cortex) | Detecção de contradição |
+| Memórias | Escrita + validação + persistência | Recall por participante | Recall por texto | Recarga a frio |
 |---|---|---|---|---|
-| customer_support | 540 → 123 | **77.2%** | 0.367 → 0.778 | 100% |
-| personal_assistant | 380 → 111 | **70.8%** | 0.840 → 0.860 | 67% |
-| **Média** | — | **74.0%** | **0.603 → 0.819** | 83.5% |
+| 1.000 | 0,37 ms | 0,38 ms | 0,06 ms | 58 ms |
+| 5.000 | 0,39 ms | 0,18 ms | 0,12 ms | 0,24 s |
+| 20.000 | 0,44 ms | 0,53 ms | 0,26 ms | 0,93 s |
+| 50.000 | 0,53 ms | 1,13 ms | 0,55 ms | 2,3 s |
 
-- **~74% menos tokens de contexto** para a mesma informação recuperada.
-- **Precision@5 sobe de 0.60 para 0.82** — o recall retorna as memórias *certas*.
-- **Zero falsos positivos** na detecção de contradições nos dois cenários.
-- **~0.1 ms** de latência média de recall (Python puro, grafo em memória).
+O mesmo corpus na 0.3.1 (só em memória, nada persistido): com 20.000 memórias,
+uma escrita levava **4,3 ms**, um recall **193 ms**, e salvar regravava o JSON
+inteiro (**0,7 s**). São escritas ~10× mais rápidas e recall ~360× mais rápido, agora
+com armazenamento durável. Via daemon, o recall de um hook de agente custa cerca de
+1 ms, mais o início do processo.
+
+Qualidade, com `python bench/run_benchmark.py` contra um baseline top-k não estruturado:
+
+| Cenário | Tokens (baseline → Cortext) | Economia | P@5 (baseline → Cortext) | Detecção de contradição |
+|---|---|---|---|---|
+| customer_support | 540 → 115 | **78,7%** | 0,367 → 0,917 | 100% |
+| personal_assistant | 380 → 88 | **76,8%** | 0,840 → 0,800 | 67% |
+| **Média** | — | **77,8%** | **0,603 → 0,859** | 83,5% |
+
+## Agentes de código
+
+```bash
+cortext-memory install claude              # Claude Code: mod de function hooks
+cortext-memory install cursor              # Cursor: hooks + MCP (+ --project <repo> para a regra)
+cortext-memory install copilot             # Copilot CLI: hooks + MCP
+cortext-memory install vscode --project .  # Copilot Chat no VS Code: MCP + instruções
+cortext-memory install mcp                 # imprime a configuração para qualquer outro cliente MCP
+```
+
+- **Claude Code**: o mod anexa a memória recuperada a cada prompt, grava cada turno
+  concluído, dá ao modelo as ferramentas `memory_recall` / `memory_remember` /
+  `memory_forget` e adiciona um pane `/memory` com os níveis. Também pode ser
+  instalado com `/plugin install cortext --marketplace jhonymiler/Cortex`.
+- **Cursor / Copilot**: os hooks injetam a memória de longo prazo do projeto no início
+  da sessão e capturam cada turno. O recall por prompt passa pelas ferramentas MCP,
+  guiado por um arquivo de instruções ("emulação de hooks").
+- **Agentes sem hooks** (Windsurf, Claude Desktop, Codex, Gemini CLI, Zed, …): as
+  instruções do servidor MCP fazem o modelo recuperar memória no início da tarefa,
+  gravar fatos duráveis e registrar um resumo no fim.
+
+Todos os agentes falam com um único daemon local (`127.0.0.1:7077`, iniciado sob
+demanda), que mantém um grafo aquecido por projeto. Veja **[docs/AGENTS.md](docs/AGENTS.md)**.
+
+## Biblioteca
+
+```python
+from cortext import CortextV5
+
+cortex = CortextV5(namespace="myapp", path="~/.cortext/memory.db")  # path é opcional
+
+cortex.remember(who=["Maria"], what="reportou erro de pagamento",
+                why="cartão expirado", how="orientada a atualizar dados")
+
+context, result = cortex.recall("O que Maria reportou?")
+print(context)
+# Maria | reportou erro de pagamento → orientada a atualizar dados
+
+cortex.levels()        # {'working': 1, 'episodic': 0, 'semantic': 0, 'fading': 0, 'archived': 0}
+cortex.stats()         # tamanhos, escritas, níveis, latência p50/p95
+```
+
+O `CortexV5` é thread-safe. Para o laço "recall antes da chamada, grava depois"
+existe o `AgentMemoryBridge`, neutro de framework:
+
+```python
+from cortext.integration import AgentMemoryBridge
+
+bridge = AgentMemoryBridge(namespace="session-1", path="~/.cortext/memory.db")
+context = bridge.recall_context(user_input)                          # antes da chamada ao LLM
+bridge.store_turn(user_message=user_input, assistant_message=reply)  # depois do turno
+```
+
+LangChain, LangGraph e outros frameworks: [docs/INTEGRATION.md](docs/INTEGRATION.md).
+Hermes: `cortext-memory setup` instala o provider incluído no pacote, veja
+[integrations/hermes/README.md](integrations/hermes/README.md).
+
+## Como funciona
+
+```
+ESCRITA  W5H ─▶ CanonicalValidator (candidatos dos índices) ─▶ MemoryGraph ─▶ SQLite (só linhas alteradas)
+RECALL   consulta ─▶ extrator (regex PT/EN/ES, LLM opcional) ─▶ candidatos indexados ─▶ ranking ─▶ bloco compacto
+DECAY    retenção de Ebbinghaus + forget gate; o DreamAgent une duplicatas, poda e reforça
+NÍVEIS   trabalho → episódica → semântica → esmaecendo → arquivada
+```
+
+Detalhes do design: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Instalação
 
 ```bash
 pip install cortext-memory
+pip install "cortext-memory[embeddings]"   # opcional: sentence-transformers para recall/validação por embedding
 ```
-
-Extras opcionais:
-
-```bash
-pip install "cortext-memory[embeddings]"   # sentence-transformers para checagem de contradição por embedding
-pip install "cortext-memory[dev]"          # pytest, ruff
-```
-
-O Cortex roda **sem dependências extras** por padrão. Os níveis de contradição
-por embedding e LLM-as-judge são opt-in.
-
-## Usando em um agente
-
-O Cortext é **agnóstico de framework** — não depende de nenhum framework de
-agente. A `CortextV5` é a porta de entrada universal: chame `remember()` /
-`recall()` de qualquer lugar.
-
-Para o laço comum "recall antes da chamada, store depois" há um
-`AgentMemoryBridge` neutro e opcional:
-
-```python
-from cortext.integration import AgentMemoryBridge
-
-bridge = AgentMemoryBridge(namespace="session-1")
-
-context = bridge.recall_context(user_input)            # antes da chamada ao LLM
-system_prompt = (context + "\n\n" + base_prompt) if context else base_prompt
-
-bridge.store_turn(user_message=user_input, assistant_message=reply)  # após o turno
-```
-
-### LangChain / LangGraph / qualquer framework
-
-```python
-from cortext import CortextV5
-
-cortex = CortextV5(namespace="user-42")
-
-# Num node do LangGraph (ou Runnable/tool do LangChain):
-def memory_node(state):
-    context, _ = cortex.recall(state["input"])
-    state["system"] = f"{context}\n\n{state['system']}" if context else state["system"]
-    return state
-
-# Depois que o modelo responde, persista o turno:
-cortex.remember(what=state["input"], how=reply, who=["user-42"])
-```
-
-### Hermes
-
-Um plugin de memória **plug-and-play** para o Hermes vem *dentro do pacote* —
-um comando instala e configura:
-
-```bash
-pip install cortext-memory
-cortext-memory setup           # detecta o Hermes, instala o plugin, configura
-```
-
-O wizard `setup` detecta o Hermes, coloca o plugin em `~/.hermes/plugins/` e
-grava a config. Se não houver Hermes, ele só mostra o uso como biblioteca. Veja
-[integrations/hermes/README.md](integrations/hermes/README.md).
-
-## Documentação
-
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — desenho componente a componente.
-- [docs/INTEGRATION.md](docs/INTEGRATION.md) — como plugar o Cortex num agente.
 
 ## Desenvolvimento
 
 ```bash
-python -m venv venv && source venv/bin/activate
-pip install -e ".[dev]"
-
-pytest                                  # 190+ testes
-python bench/run_benchmark.py        # reproduz os benchmarks
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
+.venv/bin/python -m pytest -q                  # 243 testes
+.venv/bin/ruff check .
+.venv/bin/python bench/latency_benchmark.py    # latência em escala
+.venv/bin/python bench/run_benchmark.py        # economia de tokens / precisão
+claude plugin test cortext/agents/claude_mod   # o mod do Claude Code
 ```
 
 ## Licença

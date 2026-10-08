@@ -15,11 +15,12 @@ Complies with 5-element detector:
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Optional
 from uuid import uuid4
+
+from cortext.core.text import tokenize, tokenize_all
 
 
 # W5H required fields (the 'what' is the content; rest are optional but recommended)
@@ -77,6 +78,10 @@ class Memory:
     # are in a specific language. Used for tokenization hints and
     # cross-language debug, NOT for retrieval decisions.)
     lang: str | None = None
+
+    # Token cache for index_tokens() (not part of identity or serialization).
+    _tok_key: Any = field(default=None, init=False, repr=False, compare=False)
+    _tok_cache: frozenset = field(default=frozenset(), init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         """Enforce minimal schema (E2 — syntax)."""
@@ -153,6 +158,19 @@ class Memory:
 
     # === Serialization ===
 
+    def index_tokens(self) -> frozenset[str]:
+        """Content tokens of every W5H field (cached until a field changes).
+
+        This is what the graph's inverted index stores for the memory, so the
+        tokenizer runs once per memory instead of once per memory per query.
+        """
+        key = (self.what, self.why, self.how, tuple(self.who or ()), self.where)
+        if self._tok_key != key:
+            where = self.where if self.where and self.where != "default" else ""
+            self._tok_cache = tokenize_all(self.what, self.why, self.how, where, *(self.who or ()))
+            self._tok_key = key
+        return self._tok_cache
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -167,12 +185,17 @@ class Memory:
             "last_accessed": self.last_accessed.isoformat() if self.last_accessed else None,
             "created_at": self.created_at.isoformat(),
             "metadata": self.metadata,
+            "lang": self.lang,
+            "occurrence_count": self.occurrence_count,
+            "consolidated_from": list(self.consolidated_from),
+            "consolidated_into": self.consolidated_into,
+            "is_summary": self.is_summary,
         }
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Memory":
         return cls(
-            id=data.get("id", str(uuid4())),
+            id=data.get("id") or str(uuid4()),
             who=data.get("who", []),
             what=data.get("what", ""),
             why=data.get("why", ""),
@@ -185,6 +208,10 @@ class Memory:
             created_at=datetime.fromisoformat(data["created_at"]) if data.get("created_at") else datetime.now(),
             metadata=data.get("metadata", {}),
             lang=data.get("lang"),
+            occurrence_count=data.get("occurrence_count", 1),
+            consolidated_from=list(data.get("consolidated_from") or []),
+            consolidated_into=data.get("consolidated_into"),
+            is_summary=bool(data.get("is_summary", False)),
         )
 
     @classmethod
@@ -237,17 +264,7 @@ class Memory:
 
 # === Module-level helpers ===
 
-_STOPWORDS_PT = {"o", "a", "os", "as", "de", "do", "da", "dos", "das", "em", "no", "na", "nos", "nas",
-                 "é", "foi", "são", "e", "ou", "que", "para", "por", "com", "sem", "um", "uma"}
-_STOPWORDS_EN = {"the", "a", "an", "of", "in", "on", "at", "is", "was", "were", "are", "and", "or", "that", "for", "by", "with", "to"}
-_STOPWORDS = _STOPWORDS_PT | _STOPWORDS_EN
 
-
-def _tokenize(text: str) -> set[str]:
-    """Tokenize text into lowercase words, removing stopwords and short tokens."""
-    if not text:
-        return set()
-    # Split on non-alphanumeric
-    raw_tokens = re.findall(r"\w+", text.lower())
-    # Filter: length > 2, not stopword
-    return {t for t in raw_tokens if len(t) > 2 and t not in _STOPWORDS}
+def _tokenize(text: str) -> frozenset[str]:
+    """Content tokens (folded, no stopwords). See cortext.core.text.tokenize."""
+    return tokenize(text)

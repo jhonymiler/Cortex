@@ -26,3 +26,6 @@ htmlcov/
 data/
 *.db
 *.sqlite
+
+# Playwright / browser tool output
+browser-outputs/

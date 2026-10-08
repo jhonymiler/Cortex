@@ -10,8 +10,10 @@ Context-only provider: it auto-recalls relevant memories before each turn
 path exposes no tool; an opt-in ``cortext_inspect`` tool can be enabled for
 on-demand auditing.
 
-The in-memory graph is persisted to ``$HERMES_HOME/cortext_<namespace>.json`` so
-memory survives across sessions.
+The graph is persisted incrementally to ``$HERMES_HOME/cortext.db`` (SQLite,
+one file for every namespace; each turn writes only what changed). A legacy
+``cortext_<namespace>.json`` from earlier versions is imported once on start
+and renamed to ``.json.migrated``.
 
 Configuration lives in ``$HERMES_HOME/cortext.json`` (written by
 ``hermes memory setup``); the ``memory.cortext`` block of ``config.yaml`` is read
@@ -236,7 +238,8 @@ class CortextMemoryProvider(MemoryProvider):
         # profile-aware helper (never a bare Path.home()) if it is ever absent.
         hermes_home = Path(kwargs.get("hermes_home") or _hermes_home())
         namespace = self._config.get("namespace", "hermes")
-        self._store_path = hermes_home / f"cortext_{namespace}.json"
+        self._store_path = hermes_home / "cortext.db"
+        legacy_json = hermes_home / f"cortext_{namespace}.json"
 
         policy = (
             ValidationPolicy.BLOCK
@@ -249,6 +252,7 @@ class CortextMemoryProvider(MemoryProvider):
             validation_policy=policy,
             use_llm_extractor=bool(self._config.get("use_llm_extractor", False)),
             max_context_tokens=int(self._config.get("max_context_tokens", 300)),
+            path=self._store_path,
         )
 
         if self._config.get("use_llm_extractor", False):
@@ -261,13 +265,24 @@ class CortextMemoryProvider(MemoryProvider):
             else:
                 logger.warning("cortext: use_llm_extractor=true but no llm_extractor_model set; using heuristic")
 
-        # Load persisted graph if present.
-        try:
-            with self._lock:
-                self._bridge.cortex.graph = MemoryGraph.load(self._store_path, namespace=namespace)
-            logger.info("cortext: loaded %d memories from %s", len(self._bridge.cortex.graph), self._store_path)
-        except Exception as e:
-            logger.warning("cortext: failed to load store (%s); starting empty", e)
+        # One-time import of the JSON snapshot written by earlier versions.
+        if legacy_json.exists() and len(self._bridge.cortex.graph) == 0:
+            try:
+                with self._lock:
+                    old = MemoryGraph.load(legacy_json, namespace=namespace)
+                    graph = self._bridge.cortex.graph
+                    for m in old.iter_memories():
+                        graph.add_memory(m)
+                    for e in old.iter_entities():
+                        graph.add_entity(e)
+                    for r in old.iter_relations():
+                        graph.add_relation(r)
+                    self._bridge.cortex.flush()
+                legacy_json.rename(legacy_json.with_name(legacy_json.name + ".migrated"))
+                logger.info("cortext: migrated %d memories from %s", len(old), legacy_json)
+            except Exception as e:
+                logger.warning("cortext: legacy import from %s failed (%s)", legacy_json, e)
+        logger.info("cortext: %d memories in %s", len(self._bridge.cortex.graph), self._store_path)
 
         self._maybe_start_dream_agent()
 
@@ -437,6 +452,11 @@ class CortextMemoryProvider(MemoryProvider):
             self._dream_thread = None
         with self._lock:
             self._save()
+            if self._bridge is not None:
+                try:
+                    self._bridge.cortex.close()
+                except Exception as e:
+                    logger.debug("cortext close failed: %s", e)
         self._bridge = None
 
     def _save(self) -> None:
@@ -446,7 +466,10 @@ class CortextMemoryProvider(MemoryProvider):
             if not self._bridge or not self._store_path or not self._dirty:
                 return
             try:
-                self._bridge.cortex.graph.save(self._store_path)
+                if self._store_path.suffix == ".json":
+                    self._bridge.cortex.graph.save(self._store_path)
+                else:
+                    self._bridge.cortex.flush()  # incremental: only what changed
                 self._dirty = False
             except Exception as e:
                 logger.debug("cortext save failed: %s", e)

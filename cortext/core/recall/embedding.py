@@ -27,19 +27,33 @@ if TYPE_CHECKING:
 # Lazy import to avoid hard dependency
 _MODEL = None
 _MODEL_NAME = None
+_UNAVAILABLE = False  # memoized failure: a missing package is not re-imported per call
+
+
+def _package_installed() -> bool:
+    import importlib.util
+
+    return importlib.util.find_spec("sentence_transformers") is not None
 
 
 def _try_load_model(model_name: str = "paraphrase-multilingual-MiniLM-L12-v2"):
-    """Try to load the sentence-transformers model. Returns None if unavailable."""
-    global _MODEL, _MODEL_NAME
+    """Try to load the sentence-transformers model. Returns None if unavailable.
+
+    A failed import is remembered for the life of the process: without that,
+    every write and recall would repeat the import's filesystem search.
+    """
+    global _MODEL, _MODEL_NAME, _UNAVAILABLE
     if _MODEL is not None and _MODEL_NAME == model_name:
         return _MODEL
+    if _UNAVAILABLE:
+        return None
     try:
         from sentence_transformers import SentenceTransformer
         _MODEL = SentenceTransformer(model_name)
         _MODEL_NAME = model_name
         return _MODEL
-    except ImportError:
+    except Exception:
+        _UNAVAILABLE = True
         return None
 
 
@@ -80,9 +94,13 @@ class EmbeddingRecall:
         """
         self.model_name = model_name
         self.cache_embeddings = cache_embeddings
-        self._cache: dict[str, list[float]] = {}  # memory_id -> embedding
+        self._cache: dict[str, tuple[str, object]] = {}  # memory_id -> (text, vector)
 
     def is_available(self) -> bool:
+        # Cheap negative path: don't load a 100MB model just to learn the
+        # package is absent.
+        if _UNAVAILABLE or (_MODEL is None and not _package_installed()):
+            return False
         return _try_load_model(self.model_name) is not None
 
     def _memory_to_text(self, memory: "Memory") -> str:
@@ -134,24 +152,28 @@ class EmbeddingRecall:
         if not memories:
             return []
 
-        # Build memory texts
-        mem_texts = [self._memory_to_text(m) for m in memories]
+        import numpy as np
 
-        # Encode in batch (1 query + N memories)
-        all_texts = [query] + mem_texts
+        # Encode only what is not cached (memories are immutable in practice;
+        # the cache key includes the text so an edit re-embeds).
+        texts = [self._memory_to_text(m) for m in memories]
+        missing = [
+            i for i, (m, t) in enumerate(zip(memories, texts))
+            if not self.cache_embeddings or self._cache.get(m.id, ("",))[0] != t
+        ]
         try:
-            embeddings = model.encode(all_texts, convert_to_numpy=True)
+            query_emb = model.encode([query], convert_to_numpy=True, normalize_embeddings=True)[0]
+            if missing:
+                vecs = model.encode([texts[i] for i in missing], convert_to_numpy=True, normalize_embeddings=True)
+                for i, v in zip(missing, vecs):
+                    self._cache[memories[i].id] = (texts[i], v)
         except Exception:
             return []
 
-        # Cosine similarity
-        query_emb = embeddings[0]
-        mem_embs = embeddings[1:]
-        scored: list[tuple["Memory", float]] = []
-        for mem, mem_emb in zip(memories, mem_embs):
-            sim = cosine_similarity(query_emb, mem_emb)
-            if sim >= min_similarity:
-                scored.append((mem, sim))
-
-        scored.sort(key=lambda x: x[1], reverse=True)
-        return scored[:top_k]
+        if self.cache_embeddings:
+            matrix = np.stack([self._cache[m.id][1] for m in memories])
+        else:
+            matrix = np.stack([self._cache.pop(m.id)[1] for m in memories])
+        sims = matrix @ query_emb
+        order = np.argsort(-sims)[:top_k]
+        return [(memories[i], float(sims[i])) for i in order if sims[i] >= min_similarity]

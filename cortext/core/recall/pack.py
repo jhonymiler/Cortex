@@ -24,6 +24,7 @@ def pack_for_context(
     matches: list["Memory"],
     intent: "QueryIntent | None" = None,
     max_tokens: int = 200,
+    how_chars: int = 140,
 ) -> str:
     """
     Pack matched memories into a compact context string.
@@ -67,6 +68,11 @@ def pack_for_context(
             continue
 
         line = " | ".join(line_parts)
+        # The outcome, when recorded ("who | what → how"), capped so one long
+        # answer can't eat the budget of the memories after it.
+        mem_how = (mem.how or "").strip()
+        if mem_how:
+            line += " → " + (mem_how if len(mem_how) <= how_chars else mem_how[: how_chars - 1].rstrip() + "…")
         line_with_break = line + "\n"
 
         if used_chars + len(line_with_break) > budget_chars:
@@ -78,4 +84,4 @@ def pack_for_context(
         parts.append(line)
         used_chars += len(line_with_break)
 
-    return "".join(parts).rstrip()
+    return "\n".join(parts).rstrip()

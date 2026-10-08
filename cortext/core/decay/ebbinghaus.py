@@ -66,8 +66,10 @@ def retrievability(
         config = DecayConfig()
     now = now or datetime.now()
 
-    # Reference time = last access, fallback to creation
-    reference_time = memory.last_accessed or memory.when
+    # Reference time = last access, fallback to when the memory was *stored*.
+    # Not `when`: that is the event's time, and a memory about a past event
+    # ("born in 1990") is not forgotten the moment it is written.
+    reference_time = memory.last_accessed or memory.created_at
     days_since = max(0.0, (now - reference_time).total_seconds() / 86400)
 
     # Compute effective stability
@@ -124,3 +126,47 @@ def decay_status(
     elif r >= config.forgotten_threshold:
         return "weak"
     return "forgotten"
+
+
+# === Memory levels ===
+
+#: The levels a memory moves through, in display order.
+#:   working   — just stored, still "in mind" (younger than working_window)
+#:   episodic  — short-term: an event, retrievable, not yet reinforced
+#:   semantic  — long-term: reinforced by use, highly important, or a summary
+#:   fading    — retrievability dropping; a candidate for the forget gate
+#:   archived  — merged into another memory by consolidation (kept for audit)
+TIERS = ("working", "episodic", "semantic", "fading", "archived")
+
+
+@dataclass
+class TierConfig:
+    working_window_minutes: float = 60.0
+    semantic_min_access: int = 3
+    semantic_min_importance: float = 0.8
+    fading_below: float = 0.3
+
+
+def memory_tier(
+    memory: "Memory",
+    now: datetime | None = None,
+    config: TierConfig | None = None,
+    decay: DecayConfig | None = None,
+) -> str:
+    """Classify a memory into one of ``TIERS``."""
+    if memory.consolidated_into:
+        return "archived"
+    config = config or TierConfig()
+    now = now or datetime.now()
+    age_min = (now - memory.created_at).total_seconds() / 60
+    if age_min <= config.working_window_minutes and memory.access_count < config.semantic_min_access:
+        return "working"
+    if retrievability(memory, now, decay) < config.fading_below:
+        return "fading"
+    if (
+        memory.is_consolidated
+        or memory.access_count >= config.semantic_min_access
+        or memory.importance >= config.semantic_min_importance
+    ):
+        return "semantic"
+    return "episodic"
