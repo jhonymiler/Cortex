@@ -110,23 +110,23 @@ def _extract_general(match: re.Match, lang: str = "pt") -> QueryIntent:
 
 _PATTERNS_PT: list[tuple[re.Pattern, Callable]] = [
     # IDENTITY: "quem é/são X?"
-    (re.compile(r"quem\s+(?:é|são|foi|era)\s+(?:o|a|os|as)?\s*([\w\s\-]+?)\s*\??\s*$", re.IGNORECASE), _extract_identity),
+    (re.compile(r"quem\s+(?:é|são|foi|era)\s+(?:(?:o|a|os|as)\s+)?([\w\s\-]+?)\s*\??\s*$", re.IGNORECASE), _extract_identity),
     # ACTION: "o que X fez/faz/disse/...?"
-    (re.compile(r"o\s+que\s+(?:o|a|os|as)?\s*([\w\-]+)\s+(fez|faz|disse|diz|pediu|pede|comprou|compra|vendeu|vende|gostou|gosta|reclamou|reclama|quis|quer|precisa|fez|fazia|disse|tinha|tem)\s*\??\s*$", re.IGNORECASE), _extract_action),
-    (re.compile(r"o\s+que\s+(?:aconteceu|ocorreu|rolou)\s+com\s+(?:o|a|os|as)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_action),
+    (re.compile(r"o\s+que\s+(?:(?:o|a|os|as)\s+)?([\w\-]+)\s+(fez|faz|disse|diz|pediu|pede|comprou|compra|vendeu|vende|gostou|gosta|reclamou|reclama|quis|quer|precisa|fez|fazia|disse|tinha|tem)\s*\??\s*$", re.IGNORECASE), _extract_action),
+    (re.compile(r"o\s+que\s+(?:aconteceu|ocorreu|rolou)\s+com\s+(?:(?:o|a|os|as)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_action),
     # LOCATION: "onde X mora/trabalha/...?"
-    (re.compile(r"onde\s+(?:o|a|os|as)?\s*([\w\-]+)\s+(mora|morou|morava|trabalha|trabalhou|trabalha|está|estava|fica|ficou|fica|vai|foi)\s*\??\s*$", re.IGNORECASE), _extract_location),
-    (re.compile(r"onde\s+(?:é|fica|aconteceu|ocorreu)\s+(?:a|o|os|as)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_location),
+    (re.compile(r"onde\s+(?:(?:o|a|os|as)\s+)?([\w\-]+)\s+(mora|morou|morava|trabalha|trabalhou|trabalha|está|estava|fica|ficou|fica|vai|foi)\s*\??\s*$", re.IGNORECASE), _extract_location),
+    (re.compile(r"onde\s+(?:é|fica|aconteceu|ocorreu)\s+(?:(?:a|o|os|as)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_location),
     # TEMPORAL: "quando aconteceu/foi/é X?" / "quando X fez Y?"
-    (re.compile(r"quando\s+(?:foi|aconteceu|ocorreu|é|será|era)\s+(?:a|o|os|as)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_temporal),
-    (re.compile(r"quando\s+(?:o|a|os|as)?\s*([\w]+)\s+(fez|faz|disse|pediu|comprou|vendeu|gostou|reclamou)\s*(?:.*)$", re.IGNORECASE), _extract_temporal_who),
+    (re.compile(r"quando\s+(?:foi|aconteceu|ocorreu|é|será|era)\s+(?:(?:a|o|os|as)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_temporal),
+    (re.compile(r"quando\s+(?:(?:o|a|os|as)\s+)?([\w]+)\s+(fez|faz|disse|pediu|comprou|vendeu|gostou|reclamou)\s*(?:.*)$", re.IGNORECASE), _extract_temporal_who),
     # CAUSAL: "por que X?"
-    (re.compile(r"por\s+que\s+(?:o|a|os|as)?\s*([\w\-]+)\s+([\w\-]+)\s*\??\s*$", re.IGNORECASE), _extract_causal),
+    (re.compile(r"por\s+que\s+(?:(?:o|a|os|as)\s+)?([\w\-]+)\s+([\w\-]+)\s*\??\s*$", re.IGNORECASE), _extract_causal),
     (re.compile(r"por\s+que\s+(?:aconteceu|ocorreu|reclamou|pediu|fez)", re.IGNORECASE), _extract_causal),
     # GENERAL: "o que você sabe sobre X?"
-    (re.compile(r"o\s+que\s+(?:você|tu|vc)\s+(?:sabe|conhece)\s+sobre\s+(?:o|a|os|as)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
-    (re.compile(r"fale\s+sobre\s+(?:o|a|os|as)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
-    (re.compile(r"conte\s+sobre\s+(?:o|a|os|as)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
+    (re.compile(r"o\s+que\s+(?:você|tu|vc)\s+(?:sabe|conhece)\s+sobre\s+(?:(?:o|a|os|as)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
+    (re.compile(r"fale\s+sobre\s+(?:(?:o|a|os|as)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
+    (re.compile(r"conte\s+sobre\s+(?:(?:o|a|os|as)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
 ]
 
 
@@ -163,21 +163,21 @@ _PATTERNS_EN: list[tuple[re.Pattern, Callable]] = [
 
 _PATTERNS_ES: list[tuple[re.Pattern, Callable]] = [
     # IDENTITY: "¿quién es X?"
-    (re.compile(r"¿?quién\s+(?:es|son|fue|era)\s+(?:el|la|los|las)?\s*([\w\s\-]+?)\s*\??\s*$", re.IGNORECASE), _extract_identity),
+    (re.compile(r"¿?quién\s+(?:es|son|fue|era)\s+(?:(?:el|la|los|las)\s+)?([\w\s\-]+?)\s*\??\s*$", re.IGNORECASE), _extract_identity),
     # ACTION: "¿qué hizo X?" / "¿qué quiere X?"
-    (re.compile(r"¿?qué\s+(?:hizo|hace|dijo|dice|pidió|pide|compró|compra|vendió|vende|quiere|necesita|le\s+gusta|odia|sabe)\s+(?:el|la|los|las)?\s*([\w]+)\s*\??\s*$", re.IGNORECASE), _extract_action),
-    (re.compile(r"¿?qué\s+(?:pasó|sucedió|ocurrió)\s+con\s+(?:el|la|los|las)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_action),
+    (re.compile(r"¿?qué\s+(?:hizo|hace|dijo|dice|pidió|pide|compró|compra|vendió|vende|quiere|necesita|le\s+gusta|odia|sabe)\s+(?:(?:el|la|los|las)\s+)?([\w]+)\s*\??\s*$", re.IGNORECASE), _extract_action),
+    (re.compile(r"¿?qué\s+(?:pasó|sucedió|ocurrió)\s+con\s+(?:(?:el|la|los|las)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_action),
     # LOCATION: "¿dónde vive X?"
-    (re.compile(r"¿?dónde\s+(?:vive|vivió|trabaja|trabajó|está|estuvo|queda|quedó|va|fue)\s+(?:el|la|los|las)?\s*([\w\-]+)\s*\??\s*$", re.IGNORECASE), _extract_location),
-    (re.compile(r"¿?dónde\s+(?:es|está|queda|quedó|ocurrió)\s+(?:el|la|los|las)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_location),
+    (re.compile(r"¿?dónde\s+(?:vive|vivió|trabaja|trabajó|está|estuvo|queda|quedó|va|fue)\s+(?:(?:el|la|los|las)\s+)?([\w\-]+)\s*\??\s*$", re.IGNORECASE), _extract_location),
+    (re.compile(r"¿?dónde\s+(?:es|está|queda|quedó|ocurrió)\s+(?:(?:el|la|los|las)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_location),
     # TEMPORAL: "¿cuándo pasó X?"
-    (re.compile(r"¿?cuándo\s+(?:pasó|sucedió|ocurrió|fue|será|era)\s+(?:el|la|los|las)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_temporal),
-    (re.compile(r"¿?cuándo\s+(?:el|la|los|las)?\s*([\w]+)\s+(hizo|hizo|dijo|compró)\s*(?:.*)$", re.IGNORECASE), _extract_temporal_who),
+    (re.compile(r"¿?cuándo\s+(?:pasó|sucedió|ocurrió|fue|será|era)\s+(?:(?:el|la|los|las)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_temporal),
+    (re.compile(r"¿?cuándo\s+(?:(?:el|la|los|las)\s+)?([\w]+)\s+(hizo|hizo|dijo|compró)\s*(?:.*)$", re.IGNORECASE), _extract_temporal_who),
     # CAUSAL: "¿por qué X?"
-    (re.compile(r"¿?por\s+qué\s+(?:el|la|los|las)?\s*([\w\-]+)\s+([\w\-]+)\s*\??\s*$", re.IGNORECASE), _extract_causal),
+    (re.compile(r"¿?por\s+qué\s+(?:(?:el|la|los|las)\s+)?([\w\-]+)\s+([\w\-]+)\s*\??\s*$", re.IGNORECASE), _extract_causal),
     # GENERAL
-    (re.compile(r"¿?qué\s+(?:sabes|conoces)\s+sobre\s+(?:el|la|los|las)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
-    (re.compile(r"¿?háblame\s+de\s+(?:el|la|los|las)?\s*([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
+    (re.compile(r"¿?qué\s+(?:sabes|conoces)\s+sobre\s+(?:(?:el|la|los|las)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
+    (re.compile(r"¿?háblame\s+de\s+(?:(?:el|la|los|las)\s+)?([\w\s]+?)\s*\??\s*$", re.IGNORECASE), _extract_general),
 ]
 
 

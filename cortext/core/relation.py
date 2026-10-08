@@ -116,7 +116,7 @@ class Relation:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Relation":
         return cls(
-            id=data.get("id", str(uuid4())),
+            id=data.get("id") or str(uuid4()),
             from_id=data.get("from_id", ""),
             relation_type=data.get("relation_type", ""),
             to_id=data.get("to_id", ""),
