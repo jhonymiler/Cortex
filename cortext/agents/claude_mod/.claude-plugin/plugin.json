@@ -1,7 +1,7 @@
 {
   "name": "cortext",
-  "version": "0.4.0",
-  "description": "Cortext long-term memory: recalls relevant memories into every prompt, stores each finished turn, gives the model memory tools and a /memory pane with the memory levels.",
+  "version": "0.5.0",
+  "description": "Cortext long-term memory: recalls relevant memories into every prompt, turns each session into durable facts in the background with your own Haiku, gives the model memory tools and a /memory pane with the memory levels.",
   "author": {
     "name": "Jhony Miler"
   },
@@ -24,6 +24,12 @@
       "type": "boolean",
       "title": "Inject recalled memory",
       "description": "Attach recalled memories to each prompt as context the model reads.",
+      "default": true
+    },
+    "abstract": {
+      "type": "boolean",
+      "title": "Abstract facts in the background",
+      "description": "Use your own Haiku (via your Claude Code session) to turn finished turns into durable facts, a few jobs every 20 seconds.",
       "default": true
     }
   }

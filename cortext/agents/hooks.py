@@ -164,6 +164,10 @@ def _q(s: str) -> str:
     return quote(s, safe="")
 
 
+def _end(ns: str, session: str) -> None:
+    client.post("/api/session/end", {"ns": ns, "session": session}, timeout=5)
+
+
 def _turn(ns: str, user: str, assistant: str, agent: str, session: str) -> None:
     if user.strip():
         client.post("/api/turn", {"ns": ns, "user": user, "assistant": assistant, "agent": agent, "session": session}, timeout=5)
@@ -184,7 +188,10 @@ def handle_claude(event: str, data: dict) -> Optional[dict]:
         _save_pending("claude", session, prompt, cwd)
         ctx = _recall(ns, prompt)
         return {"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": ctx}} if ctx else None
-    if ev in ("stop", "sessionend"):
+    if ev == "sessionend":
+        _end(ns, session)
+        return None
+    if ev == "stop":
         if data.get("stop_hook_active"):
             return None
         pending = _pop_pending("claude", session)
@@ -216,6 +223,9 @@ def handle_cursor(event: str, data: dict) -> Optional[dict]:
         pending = _pop_pending("cursor", session)
         _turn(ns, pending.get("prompt", ""), data.get("text", ""), "cursor", session)
         return {}
+    if ev == "sessionend":
+        _end(ns, session)
+        return {}
     return {}
 
 
@@ -230,7 +240,10 @@ def handle_copilot(event: str, data: dict) -> Optional[dict]:
     if ev in ("userpromptsubmitted", "userpromptsubmit"):
         _save_pending("copilot", session, data.get("prompt", ""), cwd)
         return None
-    if ev in ("agentstop", "stop", "sessionend"):
+    if ev == "sessionend":
+        _end(ns, session)
+        return None
+    if ev in ("agentstop", "stop"):
         pending = _pop_pending("copilot", session)
         user, assistant = pending.get("prompt", ""), ""
         tp = data.get("transcriptPath") or data.get("transcript_path")
