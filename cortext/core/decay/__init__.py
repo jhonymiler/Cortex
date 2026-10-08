@@ -7,6 +7,9 @@ from cortext.core.decay.ebbinghaus import (
     retrievability,
     effective_stability,
     decay_status,
+    memory_tier,
+    TierConfig,
+    TIERS,
 )
 from cortext.core.decay.forget_gate import (
     ForgetGate,
@@ -18,6 +21,9 @@ __all__ = [
     "retrievability",
     "effective_stability",
     "decay_status",
+    "memory_tier",
+    "TierConfig",
+    "TIERS",
     "ForgetGate",
     "ForgetGateConfig",
 ]

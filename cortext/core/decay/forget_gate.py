@@ -121,17 +121,23 @@ class ForgetGate:
         """Estimate redundancy with other memories."""
         score = 0.0
         similar_count = 0
-        if hasattr(graph, "iter_memories"):
-            for other in graph.iter_memories():
-                if other.id == memory.id:
+        a = set((memory.what or "").lower().split())
+        if a and hasattr(graph, "iter_memories"):
+            # Overlap > 0.7 implies a shared content token, so the inverted
+            # index narrows the comparison to real candidates (no full scan).
+            tokens = memory.index_tokens()
+            if tokens and hasattr(graph, "ids_for_tokens"):
+                pool = (graph.get_memory(i) for i in graph.ids_for_tokens(tokens))
+            else:
+                pool = graph.iter_memories()
+            for other in pool:
+                if other is None or other.id == memory.id:
                     continue
-                # Simple overlap check on what-field
-                a = set((memory.what or "").lower().split())
                 b = set((other.what or "").lower().split())
-                if a and b:
-                    overlap = len(a & b) / len(a | b)
-                    if overlap > 0.7:
-                        similar_count += 1
+                if b and len(a & b) / len(a | b) > 0.7:
+                    similar_count += 1
+                    if similar_count >= 3:
+                        break
 
         if similar_count >= 3:
             score += 0.5
@@ -145,10 +151,10 @@ class ForgetGate:
         score = 0.0
         now = datetime.now()
 
-        # Old with no recent access
-        if memory.when:
-            days_old = (now - memory.when).days
-            last_access = memory.last_accessed or memory.when
+        # Old (since stored) with no recent access
+        if memory.created_at:
+            days_old = (now - memory.created_at).days
+            last_access = memory.last_accessed or memory.created_at
             days_since_access = (now - last_access).days
             if days_old > 90 and days_since_access > 60:
                 score += 0.4

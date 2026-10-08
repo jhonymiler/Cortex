@@ -62,6 +62,7 @@ class DreamAgent:
         llm_fn=None,
         llm_candidate_threshold: float = 0.45,
         max_llm_merges: int = 5,
+        protect_importance: float = 0.8,
     ) -> None:
         """
         Args:
@@ -81,6 +82,7 @@ class DreamAgent:
         self.llm_fn = llm_fn
         self.llm_candidate_threshold = llm_candidate_threshold
         self.max_llm_merges = max_llm_merges
+        self.protect_importance = protect_importance
 
     def run_cycle(self, graph: "MemoryGraph") -> DreamCycleResult:
         """
@@ -100,6 +102,11 @@ class DreamAgent:
         result.n_cleaned = self._cleanup_forgotten(graph)
         result.n_consolidated = self._consolidate_similar(graph)
         result.n_replayed = self._replay_top(graph)
+
+        # Consolidation and replay mutate memories in place; let a store
+        # persist them on its next flush.
+        if hasattr(graph, "mark_all_dirty"):
+            graph.mark_all_dirty()
 
         result.duration_ms = (time.perf_counter() - start) * 1000
         return result
@@ -272,22 +279,37 @@ class DreamAgent:
         return json.loads(raw[start : end + 1])
 
     def _cleanup_forgotten(self, graph: "MemoryGraph") -> int:
-        """Delete memories with very low retrievability."""
+        """Delete memories whose retrievability fell below the threshold.
+
+        Protected from deletion: high-importance memories (>= protect_importance)
+        and consolidation summaries — long-term knowledge is not pruned by
+        disuse alone. Deleting a canonical memory also deletes the archived
+        duplicates merged into it, so no ``consolidated_into`` dangles.
+        """
         if not hasattr(graph, "iter_memories"):
             return 0
         from cortext.core.decay.ebbinghaus import retrievability
 
         to_delete = []
         for mem in graph.iter_memories():
+            if mem.consolidated_into or mem.is_summary or mem.importance >= self.protect_importance:
+                continue
             try:
-                r = retrievability(mem)
-                if r < self.cleanup_threshold:
-                    to_delete.append(mem)
+                if retrievability(mem) < self.cleanup_threshold:
+                    to_delete.append(mem.id)
             except Exception:
                 pass
+        if not to_delete:
+            return 0
 
-        # Delete (direct dict removal)
-        for mem in to_delete:
-            if hasattr(graph, "_memories"):
-                graph._memories.pop(mem.id, None)
-        return len(to_delete)
+        doomed = set(to_delete)
+        for mem in graph.iter_memories():
+            if mem.consolidated_into in doomed:
+                to_delete.append(mem.id)
+
+        for mid in to_delete:
+            if hasattr(graph, "remove_memory"):
+                graph.remove_memory(mid)
+            else:
+                graph._memories.pop(mid, None)
+        return len(doomed)

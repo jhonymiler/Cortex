@@ -5,9 +5,14 @@ dependency-free wizard that installs and configures the Cortext memory plugin
 for Hermes (or explains library usage if Hermes is not present).
 
 Usage:
-    cortext-memory setup            # interactive wizard
-    cortext-memory setup --yes      # non-interactive (defaults)
-    cortext-memory hermes-install   # just drop the plugin in, no config
+    cortext-memory serve                    # run the daemon in the foreground
+    cortext-memory daemon start|stop|status # run it in the background
+    cortext-memory dashboard                # open the control panel
+    cortext-memory install <agent>          # claude | cursor | copilot | vscode | mcp
+    cortext-memory hook <agent> <event>     # (called by agent hooks)
+    cortext-memory mcp                      # MCP server on stdio
+    cortext-memory recall "query" | remember "fact" | stats | ns
+    cortext-memory setup                    # Hermes wizard
     cortext-memory info
 """
 
@@ -128,11 +133,24 @@ def cmd_info(_args) -> int:
         ],
     )
     print()
+    from cortext.server import client, config
+
+    running = client.is_running()
+    _box(
+        "Daemon",
+        [
+            f"status       {GREEN + 'running' + RESET if running else YELLOW + 'stopped' + RESET}",
+            f"url          {config.base_url()}",
+            f"database     {config.db_path()}",
+        ],
+    )
+    print()
     print(f"  {DIM}Library use (any framework):{RESET}")
     print("      from cortext import CortextV5")
-    print("      cortex = CortextV5(namespace='myapp')")
+    print("      cortex = CortextV5(namespace='myapp', path='~/.cortext/memory.db')")
     print()
-    print(f"  Run {BOLD}cortext-memory setup{RESET} to wire it into Hermes.")
+    print(f"  Agents: {BOLD}cortext-memory install claude|cursor|copilot|vscode|mcp{RESET}")
+    print(f"  Hermes: {BOLD}cortext-memory setup{RESET}")
     print()
     return 0
 
@@ -300,6 +318,148 @@ def cmd_setup(args) -> int:
     return 0
 
 
+# ---- daemon, agents, memory ---------------------------------------------------
+
+def cmd_serve(args) -> int:
+    import logging
+
+    from cortext.server.daemon import serve
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+    return serve(host=args.host, port=args.port, db=args.db, dream_interval=args.dream_interval)
+
+
+def cmd_daemon(args) -> int:
+    from cortext.server import client, config
+
+    action = args.action
+    if action == "status":
+        if client.is_running():
+            h = client.get("/api/health")
+            _ok(f"running · pid {h['pid']} · v{h['version']} · up {h['uptime_s']}s · {config.base_url()}")
+            return 0
+        _warn("stopped")
+        return 1
+    if action in ("stop", "restart"):
+        if client.is_running():
+            _ok("stopped") if client.stop_daemon() else _warn("could not stop the daemon")
+        elif action == "stop":
+            _warn("not running")
+    if action in ("start", "restart"):
+        if client.is_running():
+            _ok(f"already running at {config.base_url()}")
+            return 0
+        if client.start_daemon():
+            _ok(f"started at {config.base_url()} (log: {config.log_file()})")
+            return 0
+        print(f"{RED}error:{RESET} daemon did not come up; see {config.log_file()}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def cmd_dashboard(args) -> int:
+    import webbrowser
+
+    from cortext.server import client, config
+
+    if not client.ensure_daemon():
+        print(f"{RED}error:{RESET} daemon did not come up; see {config.log_file()}", file=sys.stderr)
+        return 1
+    url = config.base_url() + "/"
+    _ok(f"dashboard at {url}")
+    if not args.no_open:
+        webbrowser.open(url)
+    return 0
+
+
+def cmd_hook(args) -> int:
+    from cortext.agents.hooks import run
+
+    return run(args.agent, args.event)
+
+
+def cmd_mcp(_args) -> int:
+    from cortext.agents.mcp import main as mcp_main
+
+    return mcp_main()
+
+
+def cmd_install(args) -> int:
+    from cortext.agents import install
+
+    plan = install.run(args.target, project=args.project, dry_run=args.dry_run, classic=args.classic)
+    if args.target == "mcp":
+        print(plan.notes[0])
+        return 0
+    head = "Would change" if args.dry_run else "Changed"
+    _box(f"Cortext → {args.target}", [f"{head}:"] + [f"  {c}" for c in plan.changes or ["(nothing)"]])
+    for n in plan.notes:
+        _step(n)
+    return 0
+
+
+def _ns(args) -> str:
+    from cortext.server import config
+
+    return args.ns or config.namespace_for(os.getcwd())
+
+
+def cmd_recall(args) -> int:
+    from cortext.server import client
+
+    client.ensure_daemon()
+    r = client.post("/api/recall", {"ns": _ns(args), "query": args.query, "max_results": args.limit, "touch": False})
+    if args.json:
+        print(json.dumps(r, ensure_ascii=False, indent=2))
+        return 0
+    if not r["memories"]:
+        _warn(f"nothing relevant in {_ns(args)} ({r['ms']} ms)")
+        return 0
+    for m in r["memories"]:
+        who = ", ".join(m["who"])
+        print(f"  {DIM}{m['id'][:8]}{RESET} {CYAN}{m['tier']:<9}{RESET} " + (f"{BOLD}{who}{RESET} | " if who else "") + m["what"])
+    print(f"  {DIM}{len(r['memories'])} hits in {r['ms']} ms · {_ns(args)}{RESET}")
+    return 0
+
+
+def cmd_remember(args) -> int:
+    from cortext.server import client
+
+    client.ensure_daemon()
+    body = {"ns": _ns(args), "text": args.text, "importance": args.importance}
+    if args.who:
+        body["who"] = [w.strip() for w in args.who.split(",") if w.strip()]
+    r = client.post("/api/remember", body)
+    if r["stored"]:
+        _ok(f"stored {r['id'][:8]} in {_ns(args)} ({r['ms']} ms){' — ' + r['reason'] if r['status'] == 'WARN' else ''}")
+        return 0
+    _warn(f"not stored: {r['reason']}")
+    return 1
+
+
+def cmd_stats(args) -> int:
+    from cortext.server import client
+
+    client.ensure_daemon()
+    if args.ns:
+        print(json.dumps(client.get(f"/api/stats?ns={args.ns}"), ensure_ascii=False, indent=2))
+        return 0
+    o = client.get("/api/overview")
+    lines = [f"{n['name']:<32} {n['memories']:>7} memories" for n in o["namespaces"]] or ["(empty)"]
+    lines += ["", "levels  " + "  ".join(f"{k} {v}" for k, v in o["levels"].items())]
+    lat = o["latency"]
+    lines.append(f"latency recall p50 {lat['recall']['p50_ms']} ms · remember p50 {lat['remember']['p50_ms']} ms")
+    _box(f"Cortext · {o['total_memories']} memories", lines)
+    return 0
+
+
+def cmd_ns(args) -> int:
+    from cortext.server import config
+
+    print(config.namespace_for(args.path or os.getcwd()))
+    return 0
+
+
 def main(argv=None) -> int:
     import argparse
 
@@ -320,6 +480,58 @@ def main(argv=None) -> int:
 
     p_info = sub.add_parser("info", help="show status")
     p_info.set_defaults(func=cmd_info)
+
+    p_serve = sub.add_parser("serve", help="run the memory daemon in the foreground")
+    p_serve.add_argument("--host")
+    p_serve.add_argument("--port", type=int)
+    p_serve.add_argument("--db", help="SQLite file (default ~/.cortext/memory.db)")
+    p_serve.add_argument("--dream-interval", type=int, default=1800, help="seconds between consolidation cycles (0 = off)")
+    p_serve.set_defaults(func=cmd_serve)
+
+    p_d = sub.add_parser("daemon", help="start/stop/status of the background daemon")
+    p_d.add_argument("action", choices=["start", "stop", "restart", "status"])
+    p_d.set_defaults(func=cmd_daemon)
+
+    p_dash = sub.add_parser("dashboard", help="open the control panel in the browser")
+    p_dash.add_argument("--no-open", action="store_true", help="print the URL only")
+    p_dash.set_defaults(func=cmd_dashboard)
+
+    p_hook = sub.add_parser("hook", help="agent hook adapter (reads the agent's JSON on stdin)")
+    p_hook.add_argument("agent", choices=["claude", "claude-code", "vscode", "cursor", "copilot", "generic"])
+    p_hook.add_argument("event")
+    p_hook.set_defaults(func=cmd_hook)
+
+    p_mcp = sub.add_parser("mcp", help="MCP server on stdio (Cursor, Copilot, Windsurf, Claude Desktop, ...)")
+    p_mcp.set_defaults(func=cmd_mcp)
+
+    p_ins = sub.add_parser("install", help="wire Cortext into an agent")
+    p_ins.add_argument("target", choices=["claude", "cursor", "copilot", "vscode", "mcp"])
+    p_ins.add_argument("--project", help="configure this repository (project-scoped files)")
+    p_ins.add_argument("--classic", action="store_true", help="claude: settings.json command hooks instead of the mod")
+    p_ins.add_argument("--dry-run", action="store_true", help="show what would change")
+    p_ins.set_defaults(func=cmd_install)
+
+    p_rc = sub.add_parser("recall", help="recall memories for a query")
+    p_rc.add_argument("query")
+    p_rc.add_argument("--ns", help="namespace (default: this project's)")
+    p_rc.add_argument("--limit", type=int, default=8)
+    p_rc.add_argument("--json", action="store_true")
+    p_rc.set_defaults(func=cmd_recall)
+
+    p_rm = sub.add_parser("remember", help="store a fact")
+    p_rm.add_argument("text")
+    p_rm.add_argument("--who", help="comma-separated participants")
+    p_rm.add_argument("--importance", type=float, default=0.7)
+    p_rm.add_argument("--ns")
+    p_rm.set_defaults(func=cmd_remember)
+
+    p_st = sub.add_parser("stats", help="memory levels, sizes and latency")
+    p_st.add_argument("--ns")
+    p_st.set_defaults(func=cmd_stats)
+
+    p_ns = sub.add_parser("ns", help="print the namespace for a folder")
+    p_ns.add_argument("path", nargs="?")
+    p_ns.set_defaults(func=cmd_ns)
 
     args = parser.parse_args(argv)
     if not getattr(args, "command", None):

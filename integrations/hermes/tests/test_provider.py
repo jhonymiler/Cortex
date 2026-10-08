@@ -107,3 +107,36 @@ def test_no_tool_schema_unless_enabled(provider_cls):
     enabled = provider_cls(config={"expose_inspect_tool": True})
     schemas = enabled.get_tool_schemas()
     assert schemas and schemas[0]["name"] == "cortext_inspect"
+
+
+def test_save_flushes_incrementally_with_sqlite_store(tmp_path, provider_cls):
+    p = provider_cls(config={})
+    bridge = MagicMock()
+    p._bridge = bridge
+    p._store_path = tmp_path / "cortext.db"
+    p._dirty = True
+
+    p._save()
+    bridge.cortex.flush.assert_called_once_with()
+    bridge.cortex.graph.save.assert_not_called()
+    assert p._dirty is False
+
+
+def test_initialize_migrates_legacy_json(tmp_path, provider_cls):
+    from cortext import CortexV5
+
+    legacy = CortexV5(namespace="hermes")
+    legacy.remember(who=["Maria"], what="pediu reembolso", where="suporte")
+    legacy.graph.save(tmp_path / "cortext_hermes.json")
+
+    p = provider_cls(config={"dream_agent": False})
+    p.initialize("s1", hermes_home=str(tmp_path))
+    assert len(p._bridge.cortex.graph) == 1
+    assert (tmp_path / "cortext_hermes.json.migrated").exists()
+    p.shutdown()
+
+    # A fresh provider reads it back from SQLite.
+    p2 = provider_cls(config={"dream_agent": False})
+    p2.initialize("s2", hermes_home=str(tmp_path))
+    assert "Maria" in p2.prefetch("O que Maria pediu?")
+    p2.shutdown()

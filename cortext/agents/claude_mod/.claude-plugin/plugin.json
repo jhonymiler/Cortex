@@ -1,0 +1,30 @@
+{
+  "name": "cortext",
+  "version": "0.4.0",
+  "description": "Cortext long-term memory: recalls relevant memories into every prompt, stores each finished turn, gives the model memory tools and a /memory pane with the memory levels.",
+  "author": {
+    "name": "Jhony Miler"
+  },
+  "homepage": "https://github.com/jhonymiler/Cortex",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "port": {
+      "type": "number",
+      "title": "Daemon port",
+      "description": "Port of the local Cortext daemon (cortext-memory serve).",
+      "default": 7077
+    },
+    "command": {
+      "type": "string",
+      "title": "Cortext command",
+      "description": "Command used to start the daemon when it is not running.",
+      "default": "cortext-memory"
+    },
+    "inject": {
+      "type": "boolean",
+      "title": "Inject recalled memory",
+      "description": "Attach recalled memories to each prompt as context the model reads.",
+      "default": true
+    }
+  }
+}

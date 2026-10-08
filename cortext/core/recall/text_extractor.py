@@ -32,12 +32,28 @@ _WHERE_PATTERNS = [
 ]
 
 
+# Capitalized words that are not names: sentence openers, question words,
+# requests and pronouns (PT/EN/ES).
+_NOT_NAMES = {
+    "the", "que", "com", "para", "por", "uma", "não", "nao", "como", "quando", "onde",
+    "qual", "quais", "quem", "porque", "pode", "poderia", "preciso", "quero", "vamos",
+    "faça", "faca", "crie", "adicione", "corrija", "mostre", "explique", "agora", "também",
+    "tambem", "ele", "ela", "eles", "elas", "você", "voce", "isso", "este", "esta", "esse",
+    "essa", "aqui", "ali", "então", "entao", "mas", "hoje", "ontem", "amanhã",
+    "what", "how", "why", "when", "where", "which", "who", "can", "could", "would",
+    "should", "please", "let", "make", "add", "fix", "show", "explain", "this", "that",
+    "these", "those", "there", "here", "then", "but", "and", "now", "today", "yes",
+    "cómo", "cuándo", "dónde", "cuál", "quién", "puedes", "quiero", "necesito", "esto", "eso",
+    "segunda", "terça", "quarta", "quinta", "sexta", "sábado", "domingo",
+}
+
+
 def extract_who(text: str) -> list[str]:
-    """Extract proper-noun-like names from text."""
+    """Extract proper-noun-like names from text (not sentence-opening function words)."""
     candidates = set()
     for match in _WHO_PATTERN.finditer(text):
         name = match.group(1)
-        if name.lower() not in {"the", "que", "com", "para", "por", "uma", "não"}:
+        if name.lower() not in _NOT_NAMES:
             candidates.add(name)
     return sorted(candidates)
 

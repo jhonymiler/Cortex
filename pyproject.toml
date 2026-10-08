@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cortext-memory"
-version = "0.3.1"
-description = "Cognitive memory for AI agents — W5H-structured, contradiction-aware, internationalized, token-efficient"
+version = "0.4.0"
+description = "Low-latency graph memory for AI agents — indexed W5H graph, SQLite, hooks/MCP for Claude Code, Cursor and Copilot, live dashboard"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Jhony Miler", email = "jonatasmiler@gmail.com" }]
 requires-python = ">=3.10"
-keywords = ["memory", "agents", "llm", "ai", "rag"]
+keywords = ["memory", "agents", "llm", "ai", "rag", "mcp", "claude-code", "cursor", "copilot"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -52,6 +52,13 @@ include = ["cortext*"]
 
 [tool.setuptools.package-data]
 "cortext.hermes_plugin" = ["plugin.yaml"]
+"cortext.server" = ["static/*.html"]
+"cortext.agents" = [
+    "claude_mod/.claude-plugin/*.json",
+    "claude_mod/hooks/*.json",
+    "claude_mod/hooks/*.tsx",
+    "claude_mod/types/*.d.ts",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "integrations/hermes/tests"]
@@ -59,3 +66,18 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-q --tb=short"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 130
+extend-exclude = ["browser-outputs"]
+
+[tool.ruff.lint]
+# Pin the classic rule set: newer ruff releases widen the defaults, which made
+# `ruff check .` in CI depend on whichever ruff version pip happened to install.
+select = ["E4", "E7", "E9", "F", "B"]
+ignore = ["B008", "B905"]
+
+[tool.ruff.lint.per-file-ignores]
+# Lazy exports: the TYPE_CHECKING imports exist for static analyzers only.
+"cortext/__init__.py" = ["F401"]

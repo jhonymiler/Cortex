@@ -84,6 +84,7 @@ class TestDefinitiveAcceptance:
         # Low importance + old → low retrievability
         old_time = datetime.now() - timedelta(days=365)
         old_unimportant, _ = cortex.remember(who=["B"], what="y", importance=0.1, when=old_time)
+        old_unimportant.created_at = old_time  # stored long ago (decay counts from storage)
         r_recent = retrievability(recent_important)
         r_old = retrievability(old_unimportant)
         assert r_recent > r_old

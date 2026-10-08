@@ -66,7 +66,7 @@ class Entity:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Entity":
         return cls(
-            id=data.get("id", str(uuid4())),
+            id=data.get("id") or str(uuid4()),
             type=data.get("type", ""),
             name=data.get("name", ""),
             identifiers=data.get("identifiers", []),

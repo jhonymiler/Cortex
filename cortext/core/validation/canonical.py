@@ -25,10 +25,14 @@ DETECTION CATEGORIES:
 from __future__ import annotations
 
 import re
+from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Optional
+
+from cortext.core.text import tokenize
 
 if TYPE_CHECKING:
     from cortext.core.memory import Memory, Entity
@@ -112,17 +116,18 @@ _NEGATION_SIGNALS = {
     "detests", "abominates", "dislikes", "neither", "none", "impossible",
     "without",
     # Spanish
-    "no", "nunca", "jamás", "rechazó", "rechaza", "negó", "niega", "odia",
-    "detesta", "abomina", "ninguno", "ninguna", "imposible",
+    "jamás", "rechazó", "rechaza", "negó", "niega", "odia",
+    "detesta", "ninguno", "ninguna", "imposible",
     "sin",  # "without" (sin azúcar = no sugar)
 }
 
 
+@lru_cache(maxsize=65536)
 def _has_negation(text: str) -> bool:
     """Check if text contains any negation signal (language-agnostic)."""
     if not text:
         return False
-    words = set(text.lower().split())
+    words = set(re.findall(r"\w+", text.lower()))
     return bool(words & _NEGATION_SIGNALS)
 
 
@@ -133,11 +138,13 @@ def _jaccard(set_a: set[str], set_b: set[str]) -> float:
     return len(set_a & set_b) / len(set_a | set_b)
 
 
-def _tokenize(text: str) -> set[str]:
-    """Simple whitespace tokenizer with lowercase."""
+@lru_cache(maxsize=65536)
+def _tokenize(text: str) -> frozenset[str]:
+    """Word tokenizer (lowercase, length > 1). Memoized: the same existing
+    memories are compared again on every write about the same referent."""
     if not text:
-        return set()
-    return {w for w in re.findall(r"\w+", text.lower()) if len(w) > 1}
+        return frozenset()
+    return frozenset(w for w in re.findall(r"\w+", text.lower()) if len(w) > 1)
 
 
 def _who_overlap(memory_a: "Memory", memory_b: "Memory") -> float:
@@ -176,6 +183,7 @@ class CanonicalValidator:
         self,
         policy: ValidationPolicy = ValidationPolicy.WARN,
         enable_embedding_check: bool = True,
+        history_size: int = 1000,
     ) -> None:
         """
         Args:
@@ -185,7 +193,8 @@ class CanonicalValidator:
         """
         self.policy = policy
         self.enable_embedding_check = enable_embedding_check
-        self._history: list[ValidationResult] = []
+        # Bounded: a long-running process must not grow without limit.
+        self._history: deque[ValidationResult] = deque(maxlen=history_size)
         self._embedding_recall = None
         if enable_embedding_check:
             try:
@@ -216,8 +225,20 @@ class CanonicalValidator:
         best_conflict: Optional["Memory"] = None
         conflict_level = "none"
 
+        # Hoisted out of the loop: the new memory's sets are the same for
+        # every candidate.
+        new_what = _tokenize(new_memory.what)
+        new_who = set(new_memory.who or [])
+        embedding_on = (
+            self.enable_embedding_check
+            and self._embedding_recall is not None
+            and self._embedding_recall.is_available()
+        )
+
         for existing in overlapping:
-            sim = _what_overlap(new_memory, existing)
+            old_what = _tokenize(existing.what)
+            union = len(new_what | old_what) if new_what and old_what else 0
+            sim = len(new_what & old_what) / union if union else 0.0
 
             # 4a. Redundancy (token-based)
             if sim >= self.REDUNDANCY_THRESHOLD:
@@ -225,7 +246,9 @@ class CanonicalValidator:
                     best_similar = (sim, existing)
 
             # 4b. Contradiction (heuristic: negation + polarity)
-            who_overlap = _who_overlap(new_memory, existing)
+            old_who = set(existing.who or [])
+            who_union = len(new_who | old_who) if new_who and old_who else 0
+            who_overlap = len(new_who & old_who) / who_union if who_union else 0.0
             if (
                 who_overlap >= self.CONTRADICTION_WHO_OVERLAP
                 and sim >= self.CONTRADICTION_WHAT_OVERLAP
@@ -236,11 +259,7 @@ class CanonicalValidator:
                     break
 
                 # 4c. Contradiction (embedding: semantic opposition)
-                if (
-                    self.enable_embedding_check
-                    and self._embedding_recall
-                    and self._embedding_recall.is_available()
-                ):
+                if embedding_on:
                     emb_sim = self._embedding_similarity(new_memory, existing)
                     # High token overlap + low embedding similarity = contradiction
                     if sim >= self.CONTRADICTION_WHAT_OVERLAP and emb_sim < 0.4:
@@ -360,6 +379,8 @@ class CanonicalValidator:
         self, name: str, graph: "MemoryGraph"
     ) -> list["Entity"]:
         """Find entities whose name matches (case-insensitive)."""
+        if hasattr(graph, "find_entities_by_name"):
+            return graph.find_entities_by_name(name)
         if not hasattr(graph, "_entities"):
             return []
         name_lower = name.lower()
@@ -372,14 +393,37 @@ class CanonicalValidator:
     def _find_overlapping(
         self, memory: "Memory", graph: "MemoryGraph"
     ) -> list["Memory"]:
-        """Find existing memories sharing who + where."""
+        """Find existing memories sharing who + where.
+
+        Redundancy and contradiction both need what-overlap, so a candidate
+        must share a content token with the new memory: the inverted index
+        yields exactly those instead of scanning the graph.
+        """
         if not hasattr(graph, "_memories"):
             return []
         new_who = set(getattr(memory, "who", None) or [])
         new_where = getattr(memory, "where", None) or "default"
 
+        if hasattr(graph, "ids_for_tokens") and memory.index_tokens():
+            what_tokens = tokenize(memory.what)
+            if new_who and hasattr(graph, "ids_for_exact_who"):
+                # who must intersect, unless the existing memory has no who.
+                # Start from the smaller side of the intersection.
+                by_who = graph.ids_for_exact_who(new_who) | graph.ids_without_who()
+                if len(by_who) <= graph.postings_size(what_tokens):
+                    ids = graph.filter_by_tokens(by_who, what_tokens)
+                else:
+                    ids = graph.ids_for_tokens(what_tokens) & by_who
+            else:
+                ids = graph.ids_for_tokens(what_tokens)
+            pool = (graph.get_memory(i) for i in ids)
+        else:
+            pool = graph._memories.values()
+
         overlapping: list["Memory"] = []
-        for existing in graph._memories.values():
+        for existing in pool:
+            if existing is None or existing.consolidated_into:
+                continue
             existing_where = getattr(existing, "where", None) or "default"
             if existing_where != new_where:
                 continue
@@ -416,7 +460,7 @@ class CanonicalValidator:
             return 1.0
 
     def get_history(self) -> list[ValidationResult]:
-        return self._history.copy()
+        return list(self._history)
 
     def get_blocked(self) -> list[ValidationResult]:
         return [r for r in self._history if r.status == ValidationStatus.BLOCKED]

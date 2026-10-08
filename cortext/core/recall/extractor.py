@@ -115,7 +115,7 @@ def detect_lang(text: str) -> str:
     # Common words per language
     pt_signals = {"não", "que", "para", "com", "uma", "como", "foi", "são", "quem", "onde", "quando", "por"}
     en_signals = {"the", "what", "where", "when", "who", "why", "how", "is", "did", "are", "with", "for", "does"}
-    es_signals = {"qué", "quién", "dónde", "cuándo", "cómo", "es", "fue", "con", "para", "pide", "pides", "hace", "vive", "sabe", "vive"}
+    es_signals = {"qué", "quién", "dónde", "cuándo", "cómo", "es", "fue", "con", "para", "pide", "pides", "hace", "vive", "sabe"}
 
     pt_count = len(words & pt_signals)
     en_count = len(words & en_signals)

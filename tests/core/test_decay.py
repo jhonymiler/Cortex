@@ -29,10 +29,16 @@ class TestEbbinghausDecay:
 
     def test_retrievability_old(self):
         old_time = datetime.now() - timedelta(days=30)
-        m = Memory(what="x", when=old_time)
+        m = Memory(what="x", when=old_time, created_at=old_time)
         r = retrievability(m)
         # 30 days, base 7 days stability → R = e^(-30/7) ≈ 0.013
         assert r < 0.05  # mostly forgotten
+
+    def test_past_event_is_not_born_forgotten(self):
+        """Regression: `when` is the event's time; a memory written today about
+        a 1990 event is fresh, not forgotten on arrival."""
+        m = Memory(what="nasceu em Recife", when=datetime(1990, 5, 1))
+        assert retrievability(m) > 0.95
 
     def test_retrievability_decay_curve(self):
         """R should decay exponentially."""
@@ -160,7 +166,8 @@ class TestDreamAgent:
     def test_cleanup_forgotten(self):
         g = MemoryGraph()
         # Old memory with low retrievability
-        old = Memory(what="x", when=datetime.now() - timedelta(days=365))
+        old_t = datetime.now() - timedelta(days=365)
+        old = Memory(what="x", when=old_t, created_at=old_t)
         old.importance = 0.1  # very low
         g._memories[old.id] = old
 
