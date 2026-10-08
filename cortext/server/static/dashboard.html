@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cortext Memory</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='10' cy='12' r='5' fill='%23d95926'/%3E%3Ccircle cx='21' cy='10' r='4' fill='%233987e5'/%3E%3Ccircle cx='18' cy='22' r='6' fill='%23199e70'/%3E%3C/svg%3E">
+<style>
+:root {
+  color-scheme: dark;
+  --page: #0c0d10;
+  --surface: #14151a;
+  --surface-2: #1b1d23;
+  --surface-3: #23262e;
+  --ink: #f3f2ee;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+  --hair: rgba(255,255,255,.08);
+  --hair-2: rgba(255,255,255,.14);
+  --grid: #2c2c2a;
+  --t-working: #d95926;
+  --t-episodic: #3987e5;
+  --t-semantic: #199e70;
+  --t-fading: #898781;
+  --t-archived: #4f4e4a;
+  --good: #0ca30c;
+  --critical: #d03b3b;
+  --accent: #3987e5;
+  --glow: rgba(57,135,229,.18);
+  --shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 12px 32px rgba(0,0,0,.35);
+  --radius: 14px;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --page: #f4f4f1;
+  --surface: #fcfcfb;
+  --surface-2: #f3f3f0;
+  --surface-3: #e9e8e3;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #6f6d68;
+  --hair: rgba(11,11,11,.09);
+  --hair-2: rgba(11,11,11,.16);
+  --grid: #e1e0d9;
+  --t-working: #eb6834;
+  --t-episodic: #2a78d6;
+  --t-semantic: #1baf7a;
+  --t-fading: #a3a19a;
+  --t-archived: #c9c7c0;
+  --accent: #2a78d6;
+  --glow: rgba(42,120,214,.14);
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: radial-gradient(1200px 600px at 10% -10%, var(--glow), transparent 60%), var(--page);
+  color: var(--ink);
+  font: 14px/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+button, input, select { font: inherit; color: inherit; }
+.wrap { max-width: 1480px; margin: 0 auto; padding: 18px 20px 48px; }
+
+/* top bar */
+.top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 650; font-size: 17px; letter-spacing: -.01em; }
+.brand svg { width: 28px; height: 28px; }
+.brand small { font-weight: 500; color: var(--muted); font-size: 12px; }
+.spacer { flex: 1; }
+.pill { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); color: var(--ink-2); font-size: 13px; }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.live-dot.on { background: var(--good); box-shadow: 0 0 0 0 rgba(12,163,12,.6); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(12,163,12,.55); } 70% { box-shadow: 0 0 0 8px rgba(12,163,12,0); } 100% { box-shadow: 0 0 0 0 rgba(12,163,12,0); } }
+select.ns { appearance: none; height: 34px; padding: 0 34px 0 12px; border-radius: 999px; border: 1px solid var(--hair-2); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%23898781' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center; font-weight: 550; cursor: pointer; max-width: 320px; }
+.btn { height: 34px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--hair-2); background: var(--surface); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 550; transition: background .15s, border-color .15s, transform .1s; }
+.btn:hover { background: var(--surface-2); border-color: var(--muted); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--accent); border-color: transparent; color: #fff; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--critical); }
+.btn:disabled { opacity: .5; cursor: progress; }
+.iconbtn { width: 34px; padding: 0; justify-content: center; }
+
+/* cards */
+.card { background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius); box-shadow: var(--shadow); }
+.card h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: .02em; text-transform: uppercase; }
+.card-h { display: flex; align-items: center; gap: 10px; padding: 14px 16px 0; }
+.card-h .hint { color: var(--muted); font-size: 12px; text-transform: none; letter-spacing: 0; font-weight: 400; }
+
+/* KPI tiles */
+.kpis { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
+.kpi { padding: 14px 16px 12px; position: relative; overflow: hidden; min-height: 112px; }
+.kpi .label { color: var(--muted); font-size: 12px; font-weight: 550; letter-spacing: .02em; text-transform: uppercase; }
+.kpi .value { font-size: 30px; font-weight: 650; letter-spacing: -.02em; margin-top: 4px; }
+.kpi.hero .value { font-size: 44px; line-height: 1.05; }
+.kpi .value small { font-size: 14px; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
+.kpi .sub { color: var(--ink-2); font-size: 12px; margin-top: 2px; }
+.kpi canvas { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 38px; }
+.stackbar { display: flex; gap: 2px; height: 10px; border-radius: 6px; overflow: hidden; margin-top: 12px; background: var(--surface-3); }
+.stackbar span { display: block; height: 100%; transition: flex-grow .6s cubic-bezier(.2,.8,.2,1); min-width: 0; }
+
+/* main grid */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 12px; }
+.clouds-card { position: relative; min-height: 560px; display: flex; flex-direction: column; }
+.clouds-card .card-h { padding-bottom: 8px; }
+#clouds { flex: 1; width: 100%; min-height: 500px; display: block; cursor: grab; border-radius: 0 0 var(--radius) var(--radius); }
+#clouds.dragging { cursor: grabbing; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--hair-2); background: transparent; font-size: 12px; cursor: pointer; color: var(--ink-2); user-select: none; transition: opacity .15s, background .15s; }
+.chip .sw { width: 9px; height: 9px; border-radius: 50%; }
+.chip b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.chip.off { opacity: .38; }
+.chip:hover { background: var(--surface-2); }
+.zoombar { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
+
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.levels { padding: 0 16px 14px; }
+.level { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 9px 0; border-bottom: 1px solid var(--hair); cursor: pointer; }
+.level:last-child { border-bottom: 0; }
+.level .name { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.level .name .sw { width: 10px; height: 10px; border-radius: 3px; }
+.level .count { font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+.level .desc { color: var(--muted); font-size: 12px; grid-column: 1 / -1; }
+.level .bar { grid-column: 1 / -1; height: 4px; background: var(--surface-3); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.level .bar i { display: block; height: 100%; border-radius: 3px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+
+.recall { padding: 12px 16px 14px; }
+.searchbox { display: flex; gap: 8px; }
+.searchbox input { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--hair-2); background: var(--surface-2); outline: none; }
+.searchbox input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+.results { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow: auto; }
+.res { padding: 8px 10px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--hair); cursor: pointer; font-size: 13px; }
+.res:hover { border-color: var(--hair-2); }
+.res .meta { color: var(--muted); font-size: 11px; display: flex; gap: 8px; margin-bottom: 2px; align-items: center; }
+.tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--ink-2); }
+.tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--muted)); }
+.empty { color: var(--muted); font-size: 13px; padding: 8px 2px; }
+
+.feed { padding: 6px 8px 10px; max-height: 300px; overflow: auto; }
+.ev { display: grid; grid-template-columns: 62px 74px 1fr auto; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 8px; font-size: 12px; }
+.ev:nth-child(odd) { background: var(--surface-2); }
+.ev .t { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+.ev .op { font-weight: 650; }
+.ev .d { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev .ms { font-family: var(--mono); color: var(--muted); font-size: 11px; }
+.ev.new { animation: flash 1.2s ease-out; }
+@keyframes flash { from { background: var(--glow); } }
+
+/* table */
+.tablecard { margin-top: 12px; }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--hair); align-items: center; }
+.tabs { display: flex; gap: 4px; background: var(--surface-2); padding: 3px; border-radius: 999px; flex-wrap: wrap; }
+.tab { border: 0; background: transparent; height: 28px; padding: 0 12px; border-radius: 999px; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.tab.on { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.tools input, .tools select { height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--hair-2); background: var(--surface-2); }
+.tools input { flex: 1; min-width: 160px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 9px 16px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+th { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--surface-2); }
+td .what { font-weight: 550; }
+td .how { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.rbar { display: inline-block; width: 46px; height: 5px; border-radius: 3px; background: var(--surface-3); vertical-align: middle; margin-left: 6px; overflow: hidden; }
+.rbar i { display: block; height: 100%; background: var(--ink-2); }
+.pager { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; color: var(--muted); font-size: 12px; }
+
+/* tooltip & drawer */
+.tip { position: fixed; pointer-events: none; z-index: 30; max-width: 340px; padding: 10px 12px; border-radius: 10px; background: var(--surface-3); border: 1px solid var(--hair-2); box-shadow: 0 10px 30px rgba(0,0,0,.35); font-size: 12.5px; opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; }
+.tip.on { opacity: 1; transform: none; }
+.tip .tw { font-weight: 600; font-size: 13px; margin: 4px 0; }
+.tip .kv { color: var(--ink-2); display: flex; gap: 10px; flex-wrap: wrap; font-size: 11.5px; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); background: var(--surface); border-left: 1px solid var(--hair-2); z-index: 40; transform: translateX(100%); transition: transform .25s cubic-bezier(.2,.8,.2,1); display: flex; flex-direction: column; box-shadow: -20px 0 40px rgba(0,0,0,.3); }
+.drawer.on { transform: none; }
+.drawer header { padding: 16px; border-bottom: 1px solid var(--hair); display: flex; gap: 10px; align-items: flex-start; }
+.drawer header h3 { margin: 6px 0 0; font-size: 16px; line-height: 1.35; }
+.drawer .body { padding: 14px 16px; overflow: auto; flex: 1; }
+.w5h { display: grid; grid-template-columns: 70px 1fr; gap: 8px 12px; font-size: 13px; }
+.w5h dt { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; padding-top: 2px; }
+.w5h dd { margin: 0; word-break: break-word; }
+.drawer h4 { margin: 18px 0 8px; font-size: 12px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .03em; }
+.drawer footer { padding: 12px 16px; border-top: 1px solid var(--hair); display: flex; gap: 8px; justify-content: flex-end; }
+.scrim { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 35; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); background: var(--surface-3); border: 1px solid var(--hair-2); padding: 10px 16px; border-radius: 999px; opacity: 0; transition: all .2s; z-index: 50; font-size: 13px; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+.offline { display: none; margin-bottom: 12px; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--critical); color: var(--ink); background: color-mix(in srgb, var(--critical) 12%, transparent); }
+.offline.on { display: block; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+@media (max-width: 1180px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .kpi.hero { grid-column: 1 / -1; }
+  .main { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 12px 16px 40px; }
+  .kpis { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi .value { font-size: 24px; }
+  .kpi.hero .value { font-size: 34px; }
+  #clouds { min-height: 620px; }
+  .clouds-card { min-height: 680px; }
+  .card-h { flex-wrap: wrap; }
+  .legend { margin-left: 0; }
+  th:nth-child(3), td:nth-child(3), th:nth-child(5), td:nth-child(5) { display: none; }
+  th, td { padding: 8px 10px; }
+  .ev { grid-template-columns: 54px 64px 1fr; }
+  .ev .ms { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="10" cy="12" r="5" fill="var(--t-working)"/><circle cx="21" cy="10" r="4" fill="var(--t-episodic)"/><circle cx="18" cy="22" r="6" fill="var(--t-semantic)"/><path d="M10 12L21 10M21 10L18 22M10 12L18 22" stroke="var(--muted)" stroke-width="1" opacity=".6"/></svg>
+      <div>Cortext <small id="version"></small></div>
+    </div>
+    <label class="visually-hidden" for="ns">Namespace</label>
+    <select id="ns" class="ns" title="Namespace (um por projeto)"></select>
+    <span class="pill" title="Atualizações ao vivo"><span id="live" class="live-dot"></span><span id="liveText">conectando…</span></span>
+    <span class="spacer"></span>
+    <span class="pill" id="uptime" title="Tempo de atividade do daemon">—</span>
+    <button class="btn" id="dreamBtn" title="Roda um ciclo do DreamAgent: replay, consolida duplicatas, poda esquecidas">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 9.5A5.5 5.5 0 1 1 6.5 3 4.5 4.5 0 0 0 13 9.5z"/></svg>Consolidar
+    </button>
+    <button class="btn iconbtn" id="themeBtn" title="Alternar tema" aria-label="Alternar tema">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="3.2"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9L13 13M3 13l1.1-1.1M11.9 4.1L13 3"/></svg>
+    </button>
+  </header>
+
+  <div class="offline" id="offline">O daemon não está respondendo. Inicie com <code>cortext-memory daemon start</code>; esta página reconecta sozinha.</div>
+
+  <section class="kpis">
+    <div class="card kpi hero">
+      <div class="label">Memórias</div>
+      <div class="value" id="kTotal">—</div>
+      <div class="sub" id="kTotalSub">&nbsp;</div>
+      <div class="stackbar" id="kStack" role="img" aria-label="Distribuição por nível"></div>
+    </div>
+    <div class="card kpi">
+      <div class="label">Recall · p50</div>
+      <div class="value" id="kRecall">—</div>
+      <div class="sub" id="kRecallSub">&nbsp;</div>
+      <canvas id="sparkRecall" aria-label="Latência de recall recente"></canvas>
+    </div>
+    <div class="card kpi">
+      <div class="label">Escrita · p50</div>
+      <div class="value" id="kWrite">—</div>
+      <div class="sub" id="kWriteSub">&nbsp;</div>
+      <canvas id="sparkWrite" aria-label="Latência de escrita recente"></canvas>
+    </div>
+    <div class="card kpi">
+      <div class="label">Grafo</div>
+      <div class="value" id="kVocab">—</div>
+      <div class="sub" id="kVocabSub">&nbsp;</div>
+    </div>
+    <div class="card kpi">
+      <div class="label">Validação</div>
+      <div class="value" id="kWarn">—</div>
+      <div class="sub" id="kWarnSub">&nbsp;</div>
+    </div>
+  </section>
+
+  <section class="main">
+    <div class="card clouds-card">
+      <div class="card-h">
+        <div><h2>Nuvens de memória</h2><div class="hint" id="cloudHint">cada nuvem é um nível · tamanho = importância · opacidade = retenção · anel = reforçada</div></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <canvas id="clouds" aria-label="Grafo de memórias agrupado por nível"></canvas>
+      <div class="zoombar">
+        <button class="btn iconbtn" id="zoomOut" aria-label="Diminuir zoom">−</button>
+        <button class="btn iconbtn" id="zoomReset" aria-label="Recentrar">⤾</button>
+        <button class="btn iconbtn" id="zoomIn" aria-label="Aumentar zoom">+</button>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="card">
+        <div class="card-h"><h2>Níveis</h2><span class="hint">ciclo de vida de uma memória</span></div>
+        <div class="levels" id="levels"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Recall</h2><span class="hint">teste a recuperação ao vivo</span></div>
+        <div class="recall">
+          <form class="searchbox" id="recallForm">
+            <input id="recallInput" placeholder="ex.: como fazemos o deploy?" autocomplete="off" aria-label="Consulta de recall">
+            <button class="btn primary" type="submit">Buscar</button>
+          </form>
+          <div class="results" id="results"><div class="empty">Os resultados acendem as memórias nas nuvens.</div></div>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="main" style="margin-top:12px">
+    <div class="card tablecard" style="margin-top:0">
+      <div class="tools">
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <input id="filterQ" placeholder="Filtrar por texto…" aria-label="Filtrar memórias">
+        <select id="sortSel" aria-label="Ordenar">
+          <option value="recent">Mais recentes</option>
+          <option value="importance">Mais importantes</option>
+          <option value="access">Mais acessadas</option>
+        </select>
+      </div>
+      <table>
+        <thead><tr><th>Memória</th><th>Nível</th><th>Quem</th><th class="num">Import.</th><th class="num">Acessos</th><th class="num">Retenção</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="pager"><span id="pageInfo"></span><span><button class="btn" id="prev">Anterior</button> <button class="btn" id="next">Próxima</button></span></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Atividade</h2><span class="hint">ao vivo, todos os agentes</span></div>
+      <div class="feed" id="feed"><div class="empty">Aguardando eventos…</div></div>
+    </div>
+  </section>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Detalhe da memória">
+  <header>
+    <div style="flex:1;min-width:0">
+      <span class="tag" id="dTier"></span>
+      <h3 id="dWhat"></h3>
+    </div>
+    <button class="btn iconbtn" id="dClose" aria-label="Fechar">✕</button>
+  </header>
+  <div class="body">
+    <dl class="w5h" id="dW5h"></dl>
+    <h4>Vizinhas no grafo</h4>
+    <div id="dNeighbors" class="results" style="max-height:none"></div>
+  </div>
+  <footer>
+    <button class="btn danger" id="dForget">Esquecer</button>
+  </footer>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const TIERS = ["working", "episodic", "semantic", "fading", "archived"];
+const TIER_PT = { working: "Trabalho", episodic: "Episódica", semantic: "Semântica", fading: "Esmaecendo", archived: "Arquivada" };
+const TIER_DESC = {
+  working: "Acabou de entrar — ainda “em mente” (menos de 1 h).",
+  episodic: "Curto prazo: um evento, recuperável, ainda não reforçado.",
+  semantic: "Longo prazo: reforçada pelo uso, importante ou um resumo.",
+  fading: "Retenção caindo — candidata ao esquecimento.",
+  archived: "Consolidada em outra memória; mantida para auditoria.",
+};
+const OPS_PT = { remember: "gravou", recall: "lembrou", turn: "turno", dream: "consolidou", forget: "esqueceu", load: "carregou", digest: "resumo" };
+
+const $ = (id) => document.getElementById(id);
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const tierColor = (t) => css("--t-" + t) || css("--muted");
+const fmt = (n) => Number(n || 0).toLocaleString("pt-BR");
+const fmtMs = (v) => (v == null ? "—" : v < 1 ? v.toFixed(2) : v < 10 ? v.toFixed(1) : Math.round(v).toString());
+
+const state = {
+  ns: null, overview: null, stats: null, graph: null,
+  hidden: new Set(), tab: "all", offset: 0, limit: 25,
+  lat: { recall: [], remember: [] }, highlight: new Set(), seq: 0,
+};
+
+async function api(path, opts = {}) {
+  const init = { headers: {} };
+  if (opts.body !== undefined) { init.method = opts.method || "POST"; init.headers["Content-Type"] = "application/json"; init.body = JSON.stringify(opts.body); }
+  else if (opts.method) { init.method = opts.method; init.headers["Content-Type"] = "application/json"; }
+  const r = await fetch(path, init);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || r.status);
+  return data;
+}
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("on"), 2600); }
+const nsq = () => "ns=" + encodeURIComponent(state.ns);
+
+/* ---------- theme ---------- */
+(function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem("cortext-theme"); } catch (_) {}
+  const theme = saved || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+  document.documentElement.dataset.theme = theme;
+  $("themeBtn").onclick = () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("cortext-theme", next); } catch (_) {}
+    renderAll();
+  };
+})();
+
+/* ---------- data loading ---------- */
+async function loadOverview() {
+  const o = await api("/api/overview");
+  state.overview = o;
+  $("offline").classList.remove("on");
+  const sel = $("ns");
+  const names = o.namespaces.map((n) => n.name);
+  if (!state.ns) {
+    let saved = null;
+    try { saved = localStorage.getItem("cortext-ns"); } catch (_) {}
+    state.ns = names.includes(saved) ? saved : (names.slice().sort((a, b) => (o.namespaces.find((n) => n.name === b).memories - o.namespaces.find((n) => n.name === a).memories))[0] || "default");
+  }
+  const opts = names.length ? o.namespaces : [{ name: state.ns, memories: 0 }];
+  sel.innerHTML = opts.map((n) => `<option value="${esc(n.name)}" ${n.name === state.ns ? "selected" : ""}>${esc(n.name)} · ${fmt(n.memories)}</option>`).join("");
+  const up = o.uptime_s;
+  $("uptime").textContent = "ativo há " + (up < 90 ? Math.round(up) + "s" : up < 5400 ? Math.round(up / 60) + " min" : (up / 3600).toFixed(1) + " h");
+}
+async function loadNs() {
+  const [stats, graph] = await Promise.all([api("/api/stats?" + nsq()), api("/api/graph?limit=600&" + nsq())]);
+  state.stats = stats;
+  state.graph = graph;
+  clouds.setData(graph);
+  renderAll();
+  loadTable();
+}
+async function refresh() {
+  try { await loadOverview(); await loadNs(); }
+  catch (e) { $("offline").classList.add("on"); setLive(false); }
+}
+
+/* ---------- KPIs ---------- */
+function renderKpis() {
+  const s = state.stats; if (!s) return;
+  const lv = s.levels, total = s.graph.total_memories;
+  $("kTotal").textContent = fmt(total);
+  const active = total - (lv.archived || 0);
+  $("kTotalSub").textContent = `${fmt(active)} ativas · ${fmt(lv.semantic)} de longo prazo`;
+  $("kStack").innerHTML = TIERS.map((t) => `<span title="${TIER_PT[t]}: ${fmt(lv[t])}" style="flex-grow:${lv[t] || 0};background:${tierColor(t)}"></span>`).join("");
+  const L = s.latency;
+  const ms = (v, n) => (n ? `${fmtMs(v)}<small>ms</small>` : "—");
+  $("kRecall").innerHTML = ms(L.recall.p50_ms, L.recall.count);
+  $("kRecallSub").textContent = `p95 ${fmtMs(L.recall.p95_ms)} ms · ${fmt(s.writes.recalls_total)} recalls`;
+  $("kWrite").innerHTML = ms(L.remember.p50_ms, L.remember.count);
+  $("kWriteSub").textContent = `p95 ${fmtMs(L.remember.p95_ms)} ms · ${fmt(s.writes.writes_total)} escritas`;
+  $("kVocab").innerHTML = `${fmt(s.graph.participants)}<small>entidades</small>`;
+  $("kVocabSub").textContent = `${fmt(s.graph.vocabulary)} termos indexados`;
+  const w = s.writes;
+  $("kWarn").innerHTML = `${fmt(w.writes_warned)}<small>alertas</small>`;
+  $("kWarnSub").textContent = `${fmt(w.writes_blocked)} bloqueadas · política ${s.validator_policy}`;
+  drawSpark($("sparkRecall"), state.lat.recall, tierColor("episodic"), "recall");
+  drawSpark($("sparkWrite"), state.lat.remember, tierColor("working"), "escrita");
+}
+
+function drawSpark(cv, values, color, label) {
+  const dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = w * dpr; cv.height = h * dpr;
+  const g = cv.getContext("2d"); g.scale(dpr, dpr); g.clearRect(0, 0, w, h);
+  if (values.length < 2) return;
+  const vals = values.slice(-60), max = Math.max(...vals) * 1.15 || 1;
+  const x = (i) => (i / (vals.length - 1)) * w, y = (v) => h - 4 - (v / max) * (h - 10);
+  const grad = g.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, color + "55"); grad.addColorStop(1, color + "00");
+  g.beginPath(); vals.forEach((v, i) => (i ? g.lineTo(x(i), y(v)) : g.moveTo(x(i), y(v))));
+  g.lineTo(w, h); g.lineTo(0, h); g.closePath(); g.fillStyle = grad; g.fill();
+  g.beginPath(); vals.forEach((v, i) => (i ? g.lineTo(x(i), y(v)) : g.moveTo(x(i), y(v))));
+  g.strokeStyle = color; g.lineWidth = 2; g.lineJoin = "round"; g.stroke();
+  cv.onmousemove = (ev) => {
+    const r = cv.getBoundingClientRect(), i = Math.round(((ev.clientX - r.left) / r.width) * (vals.length - 1));
+    showTip(ev.clientX, ev.clientY, `<b>${label}</b> · ${fmtMs(vals[Math.max(0, Math.min(vals.length - 1, i))])} ms<div class="kv">últimas ${vals.length} operações</div>`);
+  };
+  cv.onmouseleave = hideTip;
+}
+
+/* ---------- levels panel & legend ---------- */
+function renderLevels() {
+  const s = state.stats; if (!s) return;
+  const lv = s.levels, total = Math.max(1, s.graph.total_memories);
+  $("levels").innerHTML = TIERS.map((t) => `
+    <div class="level" data-tier="${t}" style="opacity:${state.hidden.has(t) ? .45 : 1}" title="Clique para mostrar/ocultar nas nuvens">
+      <div class="name"><span class="sw" style="background:${tierColor(t)}"></span>${TIER_PT[t]}</div>
+      <div class="count">${fmt(lv[t])} <span style="color:var(--muted);font-weight:500;font-size:12px">${Math.round((lv[t] / total) * 100)}%</span></div>
+      <div class="bar"><i style="width:${(lv[t] / total) * 100}%;background:${tierColor(t)}"></i></div>
+      <div class="desc">${TIER_DESC[t]}</div>
+    </div>`).join("");
+  $("legend").innerHTML = TIERS.map((t) => `<button class="chip ${state.hidden.has(t) ? "off" : ""}" data-tier="${t}" aria-pressed="${!state.hidden.has(t)}"><span class="sw" style="background:${tierColor(t)}"></span>${TIER_PT[t]} <b>${fmt(lv[t])}</b></button>`).join("");
+  for (const el of document.querySelectorAll("[data-tier]")) el.onclick = () => toggleTier(el.dataset.tier);
+  $("tabs").innerHTML = [["all", "Todas"], ...TIERS.map((t) => [t, TIER_PT[t]])].map(([k, v]) => `<button class="tab ${state.tab === k ? "on" : ""}" data-tab="${k}" role="tab">${v}</button>`).join("");
+  for (const el of document.querySelectorAll("[data-tab]")) el.onclick = () => { state.tab = el.dataset.tab; state.offset = 0; renderLevels(); loadTable(); };
+}
+function toggleTier(t) { state.hidden.has(t) ? state.hidden.delete(t) : state.hidden.add(t); renderLevels(); clouds.wake(); }
+
+/* ---------- memory clouds (force layout on canvas) ---------- */
+const clouds = (() => {
+  const cv = $("clouds"), g = cv.getContext("2d");
+  let W = 0, H = 0, dpr = 1, nodes = [], links = [], byId = new Map(), alpha = 0, raf = 0;
+  let view = { x: 0, y: 0, k: 1 }, hover = null, drag = null, pulse = 0;
+  const centers = {};
+
+  function layoutCenters() {
+    // Lifecycle reads left to right: new → short term → long term → fading → archived.
+    if (W < 640) {
+      // narrow screens: the lifecycle zigzags down instead of across
+      TIERS.forEach((t, i) => { centers[t] = { x: W * (i % 2 ? 0.68 : 0.32), y: H * (0.1 + i * 0.15) }; });
+      return;
+    }
+    const pad = 70, usable = Math.max(200, W - pad * 2);
+    TIERS.forEach((t, i) => {
+      const frac = i / (TIERS.length - 1);
+      centers[t] = { x: pad + usable * frac, y: H * 0.40 + Math.sin(frac * Math.PI) * -H * 0.08 };
+    });
+  }
+  function resize() {
+    dpr = devicePixelRatio || 1; W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr; layoutCenters(); wake();
+  }
+  function setData(graph) {
+    const prev = byId;
+    byId = new Map(); nodes = []; links = [];
+    for (const n of graph.nodes) {
+      const old = prev.get(n.id);
+      const tier = n.kind === "entity" ? null : n.tier;
+      const c = tier ? centers[tier] : { x: W / 2, y: H / 2 };
+      const node = Object.assign({}, n, {
+        x: old ? old.x : (c?.x ?? W / 2) + (Math.random() - 0.5) * 80,
+        y: old ? old.y : (c?.y ?? H / 2) + (Math.random() - 0.5) * 80,
+        vx: 0, vy: 0, born: old ? old.born : performance.now(),
+        rad: n.kind === "entity" ? 3.5 + Math.min(6, Math.sqrt(n.degree)) : 3 + n.importance * 7,
+      });
+      nodes.push(node); byId.set(n.id, node);
+    }
+    for (const l of graph.links) { const s = byId.get(l.source), t = byId.get(l.target); if (s && t) links.push({ s, t, kind: l.kind }); }
+    // entities start at the mean of their memories
+    for (const l of links) if (l.t.kind === "entity" && !prev.get(l.t.id)) { l.t.x = l.s.x + (Math.random() - .5) * 20; l.t.y = l.s.y + (Math.random() - .5) * 20; }
+    wake();
+  }
+  function visible(n) {
+    if (n.kind === "entity") return links.some((l) => l.t === n && !state.hidden.has(l.s.tier));
+    return !state.hidden.has(n.tier);
+  }
+  function wake() { alpha = Math.max(alpha, 0.9); if (!raf) raf = requestAnimationFrame(tick); }
+
+  function step() {
+    const k = alpha;
+    // attraction to tier center (memories) — the "cloud"
+    for (const n of nodes) {
+      if (n.kind === "memory") { const c = centers[n.tier]; if (c) { n.vx += (c.x - n.x) * 0.03 * k; n.vy += (c.y - n.y) * 0.03 * k; } }
+      // participants live on a lane under the clouds, above the memories they share
+      else n.vy += (H * (W < 640 ? 0.86 : 0.84) - n.y) * 0.05 * k;
+    }
+    // springs: memory ↔ participant, archived → canonical
+    for (const l of links) {
+      const dx = l.t.x - l.s.x, dy = l.t.y - l.s.y, d = Math.hypot(dx, dy) || 1;
+      const rest = l.kind === "merged" ? 14 : 60, f = (d - rest) * (l.kind === "merged" ? 0.0015 : 0.006) * k;
+      const fx = (dx / d) * f, fy = (dy / d) * f;
+      // participants float between the clouds they appear in; memories barely move toward them
+      if (l.t.kind === "entity") { l.t.vx -= fx * 1.6; l.s.vx += fx * 0.04; l.s.vy += fy * 0.04; }
+      else { l.s.vx += fx; l.s.vy += fy; }
+    }
+    // collision / repulsion on a spatial hash
+    const cell = 52, grid = new Map();
+    for (const n of nodes) { const key = ((n.x / cell) | 0) + "," + ((n.y / cell) | 0); (grid.get(key) || grid.set(key, []).get(key)).push(n); }
+    for (const n of nodes) {
+      const cx = (n.x / cell) | 0, cy = (n.y / cell) | 0;
+      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) {
+        const arr = grid.get((cx + i) + "," + (cy + j)); if (!arr) continue;
+        for (const m of arr) {
+          if (m === n) continue;
+          const dx = n.x - m.x, dy = n.y - m.y, d = Math.hypot(dx, dy) || 0.01;
+          const min = n.kind === "entity" && m.kind === "entity" ? 50 : n.rad + m.rad + 3;
+          if (d < min) { const f = ((min - d) / d) * 0.28; n.vx += dx * f; n.vy += dy * f; }
+        }
+      }
+    }
+    for (const n of nodes) {
+      if (n === drag) continue;
+      n.vx *= 0.82; n.vy *= 0.82; n.x += n.vx; n.y += n.vy;
+    }
+    alpha *= 0.985;
+  }
+
+  // text with a surface-colored halo so it stays legible over nodes and links
+  let placed = [];
+  function label(text, x, y, align) {
+    const w = g.measureText(text).width, x0 = align === "center" ? x - w / 2 : x;
+    const box = { x0: x0 - 2, x1: x0 + w + 2, y0: y - 11, y1: y + 3 };
+    if (placed.some((b) => b.x0 < box.x1 && box.x0 < b.x1 && b.y0 < box.y1 && box.y0 < b.y1)) return;
+    placed.push(box);
+    g.textAlign = align; g.lineJoin = "round"; g.lineWidth = 4; g.strokeStyle = css("--surface");
+    g.strokeText(text, x, y); g.fillStyle = css("--ink-2"); g.fillText(text, x, y);
+  }
+
+  function draw(now) {
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    g.save(); g.translate(view.x, view.y); g.scale(view.k, view.k);
+    placed = [];
+    const dark = document.documentElement.dataset.theme !== "light";
+    // cloud halos
+    const counts = {};
+    for (const n of nodes) if (n.kind === "memory") counts[n.tier] = (counts[n.tier] || 0) + 1;
+    for (const t of TIERS) {
+      if (state.hidden.has(t) || !counts[t]) continue;
+      const pts = nodes.filter((n) => n.kind === "memory" && n.tier === t);
+      let mx = 0, my = 0; for (const p of pts) { mx += p.x; my += p.y; } mx /= pts.length; my /= pts.length;
+      let r = 30, top = Infinity;
+      for (const p of pts) { r = Math.max(r, Math.hypot(p.x - mx, p.y - my) + 26); top = Math.min(top, p.y - p.rad); }
+      const col = tierColor(t), grad = g.createRadialGradient(mx, my, 0, mx, my, r);
+      grad.addColorStop(0, col + (dark ? "2a" : "22")); grad.addColorStop(0.7, col + (dark ? "10" : "0c")); grad.addColorStop(1, col + "00");
+      g.fillStyle = grad; g.beginPath(); g.arc(mx, my, r, 0, Math.PI * 2); g.fill();
+      g.font = "650 11.5px " + css("--sans");
+      label(`${TIER_PT[t].toUpperCase()} · ${fmt(state.stats?.levels?.[t] ?? counts[t])}`, mx, top - 12, "center");
+    }
+    // links
+    const focus = hover;
+    // selective direct labels: only the most connected participants
+    const topEntities = new Set(nodes.filter((n) => n.kind === "entity" && visible(n)).sort((a, b) => b.degree - a.degree).slice(0, 6));
+    g.lineWidth = 1;
+    for (const l of links) {
+      if (!visible(l.s) || !visible(l.t)) continue;
+      const lit = focus && (l.s === focus || l.t === focus);
+      g.strokeStyle = lit ? css("--ink-2") : (dark ? "rgba(255,255,255,.07)" : "rgba(0,0,0,.08)");
+      if (l.kind === "merged") g.setLineDash([3, 3]);
+      g.beginPath(); g.moveTo(l.s.x, l.s.y); g.lineTo(l.t.x, l.t.y); g.stroke(); g.setLineDash([]);
+    }
+    // nodes
+    pulse = (now / 1000) % 1;
+    const surface = css("--surface");
+    for (const n of nodes) {
+      if (!visible(n)) continue;
+      const age = now - n.born, grow = Math.min(1, age / 500), rad = n.rad * (0.4 + 0.6 * grow);
+      if (n.kind === "entity") {
+        g.beginPath(); g.arc(n.x, n.y, rad, 0, Math.PI * 2);
+        g.fillStyle = surface; g.fill(); g.lineWidth = 1.5; g.strokeStyle = css("--ink-2"); g.stroke();
+        continue;
+      }
+      const col = tierColor(n.tier);
+      g.globalAlpha = 0.35 + 0.65 * Math.max(0, Math.min(1, n.r));
+      g.beginPath(); g.arc(n.x, n.y, rad, 0, Math.PI * 2); g.fillStyle = col; g.fill();
+      g.globalAlpha = 1; g.lineWidth = 2; g.strokeStyle = surface; g.stroke();
+      if (n.access >= 3) { g.beginPath(); g.arc(n.x, n.y, rad + 3, 0, Math.PI * 2); g.lineWidth = 1; g.strokeStyle = col; g.stroke(); }
+      if (state.highlight.has(n.id)) {
+        const pr = rad + 4 + pulse * 10;
+        g.beginPath(); g.arc(n.x, n.y, pr, 0, Math.PI * 2); g.lineWidth = 2; g.strokeStyle = col; g.globalAlpha = 1 - pulse; g.stroke(); g.globalAlpha = 1;
+      }
+      if (n === focus) { g.beginPath(); g.arc(n.x, n.y, rad + 2.5, 0, Math.PI * 2); g.lineWidth = 2; g.strokeStyle = css("--ink"); g.stroke(); }
+    }
+    g.font = "500 11px " + css("--sans");
+    if (focus && focus.kind === "entity") label(focus.label, focus.x, focus.y + focus.rad + 14, "center");
+    for (const n of topEntities) label(n.label, n.x, n.y + n.rad + 14, "center");
+    g.restore();
+  }
+
+  function tick(now) {
+    if (alpha > 0.01) step();
+    draw(now);
+    const animating = alpha > 0.01 || state.highlight.size > 0 || nodes.some((n) => now - n.born < 500);
+    raf = animating ? requestAnimationFrame(tick) : 0;
+  }
+
+  function toWorld(ev) { const r = cv.getBoundingClientRect(); return { x: (ev.clientX - r.left - view.x) / view.k, y: (ev.clientY - r.top - view.y) / view.k }; }
+  function pick(p) {
+    let best = null, bd = 14 / view.k;
+    for (const n of nodes) { if (!visible(n)) continue; const d = Math.hypot(n.x - p.x, n.y - p.y) - n.rad; if (d < bd) { bd = d; best = n; } }
+    return best;
+  }
+  let panning = null, moved = false;
+  cv.addEventListener("pointerdown", (ev) => {
+    const p = toWorld(ev), n = pick(p); moved = false; cv.setPointerCapture(ev.pointerId);
+    if (n) { drag = n; } else { panning = { x: ev.clientX - view.x, y: ev.clientY - view.y }; cv.classList.add("dragging"); }
+  });
+  cv.addEventListener("pointermove", (ev) => {
+    const p = toWorld(ev);
+    if (drag) { drag.x = p.x; drag.y = p.y; drag.vx = drag.vy = 0; moved = true; wake(); return; }
+    if (panning) { view.x = ev.clientX - panning.x; view.y = ev.clientY - panning.y; moved = true; wake(); return; }
+    const n = pick(p);
+    if (n !== hover) { hover = n; wake(); }
+    if (n) {
+      if (n.kind === "entity") showTip(ev.clientX, ev.clientY, `<span class="tag">entidade</span><div class="tw">${esc(n.label)}</div><div class="kv">${n.degree} memórias</div>`);
+      else showTip(ev.clientX, ev.clientY, `<span class="tag" style="--c:${tierColor(n.tier)}">${TIER_PT[n.tier]}</span><div class="tw">${esc(n.label)}</div><div class="kv">${n.who.length ? "<span>" + esc(n.who.join(", ")) + "</span>" : ""}<span>import. ${n.importance}</span><span>${n.access} acessos</span><span>retenção ${Math.round(n.r * 100)}%</span></div>`);
+    } else hideTip();
+  });
+  cv.addEventListener("pointerup", (ev) => {
+    if (!moved) { const n = pick(toWorld(ev)); if (n && n.kind === "memory") openDrawer(n.id); else if (n) { $("filterQ").value = ""; loadTable(n.label); } }
+    drag = null; panning = null; cv.classList.remove("dragging");
+  });
+  cv.addEventListener("pointerleave", () => { hover = null; hideTip(); wake(); });
+  cv.addEventListener("wheel", (ev) => {
+    ev.preventDefault(); const r = cv.getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top;
+    zoomAt(mx, my, Math.exp(-ev.deltaY * 0.0015));
+  }, { passive: false });
+  function zoomAt(mx, my, f) { const k = Math.max(0.3, Math.min(4, view.k * f)); view.x = mx - ((mx - view.x) * k) / view.k; view.y = my - ((my - view.y) * k) / view.k; view.k = k; wake(); }
+  $("zoomIn").onclick = () => zoomAt(W / 2, H / 2, 1.25);
+  $("zoomOut").onclick = () => zoomAt(W / 2, H / 2, 0.8);
+  $("zoomReset").onclick = () => { view = { x: 0, y: 0, k: 1 }; wake(); };
+  new ResizeObserver(resize).observe(cv);
+  return { setData, wake, resize };
+})();
+
+/* ---------- tooltip ---------- */
+function showTip(x, y, html) {
+  const t = $("tip"); t.innerHTML = html; t.classList.add("on");
+  const w = t.offsetWidth, h = t.offsetHeight;
+  t.style.left = Math.min(innerWidth - w - 8, x + 14) + "px";
+  t.style.top = (y + h + 20 > innerHeight ? y - h - 12 : y + 14) + "px";
+}
+function hideTip() { $("tip").classList.remove("on"); }
+
+/* ---------- recall playground ---------- */
+$("recallForm").onsubmit = async (ev) => {
+  ev.preventDefault();
+  const q = $("recallInput").value.trim(); if (!q) return;
+  try {
+    const r = await api("/api/recall", { body: { ns: state.ns, query: q, max_results: 8, touch: false } });
+    state.highlight = new Set(r.memories.map((m) => m.id)); clouds.wake();
+    clearTimeout(state._hl); state._hl = setTimeout(() => { state.highlight.clear(); }, 9000);
+    $("results").innerHTML = r.memories.length
+      ? `<div class="empty" style="padding:0 2px 4px">${r.memories.length} memórias em <b>${fmtMs(r.ms)} ms</b></div>` + r.memories.map(resultCard).join("")
+      : `<div class="empty">Nada relevante (${fmtMs(r.ms)} ms).</div>`;
+    bindResults($("results"));
+  } catch (e) { toast("Falha no recall: " + e.message); }
+};
+function resultCard(m) {
+  return `<div class="res" data-id="${esc(m.id)}"><div class="meta"><span class="tag" style="--c:${tierColor(m.tier)}">${TIER_PT[m.tier]}</span><span>import. ${m.importance}</span><span>${m.access_count} acessos</span></div>${m.who.length ? "<b>" + esc(m.who.join(", ")) + "</b> · " : ""}${esc(m.what)}${m.how ? `<div style="color:var(--muted);font-size:12px;margin-top:2px">→ ${esc(m.how.slice(0, 160))}</div>` : ""}</div>`;
+}
+function bindResults(root) { for (const el of root.querySelectorAll(".res")) el.onclick = () => openDrawer(el.dataset.id); }
+
+/* ---------- table ---------- */
+async function loadTable(whoFilter) {
+  if (!state.ns) return;
+  const q = $("filterQ").value.trim();
+  const params = new URLSearchParams({ ns: state.ns, limit: state.limit, offset: state.offset, sort: $("sortSel").value });
+  if (state.tab !== "all") params.set("tier", state.tab);
+  if (q) params.set("q", q);
+  if (whoFilter) params.set("who", whoFilter);
+  try {
+    const r = await api("/api/memories?" + params);
+    $("rows").innerHTML = r.memories.length ? r.memories.map((m) => `
+      <tr data-id="${esc(m.id)}">
+        <td><div class="what">${esc(m.what)}</div>${m.how ? `<div class="how">→ ${esc(m.how.slice(0, 140))}</div>` : ""}</td>
+        <td><span class="tag" style="--c:${tierColor(m.tier)}">${TIER_PT[m.tier]}</span></td>
+        <td>${esc(m.who.join(", ")) || '<span style="color:var(--muted)">—</span>'}</td>
+        <td class="num">${m.importance.toFixed(2)}</td>
+        <td class="num">${m.access_count}</td>
+        <td class="num">${Math.round(m.retrievability * 100)}%<span class="rbar"><i style="width:${m.retrievability * 100}%"></i></span></td>
+      </tr>`).join("") : `<tr><td colspan="6" class="empty">Nenhuma memória ${whoFilter ? "sobre " + esc(whoFilter) : "neste filtro"}.</td></tr>`;
+    for (const tr of document.querySelectorAll("#rows tr[data-id]")) tr.onclick = () => openDrawer(tr.dataset.id);
+    const end = Math.min(r.total, r.offset + r.memories.length);
+    $("pageInfo").textContent = r.total ? `${fmt(r.offset + 1)}–${fmt(end)} de ${fmt(r.total)}${whoFilter ? " · sobre " + whoFilter : ""}` : "";
+    $("prev").disabled = r.offset === 0; $("next").disabled = end >= r.total;
+  } catch (e) { /* offline banner covers it */ }
+}
+let filterTimer; $("filterQ").oninput = () => { clearTimeout(filterTimer); filterTimer = setTimeout(() => { state.offset = 0; loadTable(); }, 220); };
+$("sortSel").onchange = () => { state.offset = 0; loadTable(); };
+$("prev").onclick = () => { state.offset = Math.max(0, state.offset - state.limit); loadTable(); };
+$("next").onclick = () => { state.offset += state.limit; loadTable(); };
+
+/* ---------- drawer ---------- */
+async function openDrawer(id) {
+  try {
+    const m = await api(`/api/memory/${encodeURIComponent(id)}?${nsq()}`);
+    $("dTier").textContent = TIER_PT[m.tier]; $("dTier").style.setProperty("--c", tierColor(m.tier));
+    $("dWhat").textContent = m.what;
+    const row = (k, v) => (v ? `<dt>${k}</dt><dd>${v}</dd>` : "");
+    $("dW5h").innerHTML =
+      row("Quem", esc(m.who.join(", "))) + row("Por quê", esc(m.why)) + row("Como", esc(m.how)) +
+      row("Onde", m.where !== "default" ? esc(m.where) : "") + row("Quando", new Date(m.when).toLocaleString("pt-BR")) +
+      row("Gravada", new Date(m.created_at).toLocaleString("pt-BR")) +
+      row("Uso", `${m.access_count} acessos${m.last_accessed ? " · último " + new Date(m.last_accessed).toLocaleString("pt-BR") : ""}`) +
+      row("Import.", m.importance.toFixed(2)) + row("Retenção", Math.round(m.retrievability * 100) + "%") +
+      row("Id", `<code style="font-family:var(--mono);font-size:12px">${esc(m.id)}</code>`);
+    $("dNeighbors").innerHTML = m.neighbors.length ? m.neighbors.map(resultCard).join("") : '<div class="empty">Sem vizinhas (nenhum participante em comum).</div>';
+    bindResults($("dNeighbors"));
+    $("dForget").onclick = async () => {
+      if (!confirm("Esquecer esta memória? Isso não pode ser desfeito.")) return;
+      await api(`/api/memory/${encodeURIComponent(id)}?${nsq()}`, { method: "DELETE" });
+      closeDrawer(); toast("Memória esquecida"); loadNs();
+    };
+    $("drawer").classList.add("on"); $("scrim").classList.add("on");
+  } catch (e) { toast("Memória não encontrada"); }
+}
+function closeDrawer() { $("drawer").classList.remove("on"); $("scrim").classList.remove("on"); }
+$("dClose").onclick = closeDrawer; $("scrim").onclick = closeDrawer;
+addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+
+/* ---------- actions ---------- */
+$("ns").onchange = () => {
+  state.ns = $("ns").value; state.offset = 0; state.highlight.clear();
+  try { localStorage.setItem("cortext-ns", state.ns); } catch (_) {}
+  $("results").innerHTML = '<div class="empty">Os resultados acendem as memórias nas nuvens.</div>';
+  loadNs();
+};
+$("dreamBtn").onclick = async () => {
+  if (!confirm("Rodar um ciclo de consolidação agora?\n\n• duplicatas são unidas (as originais ficam arquivadas)\n• memórias com retenção abaixo de 5% e importância < 0,8 são apagadas\n• as mais importantes são reforçadas")) return;
+  const b = $("dreamBtn"); b.disabled = true;
+  try { const r = await api("/api/dream", { body: { ns: state.ns } }); toast(`Consolidação: ${r.consolidated} unidas, ${r.cleaned} podadas, ${r.replayed} reforçadas (${fmtMs(r.ms)} ms)`); await loadNs(); }
+  catch (e) { toast("Falha: " + e.message); }
+  b.disabled = false;
+};
+
+/* ---------- live feed (SSE) ---------- */
+function setLive(on) { $("live").classList.toggle("on", on); $("liveText").textContent = on ? "ao vivo" : "offline"; }
+function renderEvent(e, isNew) {
+  const feed = $("feed"); if (feed.querySelector(".empty")) feed.innerHTML = "";
+  const d = new Date(e.ts * 1000);
+  const color = { remember: tierColor("working"), recall: tierColor("episodic"), dream: tierColor("semantic") }[e.op] || css("--ink-2");
+  const row = document.createElement("div"); row.className = "ev" + (isNew ? " new" : "");
+  row.innerHTML = `<span class="t">${d.toLocaleTimeString("pt-BR")}</span><span class="op" style="color:${color}">${OPS_PT[e.op] || e.op}</span><span class="d" title="${esc(e.ns)}">${esc(e.detail)}${e.hits != null ? ` <span style="color:var(--muted)">· ${e.hits}</span>` : ""}</span><span class="ms">${fmtMs(e.ms)} ms</span>`;
+  feed.prepend(row); while (feed.children.length > 120) feed.lastChild.remove();
+}
+let reloadTimer;
+function onEvent(e, isNew) {
+  state.seq = Math.max(state.seq, e.seq);
+  if (e.op === "recall" || e.op === "remember") { state.lat[e.op].push(e.ms); if (state.lat[e.op].length > 200) state.lat[e.op].shift(); }
+  renderEvent(e, isNew);
+  if (isNew && e.ns === state.ns && ["remember", "forget", "dream"].includes(e.op)) {
+    clearTimeout(reloadTimer); reloadTimer = setTimeout(() => { loadOverview().catch(() => {}); loadNs(); }, 600);
+  } else if (isNew) { clearTimeout(state._k); state._k = setTimeout(renderKpis, 300); }
+}
+async function connectLive() {
+  try { const past = await api("/api/activity?since=0"); past.forEach((e) => onEvent(e, false)); renderKpis(); } catch (_) {}
+  const es = new EventSource("/api/events?since=" + state.seq);
+  es.onopen = () => setLive(true);
+  es.onmessage = (m) => { try { onEvent(JSON.parse(m.data), true); } catch (_) {} };
+  es.onerror = () => { setLive(false); es.close(); setTimeout(() => refresh().then(connectLive), 3000); };
+}
+
+function renderAll() { renderKpis(); renderLevels(); clouds.wake(); }
+addEventListener("resize", () => { clearTimeout(state._r); state._r = setTimeout(renderKpis, 150); });
+
+api("/api/health").then((h) => { $("version").textContent = "v" + h.version; }).catch(() => {});
+refresh().then(connectLive);
+setInterval(() => loadOverview().catch(() => {}), 30000);
+</script>
+</body>
+</html>
