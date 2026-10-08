@@ -1,0 +1,1919 @@
+{
+ "counts": {
+  "haiku": 89,
+  "jev": 44
+ },
+ "llm_usage": {
+  "calls": 128,
+  "api_ms": [
+   12426,
+   14386,
+   6288,
+   6761,
+   22248,
+   4156,
+   4351,
+   6002,
+   9956,
+   10099,
+   8429,
+   7909,
+   4933,
+   4385,
+   6207,
+   10050,
+   8018,
+   8227,
+   7279,
+   5029,
+   7765,
+   4292,
+   7956,
+   5591,
+   8141,
+   6734,
+   10218,
+   7097,
+   15219,
+   11537,
+   4652,
+   8612,
+   6497,
+   6446,
+   12733,
+   11218,
+   13139,
+   5680,
+   20708,
+   6750,
+   5453,
+   6355,
+   9025,
+   6250,
+   4390,
+   8965,
+   13803,
+   14332,
+   11652,
+   9093,
+   7021,
+   8185,
+   6182,
+   8078,
+   8310,
+   5561,
+   2682,
+   5090,
+   4110,
+   2193,
+   18422,
+   3971,
+   4068,
+   2420,
+   2962,
+   4388,
+   1376,
+   5234,
+   6591,
+   4762,
+   3260,
+   2836,
+   4586,
+   4160,
+   3943,
+   6056,
+   7359,
+   9173,
+   4014,
+   6537,
+   3785,
+   11826,
+   3114,
+   13387,
+   14052,
+   9012,
+   4143,
+   10116,
+   12410,
+   6384,
+   6698,
+   9505,
+   5828,
+   8135,
+   8631,
+   8392,
+   14857,
+   4548,
+   9355,
+   12344,
+   16611,
+   7845,
+   8089,
+   13596,
+   13648,
+   6847,
+   5235,
+   7339,
+   3667,
+   26439,
+   3195,
+   3011,
+   10531,
+   2800,
+   2284,
+   2585,
+   2468,
+   11667,
+   9706,
+   6184,
+   6786,
+   5733,
+   4759,
+   7459,
+   7654,
+   3605,
+   7091,
+   5882
+  ],
+  "cost_usd": 2.7475250000000004,
+  "input_tokens": 530990,
+  "output_tokens": 84855
+ },
+ "summary": {
+  "S1 per-turn · raw": {
+   "gold": 1.0,
+   "stale_kept": 3,
+   "useful": 0.78125,
+   "dups": 0,
+   "memories": 32,
+   "by_trap": {
+    "agent": 1.0,
+    "completed": 1.0,
+    "plain": 1.0,
+    "superseded": 1.0
+   }
+  },
+  "S1 per-turn · heuristic": {
+   "gold": 1.0,
+   "stale_kept": 3,
+   "useful": 0.78125,
+   "dups": 0,
+   "memories": 32,
+   "by_trap": {
+    "agent": 1.0,
+    "completed": 1.0,
+    "plain": 1.0,
+    "superseded": 1.0
+   }
+  },
+  "S1 per-turn · haiku": {
+   "gold": 1.0,
+   "stale_kept": 0,
+   "useful": 0.95,
+   "dups": 0,
+   "memories": 20,
+   "by_trap": {
+    "agent": 1.0,
+    "completed": 1.0,
+    "plain": 1.0,
+    "superseded": 1.0
+   }
+  },
+  "S1 per-turn · jev": {
+   "gold": 0.46153846153846156,
+   "stale_kept": 0,
+   "useful": 1.0,
+   "dups": 0,
+   "memories": 16,
+   "by_trap": {
+    "agent": 0.6666666666666666,
+    "completed": 0.5,
+    "plain": 0.3333333333333333,
+    "superseded": 0.5
+   }
+  },
+  "S2 turn+context": {
+   "gold": 0.9230769230769231,
+   "stale_kept": 0,
+   "useful": 0.9523809523809523,
+   "dups": 1,
+   "memories": 21,
+   "by_trap": {
+    "agent": 1.0,
+    "completed": 1.0,
+    "plain": 0.8333333333333334,
+    "superseded": 1.0
+   }
+  },
+  "S3 window-4 · raw": {
+   "gold": 1.0,
+   "stale_kept": 2,
+   "useful": 0.7727272727272727,
+   "dups": 1,
+   "memories": 22,
+   "by_trap": {
+    "agent": 1.0,
+    "completed": 1.0,
+    "plain": 1.0,
+    "superseded": 1.0
+   }
+  },
+  "S3 window-4 · haiku": {
+   "gold": 1.0,
+   "stale_kept": 0,
+   "useful": 0.9333333333333333,
+   "dups": 0,
+   "memories": 15,
+   "by_trap": {
+    "agent": 1.0,
+    "completed": 1.0,
+    "plain": 1.0,
+    "superseded": 1.0
+   }
+  },
+  "S3 window-4 · jev": {
+   "gold": 0.6153846153846154,
+   "stale_kept": 0,
+   "useful": 0.8571428571428571,
+   "dups": 0,
+   "memories": 14,
+   "by_trap": {
+    "agent": 0.6666666666666666,
+    "completed": 0.5,
+    "plain": 0.5,
+    "superseded": 1.0
+   }
+  },
+  "S4 session": {
+   "gold": 0.9230769230769231,
+   "stale_kept": 0,
+   "useful": 0.9047619047619048,
+   "dups": 0,
+   "memories": 21,
+   "by_trap": {
+    "agent": 1.0,
+    "completed": 1.0,
+    "plain": 0.8333333333333334,
+    "superseded": 1.0
+   }
+  }
+ },
+ "sessions": [
+  {
+   "id": "dev-pt",
+   "variants": {
+    "S1 per-turn · raw": {
+     "memories": [
+      "Payments module tests require DATABASE_URL environment variable configured to point to a test Postgres instance.",
+      "Integration tests in this project require PostgreSQL running locally on port 5433.",
+      "Production deployments occur every Thursday.",
+      "Deployment day changed to Wednesday, effective this month.",
+      "Infrastructure team has a Thursday deployment freeze.",
+      "Bruno's team owns the reconciliation service (services/reconciliation) per CODEOWNERS"
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       true
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · heuristic": {
+     "memories": [
+      "Payments module tests require DATABASE_URL environment variable configured to point to a test Postgres instance.",
+      "Integration tests in this project require PostgreSQL running locally on port 5433.",
+      "Production deployments occur every Thursday.",
+      "Deployment day changed to Wednesday, effective this month.",
+      "Infrastructure team has a Thursday deployment freeze.",
+      "Bruno's team owns the reconciliation service (services/reconciliation) per CODEOWNERS"
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       true
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · haiku": {
+     "memories": [
+      "Payments module tests require DATABASE_URL environment variable configured to point to a test Postgres instance. Integration tests in this project require PostgreSQL running locally on port 5433.",
+      "Production deployments occur on Wednesday, effective this month (changed from Thursday). Infrastructure team has a Thursday deployment freeze.",
+      "Bruno's team owns the reconciliation service (services/reconciliation) per CODEOWNERS."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · jev": {
+     "memories": [
+      "Payments module tests require DATABASE_URL environment variable configured to point to a test Postgres instance.",
+      "Infrastructure team has a Thursday deployment freeze.",
+      "Bruno's team owns the reconciliation service (services/reconciliation) per CODEOWNERS"
+     ],
+     "eval": {
+      "gold_captured": [
+       false,
+       false,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S2 turn+context": {
+     "memories": [
+      "Payments module tests (tests/payments) require DATABASE_URL environment variable pointing to test Postgres instance on port 5433.",
+      "Payments module's 3 integration tests pass when DATABASE_URL=postgresql://localhost:5433/test is configured.",
+      "Production deployments happen on Wednesdays due to infrastructure team's Thursday freeze.",
+      "The reconciliation service (services/reconciliation) is owned by Bruno's team according to CODEOWNERS."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": 0
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · raw": {
+     "memories": [
+      "Payments module integration tests require the environment variable DATABASE_URL=postgresql://localhost:5433/test.",
+      "Production deployments are scheduled for Thursdays.",
+      "Deployments are scheduled for Wednesdays because the infrastructure team has a freeze on Thursdays.",
+      "Bruno's team owns the reconciliation service (services/reconciliation)."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       true
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · haiku": {
+     "memories": [
+      "Payments module integration tests require the environment variable DATABASE_URL=postgresql://localhost:5433/test.",
+      "Deployments are scheduled for Wednesdays because the infrastructure team has a freeze on Thursdays.",
+      "Bruno's team owns the reconciliation service (services/reconciliation)."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · jev": {
+     "memories": [
+      "Payments module integration tests require the environment variable DATABASE_URL=postgresql://localhost:5433/test.",
+      "Deployments are scheduled for Wednesdays because the infrastructure team has a freeze on Thursdays.",
+      "Bruno's team owns the reconciliation service (services/reconciliation)."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S4 session": {
+     "memories": [
+      "Integration tests require a PostgreSQL database on localhost:5433.",
+      "Production deploys happen on Wednesdays because the infrastructure team has a freeze on Thursdays.",
+      "Bruno's team owns the reconciliation service (services/reconciliation)."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "dev-en",
+   "variants": {
+    "S1 per-turn · raw": {
+     "memories": [
+      "Checkout endpoint's slow response time was caused by N+1 queries loading cart items; adding select_related reduced p95 latency from 1.8s to 220ms.",
+      "This repository uses ORM exclusively for database access, never raw SQL.",
+      "Ruff is the project's linter.",
+      "Billing code must never import from the ui module (architectural constraint).",
+      "Import-linter contract forbidding billing → ui imports is enforced in the CI pipeline."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · heuristic": {
+     "memories": [
+      "Checkout endpoint's slow response time was caused by N+1 queries loading cart items; adding select_related reduced p95 latency from 1.8s to 220ms.",
+      "This repository uses ORM exclusively for database access, never raw SQL.",
+      "Ruff is the project's linter.",
+      "Billing code must never import from the ui module (architectural constraint).",
+      "Import-linter contract forbidding billing → ui imports is enforced in the CI pipeline."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · haiku": {
+     "memories": [
+      "Checkout endpoint's slow response time was caused by N+1 queries loading cart items; adding select_related reduced p95 latency from 1.8s to 220ms.",
+      "This repository uses ORM exclusively for database access, never raw SQL.",
+      "Ruff is the project's linter.",
+      "Billing code must never import from the ui module; this architectural constraint is enforced in the CI pipeline via import-linter contract."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · jev": {
+     "memories": [
+      "Checkout endpoint's slow response time was caused by N+1 queries loading cart items; adding select_related reduced p95 latency from 1.8s to 220ms.",
+      "Ruff is the project's linter.",
+      "Import-linter contract forbidding billing → ui imports is enforced in the CI pipeline."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       false,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S2 turn+context": {
+     "memories": [
+      "Checkout endpoint had an N+1 query on cart items loading that caused 80% of response time.",
+      "Checkout endpoint N+1 query was fixed by adding select_related, improving p95 latency from 1.8s to 220ms.",
+      "The codebase uses only the ORM for database operations, never raw SQL.",
+      "The codebase forbids billing module imports from ui/ via import-linter contract wired into CI",
+      "Test coverage is currently 81%."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · raw": {
+     "memories": [
+      "Checkout endpoint's N+1 query on cart items was fixed with ORM select_related, improving p95 latency from 1.8s to 220ms.",
+      "Repository constraint: always use ORM, never raw SQL.",
+      "The billing module must never import from ui.",
+      "An import-linter contract forbidding billing→ui imports was added to CI to enforce this constraint.",
+      "Test coverage is 81%."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · haiku": {
+     "memories": [
+      "Checkout endpoint's N+1 query on cart items was fixed using ORM select_related, improving p95 latency from 1.8s to 220ms.",
+      "Repository constraint: always use ORM, never raw SQL.",
+      "Billing module must never import from ui; import-linter contract enforces this constraint in CI.",
+      "Test coverage is 81%."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · jev": {
+     "memories": [
+      "Checkout endpoint's N+1 query on cart items was fixed with ORM select_related, improving p95 latency from 1.8s to 220ms.",
+      "An import-linter contract forbidding billing→ui imports was added to CI to enforce this constraint.",
+      "Test coverage is 81%."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       false,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S4 session": {
+     "memories": [
+      "Checkout endpoint's N+1 query on cart items was causing 80% of response time.",
+      "Checkout endpoint p95 latency improved from 1.8s to 220ms after adding select_related to the cart items query.",
+      "Repository uses ORM exclusively for all database access, never raw SQL.",
+      "Billing module must never import from the ui module.",
+      "Import-linter contract enforcing billing-to-ui import restriction is wired into CI.",
+      "Test coverage is 81%."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "support-es",
+   "variants": {
+    "S1 per-turn · raw": {
+     "memories": [
+      "Account 2291 (Luis) experiences recurring duplicate invoice issues.",
+      "Ticket FAC-118 was created to cancel one of two identical invoices issued on October 3rd to account 2291 for the same order.",
+      "Luis can only be contacted by phone in the afternoon.",
+      "Luis works night shifts.",
+      "The user prefers to be contacted via WhatsApp.",
+      "Luis prefers email communication and does not use WhatsApp.",
+      "FAC-118 cancellation takes up to 5 business days."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       true
+      ],
+      "memories": [
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · heuristic": {
+     "memories": [
+      "Account 2291 (Luis) experiences recurring duplicate invoice issues.",
+      "Ticket FAC-118 was created to cancel one of two identical invoices issued on October 3rd to account 2291 for the same order.",
+      "Luis can only be contacted by phone in the afternoon.",
+      "Luis works night shifts.",
+      "The user prefers to be contacted via WhatsApp.",
+      "Luis prefers email communication and does not use WhatsApp.",
+      "FAC-118 cancellation takes up to 5 business days."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       true
+      ],
+      "memories": [
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · haiku": {
+     "memories": [
+      "Account 2291 (Luis) experiences recurring duplicate invoice issues; ticket FAC-118 was created to cancel one of two identical invoices issued on October 3rd to account 2291 for the same order",
+      "Luis works night shifts and can only be contacted by phone in the afternoon",
+      "Luis prefers email communication and does not use WhatsApp",
+      "FAC-118 cancellation takes up to 5 business days"
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · jev": {
+     "memories": [
+      "Ticket FAC-118 was created to cancel one of two identical invoices issued on October 3rd to account 2291 for the same order.",
+      "Luis prefers email communication and does not use WhatsApp.",
+      "FAC-118 cancellation takes up to 5 business days."
+     ],
+     "eval": {
+      "gold_captured": [
+       false,
+       false,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S2 turn+context": {
+     "memories": [
+      "Customer Luis manages account 2291.",
+      "Account 2291 has a duplicate invoice issue: two invoices dated October 3rd for the same order.",
+      "Ticket FAC-118 was opened to cancel one of the duplicate invoices on account 2291.",
+      "Luis has called multiple times about the duplicate invoice on account 2291, indicating an unresolved customer service issue.",
+      "Luis can only be contacted by phone in the afternoon because he works night shifts.",
+      "Luis prefers to be contacted via email; he does not use WhatsApp.",
+      "FAC-118 cancellation takes up to 5 business days."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · raw": {
+     "memories": [
+      "Account 2291 (Luis) had duplicate invoices from October 3 for the same order.",
+      "Ticket FAC-118 was opened to cancel one of Luis's duplicate invoices.",
+      "Luis can only be reached for calls in the afternoon because he works nights.",
+      "Luis prefers WhatsApp as the communication channel.",
+      "Luis prefers email communication and does not use WhatsApp.",
+      "Cancellation of FAC-118 takes up to 5 business days."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       true
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · haiku": {
+     "memories": [
+      "Account 2291 (Luis) had duplicate invoices from October 3 for the same order; ticket FAC-118 was opened to cancel one of them.",
+      "Luis can only be reached for calls in the afternoon because he works nights.",
+      "Luis prefers email communication and does not use WhatsApp.",
+      "Cancellation of FAC-118 takes up to 5 business days."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · jev": {
+     "memories": [
+      "Account 2291 (Luis) had duplicate invoices from October 3 for the same order.",
+      "Luis can only be reached for calls in the afternoon because he works nights.",
+      "Luis prefers email communication and does not use WhatsApp.",
+      "Cancellation of FAC-118 takes up to 5 business days."
+     ],
+     "eval": {
+      "gold_captured": [
+       false,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S4 session": {
+     "memories": [
+      "Luis (customer, account 2291) can only be contacted in the afternoon because he works night shifts.",
+      "Luis's preferred communication channel is email; he does not use WhatsApp.",
+      "Account 2291 has duplicate invoices from October 3rd for the same order.",
+      "Ticket FAC-118 was created to cancel one of the duplicate invoices on account 2291.",
+      "Invoice cancellations take up to 5 business days to process."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "edu-pt",
+   "variants": {
+    "S1 per-turn · raw": {
+     "memories": [
+      "Class 6º B requires fraction exercises as part of their curriculum.",
+      "Fraction exercises for class 6º B should progress from basic to intermediate difficulty.",
+      "João, a student in this class, has persistent difficulty with addition of fractions that have different denominators.",
+      "Beatriz has dyslexia.",
+      "Beatriz requires adapted tests with font size 16 and short statements as accommodations.",
+      "The school requires all lists to be delivered on Friday.",
+      "The user works with educational mathematics content, specifically fraction exercises organized by class or group identifier (6B).",
+      "The user communicates instructions and operates in Portuguese."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · heuristic": {
+     "memories": [
+      "Class 6º B requires fraction exercises as part of their curriculum.",
+      "Fraction exercises for class 6º B should progress from basic to intermediate difficulty.",
+      "João, a student in this class, has persistent difficulty with addition of fractions that have different denominators.",
+      "Beatriz has dyslexia.",
+      "Beatriz requires adapted tests with font size 16 and short statements as accommodations.",
+      "The school requires all lists to be delivered on Friday.",
+      "The user works with educational mathematics content, specifically fraction exercises organized by class or group identifier (6B).",
+      "The user communicates instructions and operates in Portuguese."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · haiku": {
+     "memories": [
+      "Class 6º B requires fraction exercises that progress from basic to intermediate difficulty as part of their curriculum.",
+      "João, a student in class 6º B, has persistent difficulty with addition of fractions that have different denominators.",
+      "Beatriz has dyslexia and requires adapted tests with font size 16 and short statements as accommodations.",
+      "The school requires all lists to be delivered on Friday.",
+      "The user works with educational mathematics content, specifically fraction exercises organized by class or group identifier (e.g., 6B), communicates instructions, and operates in Portuguese."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · jev": {
+     "memories": [
+      "The user works with educational mathematics content, specifically fraction exercises organized by class or group identifier (6B).",
+      "João, a student in this class, has persistent difficulty with addition of fractions that have different denominators.",
+      "Beatriz requires adapted tests with font size 16 and short statements as accommodations.",
+      "The school requires all lists to be delivered on Friday.",
+      "The user communicates instructions and operates in Portuguese."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       false,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S2 turn+context": {
+     "memories": [
+      "User manages a 6th grade class B (6º B) that requires fraction exercises.",
+      "15 fraction exercises were prepared for class 6º B (12 original basic-to-intermediate, plus 3 custom for João), exported to PDF file lista-fracoes-6B.pdf, with a school-mandated Friday delivery deadline.",
+      "João, a student in 6º B, has significant difficulty with fractions that have different denominators.",
+      "Beatriz is a student in 6º B with dyslexia who requires adapted assessments with font size 16 and short enunciados."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       false
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · raw": {
+     "memories": [
+      "João (6th grade class B) has significant difficulty with fractions involving different denominators.",
+      "Beatriz (6th grade class B) has dyslexia and requires adapted materials: font size 16pt and concise statements.",
+      "Three supplementary fraction exercises focusing on different denominators were created for João's targeted support.",
+      "The school requires all lists to be delivered on Friday.",
+      "Lists should include 'entrega: sexta-feira' in the header."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": 3
+       }
+      ]
+     }
+    },
+    "S3 window-4 · haiku": {
+     "memories": [
+      "João (6th grade class B) has significant difficulty with fractions involving different denominators; three supplementary fraction exercises focusing on different denominators were created for his targeted support.",
+      "Beatriz (6th grade class B) has dyslexia and requires adapted materials: font size 16pt and concise statements.",
+      "The school requires all lists to be delivered on Friday with 'entrega: sexta-feira' in the header."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       true
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · jev": {
+     "memories": [
+      "Three supplementary fraction exercises focusing on different denominators were created for João's targeted support.",
+      "Beatriz (6th grade class B) has dyslexia and requires adapted materials: font size 16pt and concise statements.",
+      "Lists should include 'entrega: sexta-feira' in the header."
+     ],
+     "eval": {
+      "gold_captured": [
+       false,
+       true,
+       false
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S4 session": {
+     "memories": [
+      "João, a student in class 6º B, has significant difficulty with fractions involving different denominators.",
+      "Beatriz, a student in class 6º B, has dyslexia and requires adapted materials: font size 16 and concise statement enunciations.",
+      "The fractions exercise list for class 6º B must be delivered to the school on Friday.",
+      "Class 6º B has a fractions exercise list consisting of 12 exercises at basic-to-intermediate level."
+     ],
+     "eval": {
+      "gold_captured": [
+       true,
+       true,
+       false
+      ],
+      "stale_kept": [],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "dev-mixed",
+   "variants": {
+    "S1 per-turn · raw": {
+     "memories": [
+      "Redis is used as the catalog cache backend.",
+      "The catalog cache has a 1-hour time-to-live (TTL).",
+      "Catalog prices change frequently (multiple times per hour), making 1-hour cache TTLs unsuitable",
+      "The catalog cache TTL is configured to 10 minutes",
+      "Product cache entries must be invalidated immediately when prices change.",
+      "Cache invalidation is implemented via hooks triggered on price update events that delete the cache key."
+     ],
+     "eval": {
+      "gold_captured": [
+       true
+      ],
+      "stale_kept": [
+       true
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · heuristic": {
+     "memories": [
+      "Redis is used as the catalog cache backend.",
+      "The catalog cache has a 1-hour time-to-live (TTL).",
+      "Catalog prices change frequently (multiple times per hour), making 1-hour cache TTLs unsuitable",
+      "The catalog cache TTL is configured to 10 minutes",
+      "Product cache entries must be invalidated immediately when prices change.",
+      "Cache invalidation is implemented via hooks triggered on price update events that delete the cache key."
+     ],
+     "eval": {
+      "gold_captured": [
+       true
+      ],
+      "stale_kept": [
+       true
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": false,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · haiku": {
+     "memories": [
+      "Redis is used as the catalog cache backend.",
+      "The catalog cache TTL is configured to 10 minutes (supersedes the previous 1-hour configuration).",
+      "Catalog prices change frequently (multiple times per hour), which is why longer cache TTLs are unsuitable.",
+      "Product cache entries are invalidated immediately when prices change via hooks triggered on price update events that delete the cache key."
+     ],
+     "eval": {
+      "gold_captured": [
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S1 per-turn · jev": {
+     "memories": [
+      "Redis is used as the catalog cache backend.",
+      "Cache invalidation is implemented via hooks triggered on price update events that delete the cache key."
+     ],
+     "eval": {
+      "gold_captured": [
+       false
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S2 turn+context": {
+     "memories": [
+      "The catalog uses Redis caching with 10-minute TTL for product data because prices change frequently throughout the day; a cache invalidation hook deletes product entries immediately when prices are updated, rather than waiting for TTL expiration."
+     ],
+     "eval": {
+      "gold_captured": [
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · raw": {
+     "memories": [
+      "Catalog caching uses Redis with a 10-minute TTL.",
+      "Product cache entries are invalidated immediately when their price changes."
+     ],
+     "eval": {
+      "gold_captured": [
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · haiku": {
+     "memories": [
+      "Catalog caching uses Redis with a 10-minute TTL, but product cache entries are invalidated immediately when their price changes"
+     ],
+     "eval": {
+      "gold_captured": [
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S3 window-4 · jev": {
+     "memories": [
+      "Product cache entries are invalidated immediately when their price changes."
+     ],
+     "eval": {
+      "gold_captured": [
+       false
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    },
+    "S4 session": {
+     "memories": [
+      "Catalog cache uses Redis with a 10-minute TTL.",
+      "Product cache entries are invalidated immediately when their price changes.",
+      "Catalog prices change frequently, necessitating the short cache TTL."
+     ],
+     "eval": {
+      "gold_captured": [
+       true
+      ],
+      "stale_kept": [
+       false
+      ],
+      "memories": [
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       },
+       {
+        "useful": true,
+        "duplicate_of": null
+       }
+      ]
+     }
+    }
+   }
+  }
+ ]
+}

@@ -25,6 +25,8 @@ cortext-memory dashboard
 | | |
 |---|---|
 | **Grafo de memória indexado** | Índices invertidos por token, participante e local; os candidatos vêm dos índices, nunca de varredura. Entidades ligam as memórias num grafo. |
+| **Abstração em segundo plano** | Turnos brutos viram fatos duráveis em segundo plano, com **o seu próprio Haiku** (o mod do Claude Code roda a fila via `$.model.complete`; outros agentes via `claude -p`). Valores substituídos são aposentados, duplicatas unidas, ruído arquivado: sem chave de API e sem custo extra. |
+| **Fatos endereçados por conteúdo** | O mesmo fato escrito de novo por qualquer agente ou pessoa reforça a memória existente em vez de duplicá-la, e as fontes são contadas. |
 | **SQLite incremental** | Store em modo WAL que grava só o que mudou, um arquivo para todos os namespaces. Contadores de acesso são gravados em segundo plano, então leituras nunca esperam o disco. |
 | **Níveis de memória** | trabalho → episódica → semântica → esmaecendo → arquivada, a partir de idade, reforço, importância e retenção de Ebbinghaus. |
 | **Escrita ciente de contradições** | O `CanonicalValidator` sinaliza ou bloqueia `X` vs `não X` na escrita (níveis heurístico → embedding → LLM). |
@@ -55,9 +57,22 @@ Qualidade, com `python bench/run_benchmark.py` contra um baseline top-k não est
 
 | Cenário | Tokens (baseline → Cortext) | Economia | P@5 (baseline → Cortext) | Detecção de contradição |
 |---|---|---|---|---|
-| customer_support | 540 → 115 | **78,7%** | 0,367 → 0,917 | 100% |
+| customer_support | 540 → 126 | **76,7%** | 0,367 → 0,833 | 100% |
 | personal_assistant | 380 → 88 | **76,8%** | 0,840 → 0,800 | 67% |
-| **Média** | — | **77,8%** | **0,603 → 0,859** | 83,5% |
+| **Média** | — | **76,8%** | **0,603 → 0,817** | 83,5% |
+
+## Evidências
+
+Cada afirmação aqui é medida por um script deste repositório; veja
+**[docs/EVIDENCE.md](docs/EVIDENCE.md)**. Destaques:
+
+- Agentes com Cortext acertam **97%** das perguntas sobre sessões anteriores contra **17%** sem memória, empatando com o histórico inteiro usando **~11% dos tokens**, e arquivando 87% dos turnos como ruído ([benchmark de valor](docs/EVIDENCE.md#1-agents-answer-better-with-cortext--end-to-end), com conjunto separado).
+- A abstração em segundo plano mantém a memória **correta**: 100% dos fatos
+  plantados capturados e 0 de 3 valores substituídos mantidos, contra 3 de 3
+  quando todo turno é guardado ([experimento](docs/experiments/2026-10-jev-judge.md)).
+- Julgamentos de contradição e relação vão de 28% (regras de palavras-chave)
+  para 96,6% (juiz calibrado + o seu Haiku nos casos incertos), em PT/EN/ES e
+  entre idiomas.
 
 ## Agentes de código
 
@@ -138,7 +153,7 @@ pip install "cortext-memory[embeddings]"   # opcional: sentence-transformers par
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m pytest -q                  # 243 testes
+.venv/bin/python -m pytest -q                  # 271 testes
 .venv/bin/ruff check .
 .venv/bin/python bench/latency_benchmark.py    # latência em escala
 .venv/bin/python bench/run_benchmark.py        # economia de tokens / precisão

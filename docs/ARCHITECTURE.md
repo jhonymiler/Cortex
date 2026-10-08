@@ -154,6 +154,51 @@ every 2 s in the daemon. A read never waits on the disk.
 `MemoryGraph.save(path)` / `load(path)` (and `CortexV5(path="x.json")`) keep
 the original whole-graph JSON snapshot.
 
+## Background abstraction: turns → durable facts
+
+Raw agent turns are noisy. A background queue turns them into durable facts with
+the **user's own small model**, so there's no API key and no per-call cost to the project:
+
+```
+turn ──▶ stored raw at once (recallable immediately) ──▶ session buffer
+4 turns / session end / 5 min idle ──▶ job "extract"  (window → durable facts, user's language + English)
+gate (default): no fact in the window      ──▶ its turns archived as noise
+                                               (unless a turn shares a rare term with a kept memory:
+                                                a lone "actually make it 10%" is a correction)
+                facts found                ──▶ raw turns stay active; facts indexed on them (alt)
+facts (opt-in): facts ──▶ job "consolidate" ──▶ raw turns replaced by consolidated facts
+```
+
+- **Queue:** `cortext/server/queue.py`, a state machine in the same SQLite file
+  (`pending → leased → done`, retries up to 3, expired leases return to pending).
+- **Workers:** the Claude Code mod leases jobs every 20 s and runs them with
+  `$.model.complete({ model: "haiku" })`. With `CORTEXT_LLM=claude-cli` or `http`
+  the daemon runs them itself. `cortext-memory queue drain` processes the queue
+  once. A worker only turns a prompt into text: the daemon builds every prompt
+  and applies every answer (`cortext/server/abstraction.py`).
+- **Why gate is the default:** measured end-to-end in `docs/EVIDENCE.md`.
+  Agents answered 29/30 with gate vs 25/30 when turns were rewritten into
+  facts. Summaries lose detail and the order of corrections, while raw turns
+  read in order let the agent see "X, then actually Y". The model's extraction
+  is reliable as a noise classifier (24/24 durable, 24/24 noise), so gate uses
+  it for that and archives 87% of turns. Windows of 4 turns
+  (`docs/experiments/2026-10-jev-judge.md`) keep it at a quarter of per-turn calls.
+- **Recall and corrections:** context is packed oldest → newest, and a memory
+  newer than the best match that shares one of its rare terms survives the
+  relative cutoff, so a correction reaches the agent after the value it corrects.
+- **Languages:** each fact is kept in the user's language with an English
+  rendering in `Memory.alt` (indexed), so a query in either language finds it.
+- **Without a worker** nothing degrades: raw turns stay recallable exactly as in 0.4.
+
+### Content addressing
+
+`Memory.fingerprint` hashes the normalized who + what + where (case, accents,
+punctuation and spacing ignored; `cortext/core/text.py:fingerprint`). Writing a
+fact that is already stored reinforces it: `occurrence_count` grows, importance
+keeps the maximum, a missing why/how is filled in, and the source is recorded in
+`metadata.seen_by`. The lookup is an O(1) index. For a team, this gives the
+count of independent people who asserted a fact.
+
 ## Service layer
 
 ```
@@ -162,6 +207,9 @@ cortext/server/engine.py   MemoryEngine: one CortexV5 per namespace over one SQL
                            turn capture, session digest, activity feed, background
                            flusher (2 s) and DreamAgent loop (30 min)
 cortext/server/client.py   stdlib http.client; starts the daemon on demand
+cortext/server/queue.py    JobQueue state machine (SQLite)
+cortext/server/abstraction.py  window → extract → consolidate prompts and their application
+cortext/llm.py             LLM backends for the daemon worker: claude-cli (user login), OpenAI-compatible http
 cortext/agents/hooks.py    universal hook adapter (Claude Code, Cursor, Copilot, generic)
 cortext/agents/mcp.py      MCP server on stdio
 cortext/agents/claude_mod  Claude Code function-hook mod

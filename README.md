@@ -25,6 +25,8 @@ cortext-memory dashboard
 | | |
 |---|---|
 | **Indexed memory graph** | Inverted indexes by token, participant and place; candidates come from the indexes, never a scan. Entities link memories into a graph. |
+| **Background abstraction** | Raw turns become durable facts in the background, with **your own Haiku** (the Claude Code mod runs the queue via `$.model.complete`; other agents via `claude -p`). Superseded values are retired, duplicates merged, noise archived: no API key, no extra bill. |
+| **Content-addressed facts** | The same fact written again by any agent or person reinforces the stored memory instead of duplicating it, and the sources are counted. |
 | **Incremental SQLite** | WAL-mode store that writes only what changed, one file for every namespace. Access counts are written behind, so reads never wait on the disk. |
 | **Memory levels** | working → episodic → semantic → fading → archived, from age, reinforcement, importance and Ebbinghaus retrievability. |
 | **Contradiction-aware writes** | `CanonicalValidator` flags or blocks `X` vs `not X` at write time (heuristic → embedding → LLM levels). |
@@ -55,9 +57,22 @@ Quality, from `python bench/run_benchmark.py` against an unstructured top-k base
 
 | Scenario | Tokens (baseline → Cortext) | Savings | P@5 (baseline → Cortext) | Contradiction detection |
 |---|---|---|---|---|
-| customer_support | 540 → 115 | **78.7%** | 0.367 → 0.917 | 100% |
+| customer_support | 540 → 126 | **76.7%** | 0.367 → 0.833 | 100% |
 | personal_assistant | 380 → 88 | **76.8%** | 0.840 → 0.800 | 67% |
-| **Average** | — | **77.8%** | **0.603 → 0.859** | 83.5% |
+| **Average** | — | **76.8%** | **0.603 → 0.817** | 83.5% |
+
+## Evidence
+
+Every claim here is measured by a script in this repository; see
+**[docs/EVIDENCE.md](docs/EVIDENCE.md)**. Highlights:
+
+- Agents with Cortext answer **97%** of questions about earlier sessions vs **17%** without memory, matching the full history with **~11% of the tokens**, while archiving 87% of turns as noise ([value benchmark](docs/EVIDENCE.md#1-agents-answer-better-with-cortext--end-to-end), with a held-out set).
+- Background abstraction keeps memory **correct**: 100% of planted facts
+  captured and 0 of 3 superseded values kept, vs 3 of 3 kept when every turn is
+  stored ([experiment](docs/experiments/2026-10-jev-judge.md)).
+- Contradiction and relation judgments go from 28% (keyword rules) to 96.6%
+  (calibrated judge plus your Haiku for its uncertain cases), in PT/EN/ES and
+  across languages.
 
 ## Coding agents
 
@@ -138,7 +153,7 @@ pip install "cortext-memory[embeddings]"   # optional: sentence-transformers for
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m pytest -q                  # 243 tests
+.venv/bin/python -m pytest -q                  # 271 tests
 .venv/bin/ruff check .
 .venv/bin/python bench/latency_benchmark.py    # latency at scale
 .venv/bin/python bench/run_benchmark.py        # token savings / precision

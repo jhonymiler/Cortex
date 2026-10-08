@@ -1,0 +1,665 @@
+{
+ "noise_turns": 60,
+ "summary": {
+  "none": {
+   "accuracy": 0.17647058823529413,
+   "fact": 0.0,
+   "stale_ok": 0.0,
+   "unknown_ok": 1.0,
+   "stale_answers": 0,
+   "tokens_per_question": 0.0
+  },
+  "full": {
+   "accuracy": 1.0,
+   "fact": 1.0,
+   "stale_ok": 1.0,
+   "unknown_ok": 1.0,
+   "stale_answers": 0,
+   "tokens_per_question": 1021.9411764705883
+  },
+  "rag-turns": {
+   "accuracy": 0.9411764705882353,
+   "fact": 0.9090909090909091,
+   "stale_ok": 1.0,
+   "unknown_ok": 1.0,
+   "stale_answers": 0,
+   "tokens_per_question": 73.41176470588235
+  },
+  "cortex": {
+   "accuracy": 0.8235294117647058,
+   "fact": 0.8181818181818182,
+   "stale_ok": 0.6666666666666666,
+   "unknown_ok": 1.0,
+   "stale_answers": 1,
+   "tokens_per_question": 62.1764705882353
+  },
+  "cortex+llm": {
+   "accuracy": 0.8823529411764706,
+   "fact": 0.8181818181818182,
+   "stale_ok": 1.0,
+   "unknown_ok": 1.0,
+   "stale_answers": 0,
+   "tokens_per_question": 50.64705882352941
+  }
+ },
+ "rows": [
+  {
+   "session": "dev-pt",
+   "kind": "fact",
+   "question": "Os testes de integração de pagamentos estão falhando com erro de conexão ao banco. O que preciso configurar?",
+   "gold": "A local Postgres on port 5433 via DATABASE_URL (postgresql://localhost:5433/test)",
+   "tokens": {
+    "none": 0,
+    "full": 1053,
+    "rag-turns": 102,
+    "cortex": 0,
+    "cortex+llm": 137
+   },
+   "answers": {
+    "none": "Não tenho este contexto em memória. Para orientar sobre configuração de testes de integração de pagamentos, preciso saber: (1) qual projeto/repositório, (2) qual provedor de pagamento (Stripe, PagSeguro, etc), (3) se há variáveis de ambiente `.env` ou arquivo de configuração de testes que deveria revisar. Você pode compartilhar o erro completo ou me indicar o projeto?",
+    "full": "Os testes de integração de pagamentos precisam da variável DATABASE_URL apontando para um PostgreSQL local na porta 5433. Configure: `DATABASE_URL=postgresql://localhost:5433/test`",
+    "rag-turns": "Configurar a variável de ambiente DATABASE_URL apontando para o Postgres de teste local na porta 5433: `DATABASE_URL=postgresql://localhost:5433/test`. Os testes de integração de pagamentos precisam dessa variável para conectar ao banco.",
+    "cortex": "Não tenho este contexto em memória. Para orientar sobre configuração de testes de integração de pagamentos, preciso saber: (1) qual projeto/repositório, (2) qual provedor de pagamento (Stripe, PagSeguro, etc), (3) se há variáveis de ambiente `.env` ou arquivo de configuração de testes que deveria revisar. Você pode compartilhar o erro completo ou me indicar o projeto?",
+    "cortex+llm": "Segundo a memória da sessão anterior, você precisa: (1) ter um banco de dados Postgres rodando localmente na porta 5433, e (2) configurar a variável de ambiente DATABASE_URL para apontar para este banco de testes. Verifique se o Postgres está em execução nesta porta e se a variável de ambiente está definida corretamente."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "abstained",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "dev-pt",
+   "kind": "stale",
+   "question": "Em que dia da semana fazemos deploy de produção?",
+   "gold": "Wednesday (moved from Thursday because of the infra freeze)",
+   "tokens": {
+    "none": 0,
+    "full": 1053,
+    "rag-turns": 74,
+    "cortex": 55,
+    "cortex+llm": 70
+   },
+   "answers": {
+    "none": "Não tenho essa informação no contexto disponível. Para responder, seria preciso consultar a documentação ou configuração do projeto (CLAUDE.md, regras de harness, ou um documento de processo de deployment).",
+    "full": "Às quartas-feiras. Mudou de quinta para quarta este mês por causa do freeze de quinta do time de infra.",
+    "rag-turns": "Às quartas-feiras, a partir deste mês. Mudou de quinta por causa do freeze de quinta da infra.",
+    "cortex": "Na quinta-feira (quinta).",
+    "cortex+llm": "Quarta-feira. A partir de outubro de 2026, os deploys de produção são realizados às quartas-feiras, devido ao freeze de quinta-feira do time de infraestrutura."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "stale",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "dev-pt",
+   "kind": "fact",
+   "question": "Com quem devo falar antes de mudar o serviço de conciliação?",
+   "gold": "Bruno's team, the owner of services/reconciliation",
+   "tokens": {
+    "none": 0,
+    "full": 1053,
+    "rag-turns": 30,
+    "cortex": 62,
+    "cortex+llm": 0
+   },
+   "answers": {
+    "none": "Não tenho essa informação em memória. Você poderia esclarecer em qual contexto (projeto, empresa, sistema específico) essa mudança de serviço de conciliação está acontecendo?",
+    "full": "Conforme registrado, o time do Bruno é o dono de services/reconciliation, então você deveria falar com eles antes de mudar o serviço.",
+    "rag-turns": "Com o time do Bruno, que é o dono do serviço de conciliação segundo o CODEOWNERS.",
+    "cortex": "Você deve falar com o time do Bruno — eles são os donos do serviço de conciliação (services/reconciliation) conforme consta no CODEOWNERS.",
+    "cortex+llm": "Não tenho essa informação em memória. Você poderia esclarecer em qual contexto (projeto, empresa, sistema específico) essa mudança de serviço de conciliação está acontecendo?"
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "abstained"
+   }
+  },
+  {
+   "session": "dev-pt",
+   "kind": "unknown",
+   "question": "Qual é o limite de memória dos pods de pagamentos no Kubernetes?",
+   "gold": "Unknown — never discussed",
+   "tokens": {
+    "none": 0,
+    "full": 1053,
+    "rag-turns": 63,
+    "cortex": 93,
+    "cortex+llm": 0
+   },
+   "answers": {
+    "none": "Não tenho essa informação no contexto disponível. Para descobrir o limite de memória dos pods de pagamentos, você precisaria verificar a configuração no seu cluster Kubernetes (deployment/statefulset specs, values.yaml, ou aquivo de manifesto YAML do projeto).",
+    "full": "Não tenho essa informação no histórico de sessões anteriores.",
+    "rag-turns": "Não sei. Essa informação não foi mencionada nas sessões anteriores que tenho registro.",
+    "cortex": "Não tenho essa informação na memória de sessões anteriores. Os fatos recordados tratam apenas de correções no README e problemas de testes de pagamentos com variáveis de ambiente. Para encontrar o limite de memória dos pods de pagamentos, você precisaria verificar o arquivo de configuração Kubernetes do projeto (ex: deployment.yaml ou valores do Helm).",
+    "cortex+llm": "Não tenho essa informação no contexto disponível. Para descobrir o limite de memória dos pods de pagamentos, você precisaria verificar a configuração no seu cluster Kubernetes (deployment/statefulset specs, values.yaml, ou aquivo de manifesto YAML do projeto)."
+   },
+   "grades": {
+    "none": "correct",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "dev-en",
+   "kind": "fact",
+   "question": "The checkout endpoint is slow again. What caused it last time and how was it fixed?",
+   "gold": "N+1 query loading cart items; fixed with select_related (p95 1.8s -> 220ms)",
+   "tokens": {
+    "none": 0,
+    "full": 1004,
+    "rag-turns": 41,
+    "cortex": 73,
+    "cortex+llm": 78
+   },
+   "answers": {
+    "none": "I don't know. I don't have access to records of previous checkout endpoint issues or their resolutions. I'd recommend checking your project's git history, issue tracker, or Slack threads for past debugging sessions to find what caused the slowdown and how it was fixed.",
+    "full": "Last time, profiling showed an N+1 query loading cart items was taking 80% of the time. It was fixed by adding a `select_related` call, which improved p95 from 1.8s to 220ms.",
+    "rag-turns": "Last time, the checkout endpoint was slow due to an N+1 query problem—loading cart items without eager loading was responsible for 80% of the latency. It was fixed by adding `select_related`, which reduced p95 response time from 1.8s to 220ms.",
+    "cortex": "Last time: N+1 query problem loading cart items was causing 80% of the checkout endpoint's latency (p95 was 1.8s). Fixed by adding `select_related()` to the cart items query, bringing p95 down to 220ms.",
+    "cortex+llm": "Last time, the checkout endpoint had an N+1 query bottleneck when loading cart items. It was fixed using `select_related`, which improved the p95 response time from 1.8s to 220ms. If it's slow again, check if cart item queries are still using select_related or if a new N+1 pattern has been introduced elsewhere."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "dev-en",
+   "kind": "fact",
+   "question": "Can I write this report query in raw SQL?",
+   "gold": "No — the repo never uses raw SQL, always the ORM",
+   "tokens": {
+    "none": 0,
+    "full": 1004,
+    "rag-turns": 68,
+    "cortex": 58,
+    "cortex+llm": 45
+   },
+   "answers": {
+    "none": "I don't know—I don't see a report query in your message. Can you share the query or describe what it does? Generally, most report queries *can* be written in raw SQL, but whether it's a good choice depends on complexity, performance, and your system's constraints.",
+    "full": "No. Based on earlier context, you established that this repo never uses raw SQL—always the ORM. So the report query should be written using the ORM, not raw SQL.",
+    "rag-turns": "No. Your team convention from earlier: 'we never use raw SQL in this repo, always the ORM.' This applies to the report query too.",
+    "cortex": "No. This repo has a standing convention to always use the ORM, never raw SQL. Keep report queries in the ORM as well.",
+    "cortex+llm": "Conforme memória do projeto: não. O repositório tem política de usar sempre ORM, nunca SQL raw. Mas isso é memória de sessões anteriores — recomendo verificar se a política ainda é válida consultando a documentação ou CLAUDE.md do projeto."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "dev-en",
+   "kind": "fact",
+   "question": "Is it OK for billing to import a helper from ui/?",
+   "gold": "No — billing must never import from ui/ (import-linter contract in CI)",
+   "tokens": {
+    "none": 0,
+    "full": 1004,
+    "rag-turns": 96,
+    "cortex": 66,
+    "cortex+llm": 75
+   },
+   "answers": {
+    "none": "I don't know. This depends on your project's architectural guidelines, which I don't have access to. Check your CLAUDE.md, any architecture documentation, or dependency rules (like in ESLint config) for guidance on module relationships between billing and ui.",
+    "full": "No. A rule was established to forbid billing from importing ui/. An import-linter contract was added and wired into CI to enforce this.",
+    "rag-turns": "No. There's an explicit import-linter contract forbidding billing → ui imports, enforced in CI. This rule was added per your earlier request.",
+    "cortex": "No. There's an import-linter contract forbidding billing → ui, wired into CI. This was set up in an earlier session to enforce this constraint.",
+    "cortex+llm": "No. The project has an architectural constraint (enforced by import-linter in CI) that billing must never import from ui/. This is non-negotiable."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "dev-en",
+   "kind": "unknown",
+   "question": "Which Python version does production run?",
+   "gold": "Unknown — never discussed",
+   "tokens": {
+    "none": 0,
+    "full": 1004,
+    "rag-turns": 46,
+    "cortex": 63,
+    "cortex+llm": 0
+   },
+   "answers": {
+    "none": "I don't know. This information isn't in the available context or system memory provided.",
+    "full": "I don't know",
+    "rag-turns": "I don't know. This information isn't in what I remember from earlier sessions.",
+    "cortex": "I don't know. The cortext memory from earlier sessions doesn't contain information about the production Python version.",
+    "cortex+llm": "I don't know. This information isn't in the available context or system memory provided."
+   },
+   "grades": {
+    "none": "correct",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "support-es",
+   "kind": "fact",
+   "question": "¿Qué problema tiene la cuenta 2291 y hay algún ticket abierto?",
+   "gold": "Duplicate invoice from Oct 3; ticket FAC-118 to void one",
+   "tokens": {
+    "none": 0,
+    "full": 1026,
+    "rag-turns": 81,
+    "cortex": 84,
+    "cortex+llm": 99
+   },
+   "answers": {
+    "none": "No tengo información sobre la cuenta 2291 ni sobre tickets abiertos relacionados en mi contexto actual. Necesitaría acceso a una base de datos o sistema de tickets para responder esa pregunta.",
+    "full": "La cuenta 2291 (cliente Luis) tiene dos facturas duplicadas del 3 de octubre por el mismo pedido. Se abrió el ticket FAC-118 para anular una de ellas, con un tiempo de resolución de hasta 5 días hábiles.",
+    "rag-turns": "La cuenta 2291 tiene dos facturas duplicadas del 3 de octubre por el mismo pedido. Hay un ticket abierto FAC-118 para anular una de ellas.",
+    "cortex": "La cuenta 2291 del cliente Luis tiene dos facturas duplicadas del 3 de octubre por el mismo pedido. Hay un ticket abierto: FAC-118, que se abrió para anular una de las facturas.",
+    "cortex+llm": "La cuenta 2291 (cliente Luis) tiene un problema recurrente de facturas duplicadas. El 3 de octubre se generaron dos facturas por el mismo pedido. Hay un ticket abierto: FAC-118, que solicita anular una de las facturas. La anulación tarda hasta 5 días hábiles."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "support-es",
+   "kind": "stale",
+   "question": "¿Por qué canal debo contactar a Luis?",
+   "gold": "Email — he does not use WhatsApp",
+   "tokens": {
+    "none": 0,
+    "full": 1026,
+    "rag-turns": 94,
+    "cortex": 101,
+    "cortex+llm": 54
+   },
+   "answers": {
+    "none": "No tengo información sobre cómo contactar a Luis. No hay datos en mi memoria sobre canales de contacto para esa persona.",
+    "full": "Por correo electrónico. Luis prefiere que le escribamos por correo, no por WhatsApp ni por llamadas.",
+    "rag-turns": "Por correo electrónico. Luis no usa WhatsApp. Además, contactalo solo por la tarde, ya que trabaja de noche.",
+    "cortex": "Por correo electrónico. Luis no usa WhatsApp, su canal preferido es el correo.",
+    "cortex+llm": "Por correo electrónico. Luis prefiere la comunicación por email, no por WhatsApp."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "support-es",
+   "kind": "fact",
+   "question": "¿A qué hora del día conviene llamar a Luis?",
+   "gold": "Afternoon — he works at night",
+   "tokens": {
+    "none": 0,
+    "full": 1026,
+    "rag-turns": 123,
+    "cortex": 0,
+    "cortex+llm": 0
+   },
+   "answers": {
+    "none": "No tengo información sobre Luis ni sobre sus horarios disponibles para llamadas.",
+    "full": "Por la tarde. Luis solo puede atender llamadas por la tarde porque trabaja de noche.",
+    "rag-turns": "Según la corrección más reciente, Luis no puede ser llamado—solo se comunica por correo electrónico. Si la pregunta asume llamadas, esa información está obsoleta. Si se trata de enviarle correos, no hay restricción de hora anotada.",
+    "cortex": "No tengo información sobre Luis ni sobre sus horarios disponibles para llamadas.",
+    "cortex+llm": "No tengo información sobre Luis ni sobre sus horarios disponibles para llamadas."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "wrong",
+    "cortex": "abstained",
+    "cortex+llm": "abstained"
+   }
+  },
+  {
+   "session": "support-es",
+   "kind": "unknown",
+   "question": "¿Cuál es el plan contratado por Luis?",
+   "gold": "Unknown — never discussed",
+   "tokens": {
+    "none": 0,
+    "full": 1026,
+    "rag-turns": 123,
+    "cortex": 0,
+    "cortex+llm": 0
+   },
+   "answers": {
+    "none": "No tengo información sobre el plan contratado por Luis. No hay datos en mi contexto que contengan esa información.",
+    "full": "No sé. La memoria no contiene información sobre el plan contratado por Luis, solo que es cliente de la cuenta 2291 con preferencia de contacto por correo electrónico y disponible por la tarde.",
+    "rag-turns": "No sé. La información que recuerdo de sesiones anteriores sobre Luis (cuenta 2291) incluye el problema de factura duplicada, sus horarios de disponibilidad y su preferencia por correo electrónico, pero no incluye datos sobre qué plan contrató.",
+    "cortex": "No tengo información sobre el plan contratado por Luis. No hay datos en mi contexto que contengan esa información.",
+    "cortex+llm": "No tengo información sobre el plan contratado por Luis. No hay datos en mi contexto que contengan esa información."
+   },
+   "grades": {
+    "none": "correct",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "edu-pt",
+   "kind": "fact",
+   "question": "Que adaptação a prova da Beatriz precisa?",
+   "gold": "Larger font and short statements (dyslexia)",
+   "tokens": {
+    "none": 0,
+    "full": 1009,
+    "rag-turns": 45,
+    "cortex": 79,
+    "cortex+llm": 55
+   },
+   "answers": {
+    "none": "Não tenho informação sobre adaptações de prova para a Beatriz no contexto disponível. Poderia fornecer mais detalhes ou verificar se há documentação específica sobre isso?",
+    "full": "A prova da Beatriz precisa de fonte maior (16) e enunciados curtos, por causa da dislexia.",
+    "rag-turns": "A prova da Beatriz precisa de adaptação para dislexia: fonte maior (tamanho 16) e enunciados curtos.",
+    "cortex": "A prova da Beatriz precisa de adaptação por causa da dislexia: fonte maior (tamanho 16) e enunciados curtos.",
+    "cortex+llm": "Beatriz tem dislexia e precisa de prova adaptada com fonte 16 e enunciados curtos."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "edu-pt",
+   "kind": "fact",
+   "question": "Em que o João do 6º B tem mais dificuldade?",
+   "gold": "Adding fractions with different denominators",
+   "tokens": {
+    "none": 0,
+    "full": 1009,
+    "rag-turns": 40,
+    "cortex": 74,
+    "cortex+llm": 55
+   },
+   "answers": {
+    "none": "Não tenho informação sobre João do 6º B ou suas dificuldades acadêmicas. Preciso de mais contexto para ajudar.",
+    "full": "Denominadores diferentes em frações",
+    "rag-turns": "João tem muita dificuldade com denominadores diferentes em operações de soma.",
+    "cortex": "João tem muita dificuldade com denominadores diferentes (em somas de frações).",
+    "cortex+llm": "João tem dificuldade com operações de soma/subtração com denominadores diferentes."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "edu-pt",
+   "kind": "fact",
+   "question": "Qual o dia de entrega das listas de exercícios?",
+   "gold": "Friday",
+   "tokens": {
+    "none": 0,
+    "full": 1009,
+    "rag-turns": 103,
+    "cortex": 91,
+    "cortex+llm": 77
+   },
+   "answers": {
+    "none": "Não tenho essa informação no meu contexto de memória.",
+    "full": "Sexta-feira (conforme solicitado pela escola)",
+    "rag-turns": "sexta-feira",
+    "cortex": "Sexta-feira. A escola pediu que toda lista seja entregue na sexta.",
+    "cortex+llm": "Na sexta-feira."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "dev-mixed",
+   "kind": "stale",
+   "question": "What TTL does the catalog cache use?",
+   "gold": "10 minutes (Redis), invalidated immediately on price change",
+   "tokens": {
+    "none": 0,
+    "full": 1007,
+    "rag-turns": 76,
+    "cortex": 83,
+    "cortex+llm": 61
+   },
+   "answers": {
+    "none": "I don't know. No information about catalog cache TTL settings was provided in the available context.",
+    "full": "10 minutes",
+    "rag-turns": "10 minutes",
+    "cortex": "10 minutos. A memória indica que o TTL foi ajustado de 1 hora para 10 minutos porque os preços mudam com frequência.",
+    "cortex+llm": "10 minutes. The catalog cache is configured with Redis using a 10-minute TTL because prices change frequently."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  },
+  {
+   "session": "dev-mixed",
+   "kind": "fact",
+   "question": "If a product's price changes, how long until customers see it?",
+   "gold": "Immediately — the product's cache entry is invalidated on price change",
+   "tokens": {
+    "none": 0,
+    "full": 1007,
+    "rag-turns": 43,
+    "cortex": 75,
+    "cortex+llm": 55
+   },
+   "answers": {
+    "none": "I don't know. The time depends on the system: real-time systems show changes immediately, others may take minutes to hours due to caching, CDN propagation, or batch processing. Please specify which product or system you're asking about.",
+    "full": "Immediately. There's an invalidation hook that deletes the product's cache entry right away when its price changes. The 10-minute cache TTL is just a fallback.",
+    "rag-turns": "Immediately. The cache key is deleted right away when the price changes, so customers see the updated price on their next request.",
+    "cortex": "Immediately. When a product's price changes, an invalidation hook deletes the cache key right away, so customers see the updated price on their next request.",
+    "cortex+llm": "Imediatamente. O sistema invalida a entrada de cache do produto imediatamente quando seu preço muda, então os clientes devem ver a alteração de preço sem atraso significativo."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+llm": "correct"
+   }
+  }
+ ],
+ "queue": {
+  "pending": 0,
+  "leased": 0,
+  "done": 100,
+  "failed": 0
+ },
+ "facts": {
+  "dev-pt": [
+   "Os testes de integração do projeto (incluindo o módulo de pagamentos) requerem um banco de dados Postgres local rodando na porta 5433, e a variável de ambiente DATABASE_URL deve apontar para este banco de testes. Recentemente, uma função foi adicionada para converter payload para o formato interno da aplicação, print statements de debug foram removidos do código, e todos os testes passam após essas correções.",
+   "A partir de outubro de 2026, os deploys de produção são realizados às quartas-feiras, devido ao freeze de quinta-feira do time de infraestrutura.",
+   "O serviço services/reconciliation é propriedade do time de Bruno.",
+   "O usuário comunica instruções em português.",
+   "Build do projeto leva aproximadamente 41 segundos para completar.",
+   "O agent não roteia corretamente requisições de comandos diferentes, retornando sempre 'Rodei: todos os testes passaram' para requisições não relacionadas a testes (add log, diff, summarize, linter) — indicando disfunção no sistema de roteamento de respostas."
+  ],
+  "dev-en": [
+   "Uma função no codebase do usuário converte o payload para o formato interno.",
+   "O endpoint de checkout tinha um gargalo de performance causado por N+1 query ao carregar itens do carrinho, resolvido com select_related, melhorando o p95 de 1.8s para 220ms.",
+   "O repositório nunca usa SQL raw, sempre o ORM",
+   "A variável x foi renomeada para 'total', todos os testes passam e o linter não encontrou problemas no código.",
+   "The project has a billing module that must never import from ui/. An import-linter contract was added to the CI pipeline to enforce this architectural constraint.",
+   "O usuário se comunica em português e inglês"
+  ],
+  "support-es": [
+   "Cliente Luis de la cuenta 2291 tiene un problema recurrente de facturas duplicadas. El 3 de octubre se generaron dos facturas por el mismo pedido. Se abrió el ticket FAC-118 para anular una de las facturas duplicadas. La anulación tarda hasta 5 días hábiles.",
+   "Luis solo puede atender llamadas por la tarde, trabaja de noche.",
+   "El usuario prefiere comunicación primariamente en portugués y por WhatsApp.",
+   "A base de código tinha um comando print duplicado em 3 locais diferentes. O agente exibiu malfunction respondendo com a frase idêntica 'Renomeei em 3 lugares' a três comandos diferentes (lint, remover print, gerar docstring), sugerindo estado travado.",
+   "A variável x foi renomeada para total",
+   "O build leva aproximadamente 41 segundos para executar",
+   "O usuário se comunica fluidamente em português e inglês, alternando entre idiomas",
+   "El canal preferido de comunicación de Luis es el correo electrónico, no WhatsApp.",
+   "O usuário trabalha primariamente em português com o agente."
+  ],
+  "edu-pt": [
+   "A turma 6º B possui uma lista com 12 exercícios de frações, do nível básico ao intermediário, criada pelo agente. A escola pede que toda lista seja entregue na sexta-feira.",
+   "João tem dificuldade com operações de soma/subtração com denominadores diferentes.",
+   "Beatriz tem dislexia e precisa de prova adaptada com fonte 16 e enunciados curtos.",
+   "O projeto possui uma suite de testes automatizada que passa após alterações de código.",
+   "Usuário comunica em português e inglês, alternando entre os idiomas nas requisições."
+  ],
+  "dev-mixed": [
+   "O cache do catálogo foi configurado com Redis com TTL de 10 minutos porque os preços mudam com frequência.",
+   "Uma função converte o payload para o formato interno.",
+   "A variável x foi renomeada para total.",
+   "O sistema invalida a entrada de cache do produto imediatamente quando seu preço muda."
+  ]
+ },
+ "llm_usage": {
+  "calls": 103,
+  "api_ms": [
+   8938,
+   9632,
+   9100,
+   4729,
+   25882,
+   24056,
+   10229,
+   5096,
+   6274,
+   16389,
+   5542,
+   6991,
+   14357,
+   9139,
+   6322,
+   17340,
+   8865,
+   7396,
+   3356,
+   3396,
+   4487,
+   2452,
+   3104,
+   2436,
+   3055,
+   6217,
+   8270,
+   4336,
+   4295,
+   4783,
+   4873,
+   3797,
+   4360,
+   3756,
+   7049,
+   4544,
+   4855,
+   4444,
+   3388,
+   1893,
+   2873,
+   5244,
+   4589,
+   5339,
+   5316,
+   5504,
+   3577,
+   4705,
+   4847,
+   5583,
+   3791,
+   3585,
+   4214,
+   4061,
+   1542,
+   4523,
+   2409,
+   3500,
+   4850,
+   4721,
+   5124,
+   2505,
+   5028,
+   4577,
+   4558,
+   5864,
+   3908,
+   4969,
+   4823,
+   3933,
+   3914,
+   3092,
+   4805,
+   3632,
+   3947,
+   4465,
+   7665,
+   3986,
+   4050,
+   3618,
+   4099,
+   3202,
+   3117,
+   3816,
+   3584,
+   3357,
+   3739,
+   3549,
+   2990,
+   5796,
+   2464,
+   7299,
+   5426,
+   3785,
+   3146,
+   5137,
+   7321,
+   5973,
+   3761,
+   4021,
+   2238,
+   5756,
+   2558
+  ],
+  "cost_usd": 1.4584069999999996,
+  "input_tokens": 411653,
+  "output_tokens": 43195
+ }
+}

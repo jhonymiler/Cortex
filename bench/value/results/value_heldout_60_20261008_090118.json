@@ -1,0 +1,519 @@
+{
+ "split": "heldout",
+ "noise_turns": 60,
+ "summary": {
+  "none": {
+   "accuracy": 0.15384615384615385,
+   "fact": 0.0,
+   "stale_ok": 0.0,
+   "unknown_ok": 1.0,
+   "stale_answers": 0,
+   "tokens_per_question": 0.0
+  },
+  "full": {
+   "accuracy": 1.0,
+   "fact": 1.0,
+   "stale_ok": 1.0,
+   "unknown_ok": 1.0,
+   "stale_answers": 0,
+   "tokens_per_question": 992.4615384615385
+  },
+  "rag-turns": {
+   "accuracy": 1.0,
+   "fact": 1.0,
+   "stale_ok": 1.0,
+   "unknown_ok": 1.0,
+   "stale_answers": 0,
+   "tokens_per_question": 80.38461538461539
+  },
+  "cortex": {
+   "accuracy": 1.0,
+   "fact": 1.0,
+   "stale_ok": 1.0,
+   "unknown_ok": 1.0,
+   "stale_answers": 0,
+   "tokens_per_question": 92.23076923076923
+  },
+  "cortex+facts": {
+   "accuracy": 0.8461538461538461,
+   "fact": 1.0,
+   "stale_ok": 0.3333333333333333,
+   "unknown_ok": 1.0,
+   "stale_answers": 2,
+   "tokens_per_question": 70.76923076923077
+  },
+  "cortex+gate": {
+   "accuracy": 0.9230769230769231,
+   "fact": 1.0,
+   "stale_ok": 0.6666666666666666,
+   "unknown_ok": 1.0,
+   "stale_answers": 1,
+   "tokens_per_question": 90.84615384615384
+  }
+ },
+ "rows": [
+  {
+   "session": "hr-pt",
+   "kind": "fact",
+   "question": "Quando a Fernanda volta da licença?",
+   "gold": "Around August/September — maternity leave from March for 6 months",
+   "tokens": {
+    "none": 0,
+    "full": 1005,
+    "rag-turns": 105,
+    "cortex": 99,
+    "cortex+facts": 69,
+    "cortex+gate": 99
+   },
+   "answers": {
+    "none": "Não tenho essa informação. Não há dados sobre o calendário ou licenças de Fernanda no contexto que possuo.",
+    "full": "Fernanda volta em setembro. Ela sai de licença-maternidade em março por 6 meses (março a agosto).",
+    "rag-turns": "Agosto. Fernanda sai em março por 6 meses e retorna em agosto.",
+    "cortex": "Conforme o que foi registrado, Fernanda volta em setembro (ela sai em março por 6 meses, logo retorna em setembro).",
+    "cortex+facts": "Segundo a memória de sessões anteriores, Fernanda estará em licença-maternidade de março a agosto (6 meses). Ela retornaria em setembro de 2026.",
+    "cortex+gate": "Conforme o que foi registrado, Fernanda volta em setembro (ela sai em março por 6 meses, logo retorna em setembro)."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "hr-pt",
+   "kind": "stale",
+   "question": "Quem está cobrindo o trabalho da Fernanda?",
+   "gold": "Júlia (not Rafael)",
+   "tokens": {
+    "none": 0,
+    "full": 1005,
+    "rag-turns": 105,
+    "cortex": 109,
+    "cortex+facts": 83,
+    "cortex+gate": 109
+   },
+   "answers": {
+    "none": "Não tenho essa informação no contexto disponível. Poderia fornecer mais detalhes sobre quem é Fernanda e em qual projeto ou contexto está trabalhando?",
+    "full": "Júlia está cobrindo as entregas da Fernanda durante sua licença-maternidade (março a agosto).",
+    "rag-turns": "Júlia está cobrindo o trabalho da Fernanda durante sua licença-maternidade (março a agosto).",
+    "cortex": "Júlia está cobrindo o trabalho da Fernanda (foi corrigido para Júlia, não Rafael).",
+    "cortex+facts": "Segundo a memória anterior, Júlia cobre as entregas da Fernanda. Além disso, Rafael assumirá suas entregas durante a licença-maternidade dela (março a agosto).",
+    "cortex+gate": "Júlia está cobrindo o trabalho da Fernanda (foi corrigido para Júlia, não Rafael)."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "stale",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "hr-pt",
+   "kind": "fact",
+   "question": "Em quais meses acontecem as avaliações de desempenho?",
+   "gold": "June and December",
+   "tokens": {
+    "none": 0,
+    "full": 1005,
+    "rag-turns": 66,
+    "cortex": 65,
+    "cortex+facts": 48,
+    "cortex+gate": 65
+   },
+   "answers": {
+    "none": "Não tenho informações sobre um calendário de avaliações de desempenho específico. Você poderia fornecer contexto sobre qual organização ou sistema você está perguntando?",
+    "full": "As avaliações de desempenho acontecem em junho e dezembro.",
+    "rag-turns": "Junho e dezembro",
+    "cortex": "junho e dezembro",
+    "cortex+facts": "As avaliações de desempenho ocorrem em junho e dezembro.",
+    "cortex+gate": "junho e dezembro"
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "hr-pt",
+   "kind": "unknown",
+   "question": "Qual é o salário da Fernanda?",
+   "gold": "Unknown — never discussed",
+   "tokens": {
+    "none": 0,
+    "full": 1005,
+    "rag-turns": 105,
+    "cortex": 142,
+    "cortex+facts": 83,
+    "cortex+gate": 142
+   },
+   "answers": {
+    "none": "Não tenho essa informação em minha memória.",
+    "full": "Não tenho essa informação. Lembro que Fernanda sai em licença-maternidade de março a agosto, e que a Júlia cobre suas entregas nesse período, mas não há registro de salário.",
+    "rag-turns": "Não sei. Minhas anotações anteriores contêm apenas informações sobre a licença-maternidade da Fernanda (março a agosto) e que a Júlia cobre suas entregas nesse período, mas nenhum registro sobre seu salário.",
+    "cortex": "Não tenho essa informação registrada das sessões anteriores. Só lembro que a Fernanda sairá de licença-maternidade em março por 6 meses, e que a Júlia e o Rafael cobrem suas entregas nesse período.",
+    "cortex+facts": "Não tenho essa informação na memória de sessões anteriores. Os dados que possuo sobre Fernanda referem-se apenas a suas entregas e período de licença-maternidade.",
+    "cortex+gate": "Não tenho essa informação registrada das sessões anteriores. Só lembro que a Fernanda sairá de licença-maternidade em março por 6 meses, e que a Júlia e o Rafael cobrem suas entregas nesse período."
+   },
+   "grades": {
+    "none": "correct",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "course-en",
+   "kind": "fact",
+   "question": "Which concept did students struggle with in the module 2 quiz?",
+   "gold": "Variance vs standard deviation (question 5)",
+   "tokens": {
+    "none": 0,
+    "full": 986,
+    "rag-turns": 108,
+    "cortex": 70,
+    "cortex+facts": 59,
+    "cortex+gate": 70
+   },
+   "answers": {
+    "none": "I don't know. I don't have access to module 2 quiz data or student performance records in my current context.",
+    "full": "Students struggled with the difference between variance and standard deviation. Question 5 on the module 2 quiz had the most errors, with students confusing these two concepts.",
+    "rag-turns": "Students struggled with variance vs standard deviation. Question 5 had the most errors, with students confusing these two concepts.",
+    "cortex": "Students struggled with confusing variance with standard deviation. Question 5 had the most errors in the module 2 quiz.",
+    "cortex+facts": "Students struggled with confusing variance with standard deviation, particularly in question 5 of the module 2 quiz.",
+    "cortex+gate": "Students struggled with confusing variance with standard deviation. Question 5 had the most errors in the module 2 quiz."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "course-en",
+   "kind": "fact",
+   "question": "When is Tom's module 3 project due?",
+   "gold": "Friday the 18th (extension for a family emergency)",
+   "tokens": {
+    "none": 0,
+    "full": 986,
+    "rag-turns": 90,
+    "cortex": 90,
+    "cortex+facts": 74,
+    "cortex+gate": 90
+   },
+   "answers": {
+    "none": "I don't know. I don't have any information about Tom or their module 3 project deadline in my available context.",
+    "full": "Friday the 18th (extended due to a family emergency)",
+    "rag-turns": "Friday the 18th",
+    "cortex": "Friday the 18th (extended due to a family emergency)",
+    "cortex+facts": "Friday the 18th (sexta-feira 18). Tom's deadline for module 3 was extended due to a family emergency.",
+    "cortex+gate": "Friday the 18th (extended due to a family emergency)"
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "course-en",
+   "kind": "fact",
+   "question": "Can a student hand in next term's project as a PDF?",
+   "gold": "No — projects must be notebooks, never PDFs",
+   "tokens": {
+    "none": 0,
+    "full": 986,
+    "rag-turns": 54,
+    "cortex": 65,
+    "cortex+facts": 57,
+    "cortex+gate": 65
+   },
+   "answers": {
+    "none": "I don't know. This question appears to be about a specific institution's project submission policy, which I don't have information about. You'd need to check your course syllabus, submission guidelines, or ask your instructor directly.",
+    "full": "No. For next term, students must submit projects as notebooks, never as PDFs.",
+    "rag-turns": "No. Next term students must submit projects as notebooks, never as PDFs.",
+    "cortex": "No. According to next term's submission requirements, students must submit projects as notebooks, not as PDFs.",
+    "cortex+facts": "No. According to the records, students should submit next term's projects as notebooks, not as PDFs.",
+    "cortex+gate": "No. According to next term's submission requirements, students must submit projects as notebooks, not as PDFs."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "shop-es",
+   "kind": "fact",
+   "question": "¿Por qué devuelven tanto la línea Andes?",
+   "gold": "Size M runs small (38% of last month's returns)",
+   "tokens": {
+    "none": 0,
+    "full": 1005,
+    "rag-turns": 73,
+    "cortex": 102,
+    "cortex+facts": 99,
+    "cortex+gate": 102
+   },
+   "answers": {
+    "none": "No tengo información almacenada sobre la línea Andes o por qué tendría una alta tasa de devoluciones. ¿Podrías proporcionar más contexto sobre a qué línea de productos o servicio te refieres?",
+    "full": "Los clientes dicen que la talla M de la línea Andes viene pequeña. El 38% de las devoluciones del último mes fueron de esa talla y línea por este motivo.",
+    "rag-turns": "La talla M de la línea Andes viene pequeña. Los clientes esperan un ajuste normal pero reciben una prenda más pequeña, por eso devuelven tanto.",
+    "cortex": "Según el análisis de devoluciones del último mes, el 38% de las devoluciones de la línea Andes son de la talla M. Los clientes reportan que la prenda viene pequeña de talla. Se agregó una nota en la ficha del producto recomendando pedir una talla más grande.",
+    "cortex+facts": "La línea Andes talla M tiene un problema de ajuste: viene pequeña. El 38% de las devoluciones del último mes corresponden a este producto, con clientes reportando que viene pequeña. Se agregó una nota recomendando pedir una talla más grande.",
+    "cortex+gate": "Según el análisis de devoluciones del último mes, el 38% de las devoluciones de la línea Andes son de la talla M. Los clientes reportan que la prenda viene pequeña de talla. Se agregó una nota en la ficha del producto recomendando pedir una talla más grande."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "shop-es",
+   "kind": "fact",
+   "question": "¿Cómo se envían los pedidos de Carmen?",
+   "gold": "Without the invoice inside the box — she buys gifts",
+   "tokens": {
+    "none": 0,
+    "full": 1005,
+    "rag-turns": 43,
+    "cortex": 77,
+    "cortex+facts": 60,
+    "cortex+gate": 77
+   },
+   "answers": {
+    "none": "No sé. No tengo información en mi memoria sobre cómo se envían los pedidos de Carmen.",
+    "full": "Los pedidos de Carmen se envían sin factura dentro de la caja, porque ella siempre compra para regalo.",
+    "rag-turns": "Los pedidos de Carmen se envían sin factura dentro de la caja, porque siempre compra para regalo.",
+    "cortex": "Los pedidos de Carmen se envían sin factura dentro de la caja, ya que siempre compra para regalo.",
+    "cortex+facts": "Los pedidos de Carmen se envían sin factura dentro de la caja, porque siempre compra para regalo.",
+    "cortex+gate": "Los pedidos de Carmen se envían sin factura dentro de la caja, ya que siempre compra para regalo."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "shop-es",
+   "kind": "stale",
+   "question": "¿Desde qué importe el envío es gratis?",
+   "gold": "50 euros",
+   "tokens": {
+    "none": 0,
+    "full": 1005,
+    "rag-turns": 28,
+    "cortex": 59,
+    "cortex+facts": 49,
+    "cortex+gate": 59
+   },
+   "answers": {
+    "none": "No sé. ¿De qué tienda o producto hablas?",
+    "full": "Desde 50 euros el envío es gratis.",
+    "rag-turns": "Desde 50 euros",
+    "cortex": "Desde 50 euros el envío es gratis.",
+    "cortex+facts": "Desde 50 euros el envío es gratis.",
+    "cortex+gate": "Desde 50 euros el envío es gratis."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "shop-es",
+   "kind": "unknown",
+   "question": "¿Cuál es el proveedor de la línea Andes?",
+   "gold": "Unknown — never discussed",
+   "tokens": {
+    "none": 0,
+    "full": 1005,
+    "rag-turns": 73,
+    "cortex": 102,
+    "cortex+facts": 99,
+    "cortex+gate": 102
+   },
+   "answers": {
+    "none": "No tengo información específica sobre el proveedor de la línea Andes. Necesitaría más contexto (¿país?, ¿tipo de transporte?) para identificar a cuál línea se refiere.",
+    "full": "No lo sé. En lo que recuerdo de sesiones anteriores se menciona la línea Andes con problemas de tamaño (talla M pequeña), pero no aparece información sobre su proveedor.",
+    "rag-turns": "No lo sé. En las sesiones anteriores se trabajó sobre devoluciones y tallas de la línea Andes, pero no aparece registrado el proveedor.",
+    "cortex": "No lo sé. La memoria de sesiones anteriores tiene notas sobre devoluciones y recomendaciones de talla de la línea Andes, pero no contiene información sobre su proveedor.",
+    "cortex+facts": "No tengo esa información en la memoria de sesiones anteriores. Sé que la línea Andes tiene un problema de ajuste en talla M, pero no conozco quién es el proveedor.",
+    "cortex+gate": "No lo sé. La memoria de sesiones anteriores tiene notas sobre devoluciones y recomendaciones de talla de la línea Andes, pero no contiene información sobre su proveedor."
+   },
+   "grades": {
+    "none": "correct",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "go-en",
+   "kind": "fact",
+   "question": "Why was ledger leaking goroutines?",
+   "gold": "Response bodies not closed on non-200 replies in ledger/sync.go; fixed with defer resp.Body.Close()",
+   "tokens": {
+    "none": 0,
+    "full": 952,
+    "rag-turns": 87,
+    "cortex": 84,
+    "cortex+facts": 86,
+    "cortex+gate": 84
+   },
+   "answers": {
+    "none": "I don't know. No information about a ledger goroutine leak is present in my current context.",
+    "full": "The HTTP client in ledger/sync.go never closes response bodies on non-200 replies. The fix was to add defer resp.Body.Close() and a leak test.",
+    "rag-turns": "The HTTP client in ledger/sync.go was not closing response bodies on non-200 replies, which left goroutines hanging. The fix was adding defer resp.Body.Close() and a leak test.",
+    "cortex": "The HTTP client in ledger/sync.go was not closing response bodies on non-200 replies, causing goroutines to leak. Fixed by adding defer resp.Body.Close().",
+    "cortex+facts": "The ledger service was leaking goroutines in ledger/sync.go because the HTTP client wasn't closing response bodies for non-200 status responses. This was fixed by adding defer resp.Body.Close().",
+    "cortex+gate": "The HTTP client in ledger/sync.go was not closing response bodies on non-200 replies, causing goroutines to leak. Fixed by adding defer resp.Body.Close()."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "correct",
+    "cortex+gate": "correct"
+   }
+  },
+  {
+   "session": "go-en",
+   "kind": "stale",
+   "question": "What canary do we use when deploying ledger?",
+   "gold": "10% for 30 minutes",
+   "tokens": {
+    "none": 0,
+    "full": 952,
+    "rag-turns": 108,
+    "cortex": 135,
+    "cortex+facts": 54,
+    "cortex+gate": 117
+   },
+   "answers": {
+    "none": "I don't know. I don't have information about your ledger deployment canary strategy in the provided context.",
+    "full": "A 10% canary for 30 minutes before full rollout.",
+    "rag-turns": "10% for 30 minutes before full rollout",
+    "cortex": "We use a 10% canary for 30 minutes before full rollout.",
+    "cortex+facts": "5% for 30 minutes before the complete rollout.",
+    "cortex+gate": "You deploy ledger with a canary at 5% traffic for 30 minutes before full rollout."
+   },
+   "grades": {
+    "none": "abstained",
+    "full": "correct",
+    "rag-turns": "correct",
+    "cortex": "correct",
+    "cortex+facts": "stale",
+    "cortex+gate": "stale"
+   }
+  }
+ ],
+ "queue": {
+  "pending": 0,
+  "leased": 0,
+  "done": 73,
+  "failed": 0
+ },
+ "facts": {
+  "hr-pt": [
+   "O time de dados organiza o planejamento de férias usando uma planilha onde cada pessoa registra seus períodos solicitados.",
+   "Fernanda sairá de licença-maternidade de março a agosto (6 meses), e Rafael assumirá suas entregas durante esse período.",
+   "O agent não está respondendo corretamente às perguntas do usuário — está retornando respostas irrelevantes que não correspondem às queries (ex: pergunta sobre map/filter recebe resposta sobre log adicionado; pergunta sobre git status recebe resposta sobre build time).",
+   "As avaliações de desempenho ocorrem em junho e dezembro.",
+   "Júlia cobre as entregas da Fernanda.",
+   "A função do projeto converte o payload para o formato interno.",
+   "O processo de build leva aproximadamente 41 segundos."
+  ],
+  "course-en": [
+   "Existe uma função que converte o payload para o formato interno.",
+   "Build completa em aproximadamente 41 segundos.",
+   "Quando solicitado para mostrar diff, o agente retorna mensagens de build completado em vez do diff. Comportamento repetido.",
+   "A variável x foi renomeada para 'total', todos os testes passam e o linter não encontrou problemas no código.",
+   "Na questão 5 do quiz do módulo 2, os erros mais comuns foram confundir variância com desvio padrão.",
+   "Para o próximo semestre, os estudantes devem enviar projetos como notebooks, nunca como PDFs.",
+   "Tom solicitou uma extensão no projeto do módulo 3.",
+   "O prazo de Tom para o módulo 3 foi estendido até sexta-feira 18 devido a uma emergência familiar"
+  ],
+  "shop-es": [
+   "O agente está preso em um loop de resposta automática, respondendo repetidamente com 'Renomeei em 3 lugares' para requisições completamente distintas (adicionar log, executar linter, remover print, gerar docstring), indicando malfunction de template ou falha sistêmica.",
+   "La clienta Carmen siempre compra para regalo; enviar sus pedidos sin factura dentro de la caja.",
+   "La línea Andes talla M tiene un problema de ajuste: el 38% de las devoluciones del último mes corresponden a este producto, con clientes reportando que viene pequeña. Se agregó una nota en la ficha del producto recomendando pedir una talla más grande.",
+   "El envío gratis ahora comienza en 50 euros, no en 40 euros.",
+   "O processo de build do projeto é concluído em aproximadamente 41 segundos."
+  ],
+  "go-en": [
+   "O serviço ledger teve vazamento de goroutines em ledger/sync.go causado pelo cliente HTTP não fechar response bodies em respostas com status não-200. Corrigido adicionando defer resp.Body.Close().",
+   "Ledger é deployado com canary a 5% durante 30 minutos antes do rollout completo.",
+   "O arquivo de config não tem problemas",
+   "Todos os testes do projeto passam"
+  ]
+ },
+ "llm_usage": {
+  "calls": 25,
+  "api_ms": [
+   6370,
+   10397,
+   4765,
+   17253,
+   12054,
+   16115,
+   3445,
+   4702,
+   5903,
+   2388,
+   3810,
+   1916,
+   2178,
+   4221,
+   3844,
+   4049,
+   2164,
+   2260,
+   4306,
+   2657,
+   2839,
+   2193,
+   2772,
+   7507,
+   2537
+  ],
+  "cost_usd": 0.6651419999999999,
+  "input_tokens": 109535,
+  "output_tokens": 9092
+ }
+}

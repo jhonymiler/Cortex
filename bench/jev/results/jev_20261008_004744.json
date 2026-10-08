@@ -1,0 +1,8233 @@
+{
+ "model": "jev-1.13.0",
+ "requests": 216,
+ "errors": [],
+ "wall_s": 15.621647510997718,
+ "latency_ms": [
+  239.73084400131484,
+  249.8617910023313,
+  250.4208779973851,
+  253.07657799930894,
+  253.25389399949927,
+  254.0715499999351,
+  255.37715800237493,
+  255.67174200114096,
+  257.41250200007926,
+  257.50732800224796,
+  258.2900330016855,
+  258.911310997064,
+  259.55436900039786,
+  259.6612199995434,
+  259.70452599722194,
+  259.98850600080914,
+  260.8981859993946,
+  260.9762440006307,
+  261.19420399845694,
+  261.19618699885905,
+  261.38071899913484,
+  261.65636899895617,
+  262.1412850021443,
+  263.1379350023053,
+  263.1499099989014,
+  263.4847869994701,
+  263.67727300021215,
+  263.7309849997109,
+  263.74511000176426,
+  264.21221700002206,
+  264.4087970002147,
+  264.67230699927313,
+  264.92461300222203,
+  265.4770729968732,
+  265.99226699909195,
+  266.2895510002272,
+  266.3723180012312,
+  266.3907329988433,
+  266.6723420006747,
+  266.9540569986566,
+  267.2244409986888,
+  267.23669299826724,
+  267.29843899738626,
+  267.4220310000237,
+  267.79028099917923,
+  268.70486800180515,
+  269.05671400163556,
+  269.07403800214524,
+  269.18215800105827,
+  269.1886089996842,
+  269.41137600078946,
+  270.213412000885,
+  270.52890000049956,
+  270.7959840008698,
+  270.97515200148337,
+  271.03590100159636,
+  271.6498209993006,
+  271.8359259997669,
+  272.40819799772,
+  272.609805000684,
+  272.7850600022066,
+  272.999761000392,
+  273.57490500071435,
+  274.06579699891154,
+  274.16226100103813,
+  274.2109539976809,
+  274.2503449990181,
+  274.4805139991513,
+  274.901045999286,
+  275.3414850012632,
+  275.560210000549,
+  275.5674070031091,
+  276.08494900050573,
+  276.2549700019008,
+  276.63371699964046,
+  276.85499699873617,
+  276.9850320000842,
+  277.1036730009655,
+  277.16681099991547,
+  277.2724729984475,
+  277.47187500062864,
+  278.2276530015224,
+  278.64804999990156,
+  278.8701919998857,
+  278.9388119999785,
+  279.0153329988243,
+  279.79971199965803,
+  280.09345199825475,
+  280.20220800317475,
+  280.2936359985324,
+  280.690080999193,
+  280.9259139976348,
+  281.44711699860636,
+  281.67717900214484,
+  281.9063700007973,
+  282.02298099859036,
+  283.19320500304457,
+  283.4590750026109,
+  284.18109899939736,
+  284.3921749990841,
+  285.6351390000782,
+  285.8408789979876,
+  286.0755520014209,
+  286.97531200305093,
+  287.3606379980629,
+  288.4418170033314,
+  288.5188759973971,
+  288.75719999996363,
+  288.7720730032015,
+  289.258468998014,
+  289.32808699755697,
+  289.3456689998857,
+  289.6888739996939,
+  290.2513600020029,
+  291.07605900208,
+  291.3530849982635,
+  291.49065499950666,
+  291.78296200188925,
+  291.97981400284334,
+  291.9844419993751,
+  292.4268659990048,
+  292.70230900147,
+  292.93117099950905,
+  293.265345000691,
+  293.4404170009657,
+  294.68522500246763,
+  295.21897900121985,
+  296.6291779994208,
+  296.7082240029413,
+  296.88888800228597,
+  298.41218599904096,
+  298.79545899893856,
+  298.84272599883843,
+  300.30077300034463,
+  300.5655570013914,
+  300.6133660019259,
+  300.75862699959544,
+  301.1270569986664,
+  301.57252500066534,
+  302.32545399849187,
+  302.8210419979587,
+  304.9479410001368,
+  305.4731289994379,
+  305.75012099870946,
+  305.77306800114457,
+  306.8016050019651,
+  306.84446500163176,
+  308.1654109992087,
+  308.8351540027361,
+  310.1014439998835,
+  310.6562009998015,
+  312.47638700006064,
+  313.9326050004456,
+  314.0328599984059,
+  314.34512399937375,
+  314.95314899802906,
+  316.434009000659,
+  316.43600500319735,
+  317.1708289992239,
+  317.27702200078056,
+  318.3553340022627,
+  318.7574850016972,
+  324.10122999863233,
+  324.50830100060557,
+  324.7936950028816,
+  324.8513790022116,
+  328.34431800074526,
+  328.75274699836154,
+  329.022610996617,
+  330.44208000137587,
+  335.4301930012298,
+  336.9619329969282,
+  339.6566529991105,
+  339.74198999931104,
+  340.0252389983507,
+  342.00348899685196,
+  343.33197500018287,
+  347.1327619990916,
+  349.10897700319765,
+  375.2217519977421,
+  383.0400290025864,
+  393.7058259980404,
+  400.33965799739235,
+  516.2154959980398,
+  516.7326720002166,
+  548.7910060001013,
+  560.5967170013173,
+  587.7302279986907,
+  645.3031179989921,
+  688.2562920000055,
+  702.6874190014496,
+  707.3639500013087,
+  709.2938810019405,
+  713.9759479978238,
+  732.7006939995044,
+  735.2621840000211,
+  816.0170169976482,
+  846.1795000002894,
+  855.7246860000305,
+  883.9302550004504,
+  884.7455269969942,
+  911.3064949997352,
+  968.2329839997692,
+  973.6740949992964,
+  978.6248950003937,
+  989.1780409998319,
+  1021.8541960020957,
+  1092.0886019994214,
+  1301.0393160002423,
+  1346.1939709995931,
+  1592.8659139972297,
+  1625.0581469976169,
+  1638.4020740006235,
+  1713.4112769999774,
+  1755.5768979982531,
+  1783.494161998533
+ ],
+ "input_tokens": 160807,
+ "relation": [
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.01,
+    "contradicts": 0.0,
+    "refines": 0.99,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "o deploy de produção roda pelo GitHub Actions com Helm e exige aprovação do Bruno antes"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "o deploy de produção é feito à mão com kubectl, sem pipeline de CI"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.52,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.36,
+    "unrelated": 0.64
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "o pipeline de CI também roda o linter em cada pull request"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.97,
+    "contradicts": 0.0,
+    "refines": 0.03,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "a produção é publicada com Helm, disparada por um workflow do GitHub Actions"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.53,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.65,
+    "refines": 0.35
+   },
+   "baseline": "unrelated",
+   "new": "production deploys run through GitHub Actions using Helm",
+   "old": "the CI pipeline also runs the linter on every pull request"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.01,
+    "unrelated": 0.0,
+    "refines": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "production deploys run through GitHub Actions using Helm",
+   "old": "production deploys run through GitHub Actions with Helm and need Bruno's approval first"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.98,
+    "unrelated": 0.0,
+    "refines": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "production deploys run through GitHub Actions using Helm",
+   "old": "we ship to production with Helm, triggered by a GitHub Actions workflow"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "same": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "production deploys run through GitHub Actions using Helm",
+   "old": "production deploys are done by hand with kubectl, with no CI pipeline"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el despliegue a producción se ejecuta en GitHub Actions con Helm",
+   "old": "el despliegue a producción se hace a mano con kubectl, sin pipeline de CI"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.55,
+   "probs": {
+    "unrelated": 0.66,
+    "contradicts": 0.0,
+    "same": 0.0,
+    "refines": 0.34
+   },
+   "baseline": "unrelated",
+   "new": "el despliegue a producción se ejecuta en GitHub Actions con Helm",
+   "old": "el pipeline de CI también ejecuta el linter en cada pull request"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.02,
+    "refines": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "el despliegue a producción se ejecuta en GitHub Actions con Helm",
+   "old": "el despliegue a producción va por GitHub Actions con Helm y requiere la aprobación de Bruno antes"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.99,
+    "unrelated": 0.0,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "el despliegue a producción se ejecuta en GitHub Actions con Helm",
+   "old": "publicamos en producción con Helm, lanzado por un workflow de GitHub Actions"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "production deploys are done by hand with kubectl, with no CI pipeline"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.03,
+    "refines": 0.97,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "production deploys run through GitHub Actions with Helm and need Bruno's approval first"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.88,
+   "probs": {
+    "refines": 0.09,
+    "same": 0.91,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "we ship to production with Helm, triggered by a GitHub Actions workflow"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.44,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "refines": 0.42,
+    "unrelated": 0.58
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "the CI pipeline also runs the linter on every pull request"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el despliegue a producción se ejecuta en GitHub Actions con Helm",
+   "old": "o deploy de produção é feito à mão com kubectl, sem pipeline de CI"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.91,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.93,
+    "same": 0.07
+   },
+   "baseline": "unrelated",
+   "new": "el despliegue a producción se ejecuta en GitHub Actions con Helm",
+   "old": "o deploy de produção roda pelo GitHub Actions com Helm e exige aprovação do Bruno antes"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.6,
+   "probs": {
+    "unrelated": 0.7,
+    "contradicts": 0.0,
+    "refines": 0.3,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el despliegue a producción se ejecuta en GitHub Actions con Helm",
+   "old": "o pipeline de CI também roda o linter em cada pull request"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.95,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.04,
+    "same": 0.96
+   },
+   "baseline": "unrelated",
+   "new": "el despliegue a producción se ejecuta en GitHub Actions con Helm",
+   "old": "a produção é publicada com Helm, disparada por um workflow do GitHub Actions"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "a produção é publicada com Helm, disparada por um workflow do GitHub Actions"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "o deploy de produção é feito à mão com kubectl, sem pipeline de CI"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "refines": 0.99,
+    "contradicts": 0.0,
+    "same": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "o deploy de produção roda pelo GitHub Actions com Helm e exige aprovação do Bruno antes"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "refines",
+   "conf": 0.45,
+   "probs": {
+    "unrelated": 0.41,
+    "contradicts": 0.0,
+    "refines": 0.59,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o deploy de produção roda pelo GitHub Actions usando Helm",
+   "old": "o pipeline de CI também roda o linter em cada pull request"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "same": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "o banco principal é MySQL 8"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 0.99,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "o backup do banco roda todo dia às 3h"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.03,
+    "unrelated": 0.0,
+    "refines": 0.97
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "o banco principal é PostgreSQL 15, com uma réplica de leitura em us-east"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "usamos Postgres, versão 15, como banco de dados principal"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.02,
+    "refines": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "the main database is PostgreSQL 15",
+   "old": "the main database is PostgreSQL 15, with a read replica in us-east"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the main database is PostgreSQL 15",
+   "old": "the main database is MySQL 8"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "the main database is PostgreSQL 15",
+   "old": "we use Postgres version 15 as our primary database"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.98,
+    "contradicts": 0.0,
+    "same": 0.0,
+    "refines": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "the main database is PostgreSQL 15",
+   "old": "the database backup runs every day at 3am"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la base de datos principal es PostgreSQL 15",
+   "old": "la base de datos principal es MySQL 8"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.98,
+    "contradicts": 0.0,
+    "refines": 0.02,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la base de datos principal es PostgreSQL 15",
+   "old": "la copia de seguridad de la base corre todos los días a las 3h"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la base de datos principal es PostgreSQL 15",
+   "old": "usamos Postgres versión 15 como base de datos principal"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.95,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.96,
+    "same": 0.04
+   },
+   "baseline": "unrelated",
+   "new": "la base de datos principal es PostgreSQL 15",
+   "old": "la base de datos principal es PostgreSQL 15, con una réplica de lectura en us-east"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "we use Postgres version 15 as our primary database"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.72,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.21,
+    "refines": 0.79
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "the main database is PostgreSQL 15, with a read replica in us-east"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "the main database is MySQL 8"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.99,
+    "contradicts": 0.0,
+    "same": 0.0,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "the database backup runs every day at 3am"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.79,
+   "probs": {
+    "same": 0.16,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.84
+   },
+   "baseline": "unrelated",
+   "new": "la base de datos principal es PostgreSQL 15",
+   "old": "o banco principal é PostgreSQL 15, com uma réplica de leitura em us-east"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.88,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.91,
+    "refines": 0.09
+   },
+   "baseline": "unrelated",
+   "new": "la base de datos principal es PostgreSQL 15",
+   "old": "o backup do banco roda todo dia às 3h"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la base de datos principal es PostgreSQL 15",
+   "old": "usamos Postgres, versão 15, como banco de dados principal"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la base de datos principal es PostgreSQL 15",
+   "old": "o banco principal é MySQL 8"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.01,
+    "same": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "usamos Postgres, versão 15, como banco de dados principal"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "o banco principal é MySQL 8"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.92,
+   "probs": {
+    "refines": 0.94,
+    "unrelated": 0.0,
+    "same": 0.06,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "o banco principal é PostgreSQL 15, com uma réplica de leitura em us-east"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.89,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.92,
+    "contradicts": 0.0,
+    "refines": 0.08
+   },
+   "baseline": "unrelated",
+   "new": "o banco principal é PostgreSQL 15",
+   "old": "o backup do banco roda todo dia às 3h"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.92,
+   "probs": {
+    "refines": 0.94,
+    "contradicts": 0.0,
+    "same": 0.06,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana prefere PRs de até 400 linhas e sempre com testes junto"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana prefere PRs grandes que entreguem a feature inteira de uma vez"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana estará de férias na segunda quinzena de dezembro"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana gosta de PRs pequenos, no máximo umas 400 linhas"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefers short pull requests, up to 400 lines",
+   "old": "Ana will be on vacation in the second half of December"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.97,
+    "unrelated": 0.0,
+    "same": 0.03
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefers short pull requests, up to 400 lines",
+   "old": "Ana prefers PRs of up to 400 lines, always with tests included"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefers short pull requests, up to 400 lines",
+   "old": "Ana prefers large PRs that deliver the whole feature at once"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefers short pull requests, up to 400 lines",
+   "old": "Ana likes small PRs, roughly 400 lines at most"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefiere pull requests cortos, de hasta 400 líneas",
+   "old": "Ana estará de vacaciones la segunda quincena de diciembre"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefiere pull requests cortos, de hasta 400 líneas",
+   "old": "Ana prefiere PR grandes que entreguen la funcionalidad completa de una vez"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefiere pull requests cortos, de hasta 400 líneas",
+   "old": "a Ana le gustan los PR pequeños, de unas 400 líneas como máximo"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "same": 0.05,
+    "contradicts": 0.0,
+    "refines": 0.95,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefiere pull requests cortos, de hasta 400 líneas",
+   "old": "Ana prefiere PR de hasta 400 líneas y siempre con pruebas incluidas"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.91,
+   "probs": {
+    "refines": 0.93,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.07
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana prefers PRs of up to 400 lines, always with tests included"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana will be on vacation in the second half of December"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana prefers large PRs that deliver the whole feature at once"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana likes small PRs, roughly 400 lines at most"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefiere pull requests cortos, de hasta 400 líneas",
+   "old": "Ana gosta de PRs pequenos, no máximo umas 400 linhas"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefiere pull requests cortos, de hasta 400 líneas",
+   "old": "Ana prefere PRs grandes que entreguem a feature inteira de uma vez"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefiere pull requests cortos, de hasta 400 líneas",
+   "old": "Ana estará de férias na segunda quinzena de dezembro"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "refines": 0.97,
+    "unrelated": 0.0,
+    "same": 0.03,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefiere pull requests cortos, de hasta 400 líneas",
+   "old": "Ana prefere PRs de até 400 linhas e sempre com testes junto"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana gosta de PRs pequenos, no máximo umas 400 linhas"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana prefere PRs grandes que entreguem a feature inteira de uma vez"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.03,
+    "contradicts": 0.0,
+    "refines": 0.97,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana prefere PRs de até 400 linhas e sempre com testes junto"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Ana prefere pull requests curtos, de até 400 linhas",
+   "old": "Ana estará de férias na segunda quinzena de dezembro"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria atualizou o endereço de entrega no cadastro"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria solicitou o dinheiro de volta do pedido 1182 porque a entrega atrasou"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.95,
+   "probs": {
+    "same": 0.04,
+    "refines": 0.96,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria pediu reembolso do pedido 1182 por atraso, e o reembolso foi aprovado em 3 dias úteis"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria não quer reembolso do pedido 1182; ela quer trocar o produto"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Maria asked for a refund on order 1182 because of a late delivery",
+   "old": "Maria does not want a refund for order 1182; she wants to exchange the product"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Maria asked for a refund on order 1182 because of a late delivery",
+   "old": "Maria updated the delivery address on her account"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.92,
+   "probs": {
+    "same": 0.05,
+    "contradicts": 0.0,
+    "refines": 0.95,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Maria asked for a refund on order 1182 because of a late delivery",
+   "old": "Maria asked for a refund on order 1182 for the delay, and it was approved within 3 business days"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Maria asked for a refund on order 1182 because of a late delivery",
+   "old": "Maria requested her money back for order 1182 since delivery was late"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "la clienta María pidió el reembolso del pedido 1182 por retraso en la entrega",
+   "old": "María no quiere reembolso del pedido 1182; quiere cambiar el producto"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta María pidió el reembolso del pedido 1182 por retraso en la entrega",
+   "old": "María actualizó la dirección de entrega en su cuenta"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta María pidió el reembolso del pedido 1182 por retraso en la entrega",
+   "old": "María solicitó la devolución del dinero del pedido 1182 porque la entrega llegó tarde"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.85,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.89,
+    "same": 0.11,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta María pidió el reembolso del pedido 1182 por retraso en la entrega",
+   "old": "María pidió el reembolso del pedido 1182 por el retraso, y se aprobó en 3 días hábiles"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria updated the delivery address on her account"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.88,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.09,
+    "refines": 0.91,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria asked for a refund on order 1182 for the delay, and it was approved within 3 business days"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.99,
+    "refines": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria does not want a refund for order 1182; she wants to exchange the product"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria requested her money back for order 1182 since delivery was late"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta María pidió el reembolso del pedido 1182 por retraso en la entrega",
+   "old": "Maria solicitou o dinheiro de volta do pedido 1182 porque a entrega atrasou"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta María pidió el reembolso del pedido 1182 por retraso en la entrega",
+   "old": "Maria não quer reembolso do pedido 1182; ela quer trocar o produto"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.87,
+   "probs": {
+    "refines": 0.9,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.1
+   },
+   "baseline": "unrelated",
+   "new": "la clienta María pidió el reembolso del pedido 1182 por retraso en la entrega",
+   "old": "Maria pediu reembolso do pedido 1182 por atraso, e o reembolso foi aprovado em 3 dias úteis"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta María pidió el reembolso del pedido 1182 por retraso en la entrega",
+   "old": "Maria atualizou o endereço de entrega no cadastro"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria solicitou o dinheiro de volta do pedido 1182 porque a entrega atrasou"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria não quer reembolso do pedido 1182; ela quer trocar o produto"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.99,
+    "same": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria pediu reembolso do pedido 1182 por atraso, e o reembolso foi aprovado em 3 dias úteis"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Maria pediu reembolso do pedido 1182 por atraso na entrega",
+   "old": "Maria atualizou o endereço de entrega no cadastro"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.98,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João não está indo bem em frações"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.85,
+   "probs": {
+    "same": 0.11,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.89
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João tem dificuldade com frações, principalmente na soma com denominadores diferentes"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João prefere estudar à noite"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João domina frações e até ajuda os colegas"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.02,
+    "contradicts": 0.0,
+    "same": 0.98
+   },
+   "baseline": "contradicts",
+   "new": "the student João struggles with fractions",
+   "old": "João is not doing well with fractions"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the student João struggles with fractions",
+   "old": "João prefers to study at night"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.85,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.89,
+    "contradicts": 0.0,
+    "same": 0.11
+   },
+   "baseline": "unrelated",
+   "new": "the student João struggles with fractions",
+   "old": "João struggles with fractions, especially adding ones with different denominators"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the student João struggles with fractions",
+   "old": "João has mastered fractions and even helps classmates"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el alumno João tiene dificultades con las fracciones",
+   "old": "João domina las fracciones e incluso ayuda a sus compañeros"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "el alumno João tiene dificultades con las fracciones",
+   "old": "João prefiere estudiar por la noche"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.83,
+   "probs": {
+    "same": 0.13,
+    "contradicts": 0.0,
+    "refines": 0.87,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el alumno João tiene dificultades con las fracciones",
+   "old": "João tiene dificultades con las fracciones, sobre todo al sumar con denominadores distintos"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "el alumno João tiene dificultades con las fracciones",
+   "old": "a João no le va bien con las fracciones"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.91,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.93,
+    "unrelated": 0.0,
+    "same": 0.07
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João struggles with fractions, especially adding ones with different denominators"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João prefers to study at night"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João is not doing well with fractions"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João has mastered fractions and even helps classmates"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.81,
+   "probs": {
+    "refines": 0.86,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.14
+   },
+   "baseline": "unrelated",
+   "new": "el alumno João tiene dificultades con las fracciones",
+   "old": "João tem dificuldade com frações, principalmente na soma com denominadores diferentes"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.02,
+    "same": 0.98,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el alumno João tiene dificultades con las fracciones",
+   "old": "João não está indo bem em frações"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el alumno João tiene dificultades con las fracciones",
+   "old": "João domina frações e até ajuda os colegas"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el alumno João tiene dificultades con las fracciones",
+   "old": "João prefere estudar à noite"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João não está indo bem em frações"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João domina frações e até ajuda os colegas"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João tem dificuldade com frações, principalmente na soma com denominadores diferentes"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "o aluno João tem dificuldade com frações",
+   "old": "João prefere estudar à noite"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "a API pública aceita até 1000 requisições por minuto por chave"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "a documentação da API pública fica no Notion"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "cada chave da API pública pode fazer no máximo 100 chamadas por minuto"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.03,
+    "refines": 0.97
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "a API pública limita 100 requisições por minuto por chave e responde 429 com Retry-After ao estourar"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "the public API allows 100 requests per minute per key",
+   "old": "the public API documentation lives in Notion"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.98,
+    "contradicts": 0.0,
+    "same": 0.02,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the public API allows 100 requests per minute per key",
+   "old": "the public API allows 100 requests per minute per key and answers 429 with Retry-After when exceeded"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the public API allows 100 requests per minute per key",
+   "old": "the public API accepts up to 1000 requests per minute per key"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the public API allows 100 requests per minute per key",
+   "old": "each public API key can make at most 100 calls per minute"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la API pública limita a 100 solicitudes por minuto por clave",
+   "old": "la API pública acepta hasta 1000 solicitudes por minuto por clave"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la API pública limita a 100 solicitudes por minuto por clave",
+   "old": "la documentación de la API pública está en Notion"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la API pública limita a 100 solicitudes por minuto por clave",
+   "old": "cada clave de la API pública puede hacer como máximo 100 llamadas por minuto"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.95,
+   "probs": {
+    "refines": 0.96,
+    "same": 0.04,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la API pública limita a 100 solicitudes por minuto por clave",
+   "old": "la API pública limita a 100 solicitudes por minuto por clave y responde 429 con Retry-After al superarlo"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "the public API documentation lives in Notion"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "the public API accepts up to 1000 requests per minute per key"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "each public API key can make at most 100 calls per minute"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "same": 0.05,
+    "contradicts": 0.0,
+    "refines": 0.95,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "the public API allows 100 requests per minute per key and answers 429 with Retry-After when exceeded"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la API pública limita a 100 solicitudes por minuto por clave",
+   "old": "cada chave da API pública pode fazer no máximo 100 chamadas por minuto"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la API pública limita a 100 solicitudes por minuto por clave",
+   "old": "a API pública aceita até 1000 requisições por minuto por chave"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "refines": 0.97,
+    "same": 0.03,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la API pública limita a 100 solicitudes por minuto por clave",
+   "old": "a API pública limita 100 requisições por minuto por chave e responde 429 com Retry-After ao estourar"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la API pública limita a 100 solicitudes por minuto por clave",
+   "old": "a documentação da API pública fica no Notion"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "cada chave da API pública pode fazer no máximo 100 chamadas por minuto"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "a API pública aceita até 1000 requisições por minuto por chave"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.01,
+    "refines": 0.99,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "a API pública limita 100 requisições por minuto por chave e responde 429 com Retry-After ao estourar"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.99,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a API pública limita 100 requisições por minuto por chave",
+   "old": "a documentação da API pública fica no Notion"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.95,
+    "same": 0.05
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "feature flags ficam no LaunchDarkly, e flags antigas são removidas a cada sprint"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "same": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "não usamos variáveis de ambiente para feature flags; elas ficam no LaunchDarkly"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.95,
+   "probs": {
+    "unrelated": 0.96,
+    "contradicts": 0.0,
+    "refines": 0.04,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "os segredos da aplicação ficam no Vault"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "feature flags são configuradas por variáveis de ambiente no deploy"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "feature flags live in LaunchDarkly, never in environment variables",
+   "old": "we don't use environment variables for feature flags; they are in LaunchDarkly"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.03,
+    "unrelated": 0.97
+   },
+   "baseline": "unrelated",
+   "new": "feature flags live in LaunchDarkly, never in environment variables",
+   "old": "application secrets are stored in Vault"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "feature flags live in LaunchDarkly, never in environment variables",
+   "old": "feature flags live in LaunchDarkly, and stale flags are removed every sprint"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "feature flags live in LaunchDarkly, never in environment variables",
+   "old": "feature flags are configured through environment variables at deploy time"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las feature flags viven en LaunchDarkly, nunca en variables de entorno",
+   "old": "no usamos variables de entorno para las feature flags; están en LaunchDarkly"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "contradicts",
+   "new": "las feature flags viven en LaunchDarkly, nunca en variables de entorno",
+   "old": "las feature flags se configuran con variables de entorno en el despliegue"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "refines": 0.97,
+    "same": 0.03,
+    "unrelated": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "las feature flags viven en LaunchDarkly, nunca en variables de entorno",
+   "old": "las feature flags viven en LaunchDarkly y las antiguas se eliminan en cada sprint"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.99,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las feature flags viven en LaunchDarkly, nunca en variables de entorno",
+   "old": "los secretos de la aplicación se guardan en Vault"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "feature flags are configured through environment variables at deploy time"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 0.99,
+    "same": 0.0,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "application secrets are stored in Vault"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "we don't use environment variables for feature flags; they are in LaunchDarkly"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.05,
+    "refines": 0.95
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "feature flags live in LaunchDarkly, and stale flags are removed every sprint"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las feature flags viven en LaunchDarkly, nunca en variables de entorno",
+   "old": "feature flags são configuradas por variáveis de ambiente no deploy"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.9,
+   "probs": {
+    "same": 0.07,
+    "contradicts": 0.0,
+    "refines": 0.93,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las feature flags viven en LaunchDarkly, nunca en variables de entorno",
+   "old": "feature flags ficam no LaunchDarkly, e flags antigas são removidas a cada sprint"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las feature flags viven en LaunchDarkly, nunca en variables de entorno",
+   "old": "não usamos variáveis de ambiente para feature flags; elas ficam no LaunchDarkly"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.95,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.03,
+    "unrelated": 0.97
+   },
+   "baseline": "unrelated",
+   "new": "las feature flags viven en LaunchDarkly, nunca en variables de entorno",
+   "old": "os segredos da aplicação ficam no Vault"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "não usamos variáveis de ambiente para feature flags; elas ficam no LaunchDarkly"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "feature flags são configuradas por variáveis de ambiente no deploy"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.03,
+    "refines": 0.97
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "feature flags ficam no LaunchDarkly, e flags antigas são removidas a cada sprint"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.83,
+   "probs": {
+    "unrelated": 0.87,
+    "refines": 0.13,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "feature flags ficam no LaunchDarkly, nunca em variáveis de ambiente",
+   "old": "os segredos da aplicação ficam no Vault"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla deixou de cuidar do onboarding; agora quem coordena é o Diego"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.77,
+   "probs": {
+    "same": 0.17,
+    "contradicts": 0.01,
+    "refines": 0.82,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla coordena o onboarding de novos funcionários e faz a primeira reunião no dia 1"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.01,
+    "refines": 0.0,
+    "unrelated": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla lidera o time de dados"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.98,
+   "probs": {
+    "same": 0.98,
+    "contradicts": 0.02,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "o onboarding de quem entra na empresa é responsabilidade da Carla"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla runs onboarding for new employees",
+   "old": "Carla no longer handles onboarding; Diego coordinates it now"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "Carla runs onboarding for new employees",
+   "old": "onboarding new hires is Carla's responsibility"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.8,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.85,
+    "same": 0.14,
+    "contradicts": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "Carla runs onboarding for new employees",
+   "old": "Carla runs onboarding for new employees and holds the first meeting on day one"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla runs onboarding for new employees",
+   "old": "Carla leads the data team"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordina el onboarding de los nuevos empleados",
+   "old": "el onboarding de quienes entran a la empresa es responsabilidad de Carla"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "refines": 0.95,
+    "same": 0.05,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordina el onboarding de los nuevos empleados",
+   "old": "Carla coordina el onboarding de los nuevos empleados y hace la primera reunión el día 1"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordina el onboarding de los nuevos empleados",
+   "old": "Carla ya no se encarga del onboarding; ahora lo coordina Diego"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordina el onboarding de los nuevos empleados",
+   "old": "Carla lidera el equipo de datos"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla no longer handles onboarding; Diego coordinates it now"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "contradicts": 0.01,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "onboarding new hires is Carla's responsibility"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla leads the data team"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.59,
+   "probs": {
+    "same": 0.3,
+    "contradicts": 0.01,
+    "refines": 0.69,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla runs onboarding for new employees and holds the first meeting on day one"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.99,
+    "contradicts": 0.01,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordina el onboarding de los nuevos empleados",
+   "old": "Carla lidera o time de dados"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordina el onboarding de los nuevos empleados",
+   "old": "Carla deixou de cuidar do onboarding; agora quem coordena é o Diego"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.81,
+   "probs": {
+    "same": 0.13,
+    "refines": 0.86,
+    "contradicts": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordina el onboarding de los nuevos empleados",
+   "old": "Carla coordena o onboarding de novos funcionários e faz a primeira reunião no dia 1"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "refines": 0.0,
+    "contradicts": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordina el onboarding de los nuevos empleados",
+   "old": "o onboarding de quem entra na empresa é responsabilidade da Carla"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "o onboarding de quem entra na empresa é responsabilidade da Carla"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla deixou de cuidar do onboarding; agora quem coordena é o Diego"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "refines": 0.99,
+    "contradicts": 0.0,
+    "same": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla coordena o onboarding de novos funcionários e faz a primeira reunião no dia 1"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Carla coordena o onboarding de novos funcionários",
+   "old": "Carla lidera o time de dados"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.99,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "o projeto usa Python 3.12"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.99,
+    "refines": 0.0,
+    "unrelated": 0.01,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "o projeto não tem testes automatizados"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.0,
+    "same": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "todo commit é precedido pela suíte do pytest"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.95,
+    "unrelated": 0.0,
+    "same": 0.05
+   },
+   "baseline": "contradicts",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "os testes rodam com pytest antes de cada commit; os lentos são marcados como slow e rodam só no CI"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.98,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "tests run with pytest before every commit",
+   "old": "tests run with pytest before every commit; slow ones are marked slow and run only in CI"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "tests run with pytest before every commit",
+   "old": "the project has no automated tests"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "tests run with pytest before every commit",
+   "old": "every commit is preceded by running the pytest suite"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "tests run with pytest before every commit",
+   "old": "the project uses Python 3.12"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.99,
+    "same": 0.0,
+    "refines": 0.01,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las pruebas se ejecutan con pytest antes de cada commit",
+   "old": "el proyecto usa Python 3.12"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "las pruebas se ejecutan con pytest antes de cada commit",
+   "old": "el proyecto no tiene pruebas automatizadas"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.95,
+   "probs": {
+    "unrelated": 0.0,
+    "same": 0.04,
+    "refines": 0.96,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las pruebas se ejecutan con pytest antes de cada commit",
+   "old": "las pruebas corren con pytest antes de cada commit; las lentas se marcan como slow y solo corren en CI"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las pruebas se ejecutan con pytest antes de cada commit",
+   "old": "cada commit va precedido de la suite de pytest"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "the project uses Python 3.12"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "every commit is preceded by running the pytest suite"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.85,
+   "probs": {
+    "same": 0.11,
+    "contradicts": 0.0,
+    "refines": 0.89,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "tests run with pytest before every commit; slow ones are marked slow and run only in CI"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "the project has no automated tests"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las pruebas se ejecutan con pytest antes de cada commit",
+   "old": "o projeto não tem testes automatizados"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las pruebas se ejecutan con pytest antes de cada commit",
+   "old": "todo commit é precedido pela suíte do pytest"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "las pruebas se ejecutan con pytest antes de cada commit",
+   "old": "o projeto usa Python 3.12"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.88,
+   "probs": {
+    "same": 0.09,
+    "contradicts": 0.0,
+    "refines": 0.91,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las pruebas se ejecutan con pytest antes de cada commit",
+   "old": "os testes rodam com pytest antes de cada commit; os lentos são marcados como slow e rodam só no CI"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "refines": 0.01,
+    "same": 0.99,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "todo commit é precedido pela suíte do pytest"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "o projeto não tem testes automatizados"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "os testes rodam com pytest antes de cada commit; os lentos são marcados como slow e rodam só no CI"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.84,
+   "probs": {
+    "refines": 0.12,
+    "contradicts": 0.0,
+    "unrelated": 0.88,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "os testes rodam com pytest antes de cada commit",
+   "old": "o projeto usa Python 3.12"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.98,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro prefere WhatsApp, de preferência depois das 18h"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.02,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro gosta que falem com ele pelo WhatsApp"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro comprou o plano anual"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro pediu para nunca ser contatado por WhatsApp, só por e-mail"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Pedro prefers to be contacted on WhatsApp",
+   "old": "Pedro bought the annual plan"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "contradicts",
+   "new": "customer Pedro prefers to be contacted on WhatsApp",
+   "old": "Pedro asked never to be contacted on WhatsApp, only by email"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "refines": 0.99,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "customer Pedro prefers to be contacted on WhatsApp",
+   "old": "Pedro prefers WhatsApp, ideally after 6pm"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Pedro prefers to be contacted on WhatsApp",
+   "old": "Pedro likes being reached through WhatsApp"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "el cliente Pedro prefiere que lo contacten por WhatsApp",
+   "old": "Pedro pidió que nunca lo contacten por WhatsApp, solo por correo"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "refines": 0.97,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.03
+   },
+   "baseline": "unrelated",
+   "new": "el cliente Pedro prefiere que lo contacten por WhatsApp",
+   "old": "Pedro prefiere WhatsApp, preferiblemente después de las 18h"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.02,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "el cliente Pedro prefiere que lo contacten por WhatsApp",
+   "old": "a Pedro le gusta que le hablen por WhatsApp"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el cliente Pedro prefiere que lo contacten por WhatsApp",
+   "old": "Pedro compró el plan anual"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro bought the annual plan"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro likes being reached through WhatsApp"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro asked never to be contacted on WhatsApp, only by email"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.98,
+    "same": 0.02,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro prefers WhatsApp, ideally after 6pm"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el cliente Pedro prefiere que lo contacten por WhatsApp",
+   "old": "Pedro pediu para nunca ser contatado por WhatsApp, só por e-mail"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.95,
+    "same": 0.05,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el cliente Pedro prefiere que lo contacten por WhatsApp",
+   "old": "Pedro prefere WhatsApp, de preferência depois das 18h"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "el cliente Pedro prefiere que lo contacten por WhatsApp",
+   "old": "Pedro comprou o plano anual"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "same": 0.99,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el cliente Pedro prefiere que lo contacten por WhatsApp",
+   "old": "Pedro gosta que falem com ele pelo WhatsApp"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro gosta que falem com ele pelo WhatsApp"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro pediu para nunca ser contatado por WhatsApp, só por e-mail"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.97,
+    "unrelated": 0.0,
+    "same": 0.03
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro prefere WhatsApp, de preferência depois das 18h"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.99,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cliente Pedro prefere ser contatado por WhatsApp",
+   "old": "Pedro comprou o plano anual"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "o time usa Jira para organizar as tarefas"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "a daily do time é às 14h"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.91,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.93,
+    "same": 0.07
+   },
+   "baseline": "contradicts",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "a daily é às 9h30 (Brasília) e dura no máximo 15 minutos"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "same": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "o time faz a reunião diária às nove e meia (Brasília)"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the team's daily standup is at 9:30am Brasília time",
+   "old": "the team's daily standup is at 2pm"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "the team's daily standup is at 9:30am Brasília time",
+   "old": "the team uses Jira to organize tasks"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.85,
+   "probs": {
+    "same": 0.11,
+    "contradicts": 0.0,
+    "refines": 0.89,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the team's daily standup is at 9:30am Brasília time",
+   "old": "the daily is at 9:30am (Brasília) and lasts at most 15 minutes"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the team's daily standup is at 9:30am Brasília time",
+   "old": "the team holds its daily meeting at half past nine, Brasília time"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la daily del equipo es a las 9:30, hora de Brasilia",
+   "old": "el equipo hace la reunión diaria a las nueve y media (hora de Brasilia)"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la daily del equipo es a las 9:30, hora de Brasilia",
+   "old": "el equipo usa Jira para organizar las tareas"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.92,
+   "probs": {
+    "same": 0.06,
+    "contradicts": 0.0,
+    "refines": 0.94,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la daily del equipo es a las 9:30, hora de Brasilia",
+   "old": "la daily es a las 9:30 (Brasilia) y dura como máximo 15 minutos"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la daily del equipo es a las 9:30, hora de Brasilia",
+   "old": "la daily del equipo es a las 14h"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "same": 0.99,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "the team holds its daily meeting at half past nine, Brasília time"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.69,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.77,
+    "same": 0.23,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "the daily is at 9:30am (Brasília) and lasts at most 15 minutes"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "the team uses Jira to organize tasks"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.88,
+   "probs": {
+    "contradicts": 0.91,
+    "refines": 0.0,
+    "same": 0.01,
+    "unrelated": 0.08
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "the team's daily standup is at 2pm"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la daily del equipo es a las 9:30, hora de Brasilia",
+   "old": "o time usa Jira para organizar as tarefas"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.01,
+    "same": 0.99,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la daily del equipo es a las 9:30, hora de Brasilia",
+   "old": "o time faz a reunião diária às nove e meia (Brasília)"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.65,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.74,
+    "same": 0.26,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la daily del equipo es a las 9:30, hora de Brasilia",
+   "old": "a daily é às 9h30 (Brasília) e dura no máximo 15 minutos"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la daily del equipo es a las 9:30, hora de Brasilia",
+   "old": "a daily do time é às 14h"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.91,
+   "probs": {
+    "same": 0.93,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.07
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "o time faz a reunião diária às nove e meia (Brasília)"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.01,
+    "contradicts": 0.99,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "a daily do time é às 14h"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.95,
+    "same": 0.05
+   },
+   "baseline": "contradicts",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "a daily é às 9h30 (Brasília) e dura no máximo 15 minutos"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.98,
+    "contradicts": 0.0,
+    "refines": 0.02,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a daily do time é às 9h30, horário de Brasília",
+   "old": "o time usa Jira para organizar as tarefas"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.64,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.73,
+    "refines": 0.27,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "ele bebe café amargo, sem açúcar"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "o usuário corre três vezes por semana"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "o usuário toma café sem açúcar",
+   "old": "o usuário toma café com duas colheres de açúcar"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "o usuário toma café sem açúcar, e só pela manhã"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.96,
+   "probs": {
+    "refines": 0.03,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.97
+   },
+   "baseline": "unrelated",
+   "new": "the user drinks coffee without sugar",
+   "old": "he takes his coffee black, no sugar"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "the user drinks coffee without sugar",
+   "old": "the user takes coffee with two spoons of sugar"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.98,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "the user drinks coffee without sugar",
+   "old": "the user drinks coffee without sugar, and only in the morning"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the user drinks coffee without sugar",
+   "old": "the user goes running three times a week"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "el usuario toma el café sin azúcar",
+   "old": "el usuario toma el café con dos cucharadas de azúcar"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "refines": 0.98,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el usuario toma el café sin azúcar",
+   "old": "el usuario toma el café sin azúcar, y solo por la mañana"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "el usuario toma el café sin azúcar",
+   "old": "el usuario sale a correr tres veces por semana"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.61,
+   "probs": {
+    "refines": 0.29,
+    "same": 0.71,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el usuario toma el café sin azúcar",
+   "old": "él bebe el café amargo, sin azúcar"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.89,
+   "probs": {
+    "same": 0.08,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.92
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "the user drinks coffee without sugar, and only in the morning"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "the user goes running three times a week"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "the user takes coffee with two spoons of sugar"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "he takes his coffee black, no sugar"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el usuario toma el café sin azúcar",
+   "old": "o usuário corre três vezes por semana"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.77,
+   "probs": {
+    "same": 0.83,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.17
+   },
+   "baseline": "unrelated",
+   "new": "el usuario toma el café sin azúcar",
+   "old": "ele bebe café amargo, sem açúcar"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.91,
+   "probs": {
+    "same": 0.07,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.93
+   },
+   "baseline": "unrelated",
+   "new": "el usuario toma el café sin azúcar",
+   "old": "o usuário toma café sem açúcar, e só pela manhã"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el usuario toma el café sin azúcar",
+   "old": "o usuário toma café com duas colheres de açúcar"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.77,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.83,
+    "refines": 0.17,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "ele bebe café amargo, sem açúcar"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "o usuário toma café sem açúcar",
+   "old": "o usuário toma café com duas colheres de açúcar"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.98,
+   "probs": {
+    "same": 0.01,
+    "contradicts": 0.0,
+    "refines": 0.99,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "o usuário toma café sem açúcar, e só pela manhã"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o usuário toma café sem açúcar",
+   "old": "o usuário corre três vezes por semana"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "same": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "regressão linear só é vista no módulo 5 do curso"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.92,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.06,
+    "unrelated": 0.0,
+    "refines": 0.94
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "o módulo 3 cobre regressão linear, com exercícios práticos em Python"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "o curso emite certificado ao final"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "regressão linear é o tema do terceiro módulo do curso"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "module 3 of the course covers linear regression",
+   "old": "the course issues a certificate at the end"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.92,
+   "probs": {
+    "same": 0.06,
+    "contradicts": 0.0,
+    "refines": 0.94,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "module 3 of the course covers linear regression",
+   "old": "module 3 covers linear regression, with hands-on exercises in Python"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "module 3 of the course covers linear regression",
+   "old": "linear regression is the topic of the course's third module"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "module 3 of the course covers linear regression",
+   "old": "linear regression is only taught in module 5 of the course"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el módulo 3 del curso cubre regresión lineal",
+   "old": "la regresión lineal solo se ve en el módulo 5 del curso"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "el módulo 3 del curso cubre regresión lineal",
+   "old": "el curso emite un certificado al final"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el módulo 3 del curso cubre regresión lineal",
+   "old": "la regresión lineal es el tema del tercer módulo del curso"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.03,
+    "refines": 0.97,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el módulo 3 del curso cubre regresión lineal",
+   "old": "el módulo 3 cubre regresión lineal, con ejercicios prácticos en Python"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "linear regression is the topic of the course's third module"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "linear regression is only taught in module 5 of the course"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "the course issues a certificate at the end"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.83,
+   "probs": {
+    "same": 0.13,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.87
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "module 3 covers linear regression, with hands-on exercises in Python"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el módulo 3 del curso cubre regresión lineal",
+   "old": "o curso emite certificado ao final"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "el módulo 3 del curso cubre regresión lineal",
+   "old": "regressão linear é o tema do terceiro módulo do curso"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "refines": 0.95,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.05
+   },
+   "baseline": "unrelated",
+   "new": "el módulo 3 del curso cubre regresión lineal",
+   "old": "o módulo 3 cobre regressão linear, com exercícios práticos em Python"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el módulo 3 del curso cubre regresión lineal",
+   "old": "regressão linear só é vista no módulo 5 do curso"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "regressão linear é o tema do terceiro módulo do curso"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "contradicts",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "regressão linear só é vista no módulo 5 do curso"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.98,
+    "contradicts": 0.0,
+    "same": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "o módulo 3 cobre regressão linear, com exercícios práticos em Python"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.99,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "o módulo 3 do curso cobre regressão linear",
+   "old": "o curso emite certificado ao final"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.79,
+   "probs": {
+    "same": 0.16,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.84
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "o timeout no checkout era um pool de conexões pequeno, corrigido subindo o pool para 50"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "o timeout do checkout era causado por uma query sem índice, não pelo pool de conexões"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "o timeout do checkout vinha de um pool de conexões subdimensionado"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "o checkout passou a aceitar Pix"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "the checkout timeout was caused by a connection pool that was too small",
+   "old": "the checkout timeout was caused by an unindexed query, not by the connection pool"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.92,
+   "probs": {
+    "same": 0.06,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.94
+   },
+   "baseline": "unrelated",
+   "new": "the checkout timeout was caused by a connection pool that was too small",
+   "old": "the checkout timeout was a small connection pool, fixed by raising the pool to 50"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the checkout timeout was caused by a connection pool that was too small",
+   "old": "the checkout timeouts came from an undersized connection pool"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the checkout timeout was caused by a connection pool that was too small",
+   "old": "checkout now accepts Pix payments"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el timeout del checkout lo causaba un pool de conexiones demasiado pequeño",
+   "old": "el checkout ahora acepta pagos con Pix"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "el timeout del checkout lo causaba un pool de conexiones demasiado pequeño",
+   "old": "el timeout del checkout lo causaba una consulta sin índice, no el pool de conexiones"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.61,
+   "probs": {
+    "refines": 0.71,
+    "contradicts": 0.02,
+    "unrelated": 0.0,
+    "same": 0.27
+   },
+   "baseline": "unrelated",
+   "new": "el timeout del checkout lo causaba un pool de conexiones demasiado pequeño",
+   "old": "el timeout del checkout era un pool de conexiones pequeño, corregido subiendo el pool a 50"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.02,
+    "same": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el timeout del checkout lo causaba un pool de conexiones demasiado pequeño",
+   "old": "los timeouts del checkout venían de un pool de conexiones subdimensionado"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "the checkout timeouts came from an undersized connection pool"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "checkout now accepts Pix payments"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "the checkout timeout was caused by an unindexed query, not by the connection pool"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.63,
+   "probs": {
+    "refines": 0.72,
+    "same": 0.28,
+    "unrelated": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "the checkout timeout was a small connection pool, fixed by raising the pool to 50"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "el timeout del checkout lo causaba un pool de conexiones demasiado pequeño",
+   "old": "o timeout do checkout era causado por uma query sem índice, não pelo pool de conexões"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "refines": 0.01,
+    "unrelated": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el timeout del checkout lo causaba un pool de conexiones demasiado pequeño",
+   "old": "o timeout do checkout vinha de um pool de conexões subdimensionado"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.85,
+   "probs": {
+    "same": 0.11,
+    "refines": 0.89,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el timeout del checkout lo causaba un pool de conexiones demasiado pequeño",
+   "old": "o timeout no checkout era um pool de conexões pequeno, corrigido subindo o pool para 50"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "el timeout del checkout lo causaba un pool de conexiones demasiado pequeño",
+   "old": "o checkout passou a aceitar Pix"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "o timeout do checkout vinha de um pool de conexões subdimensionado"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "o timeout do checkout era causado por uma query sem índice, não pelo pool de conexões"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.84,
+   "probs": {
+    "same": 0.12,
+    "contradicts": 0.0,
+    "refines": 0.88,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "o timeout no checkout era um pool de conexões pequeno, corrigido subindo o pool para 50"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.99,
+    "same": 0.0,
+    "contradicts": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "o timeout no checkout era causado por um pool de conexões pequeno demais",
+   "old": "o checkout passou a aceitar Pix"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "refines": 0.98,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "o frontend usa TypeScript strict, com noUncheckedIndexedAccess também ligado"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "o frontend é JavaScript puro, sem TypeScript"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "o frontend é hospedado na Vercel"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.95,
+   "probs": {
+    "same": 0.96,
+    "refines": 0.04,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "o código do frontend é TypeScript com strict ligado"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "same": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the frontend uses TypeScript in strict mode",
+   "old": "the frontend is plain JavaScript, no TypeScript"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the frontend uses TypeScript in strict mode",
+   "old": "the frontend is hosted on Vercel"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.95,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.96,
+    "unrelated": 0.0,
+    "refines": 0.04
+   },
+   "baseline": "unrelated",
+   "new": "the frontend uses TypeScript in strict mode",
+   "old": "the frontend code is TypeScript with strict enabled"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.01,
+    "unrelated": 0.0,
+    "refines": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "the frontend uses TypeScript in strict mode",
+   "old": "the frontend uses strict TypeScript, with noUncheckedIndexedAccess enabled too"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "el frontend usa TypeScript en modo strict",
+   "old": "el frontend usa TypeScript strict, con noUncheckedIndexedAccess también activado"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el frontend usa TypeScript en modo strict",
+   "old": "el frontend está alojado en Vercel"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.99,
+    "unrelated": 0.0,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "el frontend usa TypeScript en modo strict",
+   "old": "el código del frontend es TypeScript con strict activado"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el frontend usa TypeScript en modo strict",
+   "old": "el frontend es JavaScript puro, sin TypeScript"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "the frontend uses strict TypeScript, with noUncheckedIndexedAccess enabled too"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "the frontend code is TypeScript with strict enabled"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "the frontend is hosted on Vercel"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "the frontend is plain JavaScript, no TypeScript"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el frontend usa TypeScript en modo strict",
+   "old": "o frontend é hospedado na Vercel"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "el frontend usa TypeScript en modo strict",
+   "old": "o código do frontend é TypeScript com strict ligado"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "el frontend usa TypeScript en modo strict",
+   "old": "o frontend é JavaScript puro, sem TypeScript"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0,
+    "same": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "el frontend usa TypeScript en modo strict",
+   "old": "o frontend usa TypeScript strict, com noUncheckedIndexedAccess também ligado"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "o código do frontend é TypeScript com strict ligado"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "o frontend é JavaScript puro, sem TypeScript"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.01,
+    "refines": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "o frontend usa TypeScript strict, com noUncheckedIndexedAccess também ligado"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o frontend usa TypeScript em modo strict",
+   "old": "o frontend é hospedado na Vercel"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.03,
+    "contradicts": 0.0,
+    "refines": 0.97,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno trabalha remoto de Recife e vem a São Paulo uma vez por mês"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.02,
+    "unrelated": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno é o responsável pelo serviço de estoque"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno trabalha presencialmente no escritório de São Paulo todos os dias"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.61,
+   "probs": {
+    "same": 0.71,
+    "contradicts": 0.0,
+    "refines": 0.29,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno é remoto e mora em Recife"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno works remotely from Recife",
+   "old": "Bruno works on-site at the São Paulo office every day"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno works remotely from Recife",
+   "old": "Bruno owns the inventory service"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.95,
+   "probs": {
+    "refines": 0.96,
+    "contradicts": 0.0,
+    "same": 0.04,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno works remotely from Recife",
+   "old": "Bruno works remotely from Recife and comes to São Paulo once a month"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "refines",
+   "conf": 0.52,
+   "probs": {
+    "refines": 0.64,
+    "contradicts": 0.0,
+    "same": 0.36,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno works remotely from Recife",
+   "old": "Bruno is remote and lives in Recife"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabaja en remoto desde Recife",
+   "old": "Bruno trabaja presencialmente en la oficina de São Paulo todos los días"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.94,
+   "probs": {
+    "same": 0.04,
+    "contradicts": 0.0,
+    "refines": 0.96,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabaja en remoto desde Recife",
+   "old": "Bruno trabaja en remoto desde Recife y viene a São Paulo una vez al mes"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabaja en remoto desde Recife",
+   "old": "Bruno es el responsable del servicio de inventario"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "refines",
+   "conf": 0.36,
+   "probs": {
+    "same": 0.48,
+    "contradicts": 0.0,
+    "refines": 0.52,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabaja en remoto desde Recife",
+   "old": "Bruno es remoto y vive en Recife"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.83,
+   "probs": {
+    "refines": 0.13,
+    "unrelated": 0.0,
+    "same": 0.87,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno is remote and lives in Recife"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.79,
+   "probs": {
+    "refines": 0.84,
+    "unrelated": 0.0,
+    "same": 0.16,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno works remotely from Recife and comes to São Paulo once a month"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno works on-site at the São Paulo office every day"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno owns the inventory service"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "refines": 0.95,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.05
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabaja en remoto desde Recife",
+   "old": "Bruno trabalha remoto de Recife e vem a São Paulo uma vez por mês"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.48,
+   "probs": {
+    "refines": 0.39,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.61
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabaja en remoto desde Recife",
+   "old": "Bruno é remoto e mora em Recife"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.02,
+    "unrelated": 0.98,
+    "contradicts": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabaja en remoto desde Recife",
+   "old": "Bruno é o responsável pelo serviço de estoque"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabaja en remoto desde Recife",
+   "old": "Bruno trabalha presencialmente no escritório de São Paulo todos os dias"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.55,
+   "probs": {
+    "same": 0.66,
+    "contradicts": 0.0,
+    "refines": 0.34,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno é remoto e mora em Recife"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno trabalha presencialmente no escritório de São Paulo todos os dias"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno trabalha remoto de Recife e vem a São Paulo uma vez por mês"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.03,
+    "unrelated": 0.97
+   },
+   "baseline": "unrelated",
+   "new": "Bruno trabalha remoto de Recife",
+   "old": "Bruno é o responsável pelo serviço de estoque"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.03,
+    "contradicts": 0.0,
+    "refines": 0.97,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia é alérgica a amendoim e também a castanhas"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia tem alergia a amendoim"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia faz aniversário em março"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia não tem nenhuma alergia alimentar"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "customer Júlia is allergic to peanuts",
+   "old": "Júlia has a peanut allergy"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "same": 0.02,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Júlia is allergic to peanuts",
+   "old": "Júlia is allergic to peanuts and also to tree nuts"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Júlia is allergic to peanuts",
+   "old": "Júlia has no food allergies at all"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "customer Júlia is allergic to peanuts",
+   "old": "Júlia's birthday is in March"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta Júlia es alérgica al cacahuete",
+   "old": "Júlia tiene alergia al maní"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta Júlia es alérgica al cacahuete",
+   "old": "el cumpleaños de Júlia es en marzo"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta Júlia es alérgica al cacahuete",
+   "old": "Júlia no tiene ninguna alergia alimentaria"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.92,
+   "probs": {
+    "refines": 0.94,
+    "same": 0.06,
+    "unrelated": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta Júlia es alérgica al cacahuete",
+   "old": "Júlia es alérgica al cacahuete y también a los frutos secos"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "refines": 0.95,
+    "contradicts": 0.0,
+    "same": 0.05,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia is allergic to peanuts and also to tree nuts"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia's birthday is in March"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia has a peanut allergy"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia has no food allergies at all"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta Júlia es alérgica al cacahuete",
+   "old": "Júlia faz aniversário em março"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.84,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.12,
+    "refines": 0.88,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta Júlia es alérgica al cacahuete",
+   "old": "Júlia é alérgica a amendoim e também a castanhas"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "contradicts": 0.01,
+    "refines": 0.01,
+    "same": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta Júlia es alérgica al cacahuete",
+   "old": "Júlia tem alergia a amendoim"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la clienta Júlia es alérgica al cacahuete",
+   "old": "Júlia não tem nenhuma alergia alimentar"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "refines": 0.01,
+    "contradicts": 0.0,
+    "same": 0.99,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia tem alergia a amendoim"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia não tem nenhuma alergia alimentar"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.95,
+   "probs": {
+    "refines": 0.96,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.04
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia é alérgica a amendoim e também a castanhas"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a cliente Júlia é alérgica a amendoim",
+   "old": "Júlia faz aniversário em março"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "não há cadência fixa de release; sai quando estiver pronto"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.97,
+    "contradicts": 0.0,
+    "refines": 0.03
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "o changelog é publicado no GitHub Releases"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "lançamos uma versão nova quinzenalmente, sempre numa quinta"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.89,
+   "probs": {
+    "same": 0.08,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.92
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "releases saem a cada duas semanas às quintas, mas hotfixes podem sair em qualquer dia"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "releases ship every two weeks, on Thursdays",
+   "old": "there is no fixed release cadence; it ships when it's ready"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "refines": 0.01,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "releases ship every two weeks, on Thursdays",
+   "old": "we cut a new version fortnightly, always on a Thursday"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "releases ship every two weeks, on Thursdays",
+   "old": "releases ship every two weeks on Thursdays, but hotfixes can ship any day"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.02,
+    "unrelated": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "releases ship every two weeks, on Thursdays",
+   "old": "the changelog is published on GitHub Releases"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las releases salen cada dos semanas, los jueves",
+   "old": "no hay cadencia fija de release; sale cuando está lista"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.97,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.02,
+    "unrelated": 0.98
+   },
+   "baseline": "unrelated",
+   "new": "las releases salen cada dos semanas, los jueves",
+   "old": "el changelog se publica en GitHub Releases"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.02,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las releases salen cada dos semanas, los jueves",
+   "old": "las releases salen cada dos semanas los jueves, pero los hotfixes pueden salir cualquier día"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las releases salen cada dos semanas, los jueves",
+   "old": "lanzamos una versión nueva cada quincena, siempre en jueves"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.91,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.07,
+    "unrelated": 0.93
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "the changelog is published on GitHub Releases"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.84,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.12,
+    "refines": 0.88,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "releases ship every two weeks on Thursdays, but hotfixes can ship any day"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.99,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "we cut a new version fortnightly, always on a Thursday"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "there is no fixed release cadence; it ships when it's ready"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.91,
+   "probs": {
+    "same": 0.07,
+    "contradicts": 0.0,
+    "refines": 0.93,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las releases salen cada dos semanas, los jueves",
+   "old": "releases saem a cada duas semanas às quintas, mas hotfixes podem sair em qualquer dia"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las releases salen cada dos semanas, los jueves",
+   "old": "lançamos uma versão nova quinzenalmente, sempre numa quinta"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.93,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.05,
+    "unrelated": 0.95
+   },
+   "baseline": "unrelated",
+   "new": "las releases salen cada dos semanas, los jueves",
+   "old": "o changelog é publicado no GitHub Releases"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "las releases salen cada dos semanas, los jueves",
+   "old": "não há cadência fixa de release; sai quando estiver pronto"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "lançamos uma versão nova quinzenalmente, sempre numa quinta"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "não há cadência fixa de release; sai quando estiver pronto"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.03,
+    "refines": 0.97,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "releases saem a cada duas semanas às quintas, mas hotfixes podem sair em qualquer dia"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.75,
+   "probs": {
+    "refines": 0.19,
+    "same": 0.0,
+    "unrelated": 0.81,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "as releases saem a cada duas semanas, às quintas-feiras",
+   "old": "o changelog é publicado no GitHub Releases"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.99,
+    "contradicts": 0.01,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz tirou 9 na prova de história"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 1.0
+   },
+   "baseline": "contradicts",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz não compareceu às últimas três aulas"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.95,
+    "same": 0.05
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz faltou às três últimas aulas por motivo de saúde, com atestado"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.02,
+    "contradicts": 0.98,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz não faltou a nenhuma aula este mês"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the student Beatriz missed the last three classes",
+   "old": "Beatriz scored 9 on the history test"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.95,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.96,
+    "same": 0.04,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the student Beatriz missed the last three classes",
+   "old": "Beatriz missed the last three classes for health reasons, with a doctor's note"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.01,
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "the student Beatriz missed the last three classes",
+   "old": "Beatriz has not missed a single class this month"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "the student Beatriz missed the last three classes",
+   "old": "Beatriz did not attend the last three lessons"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la alumna Beatriz faltó a las tres últimas clases",
+   "old": "Beatriz sacó un 9 en el examen de historia"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.99,
+    "unrelated": 0.01,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la alumna Beatriz faltó a las tres últimas clases",
+   "old": "Beatriz no ha faltado a ninguna clase este mes"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "la alumna Beatriz faltó a las tres últimas clases",
+   "old": "Beatriz no asistió a las últimas tres clases"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.95,
+   "probs": {
+    "same": 0.04,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.96
+   },
+   "baseline": "unrelated",
+   "new": "la alumna Beatriz faltó a las tres últimas clases",
+   "old": "Beatriz faltó a las tres últimas clases por motivos de salud, con justificante médico"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz did not attend the last three lessons"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.93,
+   "probs": {
+    "same": 0.05,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.95
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz missed the last three classes for health reasons, with a doctor's note"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz scored 9 on the history test"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.01,
+    "contradicts": 0.99,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz has not missed a single class this month"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la alumna Beatriz faltó a las tres últimas clases",
+   "old": "Beatriz não compareceu às últimas três aulas"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la alumna Beatriz faltó a las tres últimas clases",
+   "old": "Beatriz tirou 9 na prova de história"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "refines": 0.98,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "same": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "la alumna Beatriz faltó a las tres últimas clases",
+   "old": "Beatriz faltou às três últimas aulas por motivo de saúde, com atestado"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.99,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.99,
+    "unrelated": 0.01,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la alumna Beatriz faltó a las tres últimas clases",
+   "old": "Beatriz não faltou a nenhuma aula este mês"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "same": 1.0,
+    "refines": 0.0,
+    "contradicts": 0.0
+   },
+   "baseline": "contradicts",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz não compareceu às últimas três aulas"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.01,
+    "same": 0.0,
+    "contradicts": 0.98,
+    "refines": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz não faltou a nenhuma aula este mês"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.01,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz faltou às três últimas aulas por motivo de saúde, com atestado"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "a aluna Beatriz faltou às três últimas aulas",
+   "old": "Beatriz tirou 9 na prova de história"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.98,
+    "same": 0.02
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "o cache do catálogo expira a cada 10 minutos e é invalidado na hora quando um preço muda"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "same": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "o TTL do cache de catálogo é de 10 min"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "o cache do catálogo expira a cada uma hora"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.99,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "o catálogo tem cerca de 12 mil produtos"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.96,
+   "probs": {
+    "same": 0.03,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.97
+   },
+   "baseline": "unrelated",
+   "new": "the catalog cache expires every 10 minutes",
+   "old": "the catalog cache expires every 10 minutes and is invalidated immediately when a price changes"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the catalog cache expires every 10 minutes",
+   "old": "the catalog has about 12 thousand products"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the catalog cache expires every 10 minutes",
+   "old": "the catalog cache expires every hour"
+  },
+  {
+   "mode": "batch",
+   "cond": "en-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "the catalog cache expires every 10 minutes",
+   "old": "the catalog cache TTL is 10 min"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la caché del catálogo expira cada 10 minutos",
+   "old": "la caché del catálogo expira cada hora"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 1.0
+   },
+   "baseline": "unrelated",
+   "new": "la caché del catálogo expira cada 10 minutos",
+   "old": "el catálogo tiene unos 12 mil productos"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.97,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 0.02,
+    "refines": 0.98,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la caché del catálogo expira cada 10 minutos",
+   "old": "la caché del catálogo expira cada 10 minutos y se invalida al instante cuando cambia un precio"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-es",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la caché del catálogo expira cada 10 minutos",
+   "old": "el TTL de la caché del catálogo es de 10 min"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "the catalog has about 12 thousand products"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "the catalog cache expires every hour"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.01,
+    "same": 0.99
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "the catalog cache TTL is 10 min"
+  },
+  {
+   "mode": "batch",
+   "cond": "pt-en",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.83,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.87,
+    "same": 0.13
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "the catalog cache expires every 10 minutes and is invalidated immediately when a price changes"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.91,
+   "probs": {
+    "same": 0.07,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.93
+   },
+   "baseline": "unrelated",
+   "new": "la caché del catálogo expira cada 10 minutos",
+   "old": "o cache do catálogo expira a cada 10 minutos e é invalidado na hora quando um preço muda"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la caché del catálogo expira cada 10 minutos",
+   "old": "o cache do catálogo expira a cada uma hora"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.0,
+    "unrelated": 1.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la caché del catálogo expira cada 10 minutos",
+   "old": "o catálogo tem cerca de 12 mil produtos"
+  },
+  {
+   "mode": "batch",
+   "cond": "es-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "unrelated": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "la caché del catálogo expira cada 10 minutos",
+   "old": "o TTL do cache de catálogo é de 10 min"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "refines": 0.0,
+    "contradicts": 0.0,
+    "same": 1.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "o TTL do cache de catálogo é de 10 min"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "same": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "o cache do catálogo expira a cada uma hora"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "refines": 0.99,
+    "same": 0.01
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "o cache do catálogo expira a cada 10 minutos e é invalidado na hora quando um preço muda"
+  },
+  {
+   "mode": "pair",
+   "cond": "pt-pt",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.93,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.05,
+    "contradicts": 0.0,
+    "unrelated": 0.95
+   },
+   "baseline": "unrelated",
+   "new": "o cache do catálogo expira a cada 10 minutos",
+   "old": "o catálogo tem cerca de 12 mil produtos"
+  }
+ ],
+ "durable": [
+  {
+   "lang": "pt",
+   "text": "Decidimos que todo endpoint novo precisa de teste de contrato antes do merge",
+   "gold": true,
+   "p_durable": 0.94,
+   "importance": 3.14,
+   "imp_conf": 0.83,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "A partir de agora, deploy em produção só às quintas-feiras",
+   "gold": true,
+   "p_durable": 0.92,
+   "importance": 3.1,
+   "imp_conf": 0.71,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "Lembre que o Bruno é o dono do serviço de estoque, fale com ele antes de mudar a API",
+   "gold": true,
+   "p_durable": 0.89,
+   "importance": 2.96,
+   "imp_conf": 0.76,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "O cliente da conta 8841 só aceita nota fiscal com o CNPJ da matriz",
+   "gold": true,
+   "p_durable": 0.95,
+   "importance": 3.28,
+   "imp_conf": 0.69,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "Nunca use float para valores monetários neste projeto; usamos Decimal",
+   "gold": true,
+   "p_durable": 0.96,
+   "importance": 3.51,
+   "imp_conf": 0.59,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "A aluna Beatriz precisa de prova adaptada por causa da dislexia",
+   "gold": true,
+   "p_durable": 0.9,
+   "importance": 3.14,
+   "imp_conf": 0.55,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "roda os testes de novo",
+   "gold": false,
+   "p_durable": 0.05,
+   "importance": 0.51,
+   "imp_conf": 0.57,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "ok, pode continuar",
+   "gold": false,
+   "p_durable": 0.04,
+   "importance": 0.09,
+   "imp_conf": 0.93,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "qual a diferença entre let e const em JavaScript?",
+   "gold": false,
+   "p_durable": 0.09,
+   "importance": 0.64,
+   "imp_conf": 0.47,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "mostra o conteúdo do arquivo main.py",
+   "gold": false,
+   "p_durable": 0.03,
+   "importance": 0.32,
+   "imp_conf": 0.74,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "corrige o erro de digitação na linha 30",
+   "gold": false,
+   "p_durable": 0.03,
+   "importance": 0.25,
+   "imp_conf": 0.8,
+   "baseline": true
+  },
+  {
+   "lang": "pt",
+   "text": "valeu, ficou ótimo!",
+   "gold": false,
+   "p_durable": 0.04,
+   "importance": 0.09,
+   "imp_conf": 0.93,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "We agreed that the payments service must never call the inventory DB directly",
+   "gold": true,
+   "p_durable": 0.95,
+   "importance": 3.54,
+   "imp_conf": 0.62,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "Remember: staging resets every Sunday night, don't keep test data there",
+   "gold": true,
+   "p_durable": 0.93,
+   "importance": 2.79,
+   "imp_conf": 0.73,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "The client prefers weekly summaries by email, not Slack messages",
+   "gold": true,
+   "p_durable": 0.95,
+   "importance": 2.71,
+   "imp_conf": 0.71,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "Our convention is snake_case for database columns and camelCase in the API",
+   "gold": true,
+   "p_durable": 0.96,
+   "importance": 2.82,
+   "imp_conf": 0.77,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "Employees in the Lisbon office follow Portuguese public holidays, not Brazilian ones",
+   "gold": true,
+   "p_durable": 0.92,
+   "importance": 2.65,
+   "imp_conf": 0.66,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "The flaky webhook test is caused by a race in the retry queue; it's tracked in JIRA-412",
+   "gold": true,
+   "p_durable": 0.63,
+   "importance": 2.42,
+   "imp_conf": 0.5,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "run the linter",
+   "gold": false,
+   "p_durable": 0.05,
+   "importance": 0.42,
+   "imp_conf": 0.65,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "what does this regex do?",
+   "gold": false,
+   "p_durable": 0.02,
+   "importance": 0.19,
+   "imp_conf": 0.83,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "thanks, looks good",
+   "gold": false,
+   "p_durable": 0.04,
+   "importance": 0.05,
+   "imp_conf": 0.97,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "show me the git log",
+   "gold": false,
+   "p_durable": 0.03,
+   "importance": 0.12,
+   "imp_conf": 0.91,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "rename this variable to total",
+   "gold": false,
+   "p_durable": 0.08,
+   "importance": 0.29,
+   "imp_conf": 0.77,
+   "baseline": true
+  },
+  {
+   "lang": "en",
+   "text": "continue",
+   "gold": false,
+   "p_durable": 0.02,
+   "importance": 0.08,
+   "imp_conf": 0.95,
+   "baseline": false
+  },
+  {
+   "lang": "es",
+   "text": "Acordamos que la API de pagos usa claves de idempotencia en todos los POST",
+   "gold": true,
+   "p_durable": 0.92,
+   "importance": 3.05,
+   "imp_conf": 0.77,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "El cliente Luis solo puede recibir llamadas por la tarde, trabaja de noche",
+   "gold": true,
+   "p_durable": 0.94,
+   "importance": 3.02,
+   "imp_conf": 0.71,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "En este proyecto las migraciones se escriben a mano, nunca autogeneradas",
+   "gold": true,
+   "p_durable": 0.94,
+   "importance": 2.74,
+   "imp_conf": 0.71,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "La profesora pidió que los ejercicios de la semana se entreguen siempre el viernes",
+   "gold": true,
+   "p_durable": 0.78,
+   "importance": 2.25,
+   "imp_conf": 0.3,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "El equipo de soporte responde en menos de 4 horas para clientes premium",
+   "gold": true,
+   "p_durable": 0.85,
+   "importance": 2.39,
+   "imp_conf": 0.44,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "Recuerda que la base de staging no tiene datos reales de clientes por LGPD",
+   "gold": true,
+   "p_durable": 0.9,
+   "importance": 3.44,
+   "imp_conf": 0.55,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "ejecuta las pruebas otra vez",
+   "gold": false,
+   "p_durable": 0.03,
+   "importance": 0.35,
+   "imp_conf": 0.7,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "¿qué significa este error?",
+   "gold": false,
+   "p_durable": 0.02,
+   "importance": 0.19,
+   "imp_conf": 0.82,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "gracias, perfecto",
+   "gold": false,
+   "p_durable": 0.03,
+   "importance": 0.06,
+   "imp_conf": 0.97,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "abre el archivo de configuración",
+   "gold": false,
+   "p_durable": 0.04,
+   "importance": 0.51,
+   "imp_conf": 0.58,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "formatea este JSON",
+   "gold": false,
+   "p_durable": 0.05,
+   "importance": 0.28,
+   "imp_conf": 0.77,
+   "baseline": true
+  },
+  {
+   "lang": "es",
+   "text": "sigue",
+   "gold": false,
+   "p_durable": 0.03,
+   "importance": 0.1,
+   "imp_conf": 0.94,
+   "baseline": false
+  }
+ ]
+}
