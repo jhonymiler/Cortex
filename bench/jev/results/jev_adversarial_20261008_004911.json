@@ -1,0 +1,513 @@
+{
+ "relation": [
+  {
+   "trap": "temporal",
+   "new": "o banco principal é MySQL",
+   "old": "migramos o banco principal de MySQL para Postgres em março",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.92,
+   "probs": {
+    "refines": 0.05,
+    "unrelated": 0.0,
+    "contradicts": 0.94,
+    "same": 0.01
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "temporal",
+   "new": "Carla é a gerente do time de dados",
+   "old": "a Carla saiu da empresa em agosto",
+   "gold": "contradicts",
+   "pred": "unrelated",
+   "conf": 0.36,
+   "probs": {
+    "unrelated": 0.52,
+    "same": 0.0,
+    "refines": 0.08,
+    "contradicts": 0.4
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "temporal",
+   "new": "the API is on version 2",
+   "old": "we sunset API v2 last month; everyone is on v3",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 1.0,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "world",
+   "new": "o servidor de produção fica em Lisboa",
+   "old": "o servidor de produção fica na América do Sul",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "world",
+   "new": "a reunião de planejamento é às segundas",
+   "old": "a reunião de planejamento acontece no primeiro dia útil da semana",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.93,
+   "probs": {
+    "same": 0.95,
+    "contradicts": 0.0,
+    "refines": 0.05,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "world",
+   "new": "el cliente vive en Madrid",
+   "old": "el cliente vive en la capital de España",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.95,
+   "probs": {
+    "same": 0.96,
+    "contradicts": 0.0,
+    "refines": 0.04,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "world",
+   "new": "o build usa Node 20",
+   "old": "o build usa a versão LTS do Node lançada em abril de 2023",
+   "gold": "same",
+   "pred": "refines",
+   "conf": 0.37,
+   "probs": {
+    "contradicts": 0.33,
+    "unrelated": 0.01,
+    "same": 0.13,
+    "refines": 0.53
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "homonym",
+   "new": "Maria do financeiro aprova os reembolsos",
+   "old": "Maria do suporte atende o chat da madrugada",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.96,
+   "probs": {
+    "contradicts": 0.03,
+    "unrelated": 0.97,
+    "same": 0.0,
+    "refines": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "homonym",
+   "new": "o serviço payments roda em Go",
+   "old": "o time de payments faz on-call em escala semanal",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.99,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.01,
+    "contradicts": 0.0,
+    "unrelated": 0.99
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "scope",
+   "new": "o ambiente de staging escala para zero à noite",
+   "old": "o ambiente de produção nunca escala para zero",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.49,
+   "probs": {
+    "same": 0.0,
+    "refines": 0.24,
+    "contradicts": 0.14,
+    "unrelated": 0.62
+   },
+   "baseline": "contradicts"
+  },
+  {
+   "trap": "scope",
+   "new": "os alunos do 7º ano fazem prova às sextas",
+   "old": "os alunos do 9º ano fazem prova às quartas",
+   "gold": "unrelated",
+   "pred": "unrelated",
+   "conf": 0.87,
+   "probs": {
+    "refines": 0.09,
+    "same": 0.0,
+    "contradicts": 0.01,
+    "unrelated": 0.9
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "units",
+   "new": "a API limita 100 requisições por minuto",
+   "old": "a API limita 6000 requisições por hora",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.29,
+   "probs": {
+    "contradicts": 0.2,
+    "unrelated": 0.02,
+    "refines": 0.31,
+    "same": 0.47000000000000003
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "units",
+   "new": "o timeout do gateway é de 30 segundos",
+   "old": "o gateway desiste depois de meio minuto",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.98,
+    "refines": 0.02
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "units",
+   "new": "o cache expira em 10 minutos",
+   "old": "o cache expira em 600 segundos",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.92,
+   "probs": {
+    "same": 0.94,
+    "contradicts": 0.06,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "units",
+   "new": "o cache expira em 10 minutos",
+   "old": "o cache expira em 10 segundos",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "negation",
+   "new": "não é proibido usar ORM neste projeto",
+   "old": "pode usar ORM neste projeto",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.96,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.01,
+    "refines": 0.02,
+    "same": 0.97
+   },
+   "baseline": "contradicts"
+  },
+  {
+   "trap": "negation",
+   "new": "nunca fazemos deploy na sexta",
+   "old": "deploy na sexta é proibido",
+   "gold": "same",
+   "pred": "same",
+   "conf": 0.97,
+   "probs": {
+    "unrelated": 0.0,
+    "refines": 0.02,
+    "same": 0.98,
+    "contradicts": 0.0
+   },
+   "baseline": "contradicts"
+  },
+  {
+   "trap": "negation",
+   "new": "nunca fazemos deploy na sexta",
+   "old": "sexta é o dia preferido para deploy",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.98,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.99,
+    "refines": 0.0,
+    "unrelated": 0.01
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "slang",
+   "new": "o deploy é pelo GitHub Actions com Helm",
+   "old": "deploy eh pelo actions c/ helm",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "same": 1.0,
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "slang",
+   "new": "o cliente Pedro prefere contato por WhatsApp",
+   "old": "Pedro não curte que mandem zap pra ele, só email",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 1.0,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "slang",
+   "new": "a Ana prefere PRs pequenos",
+   "old": "Ana curte PR enxuto",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "same": 1.0,
+    "refines": 0.0,
+    "unrelated": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "opinion",
+   "new": "o serviço de estoque é escrito em Python",
+   "old": "o Bruno acha que deveríamos reescrever o estoque em Go",
+   "gold": "unrelated",
+   "pred": "contradicts",
+   "conf": 0.23,
+   "probs": {
+    "contradicts": 0.42,
+    "refines": 0.27,
+    "unrelated": 0.3,
+    "same": 0.01
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "refine",
+   "new": "o reembolso sai em até 7 dias",
+   "old": "o reembolso sai em até 7 dias, e em 24h para clientes premium",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "refines": 0.99,
+    "unrelated": 0.0,
+    "same": 0.01,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "refine",
+   "new": "João tem dificuldade em matemática",
+   "old": "João tem dificuldade em matemática, especialmente geometria",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.99,
+   "probs": {
+    "unrelated": 0.0,
+    "same": 0.01,
+    "refines": 0.99,
+    "contradicts": 0.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "turn",
+   "new": "pagamentos sobe via helm chart no k8s",
+   "old": "Como configuro o deploy do serviço de pagamentos no Kubernetes? → Usamos o Helm chart em infra/charts/payments com values-prod.yaml",
+   "gold": "same",
+   "pred": "refines",
+   "conf": 0.81,
+   "probs": {
+    "refines": 0.86,
+    "contradicts": 0.0,
+    "unrelated": 0.01,
+    "same": 0.13
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "turn",
+   "new": "o fluxo de reembolso usa a fila SQS refunds",
+   "old": "Refatora o worker de reembolso → movi o consumo da fila SQS 'refunds' para o RefundWorker e adicionei retry exponencial",
+   "gold": "refines",
+   "pred": "refines",
+   "conf": 0.85,
+   "probs": {
+    "unrelated": 0.0,
+    "contradicts": 0.0,
+    "same": 0.11,
+    "refines": 0.89
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "crossling",
+   "new": "the team prefers small, frequent releases",
+   "old": "o time prefere lançar pouco e com frequência",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "crossling",
+   "new": "la clienta quiere factura en papel",
+   "old": "a cliente pediu nota fiscal só por e-mail, nada impresso",
+   "gold": "contradicts",
+   "pred": "contradicts",
+   "conf": 0.9,
+   "probs": {
+    "same": 0.0,
+    "contradicts": 0.93,
+    "refines": 0.0,
+    "unrelated": 0.07
+   },
+   "baseline": "unrelated"
+  },
+  {
+   "trap": "crossling",
+   "new": "the student is fluent in Spanish",
+   "old": "o aluno fala espanhol fluentemente",
+   "gold": "same",
+   "pred": "same",
+   "conf": 1.0,
+   "probs": {
+    "contradicts": 0.0,
+    "refines": 0.0,
+    "unrelated": 0.0,
+    "same": 1.0
+   },
+   "baseline": "unrelated"
+  }
+ ],
+ "durable": [
+  {
+   "text": "corrige esse teste, e lembra que aqui a gente sempre usa Decimal pra dinheiro",
+   "gold": true,
+   "p": 0.93,
+   "baseline": true
+  },
+  {
+   "text": "por que você usou tabs? neste repo é sempre 2 espaços",
+   "gold": true,
+   "p": 0.92,
+   "baseline": true
+  },
+  {
+   "text": "sempre me responda em português, mesmo quando eu escrever em inglês",
+   "gold": true,
+   "p": 0.92,
+   "baseline": true
+  },
+  {
+   "text": "fix the import, and note that the billing module must never import from ui/",
+   "gold": true,
+   "p": 0.91,
+   "baseline": true
+  },
+  {
+   "text": "arregla el bug; por cierto, el cliente ACME tiene SLA de 2 horas",
+   "gold": true,
+   "p": 0.92,
+   "baseline": true
+  },
+  {
+   "text": "antes de mexer no estoque fala com o Bruno, ele é o dono desse serviço",
+   "gold": true,
+   "p": 0.86,
+   "baseline": true
+  },
+  {
+   "text": "renomeia total para total_bruto no arquivo invoice.py",
+   "gold": false,
+   "p": 0.41,
+   "baseline": true
+  },
+  {
+   "text": "hoje estou com pressa, responde curto",
+   "gold": false,
+   "p": 0.3,
+   "baseline": true
+  },
+  {
+   "text": "explica o que é uma closure em JavaScript com um exemplo",
+   "gold": false,
+   "p": 0.04,
+   "baseline": true
+  },
+  {
+   "text": "roda o build de novo e me mostra só os erros",
+   "gold": false,
+   "p": 0.16,
+   "baseline": true
+  },
+  {
+   "text": "add a log line in the retry loop so I can debug this",
+   "gold": false,
+   "p": 0.09,
+   "baseline": true
+  },
+  {
+   "text": "¿puedes resumir este archivo en tres frases?",
+   "gold": false,
+   "p": 0.08,
+   "baseline": true
+  }
+ ]
+}

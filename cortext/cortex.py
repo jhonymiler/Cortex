@@ -32,7 +32,7 @@ from cortext.core.recall import StructuralQueryParser
 from cortext.core.recall.embedding import EmbeddingRecall
 from cortext.core.recall.pack import pack_for_context
 from cortext.core.text import fold
-from cortext.core.validation import CanonicalValidator, ValidationPolicy, ValidationStatus
+from cortext.core.validation import CanonicalValidator, ValidationPolicy, ValidationResult, ValidationStatus
 from cortext.workers import DreamAgent
 
 
@@ -100,6 +100,7 @@ class CortexV5:
             "writes_total": 0,
             "writes_blocked": 0,
             "writes_warned": 0,
+            "writes_reinforced": 0,
             "recalls_total": 0,
         }
         self._latency: dict[str, deque] = {
@@ -181,6 +182,21 @@ class CortexV5:
         memory = Memory(**kwargs)
 
         with self._lock:
+            # Content addressing: the same fact again (any agent, session or
+            # person) reinforces the stored memory instead of duplicating it.
+            existing = self.graph.find_by_fingerprint(memory.fingerprint)
+            if existing is not None:
+                self._reinforce(existing, memory)
+                self._stats["writes_reinforced"] += 1
+                self._autoflush()
+                self._latency["remember"].append((time.perf_counter() - t0) * 1000)
+                return existing, ValidationResult(
+                    status=ValidationStatus.OK,
+                    reason=f"Reinforced existing memory {existing.id} (same content)",
+                    similar_memory=existing,
+                    metadata={"reinforced": True, "occurrences": existing.occurrence_count},
+                )
+
             result = None
             if validate:
                 result = self.validator.validate_write(memory, self.graph)
@@ -195,6 +211,23 @@ class CortexV5:
             self._autoflush()
             self._latency["remember"].append((time.perf_counter() - t0) * 1000)
         return memory, result
+
+    def _reinforce(self, existing: Memory, new: Memory) -> None:
+        """Fold a restated fact into the stored one: count it, keep the strongest
+        importance, fill missing why/how, and record who restated it."""
+        existing.occurrence_count += 1
+        existing.importance = max(existing.importance, new.importance)
+        if not existing.why and new.why:
+            existing.why = new.why
+        if not existing.how and new.how:
+            existing.how = new.how
+        source = new.metadata.get("author") or new.metadata.get("agent")
+        if source:
+            seen = existing.metadata.setdefault("seen_by", [])
+            if source not in seen and len(seen) < 100:
+                seen.append(source)
+        existing.touch()
+        self.graph.reindex(existing)
 
     def remember_text(
         self,
@@ -257,7 +290,10 @@ class CortexV5:
                 # disk. They reach the store with the next write, flush() or
                 # close() (the daemon also flushes them every few seconds).
                 self.graph.mark_dirty(result.memories)
-            packed = pack_for_context(result.memories, result.intent, max_tokens=max_tokens)
+            # Context reads oldest → newest, so a later correction comes after the
+            # value it corrects; the ranked order stays in result.memories.
+            chronological = sorted(result.memories, key=lambda m: m.created_at)
+            packed = pack_for_context(chronological, result.intent, max_tokens=max_tokens)
             self._stats["recalls_total"] += 1
             self._latency["recall"].append((time.perf_counter() - t0) * 1000)
         return packed, result
@@ -306,6 +342,9 @@ class CortexV5:
             "retrievability": round(retrievability(memory, now), 3),
             "consolidated_into": memory.consolidated_into,
             "is_summary": memory.is_summary,
+            "kind": memory.metadata.get("kind", "memory"),
+            "occurrences": memory.occurrence_count,
+            "alt": memory.alt,
         }
         if query is not None:
             record["match_score"] = round(memory.matches_text(query), 3)

@@ -1,5 +1,5 @@
 import type { On } from 'claude-code'
-import { expect, test } from 'claude-code/testing'
+import { expect, mock, test } from 'claude-code/testing'
 
 const RECALL = {
   context: '<cortext-memory>\n- payments-api | uses idempotency keys\n</cortext-memory>',
@@ -15,7 +15,10 @@ const STATS = {
 }
 
 // What the engine does beneath the plugin, reduced to what this mod touches.
-function engineBeneath(on: On) {
+function engineBeneath(on: On, withClock = true) {
+  if (withClock) {
+    mock.clock(on)
+  }
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('prompt.submit', ($, e) => ({ text: e.text, context: e.context }))
   on('turn.complete', ($, e) => ({ text: e.answer }))
@@ -36,6 +39,12 @@ function fakeDaemon(log: { url: string; body?: string }[]) {
       : path === '/api/recall' ? RECALL
       : path === '/api/turn' ? { stored: true }
       : path === '/api/remember' ? { stored: true, id: 'bbbbbbbb-2222', status: 'OK', reason: '' }
+      : path === '/api/session/end' ? { jobs: [7] }
+      : path === '/api/queue' ? { pending: 1, leased: 0, done: 4, failed: 0 }
+      : path === '/api/queue/lease' ? (log.filter(r => r.url.endsWith('/api/queue/lease')).length === 1
+        ? { id: 7, kind: 'extract', prompt: 'Part of an agent session: ...', system: 'json only', model: 'haiku' }
+        : {})
+      : path === '/api/queue/complete' ? { ok: true, added: ['f1'] }
       : null
     return { value: { status: reply ? 200 : 404, ok: reply !== null, headers: {}, text: JSON.stringify(reply) } }
   }
@@ -59,6 +68,7 @@ test('recalled memory is attached to the prompt, and the turn is stored', async 
     user: 'how do we avoid double charges?',
     assistant: 'We use idempotency keys.',
     agent: 'claude-code',
+    session: expect.any(String),
   })
 })
 
@@ -92,4 +102,37 @@ test('memory_remember tool stores through the daemon', async ($, on) => {
   const sent = JSON.parse(log.find(x => x.url.endsWith('/api/remember'))?.body ?? '{}')
   expect(sent.what).toBe('deploys go through Helm')
   expect(sent.ns).toBe('project:demo')
+})
+
+test('background worker runs queued jobs with the user\'s Haiku and returns the text', async ($, on) => {
+  const log: { url: string; body?: string }[] = []
+  const clock = mock.clock(on)
+  engineBeneath(on, false)
+  on('http.fetch', fakeDaemon(log))
+  const asked: { model: string; prompt: string }[] = []
+  on('model.complete', ($, e) => {
+    asked.push({ model: e.model, prompt: e.prompt })
+    return { value: { isAnswered: true, text: '{"facts": []}', usage: { input_tokens: 10, output_tokens: 5,
+      cache_creation_input_tokens: 0, cache_read_input_tokens: 0 } } }
+  })
+  await $.session.start({ cwd: '/work/demo', surface: 'terminal', isInteractive: true })
+  await clock.advance(20_000)
+  expect(asked).toEqual([{ model: 'haiku', prompt: 'Part of an agent session: ...' }])
+  const done = log.find(r => r.url.endsWith('/api/queue/complete'))
+  expect(JSON.parse(done?.body ?? '{}')).toEqual({ id: 7, text: '{"facts": []}' })
+})
+
+test('turns carry a session id, and session end asks the daemon to abstract it', async ($, on) => {
+  const log: { url: string; body?: string }[] = []
+  engineBeneath(on)
+  on('session.end', ($, e) => ({ sessionId: e.sessionId }))
+  on('http.fetch', fakeDaemon(log))
+  await $.session.start({ cwd: '/work/demo', surface: 'terminal', isInteractive: true })
+  await $.prompt.submit({ text: 'deploy é na quarta agora', wait: false, origin: { kind: 'composer' } })
+  await $.turn.complete({ answer: 'Anotado.', durationMs: 5, isAborted: false, turnId: 't9', reason: 'answer' })
+  const turn = JSON.parse(log.find(r => r.url.endsWith('/api/turn'))?.body ?? '{}')
+  expect(typeof turn.session).toBe('string')
+  await $.session.end({ reason: 'clear', sessionId: 's-1', resume: undefined as never })
+  const end = JSON.parse(log.find(r => r.url.endsWith('/api/session/end'))?.body ?? '{}')
+  expect(end).toEqual({ ns: 'project:demo', session: turn.session })
 })

@@ -165,7 +165,8 @@ class MemoryGraph:
         self._who: dict[str, set[str]] = {}
         self._where: dict[str, set[str]] = {}
         self._nowho: set[str] = set()
-        self._indexed: dict[str, tuple[frozenset[str], tuple[str, ...], str]] = {}
+        self._fp: dict[str, str] = {}  # content fingerprint -> memory id
+        self._indexed: dict[str, tuple[frozenset[str], tuple[str, ...], str, str]] = {}
         # Change tracking for incremental persistence
         self._dirty: set[str] = set()
         self._deleted: set[str] = set()
@@ -197,7 +198,9 @@ class MemoryGraph:
         if not who:
             self._nowho.add(mid)
         _add(self._where, where, mid)
-        self._indexed[mid] = (tokens, who, where)
+        fp = memory.fingerprint
+        self._indexed[mid] = (tokens, who, where, fp)
+        self._fp.setdefault(fp, mid)
         self._dirty.add(mid)
         self._deleted.discard(mid)
         self._version += 1
@@ -206,7 +209,9 @@ class MemoryGraph:
         entry = self._indexed.pop(mid, None)
         if entry is None:
             return
-        tokens, who, where = entry
+        tokens, who, where, fp = entry
+        if self._fp.get(fp) == mid:
+            del self._fp[fp]
         for t in tokens:
             _discard(self._tok, t, mid)
         for w in who:
@@ -370,6 +375,12 @@ class MemoryGraph:
                     if vocab.startswith(t):
                         out |= ids
         return out
+
+    def find_by_fingerprint(self, fp: str) -> Optional[Memory]:
+        """The live (not merged-away) memory with this content address, if any."""
+        mid = self._fp.get(fp)
+        m = self._memories.get(mid) if mid else None
+        return m if m is not None and not m.consolidated_into else None
 
     def ids_for_who(self, name: str) -> set[str]:
         """Memory ids whose participants match ``name`` (exact or by word)."""

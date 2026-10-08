@@ -16,6 +16,10 @@ Pure Python ≥ 3.10, zero required dependencies.
 - Test (single): `.venv/bin/python -m pytest -q tests/test_service.py::test_mcp_protocol`
 - Lint: `.venv/bin/ruff check .` (rule set pinned in `pyproject.toml`)
 - Benchmark: `.venv/bin/python bench/run_benchmark.py` (writes `bench/results/*.json`)
+- Latency at scale: `.venv/bin/python bench/latency_benchmark.py`
+- Value end-to-end (needs `claude` login): `.venv/bin/python bench/value/memory_value.py 60`
+- Model experiments (need `claude`, `JEV_API_KEY` in `.env`): `bench/jev/*.py`; LLM answers
+  are cached in `bench/jev/results/llm_cache.jsonl`, so re-runs resume
 - Daemon: `.venv/bin/cortext-memory serve` (foreground) / `daemon start|stop|status`
 - Dashboard: `.venv/bin/cortext-memory dashboard` → http://127.0.0.1:7077
 - Claude Code mod: `claude plugin validate cortext/agents/claude_mod` and
@@ -30,7 +34,11 @@ Pure Python ≥ 3.10, zero required dependencies.
   `JsonStore` (legacy snapshot)
 - `cortext/cortex.py` — `CortexV5` facade (aliases `CortextV5`, `Cortex`), thread-safe
 - `cortext/server/` — `daemon.py` (HTTP API + `static/dashboard.html`),
-  `engine.py` (multi-namespace service), `client.py` + `config.py` (stdlib only)
+  `engine.py` (multi-namespace service), `queue.py` (job state machine),
+  `abstraction.py` (turns → facts: window → extract → consolidate),
+  `client.py` + `config.py` (stdlib only)
+- `cortext/llm.py` — LLM backends for the daemon worker (`claude -p` on the user's
+  login, OpenAI-compatible http)
 - `cortext/agents/` — `hooks.py` (universal hook adapter), `mcp.py` (stdio MCP),
   `install.py` (per-agent installers), `claude_mod/` (Claude Code function-hook mod)
 - `cortext/hermes_plugin/` — Hermes memory provider shipped in the wheel
@@ -48,6 +56,9 @@ Pure Python ≥ 3.10, zero required dependencies.
 - Installers extend configs (read → merge → write, `*.cortext-backup` once);
   they never replace a user's file.
 - Decay counts from `created_at`/`last_accessed`, not `when` (the event time).
+- Design changes to memory quality are decided by measurement: record the data in
+  `docs/experiments/` (and `docs/EVIDENCE.md`) together with the change.
+- `.env` holds local secrets and is gitignored; never print its values.
 - Recall touches (access counts) are write-behind; new memories are written
   synchronously when a store is attached.
 

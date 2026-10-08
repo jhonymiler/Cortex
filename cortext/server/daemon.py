@@ -239,6 +239,25 @@ class _Handler(BaseHTTPRequestHandler):
         b = self._body()
         self._json(self.engine.dream(b.get("ns") or q.get("ns", "default")))
 
+    def post_session_end(self, q: dict) -> None:
+        b = self._body()
+        self._json({"jobs": self.engine.end_session(b.get("ns") or q.get("ns", "default"), b.get("session", ""))})
+
+    def post_queue_lease(self, q: dict) -> None:
+        b = self._body()
+        self._json(self.engine.lease_job(str(b.get("worker") or "client")) or {})
+
+    def post_queue_complete(self, q: dict) -> None:
+        b = self._body()
+        self._json(self.engine.complete_job(int(b["id"]), str(b.get("text", ""))))
+
+    def post_queue_fail(self, q: dict) -> None:
+        b = self._body()
+        self._json({"state": self.engine.queue.fail(int(b["id"]), str(b.get("error", "worker error")))})
+
+    def get_queue(self, q: dict) -> None:
+        self._json(self.engine.queue.stats(q.get("ns") or None))
+
     def post_shutdown(self, q: dict) -> None:
         self._json({"ok": True})
         threading.Thread(target=self.server.shutdown, daemon=True).start()
@@ -262,6 +281,11 @@ _ROUTES: dict[tuple[str, str], Callable[[_Handler, dict], None]] = {
     ("POST", "/api/recall"): _Handler.post_recall,
     ("POST", "/api/turn"): _Handler.post_turn,
     ("POST", "/api/dream"): _Handler.post_dream,
+    ("POST", "/api/session/end"): _Handler.post_session_end,
+    ("POST", "/api/queue/lease"): _Handler.post_queue_lease,
+    ("POST", "/api/queue/complete"): _Handler.post_queue_complete,
+    ("POST", "/api/queue/fail"): _Handler.post_queue_fail,
+    ("GET", "/api/queue"): _Handler.get_queue,
     ("POST", "/api/shutdown"): _Handler.post_shutdown,
 }
 

@@ -163,8 +163,9 @@ def test_sqlite_namespaces_are_isolated(tmp_path):
 def test_consolidation_survives_reload(tmp_path):
     db = tmp_path / "m.db"
     c = CortexV5(path=db, enable_dream_agent=True, enable_embedding_recall=False)
-    for _ in range(3):
-        c.remember(who=["Ana"], what="Ana pediu commits em inglês", validate=False)
+    base = "Ana pediu que as mensagens de commit sejam escritas em inglês"
+    for extra in ("", " sempre", " agora"):  # near-duplicates (exact repeats are reinforced instead)
+        c.remember(who=["Ana"], what=base + extra, validate=False)
     c.run_dream_cycle()
     archived = sum(1 for m in c.graph.iter_memories() if m.consolidated_into)
     assert archived == 2
@@ -217,3 +218,58 @@ def test_import_is_lazy():
     code = "import sys, cortext, cortext.server.client; print('cortext.cortex' in sys.modules)"
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
     assert out.stdout.strip() == "False"
+
+
+# --- content addressing ------------------------------------------------------------
+
+def test_same_fact_reinforces_instead_of_duplicating():
+    c = CortexV5(enable_embedding_recall=False)
+    first, _ = c.remember(who=["Ana"], what="Prefere PRs curtos.", importance=0.5, metadata={"agent": "claude-code"})
+    again, result = c.remember(who=["ana"], what="prefere prs curtos", why="revisão mais rápida",
+                               importance=0.8, metadata={"agent": "cursor"})
+    assert again.id == first.id and len(c.graph) == 1
+    assert result.metadata["reinforced"] is True
+    assert (first.occurrence_count, first.importance, first.why) == (2, 0.8, "revisão mais rápida")
+    assert first.metadata["seen_by"] == ["cursor"]
+    assert c.stats()["writes"]["writes_reinforced"] == 1
+
+
+def test_fingerprint_ignores_case_accents_punctuation():
+    a = Memory(who=["João"], what="Usa Postgres 15!")
+    b = Memory(who=["joao"], what="usa postgres 15")
+    assert a.fingerprint == b.fingerprint
+    assert a.fingerprint != Memory(who=["João"], what="usa postgres 16").fingerprint
+
+
+def test_fingerprint_index_survives_removal():
+    g = MemoryGraph()
+    m = g.add_memory(Memory(what="fato único"))
+    assert g.find_by_fingerprint(m.fingerprint) is m
+    g.remove_memory(m.id)
+    assert g.find_by_fingerprint(m.fingerprint) is None
+
+
+def test_participant_name_anchors_recall_even_when_frequent():
+    """A customer's namespace mentions the customer everywhere; the name must still anchor."""
+    c = CortexV5(enable_embedding_recall=False)
+    for i in range(30):
+        c.remember(who=["Luis"], what=f"Luis abriu o chamado número {i} sobre faturas", validate=False)
+    c.remember(who=["Luis"], what="Luis prefere contato por e-mail", validate=False)
+    for i in range(10):
+        c.remember(what=f"nota interna irrelevante {i}", validate=False)
+    _, result = c.recall("qual o melhor canal para falar com Luis por e-mail?", touch=False)
+    assert result.memories and result.memories[0].what == "Luis prefere contato por e-mail"
+
+
+def test_newer_correction_survives_cutoff_and_context_is_chronological():
+    from datetime import datetime, timedelta
+
+    c = CortexV5(enable_embedding_recall=False)
+    old, _ = c.remember(what="deploy ledger with a canary at 5% for 30 minutes", validate=False)
+    old.created_at = datetime.now() - timedelta(days=2)
+    new, _ = c.remember(what="actually make the canary 10%", validate=False)
+    for i in range(20):
+        c.remember(what=f"unrelated release note {i}", validate=False)
+    packed, result = c.recall("What canary do we use when deploying ledger?", touch=False)
+    assert {m.id for m in result.memories} >= {old.id, new.id}
+    assert packed.index("5%") < packed.index("10%")  # oldest first: the correction reads last

@@ -14,6 +14,9 @@ export type CortextOverview = {
   recallP50: number
   rememberP50: number
   stored: number
+  queuePending: number
+  queueDone: number
+  queueFailed: number
 }
 
 declare module 'claude-code' {

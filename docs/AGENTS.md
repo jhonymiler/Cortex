@@ -55,6 +55,26 @@ agents, and for any agent with no hooks at all, the MCP server's `instructions`
 These are the same three moments a hook system covers, carried out by the model
 through tools.
 
+## Background abstraction (your own Haiku)
+
+Captured turns go into a queue. Every 4 turns (and at session end) a job asks
+the model which durable facts the window holds. Windows with none are archived
+as noise (87% of turns in the value benchmark). Useful turns stay as they were,
+with the extracted facts indexed on them, so a question in another language or
+in the fact's words finds them. Opt-in `CORTEXT_ABSTRACTION=facts` replaces raw
+turns by consolidated facts instead (measured worse; see docs/EVIDENCE.md).
+Who runs the model:
+
+| Agent | Worker |
+|---|---|
+| Claude Code (mod) | the mod itself, every 20 s, with `$.model.complete({ model: "haiku" })` on your session's login |
+| Cursor, Copilot, others | `cortext-memory serve --llm claude-cli` (the daemon uses your `claude` login), or `cortext-memory queue drain` from a cron job |
+| none configured | nothing is lost: raw turns stay recallable |
+
+See [ARCHITECTURE.md](ARCHITECTURE.md#background-abstraction-turns--durable-facts)
+for the design, and [experiments/2026-10-jev-judge.md](experiments/2026-10-jev-judge.md)
+for the measurements behind it.
+
 ## Claude Code: the mod
 
 `install claude` copies the mod to `~/.cortext/claude-mod`, points its
@@ -79,7 +99,8 @@ What it does:
   buttons to refresh, consolidate and open the dashboard. The status line shows
   `◆ cortext N mem`.
 
-Options (plugin config): `port` (7077), `command` (`cortext-memory`), `inject` (true).
+Options (plugin config): `port` (7077), `command` (`cortext-memory`), `inject` (true),
+`abstract` (true: run the abstraction queue with your Haiku).
 
 If you prefer settings.json command hooks (older builds, or VS Code agent hooks
 reading the same file): `cortext-memory install claude --classic`. Don't install
@@ -153,3 +174,7 @@ protocol versions 2025-06-18, 2025-03-26 and 2024-11-05.
 | POST | `/api/recall` `{ns, query, max_results, max_tokens, touch}` | recall (returns `context`) |
 | POST | `/api/turn` `{ns, user, assistant, agent, session}` | capture an exchange |
 | POST | `/api/dream` `{ns}` | run a consolidation cycle |
+| POST | `/api/session/end` `{ns, session}` | queue abstraction of the session's buffered turns |
+| POST | `/api/queue/lease` `{worker}` → `{id, kind, prompt, system, model}` | take a job (empty object when idle) |
+| POST | `/api/queue/complete` `{id, text}` / `/api/queue/fail` `{id, error}` | return a job's model output |
+| GET | `/api/queue?ns=` | queue state counts |

@@ -77,3 +77,16 @@ def tokenize_all(*parts: str) -> frozenset[str]:
         if p:
             out |= tokenize(p)
     return frozenset(out)
+
+
+_NON_WORD = re.compile(r"[^\w]+")
+
+
+def fingerprint(*parts: str) -> str:
+    """Content address: a short hash of the normalized text (accents, case,
+    punctuation and spacing ignored). Equal facts written by different agents,
+    sessions or people map to the same fingerprint."""
+    import hashlib
+
+    norm = "\x1f".join(_NON_WORD.sub(" ", fold(p or "")).strip() for p in parts)
+    return hashlib.blake2b(norm.encode("utf-8"), digest_size=10).hexdigest()

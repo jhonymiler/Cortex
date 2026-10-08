@@ -32,7 +32,9 @@ const TIER_COLOR: Record<keyof CortextLevels, string> = {
   archived: '#4a4f57',
 }
 
-type Options = { port?: number; command?: string; inject?: boolean }
+type Options = { port?: number; command?: string; inject?: boolean; abstract?: boolean }
+type Job = { id?: number; kind?: string; prompt?: string; system?: string; model?: string }
+type QueueStats = { pending: number; leased: number; done: number; failed: number }
 type RecallReply = { context: string; ms: number; memories: { id: string; tier: string; what: string; who: string[]; how: string }[] }
 type StatsReply = {
   levels: CortextLevels
@@ -45,6 +47,10 @@ type StatsReply = {
 let base = 'http://127.0.0.1:7077'
 let ns = 'default'
 let lastPrompt = ''
+// One id per loaded session: the daemon buffers this session's turns and
+// abstracts them every 4 turns or when the session ends.
+let session = crypto.randomUUID()
+let draining = false
 
 async function api<T>($: EngineInterface, path: string, body?: unknown, method?: string): Promise<T | null> {
   try {
@@ -64,8 +70,39 @@ async function api<T>($: EngineInterface, path: string, body?: unknown, method?:
   }
 }
 
+// Background worker: lease abstraction jobs from the daemon and run them with
+// the user's own small model. The daemon builds every prompt and applies every
+// answer; this only turns a prompt into text, a few jobs per tick.
+async function drainQueue($: EngineInterface, maxJobs: number): Promise<number> {
+  if (draining) {
+    return 0
+  }
+  draining = true
+  let done = 0
+  try {
+    while (done < maxJobs) {
+      const job = await api<Job>($, '/api/queue/lease', { worker: 'claude-code-mod' })
+      if (job === null || job.id === undefined || !job.prompt) {
+        break
+      }
+      const r = await $.model.complete({ model: job.model ?? 'haiku', prompt: job.prompt, system: job.system })
+      if (r.isAnswered) {
+        await api($, '/api/queue/complete', { id: job.id, text: r.text })
+      } else {
+        await api($, '/api/queue/fail', { id: job.id, error: r.reason })
+        break
+      }
+      done += 1
+    }
+  } finally {
+    draining = false
+  }
+  return done
+}
+
 async function refresh($: EngineInterface): Promise<void> {
   const s = await api<StatsReply>($, `/api/stats?ns=${encodeURIComponent(ns)}`)
+  const q = await api<QueueStats>($, `/api/queue?ns=${encodeURIComponent(ns)}`)
   await update($, online, () => s !== null)
   if (s === null) {
     $.ui.status(undefined)
@@ -78,6 +115,9 @@ async function refresh($: EngineInterface): Promise<void> {
     recallP50: s.latency.recall.p50_ms,
     rememberP50: s.latency.remember.p50_ms,
     stored: s.writes.writes_total,
+    queuePending: (q?.pending ?? 0) + (q?.leased ?? 0),
+    queueDone: q?.done ?? 0,
+    queueFailed: q?.failed ?? 0,
   }
   await update($, overview, () => view)
   $.ui.status(`◆ cortext ${view.memories} mem`)
@@ -87,6 +127,7 @@ export const register: Register = (on, options) => {
   const opts = (options ?? {}) as Options
   base = `http://127.0.0.1:${Number(opts.port) || 7077}`
   const inject = opts.inject !== false
+  const abstract = opts.abstract !== false
 
   on('session.start', async ($, e, next) => {
     let health = await api<{ ok: boolean }>($, '/api/health')
@@ -135,6 +176,20 @@ export const register: Register = (on, options) => {
       await refresh($)
     }
     await $.command.register({ name: 'memory', description: 'Cortext: memory levels, last recall, latency' })
+    if (abstract && health !== null) {
+      // Turn raw turns into durable facts in the background, with the user's Haiku.
+      $.clock.every(20_000, () => {
+        void drainQueue($, 2).then(n => (n > 0 ? refresh($) : undefined))
+      })
+    }
+    return next(e)
+  })
+
+  on('session.end', async ($, e, next) => {
+    if (await read($, online)) {
+      await api($, '/api/session/end', { ns, session })
+    }
+    session = crypto.randomUUID()
     return next(e)
   })
 
@@ -164,7 +219,7 @@ export const register: Register = (on, options) => {
   on('turn.complete', async ($, e, next) => {
     const result = await next(e)
     if (e.agentId === undefined && e.reason === 'answer' && lastPrompt && (await read($, online))) {
-      await api($, '/api/turn', { ns, user: lastPrompt, assistant: e.answer, agent: 'claude-code' })
+      await api($, '/api/turn', { ns, user: lastPrompt, assistant: e.answer, agent: 'claude-code', session })
       lastPrompt = ''
       await refresh($)
     }
@@ -245,6 +300,10 @@ export const register: Register = (on, options) => {
           </Text>
           <Text dimColor>
             recall p50 {view.recallP50} ms · write p50 {view.rememberP50} ms
+          </Text>
+          <Text dimColor>
+            background abstraction (your Haiku): {view.queuePending > 0 ? `${view.queuePending} pending · ` : ''}
+            {view.queueDone} done{view.queueFailed > 0 ? ` · ${view.queueFailed} failed` : ''}
           </Text>
         </Box>
         <Box flexDirection="column">

@@ -11,6 +11,7 @@ Usage:
     cortext-memory install <agent>          # claude | cursor | copilot | vscode | mcp
     cortext-memory hook <agent> <event>     # (called by agent hooks)
     cortext-memory mcp                      # MCP server on stdio
+    cortext-memory queue [drain]            # background abstraction (turns -> facts)
     cortext-memory recall "query" | remember "fact" | stats | ns
     cortext-memory setup                    # Hermes wizard
     cortext-memory info
@@ -323,6 +324,9 @@ def cmd_setup(args) -> int:
 def cmd_serve(args) -> int:
     import logging
 
+    if args.llm and args.llm != "off":
+        os.environ["CORTEXT_LLM"] = args.llm
+
     from cortext.server.daemon import serve
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
@@ -453,6 +457,33 @@ def cmd_stats(args) -> int:
     return 0
 
 
+def cmd_queue(args) -> int:
+    from cortext.server import client
+
+    client.ensure_daemon()
+    if args.action == "drain":
+        from cortext.llm import ClaudeCLI, OpenAICompatible
+
+        backend = ClaudeCLI(model=args.model) if args.llm == "claude-cli" else OpenAICompatible(
+            os.environ.get("CORTEXT_LLM_URL", ""), os.environ.get("CORTEXT_LLM_KEY", ""), args.model)
+        done = 0
+        while done < args.max:
+            job = client.post("/api/queue/lease", {"worker": f"cli:{backend.name}"})
+            if not job:
+                break
+            try:
+                text = backend.complete(job["prompt"], job.get("system") or "")
+                r = client.post("/api/queue/complete", {"id": job["id"], "text": text}, timeout=30)
+                _ok(f"job {job['id']} ({job['kind']}): {', '.join(f'{k} {len(v) if isinstance(v, list) else v}' for k, v in r.items() if k != 'ok')}")
+            except Exception as e:
+                client.post("/api/queue/fail", {"id": job["id"], "error": f"{type(e).__name__}: {e}"})
+                _warn(f"job {job['id']} failed: {e}")
+            done += 1
+        _step(f"{done} job(s) processed")
+    print(json.dumps(client.get("/api/queue"), indent=2))
+    return 0
+
+
 def cmd_ns(args) -> int:
     from cortext.server import config
 
@@ -486,6 +517,8 @@ def main(argv=None) -> int:
     p_serve.add_argument("--port", type=int)
     p_serve.add_argument("--db", help="SQLite file (default ~/.cortext/memory.db)")
     p_serve.add_argument("--dream-interval", type=int, default=1800, help="seconds between consolidation cycles (0 = off)")
+    p_serve.add_argument("--llm", choices=["off", "claude-cli", "http"], default=None,
+                         help="run background abstraction in the daemon (claude-cli = your Claude Code login)")
     p_serve.set_defaults(func=cmd_serve)
 
     p_d = sub.add_parser("daemon", help="start/stop/status of the background daemon")
@@ -528,6 +561,13 @@ def main(argv=None) -> int:
     p_st = sub.add_parser("stats", help="memory levels, sizes and latency")
     p_st.add_argument("--ns")
     p_st.set_defaults(func=cmd_stats)
+
+    p_q = sub.add_parser("queue", help="background abstraction queue: status, or drain it once")
+    p_q.add_argument("action", nargs="?", choices=["status", "drain"], default="status")
+    p_q.add_argument("--llm", choices=["claude-cli", "http"], default="claude-cli")
+    p_q.add_argument("--model", default="haiku")
+    p_q.add_argument("--max", type=int, default=50, help="max jobs to process")
+    p_q.set_defaults(func=cmd_queue)
 
     p_ns = sub.add_parser("ns", help="print the namespace for a folder")
     p_ns.add_argument("path", nargs="?")

@@ -135,7 +135,7 @@ def install_claude(plan: Plan, classic: bool = False) -> None:
         def mutate(d: dict) -> bool:
             hooks = d.setdefault("hooks", {})
             changed = False
-            for event in ("SessionStart", "UserPromptSubmit", "Stop"):
+            for event in ("SessionStart", "UserPromptSubmit", "Stop", "SessionEnd"):
                 cmd = hook_cmd("claude", event)
                 entry = {"hooks": [{"type": "command", "command": cmd, "timeout": 15}]}
                 changed |= _add_hook_entry(
@@ -184,7 +184,7 @@ def install_cursor(plan: Plan, project: Path | None = None) -> None:
         d.setdefault("version", 1)
         hooks = d.setdefault("hooks", {})
         changed = False
-        for event in ("sessionStart", "beforeSubmitPrompt", "afterAgentResponse"):
+        for event in ("sessionStart", "beforeSubmitPrompt", "afterAgentResponse", "sessionEnd"):
             changed |= _add_hook_entry(
                 hooks, event, {"command": hook_cmd("cursor", event)},
                 lambda e: "cortext.agents.hooks" in e.get("command", ""),
@@ -223,7 +223,7 @@ def install_copilot(plan: Plan, project: Path | None = None) -> None:
         d.setdefault("version", 1)
         hooks = d.setdefault("hooks", {})
         changed = False
-        for event in ("sessionStart", "userPromptSubmitted", "agentStop"):
+        for event in ("sessionStart", "userPromptSubmitted", "agentStop", "sessionEnd"):
             cmd = hook_cmd("copilot", event)
             changed |= _add_hook_entry(
                 hooks, event, {"type": "command", "bash": cmd, "powershell": cmd, "timeoutSec": 15},

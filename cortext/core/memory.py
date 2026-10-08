@@ -20,7 +20,7 @@ from datetime import datetime
 from typing import Any, Optional
 from uuid import uuid4
 
-from cortext.core.text import tokenize, tokenize_all
+from cortext.core.text import fingerprint as _fingerprint, fold, tokenize, tokenize_all
 
 
 # W5H required fields (the 'what' is the content; rest are optional but recommended)
@@ -78,6 +78,11 @@ class Memory:
     # are in a specific language. Used for tokenization hints and
     # cross-language debug, NOT for retrieval decisions.)
     lang: str | None = None
+
+    # Alternate rendering of the fact, indexed for recall but not shown: the
+    # English pivot of a fact written in another language, so a query in either
+    # language finds it and people writing in different languages consolidate.
+    alt: str = ""
 
     # Token cache for index_tokens() (not part of identity or serialization).
     _tok_key: Any = field(default=None, init=False, repr=False, compare=False)
@@ -164,12 +169,23 @@ class Memory:
         This is what the graph's inverted index stores for the memory, so the
         tokenizer runs once per memory instead of once per memory per query.
         """
-        key = (self.what, self.why, self.how, tuple(self.who or ()), self.where)
+        key = (self.what, self.why, self.how, tuple(self.who or ()), self.where, self.alt)
         if self._tok_key != key:
             where = self.where if self.where and self.where != "default" else ""
-            self._tok_cache = tokenize_all(self.what, self.why, self.how, where, *(self.who or ()))
+            self._tok_cache = tokenize_all(self.what, self.why, self.how, where, self.alt, *(self.who or ()))
             self._tok_key = key
         return self._tok_cache
+
+    @property
+    def fingerprint(self) -> str:
+        """Content address of the fact itself: who + what + where (normalized).
+
+        why/how are left out on purpose: restating the same fact with or
+        without its reason is a reinforcement, not a new memory.
+        """
+        who = " ".join(sorted(fold(w) for w in (self.who or ())))
+        where = self.where if self.where and self.where != "default" else ""
+        return _fingerprint(who, self.what, where)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -190,6 +206,7 @@ class Memory:
             "consolidated_from": list(self.consolidated_from),
             "consolidated_into": self.consolidated_into,
             "is_summary": self.is_summary,
+            "alt": self.alt,
         }
 
     @classmethod
@@ -212,6 +229,7 @@ class Memory:
             consolidated_from=list(data.get("consolidated_from") or []),
             consolidated_into=data.get("consolidated_into"),
             is_summary=bool(data.get("is_summary", False)),
+            alt=data.get("alt") or "",
         )
 
     @classmethod

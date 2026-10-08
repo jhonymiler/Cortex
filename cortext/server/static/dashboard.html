@@ -166,6 +166,8 @@ tbody tr { cursor: pointer; }
 tbody tr:hover { background: var(--surface-2); }
 td .what { font-weight: 550; }
 td .how { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.kindtag { display: inline-block; font-size: 10.5px; font-weight: 650; padding: 1px 7px; border-radius: 999px; margin-right: 6px; background: color-mix(in srgb, var(--t-semantic) 18%, transparent); color: var(--ink); vertical-align: 1px; }
+.kindtag.turn { background: var(--surface-3); color: var(--ink-2); }
 .rbar { display: inline-block; width: 46px; height: 5px; border-radius: 3px; background: var(--surface-3); vertical-align: middle; margin-left: 6px; overflow: hidden; }
 .rbar i { display: block; height: 100%; background: var(--ink-2); }
 .pager { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; color: var(--muted); font-size: 12px; }
@@ -226,6 +228,7 @@ td .how { color: var(--muted); font-size: 12px; margin-top: 2px; }
     <select id="ns" class="ns" title="Namespace (um por projeto)"></select>
     <span class="pill" title="Atualizações ao vivo"><span id="live" class="live-dot"></span><span id="liveText">conectando…</span></span>
     <span class="spacer"></span>
+    <span class="pill" id="queuePill" title="Fila de abstração: turnos viram fatos em segundo plano">fila —</span>
     <span class="pill" id="uptime" title="Tempo de atividade do daemon">—</span>
     <button class="btn" id="dreamBtn" title="Roda um ciclo do DreamAgent: replay, consolida duplicatas, poda esquecidas">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 9.5A5.5 5.5 0 1 1 6.5 3 4.5 4.5 0 0 0 13 9.5z"/></svg>Consolidar
@@ -356,7 +359,7 @@ const TIER_DESC = {
   fading: "Retenção caindo — candidata ao esquecimento.",
   archived: "Consolidada em outra memória; mantida para auditoria.",
 };
-const OPS_PT = { remember: "gravou", recall: "lembrou", turn: "turno", dream: "consolidou", forget: "esqueceu", load: "carregou", digest: "resumo" };
+const OPS_PT = { remember: "gravou", recall: "lembrou", turn: "turno", dream: "consolidou", forget: "esqueceu", load: "carregou", digest: "resumo", abstract: "abstraiu" };
 
 const $ = (id) => document.getElementById(id);
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -411,6 +414,11 @@ async function loadOverview() {
   }
   const opts = names.length ? o.namespaces : [{ name: state.ns, memories: 0 }];
   sel.innerHTML = opts.map((n) => `<option value="${esc(n.name)}" ${n.name === state.ns ? "selected" : ""}>${esc(n.name)} · ${fmt(n.memories)}</option>`).join("");
+  const qd = o.queue || {};
+  const busy = (qd.pending || 0) + (qd.leased || 0);
+  $("queuePill").textContent = `fila ${busy ? busy + " na fila" : "em dia"} · ${fmt(qd.done || 0)} feitos${qd.failed ? " · " + qd.failed + " falhas" : ""}`;
+  $("queuePill").title = o.llm ? `Worker do daemon: ${o.llm}. O mod do Claude Code também processa a fila com o seu Haiku.`
+                               : "Sem worker no daemon; o mod do Claude Code processa a fila com o seu Haiku.";
   const up = o.uptime_s;
   $("uptime").textContent = "ativo há " + (up < 90 ? Math.round(up) + "s" : up < 5400 ? Math.round(up / 60) + " min" : (up / 3600).toFixed(1) + " h");
 }
@@ -734,7 +742,7 @@ async function loadTable(whoFilter) {
     const r = await api("/api/memories?" + params);
     $("rows").innerHTML = r.memories.length ? r.memories.map((m) => `
       <tr data-id="${esc(m.id)}">
-        <td><div class="what">${esc(m.what)}</div>${m.how ? `<div class="how">→ ${esc(m.how.slice(0, 140))}</div>` : ""}</td>
+        <td><div class="what">${m.kind === "fact" ? '<span class="kindtag">fato</span>' : m.kind === "turn" ? '<span class="kindtag turn">turno</span>' : ""}${esc(m.what)}${m.occurrences > 1 ? ` <span class="kindtag" title="Reafirmada ${m.occurrences} vezes">×${m.occurrences}</span>` : ""}</div>${m.how ? `<div class="how">→ ${esc(m.how.slice(0, 140))}</div>` : ""}</td>
         <td><span class="tag" style="--c:${tierColor(m.tier)}">${TIER_PT[m.tier]}</span></td>
         <td>${esc(m.who.join(", ")) || '<span style="color:var(--muted)">—</span>'}</td>
         <td class="num">${m.importance.toFixed(2)}</td>
@@ -765,6 +773,9 @@ async function openDrawer(id) {
       row("Gravada", new Date(m.created_at).toLocaleString("pt-BR")) +
       row("Uso", `${m.access_count} acessos${m.last_accessed ? " · último " + new Date(m.last_accessed).toLocaleString("pt-BR") : ""}`) +
       row("Import.", m.importance.toFixed(2)) + row("Retenção", Math.round(m.retrievability * 100) + "%") +
+      row("Origem", m.kind === "fact" ? "fato abstraído pela fila" : m.kind === "turn" ? "turno bruto capturado" : "gravada diretamente") +
+      row("Inglês", m.alt ? esc(m.alt) : "") +
+      row("Reafirmada", m.occurrences > 1 ? `${m.occurrences} vezes` : "") +
       row("Id", `<code style="font-family:var(--mono);font-size:12px">${esc(m.id)}</code>`);
     $("dNeighbors").innerHTML = m.neighbors.length ? m.neighbors.map(resultCard).join("") : '<div class="empty">Sem vizinhas (nenhum participante em comum).</div>';
     bindResults($("dNeighbors"));

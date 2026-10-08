@@ -29,3 +29,8 @@ data/
 
 # Playwright / browser tool output
 browser-outputs/
+
+# Local secrets
+.env
+.env.*
+!.env.example

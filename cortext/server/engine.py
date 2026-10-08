@@ -10,7 +10,9 @@ dashboard, and a background DreamAgent loop.
 
 from __future__ import annotations
 
+import json
 import logging
+import os
 import re
 import threading
 import time
@@ -35,7 +37,8 @@ _TRIVIAL = re.compile(
 _INJECTED = re.compile(r"<cortext-memory>.*?</cortext-memory>", re.DOTALL)
 _WS = re.compile(r"\s+")
 
-CONTEXT_HEADER = "Cortext memory — facts recalled from earlier sessions (may be stale; verify before relying on them):"
+CONTEXT_HEADER = ("Cortext memory — facts recalled from earlier sessions, oldest first; a later entry "
+                  "supersedes an earlier one it contradicts (may be stale; verify before relying on them):")
 
 
 def _one_line(text: str, limit: int) -> str:
@@ -60,8 +63,20 @@ class MemoryEngine:
         validation_policy: ValidationPolicy = ValidationPolicy.WARN,
         dream_interval_seconds: int = 1800,
         enable_embeddings: bool = True,
+        llm: Any = "env",
     ) -> None:
+        from cortext.llm import from_env
+        from cortext.server.abstraction import Abstractor
+        from cortext.server.queue import JobQueue
+
         self.store = SQLiteStore(db_path)
+        # Background abstraction: jobs persist in the same SQLite file. The
+        # daemon runs them itself only with an LLM backend (CORTEXT_LLM); the
+        # Claude Code mod can lease and run them with the user's own model.
+        self.queue = JobQueue(self.store._conn, self.store._lock)
+        self.abstractor = Abstractor(self, mode=os.environ.get("CORTEXT_ABSTRACTION", "gate"))
+        self.llm = from_env() if llm == "env" else llm
+        self._worker_thread: Optional[threading.Thread] = None
         self.validation_policy = validation_policy
         self.enable_embeddings = enable_embeddings
         self._cortex: dict[str, CortexV5] = {}
@@ -128,6 +143,10 @@ class MemoryEngine:
         c = self.cortex(namespace)
         t0 = time.perf_counter()
         fields = {k: v for k, v in fields.items() if v not in (None, "")}
+        # Who is writing (an agent, or a person in team mode) travels as metadata.
+        source = {k: fields.pop(k) for k in ("agent", "author") if k in fields}
+        if source:
+            fields["metadata"] = {**(fields.get("metadata") or {}), **source}
         if text and not fields.get("what"):
             memory, result = c.remember_text(
                 text,
@@ -173,7 +192,7 @@ class MemoryEngine:
         from cortext.core.recall.text_extractor import extract_via_heuristic
 
         data = extract_via_heuristic(prompt)
-        return self.remember(
+        out = self.remember(
             namespace,
             what=prompt,
             who=data.get("who") or [],
@@ -182,6 +201,48 @@ class MemoryEngine:
             importance=0.5,
             metadata={k: v for k, v in {"agent": agent, "session": session, "kind": "turn"}.items() if v},
         )
+        if out.get("stored") and out.get("id"):
+            job = self.abstractor.on_turn(namespace, session, out["id"])
+            if job is not None:
+                out["abstract_job"] = job
+        return out
+
+    def end_session(self, namespace: str, session: str = "") -> list[int]:
+        """Queue abstraction of whatever the session left buffered."""
+        return self.abstractor.flush(namespace, session or None)
+
+    # === Queue (workers: the daemon's LLM backend, or the Claude Code mod) ===
+
+    def lease_job(self, worker: str) -> Optional[dict[str, Any]]:
+        """Hand a worker the next job as a ready prompt (None when idle)."""
+        from cortext.llm import DEFAULT_SYSTEM
+
+        while True:
+            job = self.queue.lease(worker, kinds=["extract", "consolidate"])
+            if job is None:
+                return None
+            prompt = self.abstractor.prompt_for(job)
+            if prompt is not None:
+                return {"id": job["id"], "kind": job["kind"], "ns": job["ns"], "prompt": prompt,
+                        "system": DEFAULT_SYSTEM, "model": "haiku"}
+            self.queue.complete(job["id"], {"skipped": "nothing to do"})
+
+    def complete_job(self, job_id: int, text: str) -> dict[str, Any]:
+        job = self.queue.get(job_id)
+        if job is None or job["state"] != "leased":
+            return {"ok": False, "error": "unknown or not leased"}
+        full = {**job, "payload": self._job_payload(job_id)}
+        try:
+            result = self.abstractor.apply(full, text)
+        except Exception as e:
+            return {"ok": False, "state": self.queue.fail(job_id, f"{type(e).__name__}: {e}")}
+        self.queue.complete(job_id, result)
+        return {"ok": True, **result}
+
+    def _job_payload(self, job_id: int) -> dict[str, Any]:
+        with self.store._lock:
+            row = self.store._conn.execute("SELECT payload FROM jobs WHERE id=?", (job_id,)).fetchone()
+        return json.loads(row[0]) if row else {}
 
     def forget(self, namespace: str, memory_id: str) -> bool:
         t0 = time.perf_counter()
@@ -263,6 +324,22 @@ class MemoryEngine:
         return written
 
     def start_background(self) -> None:
+        if self.llm is not None and self._worker_thread is None:
+            def worker() -> None:
+                last_idle_check = 0.0
+                while not self._stop.is_set():
+                    try:
+                        if time.time() - last_idle_check > 30:
+                            self.abstractor.flush_idle()
+                            last_idle_check = time.time()
+                        if self.abstractor.work_once(self.llm, worker=f"daemon:{self.llm.name}") is None:
+                            self._stop.wait(2.0)
+                    except Exception as e:  # keep the worker alive
+                        logger.warning("abstraction worker: %s", e)
+                        self._stop.wait(5.0)
+
+            self._worker_thread = threading.Thread(target=worker, name="cortext-abstract", daemon=True)
+            self._worker_thread.start()
         if self._flush_thread is None:
             def flusher() -> None:
                 while not self._stop.wait(2.0):
@@ -309,12 +386,16 @@ class MemoryEngine:
                 for op, v in lat.items()
             },
             "uptime_s": round(time.time() - self.started_at, 1),
+            "queue": self.queue.stats(),
+            "llm": self.llm.name if self.llm is not None else None,
             "last_dream": self.last_dream,
             "db": str(self.store.path),
         }
 
     def close(self) -> None:
         self._stop.set()
+        for ns in list(self._cortex):
+            self.abstractor.flush(ns)  # buffered turns become jobs; they persist for the next run
         with self._lock:
             for c in self._cortex.values():
                 try:
