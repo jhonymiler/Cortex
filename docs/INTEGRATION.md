@@ -75,7 +75,18 @@ def persist_node(state):
 
 ## Persistence
 
-The bridge holds an in-memory graph. Persist it across runs:
+Give the facade (or the bridge) a file and every write is persisted
+incrementally — only what changed is written, in one SQLite transaction:
+
+```python
+cortex = CortextV5(namespace="session-1", path="~/.cortext/memory.db")   # SQLite (recommended)
+bridge = AgentMemoryBridge(namespace="session-1", path="~/.cortext/memory.db")
+```
+
+One SQLite file holds any number of namespaces. Access counts from recall are
+written behind (on the next write, `flush()` or `close()`), so a read never waits
+on the disk. A `.json` path keeps the legacy snapshot format, written on
+`flush()`/`close()`:
 
 ```python
 from cortext.core.graph import MemoryGraph
@@ -83,6 +94,11 @@ from cortext.core.graph import MemoryGraph
 bridge.cortex.graph = MemoryGraph.load(store_path, namespace="session-1")  # startup
 bridge.cortex.graph.save(store_path)                                       # after writes
 ```
+
+## Coding agents (Claude Code, Cursor, Copilot, any MCP client)
+
+See [AGENTS.md](AGENTS.md): the local daemon, the hook adapter, the MCP server,
+the Claude Code mod and one-command installers.
 
 ## Background consolidation
 
@@ -111,7 +127,7 @@ cortext-memory setup           # wizard: detect Hermes, install plugin, configur
 The `cortext-memory` CLI bundles the plugin in the wheel and drops it into
 `~/.hermes/plugins/cortext`, then writes `$HERMES_HOME/cortext.json`. The
 provider recalls before each turn, stores after, persists to
-`$HERMES_HOME/cortext_<namespace>.json`, runs the DreamAgent in the background,
+`$HERMES_HOME/cortext.db` (incremental SQLite), runs the DreamAgent in the background,
 and optionally exposes a `cortext_inspect` tool. See
 [integrations/hermes/README.md](../integrations/hermes/README.md) for the full
 manual and the annotated config.

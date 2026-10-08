@@ -1,0 +1,14 @@
+{
+  "name": "cortext",
+  "description": "Cortext — low-latency long-term memory for Claude Code (function-hook mod).",
+  "owner": {
+    "name": "Jhony Miler"
+  },
+  "plugins": [
+    {
+      "name": "cortext",
+      "source": "./cortext/agents/claude_mod",
+      "description": "Long-term memory for Claude Code: recall into every prompt, store every turn, /memory pane. Needs `pip install cortext-memory`."
+    }
+  ]
+}
