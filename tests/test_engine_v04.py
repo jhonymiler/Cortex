@@ -247,3 +247,29 @@ def test_fingerprint_index_survives_removal():
     assert g.find_by_fingerprint(m.fingerprint) is m
     g.remove_memory(m.id)
     assert g.find_by_fingerprint(m.fingerprint) is None
+
+
+def test_participant_name_anchors_recall_even_when_frequent():
+    """A customer's namespace mentions the customer everywhere; the name must still anchor."""
+    c = CortexV5(enable_embedding_recall=False)
+    for i in range(30):
+        c.remember(who=["Luis"], what=f"Luis abriu o chamado número {i} sobre faturas", validate=False)
+    c.remember(who=["Luis"], what="Luis prefere contato por e-mail", validate=False)
+    for i in range(10):
+        c.remember(what=f"nota interna irrelevante {i}", validate=False)
+    _, result = c.recall("qual o melhor canal para falar com Luis por e-mail?", touch=False)
+    assert result.memories and result.memories[0].what == "Luis prefere contato por e-mail"
+
+
+def test_newer_correction_survives_cutoff_and_context_is_chronological():
+    from datetime import datetime, timedelta
+
+    c = CortexV5(enable_embedding_recall=False)
+    old, _ = c.remember(what="deploy ledger with a canary at 5% for 30 minutes", validate=False)
+    old.created_at = datetime.now() - timedelta(days=2)
+    new, _ = c.remember(what="actually make the canary 10%", validate=False)
+    for i in range(20):
+        c.remember(what=f"unrelated release note {i}", validate=False)
+    packed, result = c.recall("What canary do we use when deploying ledger?", touch=False)
+    assert {m.id for m in result.memories} >= {old.id, new.id}
+    assert packed.index("5%") < packed.index("10%")  # oldest first: the correction reads last

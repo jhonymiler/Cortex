@@ -188,9 +188,7 @@ class StructuralQueryParser:
             if more:
                 scored.extend(score_all(more))
                 scored.sort(key=_rank_key)
-        # Relative cutoff: a result must score at least half of the best one,
-        # so a strong match isn't diluted by memories that merely share a
-        # common word (each of those costs prompt tokens).
+        # Relative cutoff: drop matches under half the best score.
         if scored:
             floor = 0.5 * scored[0][1]
             scored = [item for item in scored if item[1] >= floor]
@@ -278,6 +276,7 @@ class StructuralQueryParser:
         hits: dict[str, int] = {}
         mass: dict[str, float] = {}
         best: dict[str, float] = {}
+        matched: dict[str, set[str]] = {}
         known_mass = 0.0
         for t in query_tokens:
             postings = graph.ids_for_token(t)
@@ -288,6 +287,7 @@ class StructuralQueryParser:
             for mid in postings:
                 hits[mid] = hits.get(mid, 0) + 1
                 mass[mid] = mass.get(mid, 0.0) + idf
+                matched.setdefault(mid, set()).add(t)
                 if idf > best.get(mid, 0.0):
                     best[mid] = idf
         if not hits:
@@ -297,21 +297,40 @@ class StructuralQueryParser:
         # "Informative": the term is in at most ~10% of memories (small graphs exempt).
         informative = math.log(1 + n / max(1.0, 0.1 * n)) if n >= 20 else 0.0
         scored: list[tuple["Memory", float]] = []
+        rejected: list["Memory"] = []
         get = graph.get_memory
         for mid, h in hits.items():
-            if h < need_all and not (mass[mid] >= 0.5 * known_mass and best[mid] >= informative):
-                continue
             mem = get(mid)
             if mem is None or mem.consolidated_into:
                 continue
-            # A query term naming a participant outweighs a mere mention.
+            # A query term naming a participant outweighs a mere mention, and
+            # anchors the match even when the name is everywhere (a customer's
+            # own namespace mentions the customer in most memories).
             is_participant = bool(mem.who) and not tokenize_all(*mem.who).isdisjoint(query_tokens)
+            if h < need_all and not (mass[mid] >= 0.5 * known_mass and (best[mid] >= informative or is_participant)):
+                rejected.append(mem)
+                continue
             scored.append((mem, mass[mid] / known_mass + (0.25 if is_participant else 0.0) + h * 1e-3))
         scored.sort(key=_rank_key)
-        # Relative cutoff: a result must score at least half of the best one,
-        # so a strong match isn't diluted by memories that merely share a
-        # common word (each of those costs prompt tokens).
         if scored:
-            floor = 0.5 * scored[0][1]
-            scored = [item for item in scored if item[1] >= floor]
+            top_mem, top_score = scored[0]
+            top_terms = matched.get(top_mem.id, set())
+            # Relative cutoff: a result must score at least half of the best one,
+            # so a strong match isn't diluted by memories that merely share a
+            # common word (each of those costs prompt tokens).
+            before_cut = [m for m, _ in scored]
+            scored = [item for item in scored if item[1] >= 0.5 * top_score]
+            # ...except a memory NEWER than the best one, sharing one of its
+            # matched terms with real weight: it may be its correction
+            # ("actually make the canary 10%" after "canary at 5%"). The context
+            # is packed oldest-first, so the agent reads the correction last.
+            kept = {m.id for m, _ in scored}
+            # the shared term must be rare (a subject like "canary", not "deploy")
+            rare = {t for t in top_terms if graph.document_frequency(t) <= max(2, 0.1 * n)}
+            newer = [m for m in rejected + before_cut
+                     if m.id not in kept and m.created_at > top_mem.created_at
+                     and matched.get(m.id, set()) & rare]
+            if newer:  # at most one: a correction is usually a single, latest statement
+                latest = max(newer, key=lambda m: m.created_at)
+                scored.append((latest, mass[latest.id] / known_mass))
         return scored[:max_results]

@@ -290,7 +290,10 @@ class CortexV5:
                 # disk. They reach the store with the next write, flush() or
                 # close() (the daemon also flushes them every few seconds).
                 self.graph.mark_dirty(result.memories)
-            packed = pack_for_context(result.memories, result.intent, max_tokens=max_tokens)
+            # Context reads oldest → newest, so a later correction comes after the
+            # value it corrects; the ranked order stays in result.memories.
+            chronological = sorted(result.memories, key=lambda m: m.created_at)
+            packed = pack_for_context(chronological, result.intent, max_tokens=max_tokens)
             self._stats["recalls_total"] += 1
             self._latency["recall"].append((time.perf_counter() - t0) * 1000)
         return packed, result

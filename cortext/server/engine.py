@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import threading
 import time
@@ -36,7 +37,8 @@ _TRIVIAL = re.compile(
 _INJECTED = re.compile(r"<cortext-memory>.*?</cortext-memory>", re.DOTALL)
 _WS = re.compile(r"\s+")
 
-CONTEXT_HEADER = "Cortext memory — facts recalled from earlier sessions (may be stale; verify before relying on them):"
+CONTEXT_HEADER = ("Cortext memory — facts recalled from earlier sessions, oldest first; a later entry "
+                  "supersedes an earlier one it contradicts (may be stale; verify before relying on them):")
 
 
 def _one_line(text: str, limit: int) -> str:
@@ -72,7 +74,7 @@ class MemoryEngine:
         # daemon runs them itself only with an LLM backend (CORTEXT_LLM); the
         # Claude Code mod can lease and run them with the user's own model.
         self.queue = JobQueue(self.store._conn, self.store._lock)
-        self.abstractor = Abstractor(self)
+        self.abstractor = Abstractor(self, mode=os.environ.get("CORTEXT_ABSTRACTION", "gate"))
         self.llm = from_env() if llm == "env" else llm
         self._worker_thread: Optional[threading.Thread] = None
         self.validation_policy = validation_policy
